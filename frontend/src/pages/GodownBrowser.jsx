@@ -21,14 +21,14 @@ const GodownBrowser = () => {
         }
 
         // Vendor ki dukan lao
-        fetch('http://localhost:5000/api/shops/my-shop', {
+        fetch('/api/shops/my-shop', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
             .then(shopData => setShop(shopData));
 
         // Godown items lao
-        fetch('http://localhost:5000/api/master-products')
+        fetch('/api/master-products')
             .then(res => res.json())
             .then(data => setGodownItems(Array.isArray(data) ? data : []));
     }, [token, user, navigate]);
@@ -45,7 +45,7 @@ const GodownBrowser = () => {
             formData.append('image', selectedItem.image); // String URL
         }
 
-        await fetch('http://localhost:5000/api/products', {
+        await fetch('/api/products', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData

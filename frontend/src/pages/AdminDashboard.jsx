@@ -34,7 +34,7 @@ const AdminDashboard = () => {
 
     const fetchShops = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/shops');
+            const res = await fetch('/api/shops');
             const data = await res.json();
             setShops(data);
             setLoadingShops(false);
@@ -53,7 +53,7 @@ const AdminDashboard = () => {
         setIsSubmitting(true);
 
         try {
-            const res = await fetch('http://localhost:5000/api/admin/onboard', {
+            const res = await fetch('/api/admin/onboard', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

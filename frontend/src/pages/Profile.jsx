@@ -15,7 +15,7 @@ const Profile = () => {
             return;
         }
 
-        fetch('http://localhost:5000/api/orders/customer', {
+        fetch('/api/orders/customer', {
             headers: {
                 'Authorization': `Bearer ${token}` // Ye raha apna VIP Pass (Token)
             }

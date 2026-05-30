@@ -33,7 +33,7 @@ const VendorDashboard = () => {
         }
 
         // Vendor ki dukan ki details lao
-        fetch('http://localhost:5000/api/shops/my-shop', {
+        fetch('/api/shops/my-shop', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
@@ -46,7 +46,7 @@ const VendorDashboard = () => {
             });
 
         // Fetch Godown Items
-        fetch('http://localhost:5000/api/master-products')
+        fetch('/api/master-products')
             .then(res => res.json())
             .then(data => setGodownItems(Array.isArray(data) ? data : []));
 
@@ -98,7 +98,7 @@ const VendorDashboard = () => {
     };
 
     const fetchOrders = (isInitial = false) => {
-        fetch('http://localhost:5000/api/orders/vendor', {
+        fetch('/api/orders/vendor', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
@@ -126,7 +126,7 @@ const VendorDashboard = () => {
     };
 
     const fetchProducts = (shopId) => {
-        fetch(`http://localhost:5000/api/products/${shopId}`)
+        fetch(`/api/products/${shopId}`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) setProducts(data);
@@ -135,7 +135,7 @@ const VendorDashboard = () => {
     };
 
     const handleUpdateOrderStatus = async (orderId, newStatus) => {
-        await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+        await fetch(`/api/orders/${orderId}/status`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ status: newStatus })
@@ -144,7 +144,7 @@ const VendorDashboard = () => {
     };
 
     const handleToggleStock = async (productId, currentStatus) => {
-        await fetch(`http://localhost:5000/api/products/${productId}`, {
+        await fetch(`/api/products/${productId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ inStock: !currentStatus })
@@ -154,7 +154,7 @@ const VendorDashboard = () => {
 
     const handleDeleteProduct = async (productId) => {
         if (!window.confirm("Are you sure? Delete this item?")) return;
-        await fetch(`http://localhost:5000/api/products/${productId}`, {
+        await fetch(`/api/products/${productId}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -174,7 +174,7 @@ const VendorDashboard = () => {
             formData.append('image', selectedGodownImage);
         }
 
-        await fetch('http://localhost:5000/api/products', {
+        await fetch('/api/products', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
@@ -199,7 +199,7 @@ const VendorDashboard = () => {
         const updatedCategories = [...(shop.customCategories || []), newCategory.trim()];
         
         try {
-            const res = await fetch(`http://localhost:5000/api/shops/${shop._id}`, {
+            const res = await fetch(`/api/shops/${shop._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ customCategories: updatedCategories })
@@ -214,7 +214,7 @@ const VendorDashboard = () => {
 
     const handleToggleShopStatus = async () => {
         try {
-            const res = await fetch(`http://localhost:5000/api/shops/${shop._id}`, {
+            const res = await fetch(`/api/shops/${shop._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ isOpen: !shop.isOpen })

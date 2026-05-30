@@ -8,7 +8,7 @@ const Home = () => {
 
     // Backend se saari dukanen (Shops) le kar aate hain
     useEffect(() => {
-        fetch('http://localhost:5000/api/shops')
+        fetch('/api/shops')
             .then(res => res.json())
             .then(data => {
                 setShops(data);
@@ -148,7 +148,7 @@ const Home = () => {
                                         <div className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex-shrink-0 flex items-center justify-center text-2xl sm:text-3xl overflow-hidden transition-transform duration-300 group-hover:scale-105 ${shop.isOpen ? 'bg-gradient-to-br from-amber-50 to-yellow-100 border-2 border-amber-200/50 shadow-sm' : 'bg-gray-100 border-2 border-gray-200'}`}>
                                             {shop.image ? (
                                                 <img 
-                                                    src={`http://localhost:5000${shop.image}`} 
+                                                    src={`${shop.image}`} 
                                                     alt={shop.name} 
                                                     className={`w-full h-full object-cover ${!shop.isOpen ? 'grayscale opacity-60' : ''}`} 
                                                 />

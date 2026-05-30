@@ -1,0 +1,43 @@
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+
+// 1. Protect Logic: Token verify karna
+const protect = async (req, res, next) => {
+    let token;
+
+    // Check kar rahe hain ki header me token bheja gaya hai ya nahi
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        try {
+            // "Bearer token123" me se sirf "token123" ko nikal rahe hain
+            token = req.headers.authorization.split(" ")[1];
+
+            // JWT Secret se token ko verify karte hain
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            // Token me user ki ID hoti hai, usse hum database se user nikal kar request me save kar rahe hain (password chhod kar)
+            req.user = await User.findById(decoded.id).select("-password");
+
+            // Agar sab theek hai toh agle step (controller) par jane do
+            next();
+        } catch (error) {
+            console.error("Token verification error:", error);
+            res.status(401).json({ message: "Not authorized, token failed" });
+        }
+    } else {
+        res.status(401).json({ message: "Not authorized, no token" });
+    }
+};
+
+// 2. Authorize Logic: User ka role check karna
+const authorize = (...roles) => {
+    return (req, res, next) => {
+        // Agar request me user nahi hai ya uska role allowed roles me nahi hai
+        if (!req.user || !roles.includes(req.user.role)) {
+            return res.status(403).json({ message: "Forbidden: You don't have permission to access this" });
+        }
+        // Agar role allowed hai toh aage jane do
+        next();
+    };
+};
+
+module.exports = { protect, authorize };

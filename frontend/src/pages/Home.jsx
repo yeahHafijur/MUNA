@@ -179,9 +179,14 @@ const Home = () => {
                                                 </h3>
                                             </div>
                                             
-                                            <p className={`text-xs leading-snug line-clamp-1 mb-2.5 ${shop.isOpen ? 'text-gray-500' : 'text-gray-400'}`}>
-                                                📍 {shop.address}
-                                            </p>
+                                            <div className={`text-xs leading-snug mb-2.5 ${shop.isOpen ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                <p className="line-clamp-1 mb-1">📍 {shop.address}</p>
+                                                {shop.vendorId?.phone && (
+                                                    <p className="font-semibold text-[10px] bg-gray-100 inline-block px-1.5 py-0.5 rounded text-gray-600">
+                                                        📞 {shop.vendorId.phone}
+                                                    </p>
+                                                )}
+                                            </div>
 
                                             {/* Tags Row */}
                                             <div className="flex items-center gap-2 flex-wrap">
@@ -203,6 +208,19 @@ const Home = () => {
                                                 <span className={`text-[10px] font-bold flex items-center gap-0.5 ${shop.isOpen ? 'text-gray-600' : 'text-gray-400'}`}>
                                                     ⭐ {shop.rating || '4.5'}
                                                 </span>
+
+                                                {/* Directions Button */}
+                                                {shop.location?.coordinates && (
+                                                    <button 
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank');
+                                                        }}
+                                                        className={`ml-auto flex-shrink-0 text-[10px] font-bold px-2 py-1 rounded-md transition-colors border ${shop.isOpen ? 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'}`}
+                                                    >
+                                                        🗺️ Directions
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
 

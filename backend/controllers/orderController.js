@@ -75,12 +75,30 @@ const placeOrder = async (req, res) => {
         }
         // ---------------------------------------------------------
 
+        // Recalculate delivery fee securely on backend
+        const settings = shop.deliverySettings || { minimumCharge: 10, minimumDistance: 2, chargePerKm: 5 };
+        let fee = settings.minimumCharge;
+        if (distance > settings.minimumDistance) {
+            const extraKm = Math.ceil(distance - settings.minimumDistance);
+            fee += (extraKm * settings.chargePerKm);
+        }
+
+        // Validate items total
+        let itemsTotal = 0;
+        for (const item of items) {
+            itemsTotal += (item.price * item.quantity);
+        }
+
+        // Final total amount
+        const finalTotalAmount = itemsTotal + fee;
+
         // Sab theek hai, toh ab Order banate hain!
         const order = await Order.create({
             customerId: req.user._id, // Bouncer (authMiddleware) se customer ki id mil gayi
             shopId,
             items,
-            totalAmount,
+            totalAmount: finalTotalAmount,
+            deliveryFee: fee,
             deliveryLocation
         });
 
@@ -113,7 +131,7 @@ const getVendorOrders = async (req, res) => {
         }
 
         const orders = await Order.find({ shopId: shop._id })
-            .populate('customerId', 'name email') // Customer ka naam
+            .populate('customerId', 'name email phone') // Customer ka naam aur number
             .sort('-createdAt');
         res.status(200).json(orders);
     } catch (error) {

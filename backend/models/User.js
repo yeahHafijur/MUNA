@@ -5,14 +5,16 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    email: {
+    phone: {
         type: String,
-        required: true,
-        unique: true
+        unique: true,
+        sparse: true // Allows multiple users to have no phone (null) for legacy compatibility
+    },
+    email: {
+        type: String
     },
     password: {
-        type: String,
-        required: true
+        type: String
     },
     role: {
         type: String,

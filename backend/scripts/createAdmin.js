@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 // MongoDB URI
-const MONGO_URI = "mongodb://127.0.0.1:27017/muna"; // Replace with your actual URI if different
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/muna"; // Replace with your actual URI if different
 
 const createSuperAdmin = async () => {
     try {
@@ -13,34 +15,28 @@ const createSuperAdmin = async () => {
 
         // Master admin details
         const name = "Super Admin";
-        const email = "admin@muna.com";
-        const password = "admin";
+        const phone = "9999999999"; // Default phone for admin
         
         // Check if admin already exists
-        const existingAdmin = await User.findOne({ email });
+        const existingAdmin = await User.findOne({ phone });
         if (existingAdmin) {
             console.log("⚠️ Master Admin pehle se bana hua hai.");
             process.exit(0);
         }
 
-        // Hash the password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
         // Create the user
         const newAdmin = await User.create({
             name,
-            email,
-            password: hashedPassword,
+            phone,
             role: "super_admin"
         });
 
         console.log("🎉 Master Admin ban gaya!");
         console.log("-----------------------------------------");
-        console.log(`Email: ${email}`);
-        console.log(`Password: ${password}`);
+        console.log(`Phone: ${phone}`);
+        console.log(`OTP (Mock): 123456`);
         console.log("-----------------------------------------");
-        console.log("Ab aap 'npm start' karke frontend se login kar sakte hain.");
+        console.log("Ab aap frontend se login kar sakte hain.");
 
         process.exit(0);
 

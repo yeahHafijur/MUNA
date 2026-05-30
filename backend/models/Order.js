@@ -31,6 +31,11 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    // Delivery fee separate tracking ke liye
+    deliveryFee: {
+        type: Number,
+        default: 0
+    },
     // 5. Delivery Location (Customer ka pata aur lat/lng)
     deliveryLocation: {
         address: { type: String, required: true },

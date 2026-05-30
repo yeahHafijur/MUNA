@@ -4,7 +4,6 @@ import Home from './pages/Home';
 import ShopDetail from './pages/ShopDetail';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import Profile from './pages/Profile';
 import VendorDashboard from './pages/VendorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -31,7 +30,6 @@ function App() {
             <Route path="/shop/:id" element={<ShopDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/vendor-dashboard" element={<VendorDashboard />} />
             <Route path="/vendor-godown" element={<GodownBrowser />} />

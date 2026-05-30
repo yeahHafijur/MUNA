@@ -9,6 +9,8 @@ const Cart = () => {
     const { token } = useAuth(); // Logged-in user ka token
 
     const [gpsLocation, setGpsLocation] = useState(null); // GPS coordinates store karne ke liye
+    const [deliveryFee, setDeliveryFee] = useState(null);
+    const [distance, setDistance] = useState(null);
     const [loading, setLoading] = useState(false);
     const [locating, setLocating] = useState(false); // GPS fetching status
     const navigate = useNavigate();
@@ -17,13 +19,29 @@ const Cart = () => {
         setLocating(true);
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setGpsLocation({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    setGpsLocation({ lat, lng });
+                    
+                    try {
+                        const res = await fetch(`/api/shops/${cartShopId}/calculate-delivery`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ lat, lng })
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            setDeliveryFee(data.deliveryFee);
+                            setDistance(data.distance);
+                        } else {
+                            alert(data.message || "Could not calculate delivery fee");
+                        }
+                    } catch (error) {
+                        console.error("Error calculating delivery fee:", error);
+                    }
+                    
                     setLocating(false);
-                    // alert("GPS Location mili! Ab aap order place kar sakte hain.");
                 },
                 (error) => {
                     alert("Location nikalne me problem hui. Kripya apne phone ki Location On karein!");
@@ -61,7 +79,7 @@ const Cart = () => {
                     price: item.price,
                     quantity: item.quantity
                 })),
-                totalAmount: getTotal(),
+                totalAmount: getTotal() + (deliveryFee || 0),
                 deliveryLocation: {
                     address: "Shared via GPS",
                     lat: gpsLocation.lat,
@@ -134,10 +152,20 @@ const Cart = () => {
             </div>
 
             {/* Bill Summary */}
-            <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100">
-                <div className="flex justify-between font-bold text-lg text-gray-800">
-                    <span>To Pay:</span>
+            <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100 space-y-2">
+                <div className="flex justify-between text-gray-600 font-semibold">
+                    <span>Item Total:</span>
                     <span>₹{getTotal()}</span>
+                </div>
+                {deliveryFee !== null && (
+                    <div className="flex justify-between text-gray-600 font-semibold">
+                        <span>Delivery Fee ({distance} km):</span>
+                        <span>₹{deliveryFee}</span>
+                    </div>
+                )}
+                <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between font-black text-lg text-gray-800">
+                    <span>Grand Total:</span>
+                    <span className="text-green-600">₹{getTotal() + (deliveryFee || 0)}</span>
                 </div>
             </div>
 
@@ -171,8 +199,8 @@ const Cart = () => {
                 </button>
                 <button
                     onClick={handlePlaceOrder}
-                    disabled={loading}
-                    className="flex-1 bg-green-600 text-white font-bold py-3 rounded-lg shadow-md hover:bg-green-700 transition-colors"
+                    disabled={loading || deliveryFee === null}
+                    className={`flex-1 font-bold py-3 rounded-lg shadow-md transition-colors ${loading || deliveryFee === null ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
                 >
                     {loading ? 'Placing Order...' : 'Place Order'}
                 </button>

@@ -20,6 +20,14 @@ const VendorDashboard = () => {
     const [newCategory, setNewCategory] = useState('');
     const [productSearchQuery, setProductSearchQuery] = useState('');
 
+    // Delivery Settings State
+    const [minCharge, setMinCharge] = useState(10);
+    const [minDistance, setMinDistance] = useState(2);
+    const [chargePerKm, setChargePerKm] = useState(5);
+
+    const [shopImageFile, setShopImageFile] = useState(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
+
     // Godown State
     const [godownItems, setGodownItems] = useState([]);
     const [showGodown, setShowGodown] = useState(false);
@@ -40,6 +48,11 @@ const VendorDashboard = () => {
             .then(shopData => {
                 if (shopData._id) {
                     setShop(shopData);
+                    if (shopData.deliverySettings) {
+                        setMinCharge(shopData.deliverySettings.minimumCharge ?? 10);
+                        setMinDistance(shopData.deliverySettings.minimumDistance ?? 2);
+                        setChargePerKm(shopData.deliverySettings.chargePerKm ?? 5);
+                    }
                     fetchOrders(true); // initial fetch
                     fetchProducts(shopData._id);
                 }
@@ -226,24 +239,94 @@ const VendorDashboard = () => {
         }
     };
 
+    const handleUpdateDeliverySettings = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await fetch(`/api/shops/${shop._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ 
+                    deliverySettings: {
+                        minimumCharge: Number(minCharge),
+                        minimumDistance: Number(minDistance),
+                        chargePerKm: Number(chargePerKm)
+                    }
+                })
+            });
+            const updatedShop = await res.json();
+            setShop(updatedShop);
+            alert("Delivery Settings updated successfully!");
+        } catch (error) {
+            console.error("Error updating delivery settings:", error);
+            alert("Failed to update delivery settings");
+        }
+    };
+
+    const handleUpdateShopImage = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setUploadingImage(true);
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const res = await fetch(`/api/shops/${shop._id}/image`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            const updatedShop = await res.json();
+            if (res.ok) {
+                setShop(updatedShop);
+                alert("Shop banner updated successfully!");
+            } else {
+                alert(updatedShop.message || "Failed to update banner");
+            }
+        } catch (error) {
+            console.error("Error updating banner:", error);
+        } finally {
+            setUploadingImage(false);
+            e.target.value = null; // reset input
+        }
+    };
+
     if (!shop) return <div className="text-center mt-20 font-bold">Loading Dashboard...</div>;
 
     return (
         <div className="max-w-4xl mx-auto mt-6 pb-20">
             {/* Header */}
-            <div className="bg-gray-900 text-white p-6 rounded-xl mb-6 flex justify-between items-center shadow-lg">
-                <div>
+            <div className="bg-gray-900 text-white p-6 rounded-xl mb-6 flex justify-between items-center shadow-lg relative overflow-hidden">
+                {shop.image && (
+                    <div className="absolute inset-0 opacity-20">
+                        <img src={shop.image} alt="Shop Banner" className="w-full h-full object-cover" />
+                    </div>
+                )}
+                <div className="relative z-10">
                     <h1 className="text-2xl font-black">{shop.name}</h1>
-                    <p className="text-gray-400 text-sm">{shop.address}</p>
+                    <p className="text-gray-400 text-sm mb-3">{shop.address}</p>
                     
-                    <button 
-                        onClick={handleToggleShopStatus}
-                        className={`mt-3 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${shop.isOpen ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'}`}
-                    >
-                        {shop.isOpen ? '🟢 Shop is Open' : '🔴 Shop is Closed'}
-                    </button>
+                    <div className="flex gap-2 items-center flex-wrap">
+                        <button 
+                            onClick={handleToggleShopStatus}
+                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${shop.isOpen ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'}`}
+                        >
+                            {shop.isOpen ? '🟢 Shop is Open' : '🔴 Shop is Closed'}
+                        </button>
+
+                        <label className="cursor-pointer bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1">
+                            {uploadingImage ? '⏳ Uploading...' : '🖼️ Change Banner'}
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={handleUpdateShopImage} 
+                                disabled={uploadingImage}
+                            />
+                        </label>
+                    </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="relative z-10 flex items-center gap-4">
                     <span className="hidden sm:inline-block bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Vendor Mode</span>
                     <button onClick={() => { logout(); navigate('/'); }} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-sm transition-colors">Logout</button>
                 </div>
@@ -260,47 +343,75 @@ const VendorDashboard = () => {
                 <div className="space-y-4">
                     {orders.length === 0 ? <div className="bg-white p-10 text-center rounded-xl border border-gray-200"><span className="text-4xl block mb-2">😴</span><p className="text-gray-500 font-bold">No orders yet.</p></div> :
                         orders.map(order => (
-                            <div key={order._id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row gap-4 justify-between">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <h3 className="font-black text-lg">#{order._id.slice(-6).toUpperCase()}</h3>
-                                        <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{order.status.replace('_', ' ')}</span>
+                            <div key={order._id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-3 justify-between items-start hover:shadow-md transition-shadow">
+                                <div className="flex-1 w-full">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="font-black text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">#{order._id.slice(-6).toUpperCase()}</h3>
+                                        <span className="text-xs text-gray-400 font-semibold">{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                     </div>
-                                    <p className="text-sm font-bold text-gray-700">{order.customerId?.name || 'Customer'}</p>
-                                    <p className="text-xs text-gray-500 mb-1">{new Date(order.createdAt).toLocaleString()}</p>
                                     
-                                    <div className="bg-blue-50 border border-blue-100 p-2 rounded-lg mb-3 flex items-start gap-2">
-                                        <span className="text-blue-500 mt-0.5">📍</span>
-                                        <div>
-                                            <p className="text-xs font-bold text-blue-900 line-clamp-2">{order.deliveryLocation?.address || 'Address missing'}</p>
-                                            {order.deliveryLocation?.lat && order.deliveryLocation?.lng && (
-                                                <a 
-                                                    href={`https://www.google.com/maps?q=${order.deliveryLocation.lat},${order.deliveryLocation.lng}`} 
-                                                    target="_blank" 
-                                                    rel="noreferrer"
-                                                    className="inline-block mt-1 text-[10px] font-bold bg-blue-600 text-white px-2 py-1 rounded shadow-sm hover:bg-blue-700 transition-colors"
-                                                >
-                                                    🗺️ View on Map
-                                                </a>
-                                            )}
+                                    <div className="mb-3">
+                                        <p className="text-sm font-bold text-gray-800 flex flex-wrap items-center gap-1.5">
+                                            <span>👤 {order.customerId?.name || 'New Customer'}</span> 
+                                            <span className="text-gray-300 hidden sm:inline">|</span>
+                                            <span className="text-gray-500 text-xs bg-gray-50 px-1.5 py-0.5 rounded font-semibold border border-gray-100">📞 {order.customerId?.phone || 'No Number'}</span>
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mb-2">
+                                        {order.items.map((item, idx) => (
+                                            <div key={idx} className="text-xs flex justify-between py-1 border-b border-gray-100 last:border-0">
+                                                <span className="text-gray-600 font-semibold">{item.quantity} x {item.name}</span>
+                                                <span className="font-bold text-gray-800">₹{item.price * item.quantity}</span>
+                                            </div>
+                                        ))}
+                                        <div className="mt-1.5 pt-1.5 border-t border-gray-200 flex justify-between font-black text-sm">
+                                            <span>Total Amount</span>
+                                            <span className="text-green-600">₹{order.totalAmount}</span>
                                         </div>
                                     </div>
-                                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                        {order.items.map((item, idx) => (
-                                            <div key={idx} className="text-sm flex justify-between gap-4"><span>{item.quantity} x {item.name}</span><span className="font-bold">₹{item.price * item.quantity}</span></div>
-                                        ))}
-                                        <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between font-black"><span>Total</span><span>₹{order.totalAmount}</span></div>
+
+                                    <div className="flex items-center gap-2 mt-2 bg-blue-50/50 p-2 rounded-lg border border-blue-50">
+                                        <span className="text-xs text-blue-500">📍</span>
+                                        <p className="text-[11px] font-semibold text-blue-900 line-clamp-2 flex-1">{order.deliveryLocation?.address || 'Address missing'}</p>
+                                        {order.deliveryLocation?.lat && order.deliveryLocation?.lng && (
+                                            <a 
+                                                href={`https://www.google.com/maps?q=${order.deliveryLocation.lat},${order.deliveryLocation.lng}`} 
+                                                target="_blank" 
+                                                rel="noreferrer" 
+                                                className="text-[10px] bg-blue-600 text-white px-2 py-1 rounded font-bold hover:bg-blue-700 shadow-sm"
+                                            >
+                                                Map
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="flex flex-col justify-center">
-                                    <select value={order.status} onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)} className="border border-gray-200 rounded-lg p-2 font-bold text-sm outline-none focus:border-yellow-400 bg-gray-50 cursor-pointer">
-                                        <option value="pending">Pending</option>
-                                        <option value="accepted">Accepted</option>
-                                        <option value="preparing">Preparing</option>
-                                        <option value="out_for_delivery">Out for Delivery</option>
-                                        <option value="delivered">Delivered</option>
-                                        <option value="cancelled">Cancelled</option>
-                                    </select>
+
+                                <div className="w-full md:w-44 flex flex-col gap-2 border-t md:border-t-0 md:border-l border-gray-100 pt-3 md:pt-0 md:pl-4">
+                                    <div className="w-full">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Update Status</label>
+                                        <select 
+                                            value={order.status} 
+                                            onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)} 
+                                            className={`w-full border rounded-lg p-2 font-bold text-xs outline-none cursor-pointer transition-colors shadow-sm
+                                                ${order.status === 'delivered' ? 'bg-green-50 border-green-200 text-green-700' : 
+                                                  order.status === 'cancelled' ? 'bg-red-50 border-red-200 text-red-700' :
+                                                  order.status === 'pending' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' :
+                                                  'bg-blue-50 border-blue-200 text-blue-700'}`}
+                                        >
+                                            <option value="pending">Pending</option>
+                                            <option value="accepted">Accepted</option>
+                                            <option value="preparing">Preparing</option>
+                                            <option value="out_for_delivery">Out for Delivery</option>
+                                            <option value="delivered">Delivered</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                    <div className="mt-auto hidden md:block">
+                                        <div className={`text-[9px] font-black uppercase tracking-widest text-center py-1.5 rounded bg-gray-50 border ${order.status === 'delivered' ? 'text-green-500 border-green-100' : 'text-gray-400 border-gray-100'}`}>
+                                            {order.status.replace('_', ' ')}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))
@@ -311,6 +422,30 @@ const VendorDashboard = () => {
             {/* PRODUCTS TAB */}
             {activeTab === 'products' && (
                 <div className="space-y-6">
+                    {/* Delivery Settings */}
+                    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h2 className="font-bold text-gray-800 mb-3 flex items-center gap-2"><span>🛵</span> Delivery Charges Settings</h2>
+                        <form onSubmit={handleUpdateDeliverySettings} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Minimum Charge (₹)</label>
+                                <input type="number" required value={minCharge} onChange={e => setMinCharge(e.target.value)} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-yellow-400 font-bold" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Minimum Distance (km)</label>
+                                <input type="number" step="0.1" required value={minDistance} onChange={e => setMinDistance(e.target.value)} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-yellow-400 font-bold" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Extra Charge Per Km (₹)</label>
+                                <input type="number" required value={chargePerKm} onChange={e => setChargePerKm(e.target.value)} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-yellow-400 font-bold" />
+                            </div>
+                            <div className="md:col-span-3 flex justify-end">
+                                <button type="submit" className="bg-gray-800 hover:bg-black text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+                                    Save Settings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
                     {/* Category Manager */}
                     <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                         <h2 className="font-bold text-gray-800 mb-3">Manage Categories</h2>

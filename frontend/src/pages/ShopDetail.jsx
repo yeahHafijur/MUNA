@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 
 const ShopDetail = () => {
     const { id } = useParams();
+    const [shop, setShop] = useState(null);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     
@@ -14,6 +15,13 @@ const ShopDetail = () => {
     const { addToCart, cartItems } = useCart();
 
     useEffect(() => {
+        // Fetch Shop Details
+        fetch(`/api/shops/${id}`)
+            .then(res => res.json())
+            .then(data => setShop(data))
+            .catch(err => console.error("Error fetching shop:", err));
+
+        // Fetch Products
         fetch(`/api/products/${id}`)
             .then(res => res.json())
             .then(data => {
@@ -53,12 +61,48 @@ const ShopDetail = () => {
 
     return (
         <div className="mt-4 pb-20">
-            {/* Header & Search */}
+            {/* Shop Banner */}
+            {shop && (
+                <div className="relative bg-gray-900 rounded-2xl p-6 sm:p-8 mb-6 overflow-hidden shadow-lg flex flex-col justify-end min-h-[160px]">
+                    {shop.image && (
+                        <div className="absolute inset-0 opacity-40">
+                            <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" />
+                        </div>
+                    )}
+                    <div className="relative z-10 text-white">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <span className={`inline-block text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full mb-2 backdrop-blur-sm border ${shop.isOpen ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'bg-red-500/20 text-red-300 border-red-500/30'}`}>
+                                    {shop.isOpen ? '● Open Now' : '● Closed'}
+                                </span>
+                                <h1 className="text-2xl sm:text-3xl font-black mb-1">{shop.name}</h1>
+                                <p className="text-gray-300 text-sm flex items-center gap-2">
+                                    <span>📍 {shop.address}</span>
+                                    {shop.vendorId?.phone && (
+                                        <span className="bg-white/20 px-2 py-0.5 rounded-md text-xs font-bold backdrop-blur-md">
+                                            📞 {shop.vendorId.phone}
+                                        </span>
+                                    )}
+                                </p>
+                            </div>
+                            {shop.location?.coordinates && (
+                                <button 
+                                    onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank')}
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-xl text-xs font-bold transition-colors backdrop-blur-md flex items-center gap-1.5"
+                                >
+                                    <span className="text-lg">🗺️</span> <span className="hidden sm:inline">Directions</span>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Search & Back */}
             <div className="mb-6">
-                <div className="flex justify-between items-end mb-4">
+                <div className="flex justify-between items-end mb-3">
                     <div>
-                        <h1 className="text-2xl font-black text-gray-800">Shop Menu</h1>
-                        <p className="text-sm text-gray-500">Find exactly what you're craving</p>
+                        <h2 className="text-xl font-black text-gray-800">Menu Items</h2>
                     </div>
                     {selectedCategory && (
                         <button 

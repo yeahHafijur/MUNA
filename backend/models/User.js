@@ -7,8 +7,11 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        unique: true,
-        sparse: true // Allows multiple users to have no phone (null) for legacy compatibility
+        unique: true
+    },
+    pushSubscription: {
+        type: Object,
+        default: null
     },
     email: {
         type: String

@@ -1,6 +1,15 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Shop = require('../models/Shop');
+const User = require('../models/User');
+const webpush = require('web-push');
+
+// Configure web-push with VAPID keys
+webpush.setVapidDetails(
+  'mailto:your_email@example.com',
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+);
 
 // Haversine formula: Do (2) GPS points ke beech ka distance (KM) nikalne ke liye
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -101,6 +110,22 @@ const placeOrder = async (req, res) => {
             deliveryFee: fee,
             deliveryLocation
         });
+
+        // 🔔 PUSH NOTIFICATION ALERT TO VENDOR
+        try {
+            const vendor = await User.findById(shop.vendorId);
+            if (vendor && vendor.pushSubscription) {
+                const payload = JSON.stringify({
+                    title: '🎉 Naya Order Aaya Hai!',
+                    body: `Total: ₹${finalTotalAmount} (${items.length} items)`,
+                    icon: '/icon-192x192.png', // PWA icon
+                });
+                await webpush.sendNotification(vendor.pushSubscription, payload);
+                console.log("Push notification sent to vendor!");
+            }
+        } catch (pushErr) {
+            console.error("Error sending push notification:", pushErr);
+        }
 
         res.status(201).json(order);
 

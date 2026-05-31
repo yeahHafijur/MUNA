@@ -26,6 +26,8 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.use('/api/master-products', require('./routes/masterProductRoutes'));
 
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+
 
 app.get("/", (req, res) => {
     res.send("MUNA is running")

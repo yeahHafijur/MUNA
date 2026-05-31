@@ -2,6 +2,21 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+  
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 const VendorDashboard = () => {
     const { user, token, logout } = useAuth();
     const navigate = useNavigate();
@@ -63,11 +78,44 @@ const VendorDashboard = () => {
             .then(res => res.json())
             .then(data => setGodownItems(Array.isArray(data) ? data : []));
 
-        // Request Notification permission if not granted
-        if ("Notification" in window && Notification.permission === "default") {
-            Notification.requestPermission();
-        }
     }, [token, user, navigate]);
+
+    // Handle enabling push notifications explicitly via a button click
+    const handleEnableNotifications = async () => {
+        try {
+            if (!("Notification" in window)) {
+                alert("Browser does not support notifications");
+                return;
+            }
+            const permission = await Notification.requestPermission();
+            if (permission !== "granted") {
+                alert("Notification permission denied!");
+                return;
+            }
+
+            const swRegistration = await navigator.serviceWorker.ready;
+            const publicVapidKey = import.meta.env.VITE_PUBLIC_VAPID_KEY;
+            
+            const subscription = await swRegistration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+            });
+
+            // Send subscription to backend
+            await fetch('/api/notifications/subscribe', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify(subscription)
+            });
+            alert("✅ Push Notifications Enabled! Ab app minimize hone par bhi order aane ka alert aayega.");
+        } catch (error) {
+            console.error("Error subscribing to push:", error);
+            alert("Failed to enable push notifications.");
+        }
+    };
 
     // Polling setup for live orders (every 10 seconds)
     useEffect(() => {
@@ -324,6 +372,12 @@ const VendorDashboard = () => {
                                 disabled={uploadingImage}
                             />
                         </label>
+                        <button 
+                            onClick={handleEnableNotifications}
+                            className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border bg-purple-500/20 text-purple-400 border-purple-500/30 hover:bg-purple-500/30"
+                        >
+                            🔔 Enable Push Alerts
+                        </button>
                     </div>
                 </div>
                 <div className="relative z-10 flex items-center gap-4">

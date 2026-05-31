@@ -18,8 +18,28 @@ const sendOTP = async (req, res) => {
         return res.status(400).json({ message: "Please enter a valid 10-digit phone number" });
     }
 
-    // Generate a fixed OTP for testing purposes
-    const otp = "123456";
+    // Generate random 6-digit OTP
+    let otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Send real SMS if FAST2SMS_API_KEY is available and it's not the admin test number
+    if (process.env.FAST2SMS_API_KEY && phone !== "9999999999") {
+        try {
+            const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${process.env.FAST2SMS_API_KEY}&route=otp&variables_values=${otp}&flash=0&numbers=${phone}`;
+            const response = await fetch(url);
+            const smsData = await response.json();
+            
+            if (!smsData.return) {
+                return res.status(500).json({ message: "SMS bhejne me dikkat aayi: " + smsData.message });
+            }
+        } catch (err) {
+            console.error("Fast2SMS Error:", err);
+            return res.status(500).json({ message: "SMS Gateway server error" });
+        }
+    } else {
+        // Fallback for testing without API key or for admin number
+        otp = "123456";
+        console.log(`[Mock SMS] OTP for ${phone} is: ${otp}`);
+    }
 
     // Check if user exists
     const userExists = await User.findOne({ phone });
@@ -29,8 +49,6 @@ const sendOTP = async (req, res) => {
         otp,
         expiresAt: Date.now() + 5 * 60 * 1000
     });
-
-    console.log(`[Mock SMS] OTP for ${phone} is: ${otp}`);
 
     res.status(200).json({ 
         message: "OTP sent successfully",

@@ -1,3 +1,8 @@
+import { precacheAndRoute } from 'workbox-precaching';
+
+// Inject manifest for PWA offline caching
+precacheAndRoute(self.__WB_MANIFEST);
+
 // Service Worker for Push Notifications
 self.addEventListener('push', function(event) {
   let data = {};

@@ -105,4 +105,72 @@ const verifyOTP = async (req, res) => {
     });
 };
 
-module.exports = { sendOTP, verifyOTP };
+// Google Sign-In: Verify Google credential token and login/register user
+const googleLogin = async (req, res) => {
+    const { credential } = req.body;
+
+    if (!credential) {
+        return res.status(400).json({ message: "Google credential is required" });
+    }
+
+    try {
+        // Decode Google JWT token (the token is already verified by Google on frontend)
+        // We verify it here by calling Google's tokeninfo endpoint
+        const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+        const payload = await googleRes.json();
+
+        if (payload.error_description) {
+            return res.status(401).json({ message: "Invalid Google token" });
+        }
+
+        const { email, name, picture, sub: googleId } = payload;
+
+        if (!email) {
+            return res.status(400).json({ message: "Google account se email nahi mili" });
+        }
+
+        // Check if user already exists with this email
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Naya user banao Google info se
+            user = await User.create({
+                name: name || "Google User",
+                email: email,
+                googleId: googleId,
+                profilePic: picture,
+                role: "customer"
+            });
+            console.log(`[Google Auth] New user registered: ${email}`);
+        } else {
+            // Purane user ka Google info update karo (agar pehle se nahi hai)
+            if (!user.googleId) {
+                user.googleId = googleId;
+            }
+            if (picture && !user.profilePic) {
+                user.profilePic = picture;
+            }
+            await user.save();
+        }
+
+        const token = generateToken(user._id, user.role);
+
+        res.status(200).json({
+            message: "Login successful!",
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            profilePic: user.profilePic,
+            token: token
+        });
+
+    } catch (error) {
+        console.error("Google Auth Error:", error);
+        res.status(500).json({ message: "Google login failed", error: error.message });
+    }
+};
+
+module.exports = { sendOTP, verifyOTP, googleLogin };
+

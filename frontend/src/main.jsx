@@ -4,15 +4,18 @@ import './index.css'
 import App from './App.jsx'
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
-
+const GOOGLE_CLIENT_ID = "739956516947-brhvingmj39r4ttur0rj1bvd354hmus9.apps.googleusercontent.com";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <AuthProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   </StrictMode>,
 )

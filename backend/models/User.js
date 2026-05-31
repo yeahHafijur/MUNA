@@ -7,14 +7,21 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        unique: true
+        sparse: true
+    },
+    email: {
+        type: String,
+        sparse: true
+    },
+    googleId: {
+        type: String
+    },
+    profilePic: {
+        type: String
     },
     pushSubscription: {
         type: Object,
         default: null
-    },
-    email: {
-        type: String
     },
     password: {
         type: String

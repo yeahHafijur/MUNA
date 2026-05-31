@@ -24,7 +24,7 @@ const sendOTP = async (req, res) => {
     // Send real SMS if FAST2SMS_API_KEY is available and it's not the admin test number
     if (process.env.FAST2SMS_API_KEY && phone !== "9999999999") {
         try {
-            const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${process.env.FAST2SMS_API_KEY}&route=q&message=Your MUNA verification code is ${otp}&flash=0&numbers=${phone}`;
+            const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${process.env.FAST2SMS_API_KEY}&route=otp&variables_values=${otp}&flash=0&numbers=${phone}`;
             const response = await fetch(url);
             const smsData = await response.json();
             

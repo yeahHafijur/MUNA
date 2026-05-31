@@ -24,7 +24,7 @@ const createProduct = async (req, res) => {
         const { name, price, category, stock } = req.body;
         
         // Agar file upload hui hai toh uska path lo, warna agar direct link aaya hai toh wo lo
-        const image = req.file ? `http://localhost:5000/uploads/${req.file.filename}` : req.body.image;
+        const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
 
         const shop = await Shop.findOne({
             vendorId: req.user._id

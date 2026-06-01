@@ -61,7 +61,7 @@ const Login = () => {
     };
 
     const handleGoogleError = () => {
-        setError('Google Sign-In me dikkat aayi. Kripya dubara try karein.');
+        setError('Google Sign-In failed. Please try again.');
     };
 
     // Phone OTP Flow (Purana system - backup ke liye)

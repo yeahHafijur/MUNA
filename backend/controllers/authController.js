@@ -29,7 +29,7 @@ const sendOTP = async (req, res) => {
             const smsData = await response.json();
             
             if (!smsData.return) {
-                return res.status(500).json({ message: "SMS bhejne me dikkat aayi: " + smsData.message });
+                return res.status(500).json({ message: "Failed to send SMS: " + smsData.message });
             }
         } catch (err) {
             console.error("Fast2SMS Error:", err);
@@ -126,14 +126,14 @@ const googleLogin = async (req, res) => {
         const { email, name, picture, sub: googleId } = payload;
 
         if (!email) {
-            return res.status(400).json({ message: "Google account se email nahi mili" });
+            return res.status(400).json({ message: "No email address found in Google account" });
         }
 
         // Check if user already exists with this email
         let user = await User.findOne({ email });
 
         if (!user) {
-            // Naya user banao Google info se
+            // Create new user from Google info
             user = await User.create({
                 name: name || "Google User",
                 email: email,
@@ -143,7 +143,7 @@ const googleLogin = async (req, res) => {
             });
             console.log(`[Google Auth] New user registered: ${email}`);
         } else {
-            // Purane user ka Google info update karo (agar pehle se nahi hai)
+            // Update existing user with Google info if missing
             if (!user.googleId) {
                 user.googleId = googleId;
             }

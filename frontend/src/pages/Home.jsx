@@ -84,7 +84,7 @@ const Home = () => {
             {/* Stats Bar */}
             <div className="grid grid-cols-3 gap-3 mb-6">
                 <div className="bg-white rounded-xl p-3 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <p className="text-xl sm:text-2xl font-black bg-gradient-to-r text-gray-800 bg-clip-text text-transparent">{shops.length}</p>
+                    <p className="text-xl sm:text-2xl font-black text-gray-800">{shops.length}</p>
                     <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Total Shops</p>
                 </div>
                 <div className="bg-white rounded-xl p-3 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow">

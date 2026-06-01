@@ -33,7 +33,7 @@ function deg2rad(deg) {
 // 1. Place Order (Customer karega)
 const placeOrder = async (req, res) => {
     try {
-        const { shopId, items, totalAmount, deliveryLocation } = req.body;
+        const { shopId, items, totalAmount, deliveryLocation, customerPhone } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({ message: "Your cart is empty!" });
@@ -125,6 +125,15 @@ const placeOrder = async (req, res) => {
             }
         } catch (pushErr) {
             console.error("Error sending push notification:", pushErr);
+        }
+
+        // Update user's phone number if provided (saves for future)
+        if (customerPhone) {
+            const customer = await User.findById(req.user._id);
+            if (customer && !customer.phone) {
+                customer.phone = customerPhone;
+                await customer.save();
+            }
         }
 
         res.status(201).json(order);

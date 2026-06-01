@@ -6,8 +6,9 @@ import { Link, useNavigate } from 'react-router-dom';
 const Cart = () => {
     // cartShopId bhi liya taaki backend ko pata chale kis dukan ka order hai
     const { cartItems, cartShopId, getTotal, removeFromCart, clearCart } = useCart();
-    const { token } = useAuth(); // Logged-in user ka token
+    const { user, token, login } = useAuth(); // Logged-in user, token, aur context update function
 
+    const [customerPhone, setCustomerPhone] = useState('');
     const [gpsLocation, setGpsLocation] = useState(null); // GPS coordinates store karne ke liye
     const [deliveryFee, setDeliveryFee] = useState(null);
     const [distance, setDistance] = useState(null);
@@ -61,9 +62,15 @@ const Cart = () => {
         }
 
         // Agar user login nahi hai, toh pehle usko login par bhejo
-        if (!token) {
+        if (!token || !user) {
             alert("Please login first to place your order!");
             navigate('/login');
+            return;
+        }
+
+        const isPhoneMissing = !user.phone;
+        if (isPhoneMissing && (!customerPhone || customerPhone.length < 10)) {
+            alert("Please enter a valid 10-digit phone number so the delivery partner can contact you!");
             return;
         }
 
@@ -84,7 +91,8 @@ const Cart = () => {
                     address: "Shared via GPS",
                     lat: gpsLocation.lat,
                     lng: gpsLocation.lng
-                }
+                },
+                customerPhone: isPhoneMissing ? customerPhone : user.phone
             };
 
             const res = await fetch('/api/orders', {
@@ -103,6 +111,11 @@ const Cart = () => {
             }
 
             // Order Success! 
+            if (isPhoneMissing) {
+                // Local context update kar do taaki dobara na maangna pade
+                login({ ...user, phone: customerPhone }, token);
+            }
+            
             clearCart(); // Cart khali karo
             navigate('/profile'); // Sidha profile par bhejo taaki status dekh sake
 
@@ -188,6 +201,28 @@ const Cart = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Missing Phone Number Input */}
+            {user && !user.phone && (
+                <div className="mb-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <label className="block text-sm font-bold text-yellow-900 mb-2">Delivery Phone Number 📱</label>
+                    <p className="text-xs text-yellow-700 mb-3">Please provide a phone number so the delivery partner can contact you.</p>
+                    <div className="flex">
+                        <span className="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg font-bold">
+                            +91
+                        </span>
+                        <input
+                            type="tel"
+                            required
+                            maxLength="10"
+                            value={customerPhone}
+                            onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, ''))}
+                            className="w-full border border-gray-200 rounded-r-lg p-3 outline-none focus:border-yellow-400 transition-colors font-semibold tracking-widest"
+                            placeholder="98765 43210"
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-4">

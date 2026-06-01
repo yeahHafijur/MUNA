@@ -15,8 +15,10 @@ const onboardVendorAndShop = async (req, res) => {
             return res.status(400).json({ message: "Valid Email and 10-digit phone number are required." });
         }
 
+        const cleanEmail = vendorEmail.trim().toLowerCase();
+
         // Check if vendor email already exists
-        let vendor = await User.findOne({ email: vendorEmail });
+        let vendor = await User.findOne({ email: cleanEmail });
         
         if (vendor) {
             if (vendor.role === "super_admin") {
@@ -31,7 +33,7 @@ const onboardVendorAndShop = async (req, res) => {
             // Create new Vendor Account
             vendor = await User.create({
                 name: vendorName,
-                email: vendorEmail,
+                email: cleanEmail,
                 phone: vendorPhone,
                 role: "vendor"
             });

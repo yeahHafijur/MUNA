@@ -11,6 +11,7 @@ const AdminDashboard = () => {
 
     const [formData, setFormData] = useState({
         vendorName: '',
+        vendorEmail: '',
         vendorPhone: '',
         shopName: '',
         shopAddress: '',
@@ -71,6 +72,7 @@ const AdminDashboard = () => {
             // Reset form
             setFormData({
                 vendorName: '',
+                vendorEmail: '',
                 vendorPhone: '',
                 shopName: '',
                 shopAddress: '',
@@ -116,6 +118,7 @@ const AdminDashboard = () => {
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-3">
                             <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">1. Vendor Details</h3>
                             <input type="text" name="vendorName" required placeholder="Vendor Full Name" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.vendorName} onChange={handleChange} />
+                            <input type="email" name="vendorEmail" required placeholder="Vendor Google Email" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.vendorEmail} onChange={handleChange} />
                             <input type="tel" name="vendorPhone" required placeholder="Vendor Phone Number (10 digits)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.vendorPhone} onChange={handleChange} minLength="10" maxLength="10" />
                         </div>
 

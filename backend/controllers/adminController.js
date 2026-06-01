@@ -4,29 +4,38 @@ const Shop = require("../models/Shop");
 // 1. Onboard Vendor & Shop (Super Admin only)
 const onboardVendorAndShop = async (req, res) => {
     try {
-        const { vendorName, vendorPhone, shopName, shopAddress, shopCategory, shopLat, shopLng } = req.body;
+        const { vendorName, vendorEmail, vendorPhone, shopName, shopAddress, shopCategory, shopLat, shopLng } = req.body;
 
         // Security Check: Sirf super_admin yeh kar sakta hai
         if (req.user.role !== 'super_admin') {
             return res.status(403).json({ message: "Aapke paas ye power nahi hai." });
         }
 
-        if (!vendorPhone || vendorPhone.length < 10) {
-            return res.status(400).json({ message: "Valid 10-digit phone number zaroori hai." });
+        if (!vendorEmail || !vendorPhone || vendorPhone.length < 10) {
+            return res.status(400).json({ message: "Valid Email and 10-digit phone number are required." });
         }
 
-        // Check if vendor phone already exists
-        const existingUser = await User.findOne({ phone: vendorPhone });
-        if (existingUser) {
-            return res.status(400).json({ message: "Is phone number se pehle se koi user/vendor bana hua hai." });
+        // Check if vendor email already exists
+        let vendor = await User.findOne({ email: vendorEmail });
+        
+        if (vendor) {
+            if (vendor.role === "super_admin") {
+                return res.status(400).json({ message: "This email is a super admin. Cannot downgrade to vendor." });
+            }
+            // Upgrade existing user to vendor
+            vendor.role = "vendor";
+            vendor.name = vendorName;
+            vendor.phone = vendorPhone;
+            await vendor.save();
+        } else {
+            // Create new Vendor Account
+            vendor = await User.create({
+                name: vendorName,
+                email: vendorEmail,
+                phone: vendorPhone,
+                role: "vendor"
+            });
         }
-
-        // 1. Create the Vendor Account
-        const vendor = await User.create({
-            name: vendorName,
-            phone: vendorPhone,
-            role: "vendor"
-        });
 
         // 2. Prepare Shop Location (if provided)
         let locationData = undefined;

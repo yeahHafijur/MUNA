@@ -126,7 +126,7 @@ const Home = () => {
                 <div className="bg-white p-10 rounded-2xl text-center border border-gray-100 shadow-sm">
                     <span className="text-5xl block mb-3">🔍</span>
                     <p className="text-gray-500 font-bold">
-                        {searchQuery ? `"${searchQuery}" se koi dukan nahi mili.` : 'Abhi koi dukan nahi mili.'}
+                        {searchQuery ? `No shops found for "${searchQuery}".` : 'No shops found right now.'}
                     </p>
                     {searchQuery && (
                         <button onClick={() => setSearchQuery('')} className="mt-3 text-sm font-bold text-yellow-500 hover:text-yellow-600 underline underline-offset-2">

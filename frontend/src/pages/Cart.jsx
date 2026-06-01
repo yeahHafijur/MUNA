@@ -49,7 +49,7 @@ const Cart = () => {
                 }
             );
         } else {
-            alert("Aapka browser location support nahi karta.");
+            alert("Your browser does not support location services.");
             setLocating(false);
         }
     };

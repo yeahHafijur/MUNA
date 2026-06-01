@@ -8,7 +8,7 @@ const onboardVendorAndShop = async (req, res) => {
 
         // Security Check: Sirf super_admin yeh kar sakta hai
         if (req.user.role !== 'super_admin') {
-            return res.status(403).json({ message: "Aapke paas ye power nahi hai." });
+            return res.status(403).json({ message: "You do not have permission to perform this action." });
         }
 
         if (!vendorEmail || !vendorPhone || vendorPhone.length < 10) {
@@ -56,7 +56,7 @@ const onboardVendorAndShop = async (req, res) => {
         });
 
         res.status(201).json({
-            message: "Vendor aur Shop dono successfully onboard ho gaye!",
+            message: "Vendor and Shop successfully onboarded!",
             vendor: { name: vendor.name, phone: vendor.phone },
             shop: { name: shop.name, address: shop.address }
         });

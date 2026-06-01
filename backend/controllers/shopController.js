@@ -14,7 +14,7 @@ const getShopById = async (req, res) => {
     try {
         const shop = await Shop.findById(req.params.id).populate('vendorId', 'name email phone');
         if (!shop) {
-            return res.status(404).json({ message: "Shop nahi mili" });
+            return res.status(404).json({ message: "Shop not found" });
         }
         res.status(200).json(shop);
     } catch (error) {
@@ -28,7 +28,7 @@ const getMyShop = async (req, res) => {
     try {
         const shop = await Shop.findOne({ vendorId: req.user._id });
         if (!shop) {
-            return res.status(404).json({ message: "Aapki koi shop nahi hai" });
+            return res.status(404).json({ message: "You don't have any shop" });
         }
         res.status(200).json(shop);
     } catch (error) {
@@ -47,7 +47,7 @@ const createShop = async (req, res) => {
 
         const existingShop = await Shop.findOne({ vendorId: req.user._id });
         if (existingShop) {
-            return res.status(400).json({ message: "Ek vendor sirf ek hi shop bana sakta hai" });
+            return res.status(400).json({ message: "A vendor can only create one shop" });
         }
 
         // Location object banayein agar lat aur lng diye gaye hain
@@ -79,7 +79,7 @@ const updateShop = async (req, res) => {
         const { name, address, image } = req.body;
         const shop = await Shop.findById(req.params.id);
         if (!shop) {
-            return res.status(404).json({ message: "Shop nahi mili" });
+            return res.status(404).json({ message: "Shop not found" });
         }
         // Security Check: Kya ye shop ishi logged-in vendor ki hai? (Ya fir super_admin hai?)
         if (shop.vendorId.toString() !== req.user._id.toString() && req.user.role !== 'super_admin') {
@@ -113,7 +113,7 @@ const updateShopImage = async (req, res) => {
     try {
         const shop = await Shop.findById(req.params.id);
         if (!shop) {
-            return res.status(404).json({ message: "Shop nahi mili" });
+            return res.status(404).json({ message: "Shop not found" });
         }
         if (shop.vendorId.toString() !== req.user._id.toString() && req.user.role !== 'super_admin') {
             return res.status(403).json({ message: "Not authorized to update this shop" });
@@ -160,7 +160,7 @@ const calculateDelivery = async (req, res) => {
 
         const shop = await Shop.findById(req.params.id);
         if (!shop) {
-            return res.status(404).json({ message: "Shop nahi mili" });
+            return res.status(404).json({ message: "Shop not found" });
         }
 
         const shopLat = shop.location?.coordinates?.[1] || 28.6139;

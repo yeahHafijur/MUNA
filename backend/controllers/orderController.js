@@ -36,7 +36,7 @@ const placeOrder = async (req, res) => {
         const { shopId, items, totalAmount, deliveryLocation } = req.body;
 
         if (!items || items.length === 0) {
-            return res.status(400).json({ message: "Aapka cart khali hai!" });
+            return res.status(400).json({ message: "Your cart is empty!" });
         }
 
         // --- ZOMATO/SWIGGY LOGIC (Single Shop & In-Stock Check) ---
@@ -44,20 +44,20 @@ const placeOrder = async (req, res) => {
             const product = await Product.findById(items[i].productId);
 
             if (!product) {
-                return res.status(404).json({ message: `Product ${items[i].name} nahi mila.` });
+                return res.status(404).json({ message: `Product ${items[i].name} not found.` });
             }
 
             // Rule 1: Kya ye product usi dukan ka hai jis dukan se order ho raha hai?
             if (product.shopId.toString() !== shopId.toString()) {
                 return res.status(400).json({
-                    message: "Aap ek sath alag-alag dukanon se saman order nahi kar sakte! (Single Shop Rule)"
+                    message: "You cannot order items from different shops at the same time!"
                 });
             }
 
             // Rule 2: Kya ye product In Stock hai? (Aapne jo naya feature add kiya)
             if (product.inStock === false) {
                 return res.status(400).json({
-                    message: `Sorry, ${product.name} out of stock ho gaya hai.`
+                    message: `Sorry, ${product.name} is currently out of stock.`
                 });
             }
         }
@@ -65,7 +65,7 @@ const placeOrder = async (req, res) => {
         // Rule 3: Kya customer dukan ke 4 KM ke daayre me hai?
         const shop = await Shop.findById(shopId);
         if (!shop) {
-            return res.status(404).json({ message: "Dukan nahi mili!" });
+            return res.status(404).json({ message: "Shop not found!" });
         }
 
         // Agar dukan ke paas location nahi hai, toh default Delhi ki location maan lo (testing ke liye)
@@ -79,7 +79,7 @@ const placeOrder = async (req, res) => {
 
         if (distance > 100) {
             return res.status(400).json({ 
-                message: `Sorry, ye dukan aapki location se ${distance.toFixed(1)} KM door hai. Hum sirf 100 KM tak deliver karte hain!` 
+                message: `Sorry, this shop is ${distance.toFixed(1)} KM away. We only deliver within 100 KM.` 
             });
         }
         // ---------------------------------------------------------
@@ -152,7 +152,7 @@ const getVendorOrders = async (req, res) => {
         // Pehle dekho vendor ki dukan kaunsi hai
         const shop = await Shop.findOne({ vendorId: req.user._id });
         if (!shop) {
-            return res.status(404).json({ message: "Aapki koi shop nahi hai." });
+            return res.status(404).json({ message: "You don't have any shop." });
         }
 
         const orders = await Order.find({ shopId: shop._id })
@@ -171,13 +171,13 @@ const updateOrderStatus = async (req, res) => {
         const order = await Order.findById(req.params.id);
 
         if (!order) {
-            return res.status(404).json({ message: "Order nahi mila" });
+            return res.status(404).json({ message: "Order not found" });
         }
 
         // Security: Kya ye order ishi vendor ki shop ka hai?
         const shop = await Shop.findOne({ vendorId: req.user._id });
         if (order.shopId.toString() !== shop._id.toString()) {
-            return res.status(403).json({ message: "Aap kisi aur ki shop ka order update nahi kar sakte" });
+            return res.status(403).json({ message: "You cannot update orders of another shop" });
         }
 
         order.status = status;

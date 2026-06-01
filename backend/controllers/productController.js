@@ -71,11 +71,11 @@ const updateProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: "Product nahi mila" });
+            return res.status(404).json({ message: "Product not found" });
         }
         const shop = await Shop.findOne({ vendorId: req.user._id });
         if (product.shopId.toString() !== shop._id.toString()) {
-            return res.status(403).json({ message: "Aap kisi aur ki shop ka product update nahi kar sakte!" });
+            return res.status(403).json({ message: "You cannot update products of another shop!" });
         }
         product.name = req.body.name || product.name;
         product.price = req.body.price || product.price;
@@ -93,11 +93,11 @@ const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: "Product nahi mila" });
+            return res.status(404).json({ message: "Product not found" });
         }
         const shop = await Shop.findOne({ vendorId: req.user._id });
         if (product.shopId.toString() !== shop._id.toString()) {
-            return res.status(403).json({ message: "Aap kisi aur ki shop ka product delete nahi kar sakte!" });
+            return res.status(403).json({ message: "You cannot delete products of another shop!" });
         }
         await product.deleteOne();
         res.status(200).json({ message: "Product deleted successfully" });

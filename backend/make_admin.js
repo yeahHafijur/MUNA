@@ -3,19 +3,9 @@ const User = require('./models/User');
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/muna")
     .then(async () => {
-        console.log("Connected to DB. Checking for admin users...");
+        console.log("Connected to DB. Setting up admins...");
 
-        // Pehla Admin (Real number)
-        let realAdmin = await User.findOne({ phone: "9101503060" });
-        if (realAdmin) {
-            realAdmin.role = "super_admin";
-            await realAdmin.save();
-            console.log("Made 9101503060 a Super Admin!");
-        } else {
-            console.log("Number 9101503060 not found, waiting for user to login first.");
-        }
-
-        // Dusra Admin (Test number)
+        // Make phone-based admin
         let testAdmin = await User.findOne({ phone: "9999999999" });
         if (!testAdmin) {
             await User.create({
@@ -28,6 +18,16 @@ mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/muna")
             testAdmin.role = "super_admin";
             await testAdmin.save();
             console.log("Made 9999999999 a Super Admin!");
+        }
+
+        // Make Google-based admin (yhz01012004@gmail.com)
+        let googleAdmin = await User.findOne({ email: "yhz01012004@gmail.com" });
+        if (googleAdmin) {
+            googleAdmin.role = "super_admin";
+            await googleAdmin.save();
+            console.log("Made yhz01012004@gmail.com a Super Admin!");
+        } else {
+            console.log("yhz01012004@gmail.com not found yet. Login with Google first, then run this script again.");
         }
 
         process.exit();

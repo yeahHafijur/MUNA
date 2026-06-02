@@ -32,7 +32,7 @@ const Navbar = () => {
                     {/* Logo */}
                     <Link to="/" className="flex items-center">
                         <img 
-                            src="/muna-logo.png" 
+                            src="/muna-logo.jpg" 
                             alt="MUNA" 
                             className="h-10 w-auto object-contain rounded drop-shadow-sm"
                         />

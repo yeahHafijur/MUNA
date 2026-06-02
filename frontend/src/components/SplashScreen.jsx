@@ -4,6 +4,8 @@ const SplashScreen = ({ onFinish }) => {
     const [fadeOut, setFadeOut] = useState(false);
     const videoRef = useRef(null);
 
+    const [isVideoReady, setIsVideoReady] = useState(false);
+
     useEffect(() => {
         if (videoRef.current) {
             videoRef.current.play().catch(error => {
@@ -32,14 +34,15 @@ const SplashScreen = ({ onFinish }) => {
 
     return (
         <div className={`fixed inset-0 z-[9999] bg-[#fdfaf3] flex items-center justify-center transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
-            <div className="relative w-64 sm:w-80 flex items-center justify-center">
+            <div className={`relative w-64 sm:w-80 aspect-square flex items-center justify-center overflow-hidden rounded-2xl shadow-[0_0_50px_10px_rgba(250,204,21,0.4)] border border-yellow-200/50 transition-opacity duration-300 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
                 <video 
                     ref={videoRef}
-                    className="w-full h-auto object-cover rounded-2xl shadow-[0_0_50px_10px_rgba(250,204,21,0.4)] border border-yellow-200/50"
+                    className="w-full h-full object-cover scale-[1.15]"
                     src="/MunaIntro.mp4"
                     playsInline
                     muted
                     autoPlay
+                    onCanPlay={() => setIsVideoReady(true)}
                     onEnded={handleFinish}
                 />
             </div>

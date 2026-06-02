@@ -53,10 +53,6 @@ const Navbar = () => {
                                 <span className="text-lg">{user.role === 'super_admin' ? '👑' : user.role === 'vendor' ? '🏪' : '👤'}</span>
                                 <span className="hidden sm:inline text-sm font-bold text-black">Hi, {user.name.split(' ')[0]}</span>
                             </Link>
-                            <button onClick={() => { logout(); navigate('/'); }} className="text-sm font-bold text-red-600 bg-red-100 hover:bg-red-200 px-2 sm:px-3 py-1.5 rounded-lg transition-colors flex items-center">
-                                <span className="hidden sm:inline">Logout</span>
-                                <span className="sm:hidden text-lg">🚪</span>
-                            </button>
                         </div>
                     ) : (
                         <Link

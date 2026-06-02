@@ -1,7 +1,8 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const Order = require('./models/Order');
 
-mongoose.connect("mongodb+srv://yhz01012004_db_user:xJaSdREG247oyMCJ@munacluster.dmjrufn.mongodb.net/muna?retryWrites=true&w=majority")
+mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
         // Update the broken order to point to the vendor's actual account ID
         const order = await Order.findById('6a1ee7379a6468055a63a335');

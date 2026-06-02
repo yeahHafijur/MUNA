@@ -1,7 +1,8 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('./models/User');
 
-mongoose.connect("mongodb+srv://yhz01012004_db_user:xJaSdREG247oyMCJ@munacluster.dmjrufn.mongodb.net/muna?retryWrites=true&w=majority")
+mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
         console.log("Connected to DB. Setting up Super Admins...");
 

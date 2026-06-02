@@ -1,8 +1,9 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const Shop = require('./models/Shop');
 const User = require('./models/User');
 
-mongoose.connect("mongodb+srv://yhz01012004_db_user:xJaSdREG247oyMCJ@munacluster.dmjrufn.mongodb.net/muna?retryWrites=true&w=majority")
+mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
         // Find the shop with name matching 'ticket point' (case insensitive)
         const shop = await Shop.findOne({ name: { $regex: /ticket point/i } });

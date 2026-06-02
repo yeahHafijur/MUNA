@@ -5,6 +5,8 @@ const Home = () => {
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [userLocation, setUserLocation] = useState(null);
+    const [locationError, setLocationError] = useState(null);
 
     // Backend se saari dukanen (Shops) le kar aate hain
     useEffect(() => {
@@ -20,16 +22,61 @@ const Home = () => {
             });
     }, []);
 
+    useEffect(() => {
+        // Try to get user location
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setUserLocation({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    });
+                },
+                (error) => {
+                    console.warn("Location error:", error.message);
+                    setLocationError("Location off. Showing random order.");
+                }
+            );
+        }
+    }, []);
+
+    const getDistance = (lat1, lon1, lat2, lon2) => {
+        if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
+        const R = 6371; // km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2); 
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        return R * c;
+    };
+
+    const shopsWithDistance = shops.map(shop => {
+        let distance = Infinity;
+        if (userLocation && shop.location?.coordinates && shop.location.coordinates.length === 2) {
+            distance = getDistance(
+                userLocation.lat, userLocation.lng,
+                shop.location.coordinates[1], // lat
+                shop.location.coordinates[0]  // lng
+            );
+        }
+        return { ...shop, distance };
+    });
+
     // Search filter
-    const filteredShops = shops.filter(shop =>
+    const filteredShops = shopsWithDistance.filter(shop =>
         shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         shop.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (shop.category || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Open shops pehle, closed shops niche
+    // Open shops pehle, uske andar jo sabse paas hai wo sabse upar
     const sortedShops = [...filteredShops].sort((a, b) => {
-        if (a.isOpen === b.isOpen) return 0;
+        if (a.isOpen === b.isOpen) {
+            return a.distance - b.distance;
+        }
         return a.isOpen ? -1 : 1;
     });
 
@@ -196,6 +243,13 @@ const Home = () => {
                                                     : 'bg-gray-100 text-gray-400 border border-gray-200'}`}>
                                                     {shop.category || 'Kirana'}
                                                 </span>
+
+                                                {/* Distance Badge */}
+                                                {shop.distance !== Infinity && (
+                                                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center gap-1">
+                                                        📍 {shop.distance < 1 ? (shop.distance * 1000).toFixed(0) + ' m' : shop.distance.toFixed(1) + ' km'}
+                                                    </span>
+                                                )}
 
                                                 {/* Udyam Badge */}
                                                 {shop.udyamNumber && (

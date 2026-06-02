@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from './components/Navbar';
 import SplashScreen from './components/SplashScreen';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import ShopDetail from './pages/ShopDetail';
 import Cart from './pages/Cart';
@@ -23,6 +24,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
       
       <div className="min-h-screen bg-gray-50 font-sans">

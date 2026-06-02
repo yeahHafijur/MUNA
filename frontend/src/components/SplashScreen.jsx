@@ -33,8 +33,21 @@ const SplashScreen = ({ onFinish }) => {
     }, []);
 
     return (
-        <div className={`fixed inset-0 z-[9999] bg-[#fdfaf3] flex items-center justify-center transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
-            <div className={`relative w-72 sm:w-96 flex items-center justify-center transition-opacity duration-300 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`fixed inset-0 z-[9999] bg-[#fdfaf3] flex items-center justify-center overflow-hidden transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
+            
+            {/* Spinning Mandala Background */}
+            <div 
+                className="absolute w-[200vmax] h-[200vmax] opacity-20 pointer-events-none"
+                style={{ 
+                    backgroundImage: "url('/mandala_pattern.png')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "repeat",
+                    animation: "spin 45s linear infinite"
+                }}
+            />
+
+            <div className={`relative w-72 sm:w-96 flex items-center justify-center transition-opacity duration-300 z-10 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
                 <video 
                     ref={videoRef}
                     className="w-full h-auto rounded-2xl shadow-xl shadow-yellow-400/50 border-2 border-yellow-400"

@@ -29,13 +29,17 @@ const Navbar = () => {
                         </button>
                     )}
 
-                    {/* Logo */}
-                    <Link to="/" className="flex items-center">
+                    {/* Logo and Text */}
+                    <Link to="/" className="flex items-center gap-2">
                         <img 
                             src="/muna-logo.jpg" 
                             alt="MUNA" 
                             className="h-10 w-auto object-contain rounded drop-shadow-sm"
                         />
+                        <div className="flex flex-col leading-none mt-1">
+                            <span className="text-sm font-black text-gray-900 tracking-tight">GROCERY</span>
+                            <span className="text-[10px] font-extrabold text-red-600 tracking-wider">IN MINUTES</span>
+                        </div>
                     </Link>
                 </div>
 

@@ -40,15 +40,18 @@ const SplashScreen = ({ onFinish }) => {
                 {`
                 @keyframes floatUp {
                     0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-                    10% { opacity: 0.2; }
-                    90% { opacity: 0.2; }
+                    10% { opacity: 0.5; }
+                    90% { opacity: 0.5; }
                     100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
                 }
                 .bubble {
                     position: absolute;
+                    top: 0;
+                    opacity: 0;
                     animation-name: floatUp;
                     animation-timing-function: linear;
                     animation-iteration-count: infinite;
+                    animation-fill-mode: both;
                     pointer-events: none;
                     user-select: none;
                 }

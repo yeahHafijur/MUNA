@@ -23,6 +23,77 @@ const AdminDashboard = () => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const [editingShop, setEditingShop] = useState(null);
+    const [editFormData, setEditFormData] = useState({
+        name: '',
+        address: '',
+        category: '',
+        udyamNumber: '',
+        lat: '',
+        lng: ''
+    });
+
+    const handleEditClick = (shop) => {
+        setEditingShop(shop);
+        setEditFormData({
+            name: shop.name || '',
+            address: shop.address || '',
+            category: shop.category || '',
+            udyamNumber: shop.udyamNumber || '',
+            lat: shop.location?.coordinates[1] || '',
+            lng: shop.location?.coordinates[0] || ''
+        });
+    };
+
+    const handleEditChange = (e) => {
+        setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+    };
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await fetch(`/api/shops/${editingShop._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(editFormData)
+            });
+            if (res.ok) {
+                setEditingShop(null);
+                fetchShops();
+            } else {
+                const data = await res.json();
+                alert(data.message || 'Failed to update shop');
+            }
+        } catch (error) {
+            console.error('Error updating shop:', error);
+        }
+    };
+
+    const handleToggleActive = async (shop) => {
+        if (!window.confirm(`Are you sure you want to ${shop.isActive ? 'DEACTIVATE' : 'ACTIVATE'} ${shop.name}?`)) return;
+        try {
+            const res = await fetch(`/api/shops/${shop._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ isActive: !shop.isActive })
+            });
+            if (res.ok) {
+                fetchShops();
+            } else {
+                const data = await res.json();
+                alert(data.message || 'Failed to toggle status');
+            }
+        } catch (error) {
+            console.error('Error toggling status:', error);
+        }
+    };
+
     useEffect(() => {
         // Protect Route
         if (!token || user?.role !== 'super_admin') {
@@ -35,7 +106,11 @@ const AdminDashboard = () => {
 
     const fetchShops = async () => {
         try {
-            const res = await fetch('/api/shops');
+            const res = await fetch('/api/shops?admin=true', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const data = await res.json();
             setShops(data);
             setLoadingShops(false);
@@ -158,7 +233,12 @@ const AdminDashboard = () => {
                             {shops.map(shop => (
                                 <div key={shop._id} className="border border-gray-100 rounded-lg p-3 hover:shadow-sm transition-shadow">
                                     <div className="flex justify-between items-start mb-1">
-                                        <h3 className="font-bold text-gray-800">{shop.name}</h3>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-bold text-gray-800">{shop.name}</h3>
+                                            {!shop.isActive && (
+                                                <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">Inactive</span>
+                                            )}
+                                        </div>
                                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${shop.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                             {shop.isOpen ? 'OPEN' : 'CLOSED'}
                                         </span>
@@ -177,12 +257,70 @@ const AdminDashboard = () => {
                                             </div>
                                         )}
                                     </div>
+
+                                    <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+                                        <button onClick={() => handleEditClick(shop)} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-1.5 rounded text-xs transition-colors">
+                                            ✏️ Edit
+                                        </button>
+                                        <button onClick={() => handleToggleActive(shop)} className={`flex-1 font-bold py-1.5 rounded text-xs transition-colors ${shop.isActive ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}>
+                                            {shop.isActive ? 'Deactivate' : 'Activate'}
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* Edit Shop Modal */}
+            {editingShop && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="bg-purple-600 p-4 flex justify-between items-center">
+                            <h2 className="text-white font-black text-lg">Edit Shop Details</h2>
+                            <button onClick={() => setEditingShop(null)} className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+                                ✕
+                            </button>
+                        </div>
+                        <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">Shop Name</label>
+                                    <input type="text" name="name" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.name} onChange={handleEditChange} />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">Address</label>
+                                    <input type="text" name="address" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.address} onChange={handleEditChange} />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">Category</label>
+                                    <input type="text" name="category" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.category} onChange={handleEditChange} />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">Udyam Number</label>
+                                    <input type="text" name="udyamNumber" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.udyamNumber} onChange={handleEditChange} />
+                                </div>
+                                <div className="flex gap-2">
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-bold text-gray-500 mb-1">Latitude</label>
+                                        <input type="number" step="any" name="lat" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.lat} onChange={handleEditChange} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-bold text-gray-500 mb-1">Longitude</label>
+                                        <input type="number" step="any" name="lng" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.lng} onChange={handleEditChange} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="pt-2">
+                                <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-3 rounded-xl transition-colors shadow-sm">
+                                    SAVE CHANGES
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -3,7 +3,25 @@ const Shop = require("../models/Shop");
 
 const getAllShops = async (req, res) => {
     try {
-        const shops = await Shop.find({}).populate('vendorId', 'name email phone');
+        let filter = { isActive: true }; // Only active shops by default
+
+        // Check if admin is requesting all shops
+        if (req.query.admin === 'true' && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            const jwt = require("jsonwebtoken");
+            const User = require("../models/User");
+            try {
+                const token = req.headers.authorization.split(' ')[1];
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const user = await User.findById(decoded.id);
+                if (user && user.role === 'super_admin') {
+                    filter = {}; // Admin sees all shops, including inactive
+                }
+            } catch (err) {
+                console.error("Admin token verification failed in getAllShops", err.message);
+            }
+        }
+
+        const shops = await Shop.find(filter).populate('vendorId', 'name email phone');
         res.status(200).json(shops);
     } catch (error) {
         res.status(500).json({ message: "Server Error", error: error.message })
@@ -89,6 +107,17 @@ const updateShop = async (req, res) => {
         shop.name = req.body.name || shop.name;
         shop.address = req.body.address || shop.address;
         shop.image = req.body.image || shop.image;
+        if (req.body.category !== undefined) shop.category = req.body.category;
+        if (req.body.udyamNumber !== undefined) shop.udyamNumber = req.body.udyamNumber;
+        if (req.body.isActive !== undefined) shop.isActive = req.body.isActive;
+        
+        if (req.body.lat !== undefined && req.body.lng !== undefined) {
+            shop.location = {
+                type: 'Point',
+                coordinates: [parseFloat(req.body.lng), parseFloat(req.body.lat)]
+            };
+        }
+
         if (req.body.customCategories !== undefined) {
             shop.customCategories = req.body.customCategories;
         }

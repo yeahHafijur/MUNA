@@ -35,17 +35,52 @@ const SplashScreen = ({ onFinish }) => {
     return (
         <div className={`fixed inset-0 z-[9999] bg-[#fdfaf3] flex items-center justify-center overflow-hidden transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
             
-            {/* Spinning Mandala Background */}
-            <div 
-                className="absolute w-[200vmax] h-[200vmax] opacity-20 pointer-events-none"
-                style={{ 
-                    backgroundImage: "url('/mandala_pattern.png')",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "repeat",
-                    animation: "spin 45s linear infinite"
-                }}
-            />
+            {/* Floating Grocery Bubbles */}
+            <style>
+                {`
+                @keyframes floatUp {
+                    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+                    10% { opacity: 0.2; }
+                    90% { opacity: 0.2; }
+                    100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+                }
+                .bubble {
+                    position: absolute;
+                    animation-name: floatUp;
+                    animation-timing-function: linear;
+                    animation-iteration-count: infinite;
+                    pointer-events: none;
+                    user-select: none;
+                }
+                `}
+            </style>
+            
+            {[
+                { icon: '🍎', left: '10%', delay: '0s', duration: '4s', size: 'text-4xl' },
+                { icon: '🛒', left: '80%', delay: '0.5s', duration: '4.5s', size: 'text-5xl' },
+                { icon: '🥦', left: '25%', delay: '1s', duration: '3.5s', size: 'text-3xl' },
+                { icon: '🛍️', left: '70%', delay: '1.5s', duration: '5s', size: 'text-4xl' },
+                { icon: '🥖', left: '35%', delay: '0.2s', duration: '4s', size: 'text-5xl' },
+                { icon: '🍅', left: '60%', delay: '2s', duration: '4.2s', size: 'text-3xl' },
+                { icon: '🥕', left: '15%', delay: '1.2s', duration: '3.8s', size: 'text-4xl' },
+                { icon: '🍉', left: '85%', delay: '2.5s', duration: '5.5s', size: 'text-4xl' },
+                { icon: '🧅', left: '50%', delay: '0.8s', duration: '4.3s', size: 'text-3xl' },
+                { icon: '🥔', left: '5%', delay: '2.2s', duration: '4.8s', size: 'text-5xl' },
+                { icon: '🛒', left: '40%', delay: '1.8s', duration: '3.9s', size: 'text-4xl' },
+                { icon: '🍇', left: '92%', delay: '0.3s', duration: '4.1s', size: 'text-3xl' },
+            ].map((bubble, i) => (
+                <div 
+                    key={i} 
+                    className={`bubble ${bubble.size}`}
+                    style={{
+                        left: bubble.left,
+                        animationDelay: bubble.delay,
+                        animationDuration: bubble.duration
+                    }}
+                >
+                    {bubble.icon}
+                </div>
+            ))}
 
             <div className={`relative w-72 sm:w-96 flex items-center justify-center transition-opacity duration-300 z-10 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
                 <video 

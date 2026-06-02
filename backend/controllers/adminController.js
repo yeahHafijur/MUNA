@@ -15,6 +15,10 @@ const onboardVendorAndShop = async (req, res) => {
             return res.status(400).json({ message: "Valid Email and 10-digit phone number are required." });
         }
 
+        if (!shopLat || !shopLng) {
+            return res.status(400).json({ message: "Shop Latitude and Longitude are required for delivery calculations." });
+        }
+
         const cleanEmail = vendorEmail.trim().toLowerCase();
 
         // Check if vendor email already exists
@@ -39,14 +43,11 @@ const onboardVendorAndShop = async (req, res) => {
             });
         }
 
-        // 2. Prepare Shop Location (if provided)
-        let locationData = undefined;
-        if (shopLat && shopLng) {
-            locationData = {
-                type: 'Point',
-                coordinates: [parseFloat(shopLng), parseFloat(shopLat)] // [Lng, Lat] format for GeoJSON
-            };
-        }
+        // 2. Prepare Shop Location
+        const locationData = {
+            type: 'Point',
+            coordinates: [parseFloat(shopLng), parseFloat(shopLat)] // [Lng, Lat] format for GeoJSON
+        };
 
         // 3. Create the Shop
         const shop = await Shop.create({

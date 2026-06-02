@@ -132,8 +132,8 @@ const AdminDashboard = () => {
                             <input type="text" name="udyamNumber" placeholder="Udyam Number (Optional)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm font-semibold tracking-wide" value={formData.udyamNumber} onChange={handleChange} />
                             
                             <div className="flex gap-2">
-                                <input type="number" step="any" name="shopLat" placeholder="Latitude (Optional)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLat} onChange={handleChange} />
-                                <input type="number" step="any" name="shopLng" placeholder="Longitude (Optional)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLng} onChange={handleChange} />
+                                <input type="number" step="any" name="shopLat" required placeholder="Latitude (Required)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLat} onChange={handleChange} />
+                                <input type="number" step="any" name="shopLng" required placeholder="Longitude (Required)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLng} onChange={handleChange} />
                             </div>
                         </div>
 

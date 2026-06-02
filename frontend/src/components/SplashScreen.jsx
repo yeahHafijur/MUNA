@@ -31,20 +31,16 @@ const SplashScreen = ({ onFinish }) => {
     }, []);
 
     return (
-        <div className={`fixed inset-0 z-[9999] bg-[#fcf9f2] flex items-center justify-center transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
-            <div className="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center">
+        <div className={`fixed inset-0 z-[9999] bg-[#fdfaf3] flex items-center justify-center transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
+            <div className="relative w-64 sm:w-80 flex items-center justify-center">
                 <video 
                     ref={videoRef}
-                    className="w-full h-full object-cover shadow-2xl rounded-full"
+                    className="w-full h-auto object-cover rounded-2xl shadow-[0_0_50px_10px_rgba(250,204,21,0.4)] border border-yellow-200/50"
                     src="/MunaIntro.mp4"
                     playsInline
                     muted
                     autoPlay
                     onEnded={handleFinish}
-                    style={{
-                        WebkitMaskImage: 'radial-gradient(circle, black 50%, transparent 80%)',
-                        maskImage: 'radial-gradient(circle, black 50%, transparent 80%)'
-                    }}
                 />
             </div>
         </div>

@@ -34,7 +34,7 @@ const SplashScreen = ({ onFinish }) => {
 
     return (
         <div className={`fixed inset-0 z-[9999] bg-[#fdfaf3] flex items-center justify-center transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
-            <div className={`relative w-64 sm:w-80 aspect-square flex items-center justify-center overflow-hidden rounded-2xl shadow-[0_0_50px_10px_rgba(250,204,21,0.4)] border border-yellow-200/50 transition-opacity duration-300 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`relative w-64 sm:w-80 aspect-square flex items-center justify-center overflow-hidden rounded-2xl shadow-xl shadow-yellow-400/50 border-2 border-yellow-400 transition-opacity duration-300 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
                 <video 
                     ref={videoRef}
                     className="w-full h-full object-cover scale-[1.15]"

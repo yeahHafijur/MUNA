@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
 import Navbar from './components/Navbar';
+import SplashScreen from './components/SplashScreen';
 import Home from './pages/Home';
 import ShopDetail from './pages/ShopDetail';
 import Cart from './pages/Cart';
@@ -17,8 +19,12 @@ import GodownBrowser from './pages/GodownBrowser';
 
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   return (
     <Router>
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
+      
       <div className="min-h-screen bg-gray-50 font-sans">
         {/* Ye humara Top Header (Navbar) hoga */}
         <Navbar />

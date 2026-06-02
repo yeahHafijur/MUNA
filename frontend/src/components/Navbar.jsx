@@ -30,13 +30,12 @@ const Navbar = () => {
                     )}
 
                     {/* Logo */}
-                    <Link to="/" className="flex flex-col">
-                        <span className="text-2xl font-black text-black tracking-tight leading-none">
-                            MUNA
-                        </span>
-                        <span className="text-[10px] font-bold text-yellow-800 uppercase tracking-widest">
-                            Your Village Store
-                        </span>
+                    <Link to="/" className="flex items-center">
+                        <img 
+                            src="/muna-logo.png" 
+                            alt="MUNA" 
+                            className="h-10 w-auto object-contain rounded drop-shadow-sm"
+                        />
                     </Link>
                 </div>
 

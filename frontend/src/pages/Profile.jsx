@@ -47,8 +47,19 @@ const Profile = () => {
                     <h1 className="text-2xl font-black text-gray-800">{user.name}</h1>
                     <p className="text-gray-500 text-sm">{user.email}</p>
                 </div>
-                <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                    {user.role}
+                <div className="flex flex-col items-end gap-2">
+                    <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                        {user.role}
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
+                    </button>
                 </div>
             </div>
 
@@ -98,16 +109,6 @@ const Profile = () => {
                 </div>
             )}
 
-            {/* Logout Button at bottom */}
-            <button
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 font-black py-4 rounded-xl transition-all shadow-sm hover:shadow-md"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                LOGOUT SECURELY
-            </button>
         </div>
     );
 };

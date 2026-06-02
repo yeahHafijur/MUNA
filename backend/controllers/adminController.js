@@ -4,7 +4,7 @@ const Shop = require("../models/Shop");
 // 1. Onboard Vendor & Shop (Super Admin only)
 const onboardVendorAndShop = async (req, res) => {
     try {
-        const { vendorName, vendorEmail, vendorPhone, shopName, shopAddress, shopCategory, shopLat, shopLng } = req.body;
+        const { vendorName, vendorEmail, vendorPhone, shopName, shopAddress, shopCategory, shopLat, shopLng, udyamNumber } = req.body;
 
         // Security Check: Sirf super_admin yeh kar sakta hai
         if (req.user.role !== 'super_admin') {
@@ -53,6 +53,7 @@ const onboardVendorAndShop = async (req, res) => {
             name: shopName,
             address: shopAddress,
             category: shopCategory || "General",
+            udyamNumber: udyamNumber || "",
             location: locationData,
             vendorId: vendor._id
         });

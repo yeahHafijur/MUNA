@@ -354,7 +354,14 @@ const VendorDashboard = () => {
                     </div>
                 )}
                 <div className="relative z-10">
-                    <h1 className="text-2xl font-black">{shop.name}</h1>
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                        <h1 className="text-2xl font-black">{shop.name}</h1>
+                        {shop.udyamNumber && (
+                            <span className="bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                🛡️ Verified Udyam
+                            </span>
+                        )}
+                    </div>
                     <p className="text-gray-400 text-sm mb-3">{shop.address}</p>
                     
                     <div className="flex gap-2 items-center flex-wrap">

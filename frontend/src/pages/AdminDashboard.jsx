@@ -16,6 +16,7 @@ const AdminDashboard = () => {
         shopName: '',
         shopAddress: '',
         shopCategory: '',
+        udyamNumber: '',
         shopLat: '',
         shopLng: ''
     });
@@ -77,6 +78,7 @@ const AdminDashboard = () => {
                 shopName: '',
                 shopAddress: '',
                 shopCategory: '',
+                udyamNumber: '',
                 shopLat: '',
                 shopLng: ''
             });
@@ -127,6 +129,7 @@ const AdminDashboard = () => {
                             <input type="text" name="shopName" required placeholder="Shop Name" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopName} onChange={handleChange} />
                             <input type="text" name="shopAddress" required placeholder="Shop Address" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopAddress} onChange={handleChange} />
                             <input type="text" name="shopCategory" placeholder="Category (e.g. Kirana, Pharmacy)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopCategory} onChange={handleChange} />
+                            <input type="text" name="udyamNumber" placeholder="Udyam Number (Optional)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm font-semibold tracking-wide" value={formData.udyamNumber} onChange={handleChange} />
                             
                             <div className="flex gap-2">
                                 <input type="number" step="any" name="shopLat" placeholder="Latitude (Optional)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLat} onChange={handleChange} />
@@ -162,9 +165,17 @@ const AdminDashboard = () => {
                                     </div>
                                     <p className="text-xs text-gray-500 mb-2">{shop.address}</p>
                                     
-                                    <div className="bg-gray-50 p-2 rounded flex justify-between items-center text-xs">
-                                        <span className="font-bold text-gray-600">Vendor:</span>
-                                        <span className="text-purple-600 font-bold">{shop.vendorId?.name || 'Unknown'}</span>
+                                    <div className="bg-gray-50 p-2 rounded flex flex-col gap-1 text-xs mt-2">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-500">Vendor:</span>
+                                            <span className="font-semibold text-gray-800">{shop.vendorId?.name || 'Unknown'}</span>
+                                        </div>
+                                        {shop.udyamNumber && (
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-500">Udyam No:</span>
+                                                <span className="font-semibold text-purple-700 bg-purple-50 px-1 rounded border border-purple-100">{shop.udyamNumber}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))}

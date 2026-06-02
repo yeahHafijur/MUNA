@@ -197,6 +197,13 @@ const Home = () => {
                                                     {shop.category || 'Kirana'}
                                                 </span>
 
+                                                {/* Udyam Badge */}
+                                                {shop.udyamNumber && (
+                                                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen ? 'bg-blue-50 text-blue-600 border border-blue-200/60' : 'bg-gray-100 text-gray-400 border border-gray-200'} flex items-center gap-1`}>
+                                                        🛡️ Verified
+                                                    </span>
+                                                )}
+
                                                 {/* Status Tag */}
                                                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen
                                                     ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'

@@ -21,6 +21,10 @@ const shopSchema = new mongoose.Schema({
         type: String,
         default: "General"
     },
+    udyamNumber: {
+        type: String,
+        default: ""
+    },
     customCategories: {
         type: [String],
         default: []

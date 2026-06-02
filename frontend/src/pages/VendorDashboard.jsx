@@ -39,6 +39,7 @@ const VendorDashboard = () => {
     const [minCharge, setMinCharge] = useState(10);
     const [minDistance, setMinDistance] = useState(2);
     const [chargePerKm, setChargePerKm] = useState(5);
+    const [maxRange, setMaxRange] = useState(5);
 
     const [shopImageFile, setShopImageFile] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
@@ -67,6 +68,7 @@ const VendorDashboard = () => {
                         setMinCharge(shopData.deliverySettings.minimumCharge ?? 10);
                         setMinDistance(shopData.deliverySettings.minimumDistance ?? 2);
                         setChargePerKm(shopData.deliverySettings.chargePerKm ?? 5);
+                        setMaxRange(shopData.deliverySettings.maxRange ?? 5);
                     }
                     fetchOrders(true); // initial fetch
                     fetchProducts(shopData._id);
@@ -297,7 +299,8 @@ const VendorDashboard = () => {
                     deliverySettings: {
                         minimumCharge: Number(minCharge),
                         minimumDistance: Number(minDistance),
-                        chargePerKm: Number(chargePerKm)
+                        chargePerKm: Number(chargePerKm),
+                        maxRange: Number(maxRange)
                     }
                 })
             });
@@ -479,7 +482,7 @@ const VendorDashboard = () => {
                     {/* Delivery Settings */}
                     <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                         <h2 className="font-bold text-gray-800 mb-3 flex items-center gap-2"><span>🛵</span> Delivery Charges Settings</h2>
-                        <form onSubmit={handleUpdateDeliverySettings} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <form onSubmit={handleUpdateDeliverySettings} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Minimum Charge (₹)</label>
                                 <input type="number" required value={minCharge} onChange={e => setMinCharge(e.target.value)} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-yellow-400 font-bold" />
@@ -492,7 +495,11 @@ const VendorDashboard = () => {
                                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Extra Charge Per Km (₹)</label>
                                 <input type="number" required value={chargePerKm} onChange={e => setChargePerKm(e.target.value)} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-yellow-400 font-bold" />
                             </div>
-                            <div className="md:col-span-3 flex justify-end">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Max Delivery Range (km)</label>
+                                <input type="number" step="0.1" required value={maxRange} onChange={e => setMaxRange(e.target.value)} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-yellow-400 font-bold" />
+                            </div>
+                            <div className="md:col-span-2 lg:col-span-4 flex justify-end">
                                 <button type="submit" className="bg-gray-800 hover:bg-black text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
                                     Save Settings
                                 </button>

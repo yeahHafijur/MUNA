@@ -168,7 +168,12 @@ const calculateDelivery = async (req, res) => {
 
         const distance = getDistanceFromLatLonInKm(shopLat, shopLng, parseFloat(lat), parseFloat(lng));
         
-        const settings = shop.deliverySettings || { minimumCharge: 10, minimumDistance: 2, chargePerKm: 5 };
+        const settings = shop.deliverySettings || { minimumCharge: 10, minimumDistance: 2, chargePerKm: 5, maxRange: 5 };
+        const maxRange = settings.maxRange || 5;
+
+        if (distance > maxRange) {
+            return res.status(400).json({ message: `Ye address shop ki delivery range (${maxRange} km) se bahar hai. Aapki doori: ${distance.toFixed(1)} km.` });
+        }
         
         let fee = settings.minimumCharge;
         if (distance > settings.minimumDistance) {

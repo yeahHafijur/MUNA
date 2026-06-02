@@ -36,7 +36,8 @@ const shopSchema = new mongoose.Schema({
     deliverySettings: {
         minimumCharge: { type: Number, default: 10 },
         minimumDistance: { type: Number, default: 2 }, // distance in km
-        chargePerKm: { type: Number, default: 5 } // charge for extra km
+        chargePerKm: { type: Number, default: 5 }, // charge for extra km
+        maxRange: { type: Number, default: 5 } // Max delivery radius in km
     },
     location: {
         type: {

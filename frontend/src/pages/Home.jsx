@@ -92,7 +92,7 @@ const Home = () => {
                     <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Open Now</p>
                 </div>
                 <div className="bg-white rounded-xl p-3 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <p className="text-xl sm:text-2xl font-black bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent">100 KM</p>
+                    <p className="text-xl sm:text-2xl font-black bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent">5 KM</p>
                     <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Delivery Range</p>
                 </div>
             </div>
@@ -144,25 +144,25 @@ const Home = () => {
                             style={{ animationDelay: `${index * 60}ms` }}
                         >
                             <div className={`bg-white rounded-2xl border overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${shop.isOpen ? 'border-gray-100' : 'border-gray-200'}`}>
-                                
+
                                 {/* Card Top — Colored Accent */}
                                 <div className={`h-1.5 w-full ${shop.isOpen ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-gray-300 to-gray-400'}`}></div>
 
                                 <div className="p-4 sm:p-5">
                                     <div className="flex items-start gap-4">
-                                        
+
                                         {/* Shop Image / Avatar */}
                                         <div className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex-shrink-0 flex items-center justify-center text-2xl sm:text-3xl overflow-hidden transition-transform duration-300 group-hover:scale-105 ${shop.isOpen ? 'bg-gradient-to-br from-amber-50 to-yellow-100 border-2 border-yellow-200/50 shadow-sm' : 'bg-gray-100 border-2 border-gray-200'}`}>
                                             {shop.image ? (
-                                                <img 
-                                                    src={`${shop.image}`} 
-                                                    alt={shop.name} 
-                                                    className={`w-full h-full object-cover ${!shop.isOpen ? 'grayscale opacity-60' : ''}`} 
+                                                <img
+                                                    src={`${shop.image}`}
+                                                    alt={shop.name}
+                                                    className={`w-full h-full object-cover ${!shop.isOpen ? 'grayscale opacity-60' : ''}`}
                                                 />
                                             ) : (
                                                 <span className={`${!shop.isOpen ? 'grayscale' : ''}`}>🏪</span>
                                             )}
-                                            
+
                                             {/* Live indicator dot */}
                                             {shop.isOpen && (
                                                 <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm">
@@ -178,7 +178,7 @@ const Home = () => {
                                                     {shop.name}
                                                 </h3>
                                             </div>
-                                            
+
                                             <div className={`text-xs leading-snug mb-2.5 ${shop.isOpen ? 'text-gray-500' : 'text-gray-400'}`}>
                                                 <p className="line-clamp-1 mb-1">📍 {shop.address}</p>
                                                 {shop.vendorId?.phone && (
@@ -191,19 +191,19 @@ const Home = () => {
                                             {/* Tags Row */}
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 {/* Category Tag */}
-                                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen 
-                                                    ? 'bg-yellow-50 text-yellow-500 border border-yellow-200/60' 
+                                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen
+                                                    ? 'bg-yellow-50 text-yellow-500 border border-yellow-200/60'
                                                     : 'bg-gray-100 text-gray-400 border border-gray-200'}`}>
                                                     {shop.category || 'Kirana'}
                                                 </span>
 
                                                 {/* Status Tag */}
-                                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen 
-                                                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60' 
+                                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen
+                                                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
                                                     : 'bg-red-50 text-red-400 border border-red-200/60'}`}>
                                                     {shop.isOpen ? '● Open' : '● Closed'}
                                                 </span>
-                                                
+
                                                 {/* Rating */}
                                                 <span className={`text-[10px] font-bold flex items-center gap-0.5 ${shop.isOpen ? 'text-gray-600' : 'text-gray-400'}`}>
                                                     ⭐ {shop.rating || '4.5'}
@@ -211,7 +211,7 @@ const Home = () => {
 
                                                 {/* Directions Button */}
                                                 {shop.location?.coordinates && (
-                                                    <button 
+                                                    <button
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank');

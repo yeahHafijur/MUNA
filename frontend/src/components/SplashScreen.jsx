@@ -85,10 +85,10 @@ const SplashScreen = ({ onFinish }) => {
                 </div>
             ))}
 
-            <div className={`relative w-72 sm:w-96 flex items-center justify-center transition-opacity duration-300 z-10 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`relative w-[85vw] max-w-sm sm:max-w-md flex items-center justify-center transition-opacity duration-300 z-10 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
                 <video 
                     ref={videoRef}
-                    className="w-full h-auto rounded-2xl shadow-xl shadow-yellow-400/50 border-2 border-yellow-400"
+                    className="w-full h-auto rounded-3xl shadow-2xl shadow-yellow-500/40"
                     src="/MunaIntro.mp4"
                     playsInline
                     muted

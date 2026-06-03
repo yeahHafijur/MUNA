@@ -123,10 +123,11 @@ const AdminDashboard = () => {
         try {
             const res = await fetch('/api/master-products');
             const data = await res.json();
-            setGodownItems(data);
+            setGodownItems(Array.isArray(data) ? data : []);
             setLoadingGodownItems(false);
         } catch (error) {
             console.error("Error fetching godown items:", error);
+            setGodownItems([]);
             setLoadingGodownItems(false);
         }
     };
@@ -219,10 +220,11 @@ const AdminDashboard = () => {
                 }
             });
             const data = await res.json();
-            setShops(data);
+            setShops(Array.isArray(data) ? data : []);
             setLoadingShops(false);
         } catch (error) {
             console.error('Error fetching shops:', error);
+            setShops([]);
             setLoadingShops(false);
         }
     };

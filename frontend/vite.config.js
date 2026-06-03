@@ -25,9 +25,35 @@ export default defineConfig({
         theme_color: '#f59e0b', // Amber/Yellow
         background_color: '#ffffff',
         display: 'standalone',
+        display_override: ['window-controls-overlay', 'standalone', 'minimal-ui'],
         orientation: 'portrait',
         categories: ['shopping', 'groceries', 'food'],
         lang: 'en',
+        dir: 'ltr',
+        iarc_rating_id: 'e84b072d-71b3-4d3e-86ae-31a8ce4e53b7',
+        related_applications: [
+          {
+            platform: 'play',
+            url: 'https://play.google.com/store/apps/details?id=com.muna.app',
+            id: 'com.muna.app'
+          }
+        ],
+        shortcuts: [
+          {
+            name: "Open Cart",
+            short_name: "Cart",
+            description: "View your shopping cart",
+            url: "/cart",
+            icons: [{ src: "/icon-192x192.png", sizes: "192x192" }]
+          },
+          {
+            name: "Vendor Dashboard",
+            short_name: "Vendor",
+            description: "Manage your shop",
+            url: "/vendor-dashboard",
+            icons: [{ src: "/icon-192x192.png", sizes: "192x192" }]
+          }
+        ],
         icons: [
           {
             src: '/icon-192x192.png',

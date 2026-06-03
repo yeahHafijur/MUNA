@@ -54,7 +54,10 @@ app.use((err, req, res, next) => {
 const mongoose = require("mongoose");
 
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("MongoDB Connected"))
+    .then(() => {
+        console.log("MongoDB Connected");
+        console.log("🚀 MUNA BACKEND LIVE - ONESIGNAL NOTIFICATION ENABLED v1.1");
+    })
     .catch((err) => console.log("Eroor is :", err));
 
 

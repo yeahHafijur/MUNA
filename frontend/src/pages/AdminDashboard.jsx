@@ -110,6 +110,7 @@ const AdminDashboard = () => {
     const [godownItems, setGodownItems] = useState([]);
     const [loadingGodownItems, setLoadingGodownItems] = useState(true);
     const [editingGodownItem, setEditingGodownItem] = useState(null);
+    const [godownSearchQuery, setGodownSearchQuery] = useState('');
 
     // For Add and Edit Godown Items
     const [godownFormData, setGodownFormData] = useState({

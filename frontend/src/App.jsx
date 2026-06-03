@@ -24,26 +24,61 @@ function App() {
         notifyButton: {
           enable: true,
         },
+        serviceWorkerParam: { scope: '/' },
       });
 
-      // Send player ID to backend if user is logged in
-      const syncPlayerId = () => {
-        const token = localStorage.getItem('token');
-        const playerId = OneSignal.User.PushSubscription.id;
-        if (token && playerId) {
-          fetch('/api/auth/save-player-id', {
+      console.log("[MUNA] OneSignal initialized successfully");
+
+      // Function to sync player ID to backend
+      const syncPlayerId = async (source) => {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            console.log("[MUNA] No auth token found, skipping player ID sync");
+            return;
+          }
+
+          const sub = OneSignal.User.PushSubscription;
+          const playerId = sub.id;
+          const optedIn = sub.optedIn;
+
+          console.log(`[MUNA] Sync attempt from: ${source}`);
+          console.log(`[MUNA] Player ID: ${playerId}`);
+          console.log(`[MUNA] Opted In: ${optedIn}`);
+
+          if (!playerId) {
+            console.log("[MUNA] No Player ID yet, will retry...");
+            return;
+          }
+
+          const res = await fetch('/api/auth/save-player-id', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ playerId })
-          }).catch(err => console.error("Failed to sync Player ID", err));
+          });
+          const data = await res.json();
+          console.log("[MUNA] Player ID sync response:", data);
+        } catch (err) {
+          console.error("[MUNA] Failed to sync Player ID:", err);
         }
       };
 
-      OneSignal.User.PushSubscription.addEventListener("change", syncPlayerId);
-      syncPlayerId();
+      // Listen for subscription changes
+      OneSignal.User.PushSubscription.addEventListener("change", (event) => {
+        console.log("[MUNA] PushSubscription changed:", event);
+        syncPlayerId("subscription-change-event");
+      });
+
+      // Try immediately
+      syncPlayerId("initial");
+
+      // Retry after 3 seconds (subscription may take a moment)
+      setTimeout(() => syncPlayerId("retry-3s"), 3000);
+      // Retry after 8 seconds
+      setTimeout(() => syncPlayerId("retry-8s"), 8000);
     });
   }, []);
 

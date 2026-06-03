@@ -5,29 +5,42 @@ const User = require('../models/User');
 
 // Function to send OneSignal push notification
 const sendOneSignalNotification = async (playerIds, heading, message) => {
-    if (!process.env.ONESIGNAL_REST_API_KEY || !playerIds || playerIds.length === 0) {
-        console.log("Skipping OneSignal: Missing API Key or Player IDs");
+    console.log("[OneSignal] Attempting to send notification...");
+    console.log("[OneSignal] API Key present:", !!process.env.ONESIGNAL_REST_API_KEY);
+    console.log("[OneSignal] Player IDs:", playerIds);
+    console.log("[OneSignal] Heading:", heading);
+    console.log("[OneSignal] Message:", message);
+
+    if (!process.env.ONESIGNAL_REST_API_KEY) {
+        console.log("[OneSignal] ❌ SKIPPED: ONESIGNAL_REST_API_KEY not found in environment!");
+        return;
+    }
+    if (!playerIds || playerIds.length === 0 || playerIds[0] === null || playerIds[0] === undefined) {
+        console.log("[OneSignal] ❌ SKIPPED: No valid Player IDs provided!");
         return;
     }
 
     try {
+        const payload = {
+            app_id: "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
+            include_subscription_ids: playerIds,
+            headings: { en: heading },
+            contents: { en: message }
+        };
+        console.log("[OneSignal] Sending payload:", JSON.stringify(payload));
+
         const response = await fetch("https://onesignal.com/api/v1/notifications", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Basic ${process.env.ONESIGNAL_REST_API_KEY}`
             },
-            body: JSON.stringify({
-                app_id: "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
-                include_subscription_ids: playerIds,
-                headings: { en: heading },
-                contents: { en: message }
-            })
+            body: JSON.stringify(payload)
         });
         const data = await response.json();
-        console.log("OneSignal push response:", data);
+        console.log("[OneSignal] ✅ Response:", JSON.stringify(data));
     } catch (error) {
-        console.error("OneSignal push error:", error);
+        console.error("[OneSignal] ❌ Error:", error);
     }
 };
 

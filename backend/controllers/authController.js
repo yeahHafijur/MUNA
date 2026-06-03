@@ -176,6 +176,8 @@ const googleLogin = async (req, res) => {
 const savePlayerId = async (req, res) => {
     try {
         const { playerId } = req.body;
+        console.log("[SavePlayerId] Received request. Player ID:", playerId, "User:", req.user?._id);
+        
         if (!playerId) {
             return res.status(400).json({ message: "Player ID is required" });
         }
@@ -188,9 +190,10 @@ const savePlayerId = async (req, res) => {
         user.onesignalPlayerId = playerId;
         await user.save();
 
+        console.log(`[SavePlayerId] ✅ Saved Player ID for user ${user.name} (${user.role}): ${playerId}`);
         res.status(200).json({ message: "Player ID saved successfully" });
     } catch (error) {
-        console.error("Save Player ID Error:", error);
+        console.error("[SavePlayerId] ❌ Error:", error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };

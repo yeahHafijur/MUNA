@@ -13,7 +13,16 @@ import AdminDashboard from './pages/AdminDashboard';
 import GodownBrowser from './pages/GodownBrowser';
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash screen once per session
+    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
+    return !hasSeenSplash;
+  });
+
+  const handleSplashFinish = () => {
+    sessionStorage.setItem('hasSeenSplash', 'true');
+    setShowSplash(false);
+  };
 
   // Initialize OneSignal
   useEffect(() => {
@@ -85,7 +94,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
+      {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
       
       <div className="min-h-screen bg-gray-50 font-sans">
         {/* Ye humara Top Header (Navbar) hoga */}

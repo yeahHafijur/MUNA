@@ -206,7 +206,7 @@ const AdminDashboard = () => {
                             <input type="text" name="shopCategory" placeholder="Category (e.g. Kirana, Pharmacy)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopCategory} onChange={handleChange} />
                             <input type="text" name="udyamNumber" placeholder="Udyam Number (Optional)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm font-semibold tracking-wide" value={formData.udyamNumber} onChange={handleChange} />
                             
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 <input type="number" step="any" name="shopLat" required placeholder="Latitude (Required)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLat} onChange={handleChange} />
                                 <input type="number" step="any" name="shopLng" required placeholder="Longitude (Required)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLng} onChange={handleChange} />
                             </div>
@@ -301,7 +301,7 @@ const AdminDashboard = () => {
                                     <label className="block text-xs font-bold text-gray-500 mb-1">Udyam Number</label>
                                     <input type="text" name="udyamNumber" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.udyamNumber} onChange={handleEditChange} />
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                     <div className="flex-1">
                                         <label className="block text-xs font-bold text-gray-500 mb-1">Latitude</label>
                                         <input type="number" step="any" name="lat" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.lat} onChange={handleEditChange} />

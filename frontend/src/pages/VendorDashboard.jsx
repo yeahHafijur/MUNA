@@ -237,22 +237,33 @@ const VendorDashboard = () => {
             formData.append('image', selectedGodownImage);
         }
 
-        await fetch('/api/products', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
-            body: formData
-        });
-        
-        // Reset forms
-        setNewProductName('');
-        setNewProductPrice('');
-        setNewProductImage(null);
-        setSelectedGodownImage('');
-        setNewProductCategory('');
-        setShowGodown(false);
-        const imgInput = document.getElementById('imageInput');
-        if (imgInput) imgInput.value = '';
-        fetchProducts(shop._id);
+        try {
+            const res = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                alert(data.message || 'Failed to add item manually');
+                return;
+            }
+
+            // Reset forms
+            setNewProductName('');
+            setNewProductPrice('');
+            setNewProductImage(null);
+            setSelectedGodownImage('');
+            setNewProductCategory('');
+            setShowGodown(false);
+            const imgInput = document.getElementById('imageInput');
+            if (imgInput) imgInput.value = '';
+            fetchProducts(shop._id);
+        } catch (error) {
+            console.error("Error adding product:", error);
+            alert("Error adding item manually. Please check your connection.");
+        }
     };
 
     const handleAddCategory = async (e) => {

@@ -172,5 +172,28 @@ const googleLogin = async (req, res) => {
     }
 };
 
-module.exports = { sendOTP, verifyOTP, googleLogin };
+// Save OneSignal Player ID for push notifications
+const savePlayerId = async (req, res) => {
+    try {
+        const { playerId } = req.body;
+        if (!playerId) {
+            return res.status(400).json({ message: "Player ID is required" });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.onesignalPlayerId = playerId;
+        await user.save();
+
+        res.status(200).json({ message: "Player ID saved successfully" });
+    } catch (error) {
+        console.error("Save Player ID Error:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+module.exports = { sendOTP, verifyOTP, googleLogin, savePlayerId };
 

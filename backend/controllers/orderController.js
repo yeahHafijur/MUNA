@@ -2,14 +2,34 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
-const webpush = require('web-push');
 
-// Configure web-push with VAPID keys
-webpush.setVapidDetails(
-  'mailto:your_email@example.com',
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-);
+// Function to send OneSignal push notification
+const sendOneSignalNotification = async (playerIds, heading, message) => {
+    if (!process.env.ONESIGNAL_REST_API_KEY || !playerIds || playerIds.length === 0) {
+        console.log("Skipping OneSignal: Missing API Key or Player IDs");
+        return;
+    }
+
+    try {
+        const response = await fetch("https://onesignal.com/api/v1/notifications", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Basic ${process.env.ONESIGNAL_REST_API_KEY}`
+            },
+            body: JSON.stringify({
+                app_id: "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
+                include_subscription_ids: playerIds,
+                headings: { en: heading },
+                contents: { en: message }
+            })
+        });
+        const data = await response.json();
+        console.log("OneSignal push response:", data);
+    } catch (error) {
+        console.error("OneSignal push error:", error);
+    }
+};
 
 // Haversine formula: Do (2) GPS points ke beech ka distance (KM) nikalne ke liye
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -114,17 +134,15 @@ const placeOrder = async (req, res) => {
         // 🔔 PUSH NOTIFICATION ALERT TO VENDOR
         try {
             const vendor = await User.findById(shop.vendorId);
-            if (vendor && vendor.pushSubscription) {
-                const payload = JSON.stringify({
-                    title: '🎉 Naya Order Aaya Hai!',
-                    body: `Total: ₹${finalTotalAmount} (${items.length} items)`,
-                    icon: '/icon-192x192.png', // PWA icon
-                });
-                await webpush.sendNotification(vendor.pushSubscription, payload);
-                console.log("Push notification sent to vendor!");
+            if (vendor && vendor.onesignalPlayerId) {
+                await sendOneSignalNotification(
+                    [vendor.onesignalPlayerId], 
+                    "🎉 Naya Order Aaya Hai!", 
+                    `Total: ₹${finalTotalAmount} (${items.length} items)`
+                );
             }
         } catch (pushErr) {
-            console.error("Error sending push notification:", pushErr);
+            console.error("Error sending push notification to vendor:", pushErr);
         }
 
         // Update user's phone number if provided (saves for future)
@@ -191,6 +209,27 @@ const updateOrderStatus = async (req, res) => {
 
         order.status = status;
         const updatedOrder = await order.save();
+
+        // 🔔 PUSH NOTIFICATION ALERT TO CUSTOMER
+        try {
+            const customer = await User.findById(order.customerId);
+            if (customer && customer.onesignalPlayerId) {
+                let statusMessage = "Your order status has been updated.";
+                if (status === 'accepted') statusMessage = "Yay! Your order has been accepted by the shop.";
+                else if (status === 'packed') statusMessage = "Your order is packed and ready!";
+                else if (status === 'out_for_delivery') statusMessage = "Your order is out for delivery! 🛵";
+                else if (status === 'delivered') statusMessage = "Your order has been delivered. Enjoy! 🎉";
+                else if (status === 'cancelled') statusMessage = "Your order was cancelled.";
+
+                await sendOneSignalNotification(
+                    [customer.onesignalPlayerId], 
+                    "Order Update 📦", 
+                    statusMessage
+                );
+            }
+        } catch (pushErr) {
+            console.error("Error sending push notification to customer:", pushErr);
+        }
 
         res.status(200).json(updatedOrder);
     } catch (error) {

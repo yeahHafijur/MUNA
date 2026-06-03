@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
         type: Object,
         default: null
     },
+    onesignalPlayerId: {
+        type: String,
+        default: null
+    },
     password: {
         type: String
     },

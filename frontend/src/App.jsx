@@ -25,6 +25,25 @@ function App() {
           enable: true,
         },
       });
+
+      // Send player ID to backend if user is logged in
+      const syncPlayerId = () => {
+        const token = localStorage.getItem('token');
+        const playerId = OneSignal.User.PushSubscription.id;
+        if (token && playerId) {
+          fetch('/api/auth/save-player-id', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ playerId })
+          }).catch(err => console.error("Failed to sync Player ID", err));
+        }
+      };
+
+      OneSignal.User.PushSubscription.addEventListener("change", syncPlayerId);
+      syncPlayerId();
     });
   }, []);
 

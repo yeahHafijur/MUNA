@@ -23,8 +23,8 @@ const createProduct = async (req, res) => {
     try {
         const { name, price, category, stock } = req.body;
         
-        // Agar file upload hui hai toh uska path lo, warna agar direct link aaya hai toh wo lo
-        const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
+        // Agar file upload hui hai toh usko base64 me convert karo
+        const image = req.file ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}` : req.body.image;
 
         const shop = await Shop.findOne({
             vendorId: req.user._id

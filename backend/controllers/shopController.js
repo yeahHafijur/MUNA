@@ -152,7 +152,7 @@ const updateShopImage = async (req, res) => {
             return res.status(400).json({ message: "Image upload failed" });
         }
 
-        shop.image = req.file.path; // Cloudinary URL
+        shop.image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
         const updatedShop = await shop.save();
         
         res.status(200).json(updatedShop);

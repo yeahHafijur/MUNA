@@ -35,48 +35,64 @@ const SplashScreen = ({ onFinish }) => {
     return (
         <div className={`fixed inset-0 z-[9999] bg-[#fdfaf3] flex items-center justify-center overflow-hidden transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
             
-            {/* Floating Grocery Bubbles */}
+            {/* Scattering Grocery Bubbles */}
             <style>
                 {`
-                @keyframes floatUp {
-                    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-                    10% { opacity: 0.5; }
-                    90% { opacity: 0.5; }
-                    100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+                @keyframes scatterOut {
+                    0% { 
+                        transform: translate(0, 0) scale(0.2) rotate(0deg); 
+                        opacity: 0; 
+                    }
+                    15% { 
+                        opacity: 0.6; 
+                    }
+                    80% {
+                        opacity: 0.4;
+                    }
+                    100% { 
+                        transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--rot)); 
+                        opacity: 0; 
+                    }
                 }
                 .bubble {
                     position: absolute;
-                    top: 0;
+                    top: 50%;
+                    left: 50%;
+                    margin-top: -20px;
+                    margin-left: -20px;
                     opacity: 0;
-                    animation-name: floatUp;
-                    animation-timing-function: linear;
+                    animation-name: scatterOut;
+                    animation-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
                     animation-iteration-count: infinite;
                     animation-fill-mode: both;
                     pointer-events: none;
                     user-select: none;
+                    z-index: 1;
                 }
                 `}
             </style>
             
             {[
-                { icon: '🍎', left: '10%', delay: '0s', duration: '4s', size: 'text-4xl' },
-                { icon: '🛒', left: '80%', delay: '0.5s', duration: '4.5s', size: 'text-5xl' },
-                { icon: '🥦', left: '25%', delay: '1s', duration: '3.5s', size: 'text-3xl' },
-                { icon: '🛍️', left: '70%', delay: '1.5s', duration: '5s', size: 'text-4xl' },
-                { icon: '🥖', left: '35%', delay: '0.2s', duration: '4s', size: 'text-5xl' },
-                { icon: '🍅', left: '60%', delay: '2s', duration: '4.2s', size: 'text-3xl' },
-                { icon: '🥕', left: '15%', delay: '1.2s', duration: '3.8s', size: 'text-4xl' },
-                { icon: '🍉', left: '85%', delay: '2.5s', duration: '5.5s', size: 'text-4xl' },
-                { icon: '🧅', left: '50%', delay: '0.8s', duration: '4.3s', size: 'text-3xl' },
-                { icon: '🥔', left: '5%', delay: '2.2s', duration: '4.8s', size: 'text-5xl' },
-                { icon: '🛒', left: '40%', delay: '1.8s', duration: '3.9s', size: 'text-4xl' },
-                { icon: '🍇', left: '92%', delay: '0.3s', duration: '4.1s', size: 'text-3xl' },
+                { icon: '🍎', tx: '-40vw', ty: '-40vh', rot: '180deg', delay: '0s', duration: '3.5s', size: 'text-4xl' },
+                { icon: '🛒', tx: '35vw', ty: '-45vh', rot: '-90deg', delay: '0.5s', duration: '4s', size: 'text-5xl' },
+                { icon: '🥦', tx: '-30vw', ty: '40vh', rot: '90deg', delay: '1s', duration: '3.5s', size: 'text-3xl' },
+                { icon: '🛍️', tx: '40vw', ty: '30vh', rot: '45deg', delay: '1.5s', duration: '4.5s', size: 'text-4xl' },
+                { icon: '🥖', tx: '-45vw', ty: '-10vh', rot: '-180deg', delay: '0.2s', duration: '3.8s', size: 'text-5xl' },
+                { icon: '🍅', tx: '45vw', ty: '-10vh', rot: '120deg', delay: '2s', duration: '3.2s', size: 'text-3xl' },
+                { icon: '🥕', tx: '-15vw', ty: '-45vh', rot: '-45deg', delay: '1.2s', duration: '3.8s', size: 'text-4xl' },
+                { icon: '🍉', tx: '15vw', ty: '45vh', rot: '220deg', delay: '2.5s', duration: '4s', size: 'text-4xl' },
+                { icon: '🧅', tx: '-20vw', ty: '35vh', rot: '60deg', delay: '0.8s', duration: '3.3s', size: 'text-3xl' },
+                { icon: '🥔', tx: '25vw', ty: '-35vh', rot: '-60deg', delay: '2.2s', duration: '3.8s', size: 'text-5xl' },
+                { icon: '🛒', tx: '35vw', ty: '40vh', rot: '100deg', delay: '1.8s', duration: '3.9s', size: 'text-4xl' },
+                { icon: '🍇', tx: '-40vw', ty: '20vh', rot: '-100deg', delay: '0.3s', duration: '3.1s', size: 'text-3xl' },
             ].map((bubble, i) => (
                 <div 
                     key={i} 
                     className={`bubble ${bubble.size}`}
                     style={{
-                        left: bubble.left,
+                        '--tx': bubble.tx,
+                        '--ty': bubble.ty,
+                        '--rot': bubble.rot,
                         animationDelay: bubble.delay,
                         animationDuration: bubble.duration
                     }}

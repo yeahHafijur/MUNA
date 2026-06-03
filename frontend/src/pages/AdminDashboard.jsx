@@ -442,7 +442,7 @@ const AdminDashboard = () => {
                     <p className="text-gray-500 text-sm">Godown is empty.</p>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {godownItems.filter(item => item.name.toLowerCase().includes(godownSearchQuery.toLowerCase())).map(item => (
+                        {godownItems.filter(item => (item.name || '').toLowerCase().includes((godownSearchQuery || '').toLowerCase())).map(item => (
                             <div key={item._id} className="border border-gray-100 rounded-xl p-3 flex flex-col items-center hover:shadow-md transition-shadow bg-gray-50 relative group">
                                 <button onClick={() => handleDeleteGodownItem(item._id)} className="absolute top-2 right-2 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center transition-all z-10 text-xs shadow-sm">✕</button>
                                 <button onClick={() => { handleGodownEditClick(item); document.getElementById('godownModal').showModal(); }} className="absolute top-2 left-2 bg-blue-100 hover:bg-blue-500 text-blue-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center transition-all z-10 text-xs shadow-sm">✏️</button>

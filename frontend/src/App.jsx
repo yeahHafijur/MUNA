@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import SplashScreen from './components/SplashScreen';
 import ScrollToTop from './components/ScrollToTop';
@@ -12,15 +12,22 @@ import VendorDashboard from './pages/VendorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import GodownBrowser from './pages/GodownBrowser';
 
-
-
-
-
-
-
-
 function App() {
   const [showSplash, setShowSplash] = useState(true);
+
+  // Initialize OneSignal
+  useEffect(() => {
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "YOUR_ONESIGNAL_APP_ID", // Replace this with the actual App ID later
+        safari_web_id: "YOUR_SAFARI_WEB_ID",
+        notifyButton: {
+          enable: true,
+        },
+      });
+    });
+  }, []);
 
   return (
     <Router>

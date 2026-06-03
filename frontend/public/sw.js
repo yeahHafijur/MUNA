@@ -1,34 +1,43 @@
 import { precacheAndRoute } from 'workbox-precaching';
+import { registerRoute, NavigationRoute } from 'workbox-routing';
+import { NetworkOnly, CacheFirst } from 'workbox-strategies';
 
-// Inject manifest for PWA offline caching
-precacheAndRoute(self.__WB_MANIFEST);
+// Precache the manifest (vite-plugin-pwa will inject the files here)
+precacheAndRoute(self.__WB_MANIFEST || []);
 
-// Service Worker for Push Notifications
-self.addEventListener('push', function(event) {
-  let data = {};
-  if (event.data) {
-    data = event.data.json();
-  }
+const OFFLINE_PAGE = '/offline.html';
 
-  const title = data.title || 'New Notification';
-  const options = {
-    body: data.body || 'You have a new update.',
-    icon: data.icon || '/icon-192x192.png',
-    badge: '/icon-192x192.png',
-    vibrate: [200, 100, 200, 100, 200, 100, 200],
-    data: {
-      url: '/'
-    }
-  };
-
+// Explicitly cache offline.html on install
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    self.registration.showNotification(title, options)
+    caches.open('offline-cache').then((cache) => {
+      return cache.add(OFFLINE_PAGE);
+    })
   );
+  self.skipWaiting();
 });
 
-self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow(event.notification.data.url)
-  );
+// Cache image files
+registerRoute(
+  ({ request }) => request.destination === 'image',
+  new CacheFirst({
+    cacheName: 'image-cache',
+  })
+);
+
+// Fallback to offline.html for navigation requests
+const networkOnly = new NetworkOnly();
+registerRoute(
+  new NavigationRoute(async (params) => {
+    try {
+      return await networkOnly.handle(params);
+    } catch (error) {
+      const cache = await caches.open('offline-cache');
+      return await cache.match(OFFLINE_PAGE);
+    }
+  })
+);
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
 });

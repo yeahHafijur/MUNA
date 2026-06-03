@@ -20,8 +20,7 @@ function App() {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     window.OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
-        appId: "YOUR_ONESIGNAL_APP_ID", // Replace this with the actual App ID later
-        safari_web_id: "YOUR_SAFARI_WEB_ID",
+        appId: "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
         notifyButton: {
           enable: true,
         },

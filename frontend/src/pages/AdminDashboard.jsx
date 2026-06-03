@@ -109,8 +109,7 @@ const AdminDashboard = () => {
     const [godownItems, setGodownItems] = useState([]);
     const [loadingGodownItems, setLoadingGodownItems] = useState(true);
     const [editingGodownItem, setEditingGodownItem] = useState(null);
-    const [godownSearchQuery, setGodownSearchQuery] = useState('');
-    
+
     // For Add and Edit Godown Items
     const [godownFormData, setGodownFormData] = useState({
         name: '',
@@ -154,8 +153,8 @@ const AdminDashboard = () => {
         }
 
         try {
-            const url = editingGodownItem 
-                ? `/api/master-products/${editingGodownItem._id}` 
+            const url = editingGodownItem
+                ? `/api/master-products/${editingGodownItem._id}`
                 : '/api/master-products';
             const method = editingGodownItem ? 'PUT' : 'POST';
 
@@ -264,7 +263,7 @@ const AdminDashboard = () => {
                 shopLat: '',
                 shopLng: ''
             });
-            
+
             // Refresh shop list
             fetchShops();
 
@@ -297,7 +296,7 @@ const AdminDashboard = () => {
                     <h2 className="text-xl font-black text-gray-800 mb-4 flex items-center gap-2">
                         <span>🚀</span> Onboard New Vendor
                     </h2>
-                    
+
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-3">
                             <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">1. Vendor Details</h3>
@@ -312,7 +311,7 @@ const AdminDashboard = () => {
                             <input type="text" name="shopAddress" required placeholder="Shop Address" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopAddress} onChange={handleChange} />
                             <input type="text" name="shopCategory" placeholder="Category (e.g. Kirana, Pharmacy)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopCategory} onChange={handleChange} />
                             <input type="text" name="udyamNumber" placeholder="Udyam Number (Optional)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm font-semibold tracking-wide" value={formData.udyamNumber} onChange={handleChange} />
-                            
+
                             <div className="flex flex-col sm:flex-row gap-2">
                                 <input type="number" step="any" name="shopLat" required placeholder="Latitude (Required)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLat} onChange={handleChange} />
                                 <input type="number" step="any" name="shopLng" required placeholder="Longitude (Required)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLng} onChange={handleChange} />
@@ -330,7 +329,7 @@ const AdminDashboard = () => {
                     <h2 className="text-xl font-black text-gray-800 mb-4 flex items-center gap-2">
                         <span>🏪</span> Active Shops ({shops.length})
                     </h2>
-                    
+
                     {loadingShops ? (
                         <p className="text-gray-500 animate-pulse font-bold text-sm">Loading shops...</p>
                     ) : shops.length === 0 ? (
@@ -351,7 +350,7 @@ const AdminDashboard = () => {
                                         </span>
                                     </div>
                                     <p className="text-xs text-gray-500 mb-2">{shop.address}</p>
-                                    
+
                                     <div className="bg-gray-50 p-2 rounded flex flex-col gap-1 text-xs mt-2">
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-500">Vendor:</span>
@@ -380,34 +379,23 @@ const AdminDashboard = () => {
                 </div>
             </div>
 
+
             {/* --- GODOWN INVENTORY MANAGEMENT --- */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mt-6">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h2 className="text-xl font-black text-gray-800 flex items-center gap-2">
                         <span>📦</span> Global Godown Inventory
                     </h2>
-                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                        <div className="relative flex-1 sm:w-64">
-                            <input 
-                                type="text" 
-                                placeholder="Search items..." 
-                                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg outline-none focus:border-indigo-500 text-sm"
-                                value={godownSearchQuery}
-                                onChange={(e) => setGodownSearchQuery(e.target.value)}
-                            />
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-                        </div>
-                        <button 
-                            onClick={() => {
-                                setEditingGodownItem(null);
-                                setGodownFormData({ name: '', category: '', image: null, imagePreview: '' });
-                                document.getElementById('godownModal').showModal();
-                            }} 
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm whitespace-nowrap"
-                        >
-                            + Add New Item
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => {
+                            setEditingGodownItem(null);
+                            setGodownFormData({ name: '', category: '', image: null, imagePreview: '' });
+                            document.getElementById('godownModal').showModal();
+                        }}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
+                    >
+                        + Add New Item
+                    </button>
                 </div>
 
                 {loadingGodownItems ? (
@@ -416,11 +404,11 @@ const AdminDashboard = () => {
                     <p className="text-gray-500 text-sm">Godown is empty.</p>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {godownItems.filter(item => item.name.toLowerCase().includes(godownSearchQuery.toLowerCase())).map(item => (
+                        {godownItems.map(item => (
                             <div key={item._id} className="border border-gray-100 rounded-xl p-3 flex flex-col items-center hover:shadow-md transition-shadow bg-gray-50 relative group">
-                                <button onClick={() => handleDeleteGodownItem(item._id)} className="absolute top-2 right-2 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-10 text-xs">✕</button>
-                                <button onClick={() => { handleGodownEditClick(item); document.getElementById('godownModal').showModal(); }} className="absolute top-2 left-2 bg-blue-100 hover:bg-blue-500 text-blue-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-10 text-xs">✏️</button>
-                                
+                                <button onClick={() => handleDeleteGodownItem(item._id)} className="absolute top-2 right-2 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center transition-all z-10 text-xs shadow-sm">✕</button>
+                                <button onClick={() => { handleGodownEditClick(item); document.getElementById('godownModal').showModal(); }} className="absolute top-2 left-2 bg-blue-100 hover:bg-blue-500 text-blue-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center transition-all z-10 text-xs shadow-sm">✏️</button>
+
                                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full p-2 shadow-sm mb-3">
                                     {item.image ? (
                                         <img src={item.image} alt={item.name} className="w-full h-full object-contain rounded-full" />

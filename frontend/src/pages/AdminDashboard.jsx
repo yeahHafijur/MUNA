@@ -102,7 +102,113 @@ const AdminDashboard = () => {
         }
 
         fetchShops();
+        fetchGodownItems();
     }, [token, user, navigate]);
+
+    // --- GODOWN INVENTORY STATE & FUNCTIONS ---
+    const [godownItems, setGodownItems] = useState([]);
+    const [loadingGodownItems, setLoadingGodownItems] = useState(true);
+    const [editingGodownItem, setEditingGodownItem] = useState(null);
+    
+    // For Add and Edit Godown Items
+    const [godownFormData, setGodownFormData] = useState({
+        name: '',
+        category: '',
+        image: null,
+        imagePreview: ''
+    });
+
+    const fetchGodownItems = async () => {
+        try {
+            const res = await fetch('/api/master-products');
+            const data = await res.json();
+            setGodownItems(data);
+            setLoadingGodownItems(false);
+        } catch (error) {
+            console.error("Error fetching godown items:", error);
+            setLoadingGodownItems(false);
+        }
+    };
+
+    const handleGodownFormChange = (e) => {
+        if (e.target.name === 'image') {
+            const file = e.target.files[0];
+            setGodownFormData({
+                ...godownFormData,
+                image: file,
+                imagePreview: file ? URL.createObjectURL(file) : ''
+            });
+        } else {
+            setGodownFormData({ ...godownFormData, [e.target.name]: e.target.value });
+        }
+    };
+
+    const handleGodownSubmit = async (e) => {
+        e.preventDefault();
+        const fd = new FormData();
+        fd.append('name', godownFormData.name);
+        fd.append('category', godownFormData.category);
+        if (godownFormData.image) {
+            fd.append('image', godownFormData.image);
+        }
+
+        try {
+            const url = editingGodownItem 
+                ? `/api/master-products/${editingGodownItem._id}` 
+                : '/api/master-products';
+            const method = editingGodownItem ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: fd
+            });
+
+            if (res.ok) {
+                setGodownFormData({ name: '', category: '', image: null, imagePreview: '' });
+                setEditingGodownItem(null);
+                fetchGodownItems();
+                const fileInput = document.getElementById('godownImageInput');
+                if (fileInput) fileInput.value = '';
+            } else {
+                const data = await res.json();
+                alert(data.message || 'Failed to save godown item');
+            }
+        } catch (error) {
+            console.error("Error saving godown item:", error);
+        }
+    };
+
+    const handleGodownEditClick = (item) => {
+        setEditingGodownItem(item);
+        setGodownFormData({
+            name: item.name,
+            category: item.category || '',
+            image: null,
+            imagePreview: item.image || ''
+        });
+    };
+
+    const handleDeleteGodownItem = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this item from the Global Godown?")) return;
+        try {
+            const res = await fetch(`/api/master-products/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                fetchGodownItems();
+            } else {
+                const data = await res.json();
+                alert(data.message || "Failed to delete item");
+            }
+        } catch (error) {
+            console.error("Error deleting item:", error);
+        }
+    };
+    // ------------------------------------------
 
     const fetchShops = async () => {
         try {
@@ -272,6 +378,94 @@ const AdminDashboard = () => {
                     )}
                 </div>
             </div>
+
+            {/* --- GODOWN INVENTORY MANAGEMENT --- */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mt-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <h2 className="text-xl font-black text-gray-800 flex items-center gap-2">
+                        <span>📦</span> Global Godown Inventory
+                    </h2>
+                    <button 
+                        onClick={() => {
+                            setEditingGodownItem(null);
+                            setGodownFormData({ name: '', category: '', image: null, imagePreview: '' });
+                            document.getElementById('godownModal').showModal();
+                        }} 
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
+                    >
+                        + Add New Item
+                    </button>
+                </div>
+
+                {loadingGodownItems ? (
+                    <p className="text-gray-500 animate-pulse font-bold text-sm">Loading inventory...</p>
+                ) : godownItems.length === 0 ? (
+                    <p className="text-gray-500 text-sm">Godown is empty.</p>
+                ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        {godownItems.map(item => (
+                            <div key={item._id} className="border border-gray-100 rounded-xl p-3 flex flex-col items-center hover:shadow-md transition-shadow bg-gray-50 relative group">
+                                <button onClick={() => handleDeleteGodownItem(item._id)} className="absolute top-2 right-2 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-10 text-xs">✕</button>
+                                <button onClick={() => { handleGodownEditClick(item); document.getElementById('godownModal').showModal(); }} className="absolute top-2 left-2 bg-blue-100 hover:bg-blue-500 text-blue-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-10 text-xs">✏️</button>
+                                
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full p-2 shadow-sm mb-3">
+                                    {item.image ? (
+                                        <img src={item.image} alt={item.name} className="w-full h-full object-contain rounded-full" />
+                                    ) : (
+                                        <div className="w-full h-full bg-gray-100 rounded-full flex items-center justify-center text-gray-400">?</div>
+                                    )}
+                                </div>
+                                <h3 className="font-bold text-gray-800 text-sm text-center leading-tight">{item.name}</h3>
+                                {item.category && <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">{item.category}</p>}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Godown Item Modal (Add/Edit) */}
+            <dialog id="godownModal" className="bg-transparent p-0 w-full max-w-md backdrop:bg-black/60 backdrop:backdrop-blur-sm">
+                <div className="bg-white rounded-2xl shadow-xl w-full overflow-hidden m-auto">
+                    <div className="bg-indigo-600 p-4 flex justify-between items-center">
+                        <h2 className="text-white font-black text-lg">{editingGodownItem ? 'Edit Godown Item' : 'Add Godown Item'}</h2>
+                        <button onClick={() => {
+                            document.getElementById('godownModal').close();
+                            setEditingGodownItem(null);
+                        }} className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+                            ✕
+                        </button>
+                    </div>
+                    <form onSubmit={(e) => { handleGodownSubmit(e); document.getElementById('godownModal').close(); }} className="p-6 space-y-4">
+                        <div className="space-y-3">
+                            <div className="flex justify-center mb-4">
+                                <label className="cursor-pointer group relative">
+                                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center border-2 border-dashed border-gray-300 group-hover:border-indigo-500 overflow-hidden">
+                                        {godownFormData.imagePreview ? (
+                                            <img src={godownFormData.imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-gray-400 text-xs text-center px-2">Click to add photo</span>
+                                        )}
+                                    </div>
+                                    <input id="godownImageInput" type="file" name="image" accept="image/*" onChange={handleGodownFormChange} className="hidden" />
+                                </label>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 mb-1">Item Name</label>
+                                <input type="text" name="name" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-indigo-500 text-sm" value={godownFormData.name} onChange={handleGodownFormChange} placeholder="e.g. Aashirvaad Atta 5kg" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 mb-1">Category (Optional)</label>
+                                <input type="text" name="category" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-indigo-500 text-sm" value={godownFormData.category} onChange={handleGodownFormChange} placeholder="e.g. Grocery" />
+                            </div>
+                        </div>
+                        <div className="pt-2">
+                            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-xl transition-colors shadow-sm">
+                                {editingGodownItem ? 'UPDATE ITEM' : 'ADD TO GODOWN'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </dialog>
 
             {/* Edit Shop Modal */}
             {editingShop && (

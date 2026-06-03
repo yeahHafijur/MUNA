@@ -16,6 +16,70 @@ const getAllMasterProducts = async (req, res) => {
     }
 };
 
+// Create a new master product (Super Admin only)
+const createMasterProduct = async (req, res) => {
+    try {
+        const { name, category } = req.body;
+        const image = req.file ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}` : req.body.image;
+
+        const newProduct = await MasterProduct.create({
+            name,
+            category,
+            image
+        });
+
+        res.status(201).json({ message: "Product added to Godown successfully", product: newProduct });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+// Update an existing master product (Super Admin only)
+const updateMasterProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, category } = req.body;
+        
+        const product = await MasterProduct.findById(id);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found in Godown" });
+        }
+
+        product.name = name || product.name;
+        product.category = category || product.category;
+
+        if (req.file) {
+            product.image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+        } else if (req.body.image !== undefined) {
+             product.image = req.body.image;
+        }
+
+        const updatedProduct = await product.save();
+        res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+// Delete a master product (Super Admin only)
+const deleteMasterProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await MasterProduct.findByIdAndDelete(id);
+        
+        if (!product) {
+            return res.status(404).json({ message: "Product not found in Godown" });
+        }
+
+        res.status(200).json({ message: "Product deleted successfully from Godown" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
-    getAllMasterProducts
+    getAllMasterProducts,
+    createMasterProduct,
+    updateMasterProduct,
+    deleteMasterProduct
 };

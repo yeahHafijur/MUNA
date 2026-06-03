@@ -528,9 +528,9 @@ const VendorDashboard = () => {
                     {/* Category Manager */}
                     <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                         <h2 className="font-bold text-gray-800 mb-3">Manage Categories</h2>
-                        <form onSubmit={handleAddCategory} className="flex gap-3 mb-4">
+                        <form onSubmit={handleAddCategory} className="flex flex-col sm:flex-row gap-3 mb-4">
                             <input type="text" placeholder="New Category (e.g. Starters)" className="flex-1 border border-gray-200 rounded-lg p-2 outline-none focus:border-yellow-400" value={newCategory} onChange={e => setNewCategory(e.target.value)} />
-                            <button type="submit" className="bg-[#f8cb46] hover:bg-yellow-400 text-white font-bold py-2 px-4 rounded-lg transition-colors">+ Add Category</button>
+                            <button type="submit" className="bg-[#f8cb46] hover:bg-yellow-400 text-white font-bold py-2 px-4 rounded-lg transition-colors w-full sm:w-auto">+ Add Category</button>
                         </form>
                         <div className="flex flex-wrap gap-2">
                             {shop.customCategories?.length > 0 ? shop.customCategories.map((cat, idx) => (

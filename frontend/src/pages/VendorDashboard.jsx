@@ -85,34 +85,11 @@ const VendorDashboard = () => {
     // Handle enabling push notifications explicitly via a button click
     const handleEnableNotifications = async () => {
         try {
-            if (!("Notification" in window)) {
-                alert("Browser does not support notifications");
-                return;
+            if (window.OneSignal) {
+                await window.OneSignal.Slidedown.promptPush();
+            } else {
+                alert("Notification system is initializing. Please wait a moment and try again.");
             }
-            const permission = await Notification.requestPermission();
-            if (permission !== "granted") {
-                alert("Notification permission denied!");
-                return;
-            }
-
-            const swRegistration = await navigator.serviceWorker.ready;
-            const publicVapidKey = import.meta.env.VITE_PUBLIC_VAPID_KEY;
-            
-            const subscription = await swRegistration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-            });
-
-            // Send subscription to backend
-            await fetch('/api/notifications/subscribe', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
-                },
-                body: JSON.stringify(subscription)
-            });
-            alert("✅ Push Notifications Enabled! Ab app minimize hone par bhi order aane ka alert aayega.");
         } catch (error) {
             console.error("Error subscribing to push:", error);
             alert("Failed to enable push notifications.");

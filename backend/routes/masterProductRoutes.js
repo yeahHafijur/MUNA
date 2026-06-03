@@ -6,15 +6,15 @@ const {
     updateMasterProduct, 
     deleteMasterProduct 
 } = require('../controllers/masterProductController');
-const { protect, superAdmin } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
 // GET /api/master-products (Public or authenticated, depending on usage. Currently public/all users can see)
 router.get('/', getAllMasterProducts);
 
 // Super Admin Only Routes
-router.post('/', protect, superAdmin, upload.single('image'), createMasterProduct);
-router.put('/:id', protect, superAdmin, upload.single('image'), updateMasterProduct);
-router.delete('/:id', protect, superAdmin, deleteMasterProduct);
+router.post('/', protect, authorize('super_admin'), upload.single('image'), createMasterProduct);
+router.put('/:id', protect, authorize('super_admin'), upload.single('image'), updateMasterProduct);
+router.delete('/:id', protect, authorize('super_admin'), deleteMasterProduct);
 
 module.exports = router;

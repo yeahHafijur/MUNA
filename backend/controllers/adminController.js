@@ -4,7 +4,7 @@ const Shop = require("../models/Shop");
 // 1. Onboard Vendor & Shop (Super Admin only)
 const onboardVendorAndShop = async (req, res) => {
     try {
-        const { vendorName, vendorEmail, vendorPhone, shopName, shopAddress, shopCategory, shopLat, shopLng, udyamNumber } = req.body;
+        const { vendorName, vendorEmail, vendorPhone, shopName, shopAddress, shopCategory, shopLat, shopLng, udyamNumber, openTime, closeTime } = req.body;
 
         // Security Check: Sirf super_admin yeh kar sakta hai
         if (req.user.role !== 'super_admin') {
@@ -17,6 +17,10 @@ const onboardVendorAndShop = async (req, res) => {
 
         if (!shopLat || !shopLng) {
             return res.status(400).json({ message: "Shop Latitude and Longitude are required for delivery calculations." });
+        }
+
+        if (!openTime || !closeTime) {
+            return res.status(400).json({ message: "Shop Open Time and Close Time are mandatory." });
         }
 
         const cleanEmail = vendorEmail.trim().toLowerCase();
@@ -56,7 +60,12 @@ const onboardVendorAndShop = async (req, res) => {
             category: shopCategory || "General",
             udyamNumber: udyamNumber || "",
             location: locationData,
-            vendorId: vendor._id
+            vendorId: vendor._id,
+            autoSchedule: {
+                enabled: true,
+                openTime: openTime,
+                closeTime: closeTime
+            }
         });
 
         res.status(201).json({

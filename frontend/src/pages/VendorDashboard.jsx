@@ -393,8 +393,7 @@ const VendorDashboard = () => {
                     <div className="vendordashboard-style-11">
                         <button 
                             onClick={handleToggleShopStatus}
-                            disabled={autoScheduleEnabled}
-                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${shop.isOpen ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'} ${autoScheduleEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${shop.isOpen ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'}`}
                         >
                             {shop.isOpen ? '🟢 Shop is Open' : '🔴 Shop is Closed'}
                         </button>
@@ -415,40 +414,6 @@ const VendorDashboard = () => {
                         >
                             🔔 Enable Push Alerts
                         </button>
-                    </div>
-
-                    {/* Schedule Settings Panel */}
-                    <div className="vendordashboard-schedule-panel mt-4 bg-white/5 p-4 rounded-xl border border-white/10 text-white w-full">
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="font-bold text-sm">⏰ Auto Open/Close Settings</span>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input 
-                                    type="checkbox" 
-                                    className="sr-only peer"
-                                    checked={autoScheduleEnabled} 
-                                    onChange={(e) => setAutoScheduleEnabled(e.target.checked)} 
-                                />
-                                <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#f8cb46]"></div>
-                            </label>
-                        </div>
-                        {autoScheduleEnabled && (
-                            <div className="flex flex-col gap-3 mt-2 animate-fade-in">
-                                <div className="flex gap-3">
-                                    <div className="flex flex-col flex-1">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Open Time</label>
-                                        <input type="time" className="bg-black/20 border border-white/10 rounded-lg p-2 text-sm focus:border-[#f8cb46] outline-none" value={openTime} onChange={(e) => setOpenTime(e.target.value)} />
-                                    </div>
-                                    <div className="flex flex-col flex-1">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Close Time</label>
-                                        <input type="time" className="bg-black/20 border border-white/10 rounded-lg p-2 text-sm focus:border-[#f8cb46] outline-none" value={closeTime} onChange={(e) => setCloseTime(e.target.value)} />
-                                    </div>
-                                </div>
-                                <button className="bg-[#f8cb46] text-black font-bold py-2 rounded-lg text-sm mt-1 hover:bg-[#e0b431] transition-colors" onClick={handleUpdateSchedule}>Save Schedule</button>
-                                <p className="text-[10px] text-gray-400 mt-1 leading-tight">
-                                    ℹ️ Manual toggle is overridden. Shop will automatically open and close daily at these times.
-                                </p>
-                            </div>
-                        )}
                     </div>
                 </div>
                 <div className="vendordashboard-style-15">

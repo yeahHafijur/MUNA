@@ -13,8 +13,8 @@ const AdminDashboard = () => {
 
     const [formData, setFormData] = useState({
         vendorName: '', vendorEmail: '', vendorPhone: '',
-        shopName: '', shopAddress: '', shopCategory: '',
-        udyamNumber: '', shopLat: '', shopLng: ''
+        shopName: '', shopAddress: '', shopCategory: '', udyamNumber: '', shopLat: '', shopLng: '',
+        openTime: '09:00', closeTime: '21:00'
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -72,7 +72,7 @@ const AdminDashboard = () => {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Error onboarding vendor');
             alert(data.message);
-            setFormData({ vendorName: '', vendorEmail: '', vendorPhone: '', shopName: '', shopAddress: '', shopCategory: '', udyamNumber: '', shopLat: '', shopLng: '' });
+            setFormData({ vendorName: '', vendorEmail: '', vendorPhone: '', shopName: '', shopAddress: '', shopCategory: '', udyamNumber: '', shopLat: '', shopLng: '', openTime: '09:00', closeTime: '21:00' });
             fetchShops();
         } catch (error) { alert(error.message); }
         finally { setIsSubmitting(false); }
@@ -230,6 +230,16 @@ const AdminDashboard = () => {
                                         <div className="adm-input-row">
                                             <input type="number" step="any" name="shopLat" required placeholder="Latitude" className="adm-input" value={formData.shopLat} onChange={handleChange} />
                                             <input type="number" step="any" name="shopLng" required placeholder="Longitude" className="adm-input" value={formData.shopLng} onChange={handleChange} />
+                                        </div>
+                                        <div className="adm-input-row">
+                                            <div style={{flex: 1}}>
+                                                <label style={{fontSize: '10px', color: '#64748b', display: 'block', marginBottom: '4px'}}>Daily Open Time (Mandatory)</label>
+                                                <input type="time" name="openTime" required className="adm-input" value={formData.openTime} onChange={handleChange} />
+                                            </div>
+                                            <div style={{flex: 1}}>
+                                                <label style={{fontSize: '10px', color: '#64748b', display: 'block', marginBottom: '4px'}}>Daily Close Time (Mandatory)</label>
+                                                <input type="time" name="closeTime" required className="adm-input" value={formData.closeTime} onChange={handleChange} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

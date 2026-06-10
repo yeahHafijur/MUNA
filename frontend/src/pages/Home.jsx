@@ -198,75 +198,107 @@ const Home = () => {
                             className="home-style-43 group"
                             style={{ animationDelay: `${index * 60}ms` }}
                         >
-                            <div className={`bg-white rounded-2xl border-2 shadow-sm overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${shop.isOpen ? 'border-gray-300' : 'border-gray-400'}`}>
-                                
-                                {/* Banner Section (Top) */}
-                                <div className="relative w-full h-40 sm:h-48 bg-gray-100 overflow-hidden">
-                                    {shop.image ? (
-                                        <img
-                                            src={`${shop.image}`}
-                                            alt={shop.name}
-                                            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${!shop.isOpen ? 'grayscale opacity-80' : ''}`}
-                                        />
-                                    ) : (
-                                        <div className={`w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-amber-50 to-yellow-100 ${!shop.isOpen ? 'grayscale' : ''}`}>🏪</div>
-                                    )}
+                            <div className={`bg-white rounded-2xl border-2 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${shop.isOpen ? 'border-gray-300' : 'border-gray-400'}`}>
 
-                                    {/* Overlay Status Tag */}
-                                    <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
-                                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm border ${shop.isOpen ? 'bg-emerald-500/90 text-white border-emerald-400' : 'bg-red-500/90 text-white border-red-400'}`}>
-                                            {shop.isOpen ? '● Open' : '● Closed'}
-                                        </span>
-                                    </div>
-                                    
-                                    {/* Distance Overlay */}
-                                    {shop.distance !== Infinity && (
-                                        <div className="absolute bottom-3 left-3">
-                                            <span className="bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg">
-                                                📍 {shop.distance < 1 ? (shop.distance * 1000).toFixed(0) + ' m' : shop.distance.toFixed(1) + ' km'} away
-                                            </span>
+                                {/* Card Top — Colored Accent */}
+                                <div className={`h-1.5 w-full ${shop.isOpen ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-gray-300 to-gray-400'}`}></div>
+
+                                <div className="home-style-44">
+                                    <div className="home-style-45">
+
+                                        {/* Shop Image / Avatar */}
+                                        <div className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex-shrink-0 flex items-center justify-center text-2xl sm:text-3xl overflow-hidden transition-transform duration-300 group-hover:scale-105 ${shop.isOpen ? 'bg-gradient-to-br from-amber-50 to-yellow-100 border-2 border-yellow-200/50 shadow-sm' : 'bg-gray-100 border-2 border-gray-200'}`}>
+                                            {shop.image ? (
+                                                <img
+                                                    src={`${shop.image}`}
+                                                    alt={shop.name}
+                                                    className={`w-full h-full object-cover ${!shop.isOpen ? 'grayscale opacity-60' : ''}`}
+                                                />
+                                            ) : (
+                                                <span className={`${!shop.isOpen ? 'grayscale' : ''}`}>🏪</span>
+                                            )}
+
+                                            {/* Live indicator dot */}
+                                            {shop.isOpen && (
+                                                <div className="home-style-46">
+                                                    <div className="home-style-47"></div>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
 
-                                {/* Details Section (Bottom) */}
-                                <div className="p-4 flex flex-col">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h3 className={`font-bold text-lg leading-tight truncate ${shop.isOpen ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {shop.name}
-                                        </h3>
-                                        <span className={`text-xs font-bold flex flex-shrink-0 items-center gap-1 ${shop.isOpen ? 'text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-md border border-yellow-100' : 'text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md border border-gray-200'}`}>
-                                            ⭐ {shop.rating || '4.5'}
-                                        </span>
-                                    </div>
+                                        {/* Shop Info */}
+                                        <div className="home-style-48">
+                                            <div className="home-style-49">
+                                                <h3 className={`font-bold text-sm sm:text-base leading-tight truncate ${shop.isOpen ? 'text-gray-900' : 'text-gray-400'}`}>
+                                                    {shop.name}
+                                                </h3>
+                                            </div>
 
-                                    <div className={`text-xs mb-3 truncate ${shop.isOpen ? 'text-gray-500' : 'text-gray-400'}`}>
-                                        <p>📍 {shop.address}</p>
-                                    </div>
+                                            <div className={`text-xs leading-snug mb-2.5 ${shop.isOpen ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                <p className="home-style-50">📍 {shop.address}</p>
+                                                {shop.vendorId?.phone && (
+                                                    <p className="home-style-51">
+                                                        📞 {shop.vendorId.phone}
+                                                    </p>
+                                                )}
+                                            </div>
 
-                                    {/* Tags & Action Row */}
-                                    <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
-                                        <span className={`flex-shrink-0 text-[10px] font-bold px-2.5 py-1 rounded-md ${shop.isOpen ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}>
-                                            {shop.category || 'Kirana'}
-                                        </span>
+                                            {/* Tags Row */}
+                                            <div className="home-style-52">
+                                                {/* Category Tag */}
+                                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen
+                                                    ? 'bg-yellow-50 text-yellow-500 border border-yellow-200/60'
+                                                    : 'bg-gray-100 text-gray-400 border border-gray-200'}`}>
+                                                    {shop.category || 'Kirana'}
+                                                </span>
 
-                                        {shop.udyamNumber && (
-                                            <span className={`flex-shrink-0 text-[10px] font-bold px-2.5 py-1 rounded-md ${shop.isOpen ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}>
-                                                🛡️ Verified
-                                            </span>
-                                        )}
+                                                {/* Distance Badge */}
+                                                {shop.distance !== Infinity && (
+                                                    <span className="home-style-53">
+                                                        📍 {shop.distance < 1 ? (shop.distance * 1000).toFixed(0) + ' m' : shop.distance.toFixed(1) + ' km'}
+                                                    </span>
+                                                )}
 
-                                        {shop.location?.coordinates && (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank');
-                                                }}
-                                                className={`ml-auto flex-shrink-0 text-[10px] font-bold px-3 py-1 rounded-md transition-colors border ${shop.isOpen ? 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'}`}
-                                            >
-                                                🗺️ Directions
-                                            </button>
-                                        )}
+                                                {/* Udyam Badge */}
+                                                {shop.udyamNumber && (
+                                                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen ? 'bg-blue-50 text-blue-600 border border-blue-200/60' : 'bg-gray-100 text-gray-400 border border-gray-200'} flex items-center gap-1`}>
+                                                        🛡️ Verified
+                                                    </span>
+                                                )}
+
+                                                {/* Status Tag */}
+                                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${shop.isOpen
+                                                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
+                                                    : 'bg-red-50 text-red-400 border border-red-200/60'}`}>
+                                                    {shop.isOpen ? '● Open' : '● Closed'}
+                                                </span>
+
+                                                {/* Rating */}
+                                                <span className={`text-[10px] font-bold flex items-center gap-0.5 ${shop.isOpen ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                    ⭐ {shop.rating || '4.5'}
+                                                </span>
+
+                                                {/* Directions Button */}
+                                                {shop.location?.coordinates && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank');
+                                                        }}
+                                                        className={`ml-auto flex-shrink-0 text-[10px] font-bold px-2 py-1 rounded-md transition-colors border ${shop.isOpen ? 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'}`}
+                                                    >
+                                                        🗺️ Directions
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Arrow Icon */}
+                                        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 group-hover:translate-x-1 ${shop.isOpen ? 'bg-gray-100 text-gray-500 group-hover:bg-yellow-100 group-hover:text-yellow-500' : 'bg-gray-100 text-gray-300'}`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="home-style-54" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

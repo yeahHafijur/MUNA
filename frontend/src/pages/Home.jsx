@@ -201,7 +201,7 @@ const Home = () => {
                             <div className={`bg-white rounded-2xl border-2 shadow-sm overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${shop.isOpen ? 'border-gray-300' : 'border-gray-400'}`}>
                                 
                                 {/* Banner Section (Top) */}
-                                <div className="relative w-full h-40 sm:h-48 bg-gray-100 overflow-hidden">
+                                <div className="relative w-full h-32 sm:h-48 bg-gray-100 overflow-hidden">
                                     {shop.image ? (
                                         <img
                                             src={`${shop.image}`}

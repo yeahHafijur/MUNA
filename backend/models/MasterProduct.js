@@ -3,8 +3,7 @@ const mongoose = require("mongoose");
 const masterProductSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        unique: true // Ek naam ka ek hi global product hoga
+        required: true
     },
     category: {
         type: String,
@@ -22,4 +21,11 @@ const masterProductSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('MasterProduct', masterProductSchema);
+const MasterProduct = mongoose.model('MasterProduct', masterProductSchema);
+
+// Ensure the old unique index on name is dropped so multiple pending items with the same name can exist
+MasterProduct.collection.dropIndex('name_1').catch(err => {
+    // Ignore error if index doesn't exist
+});
+
+module.exports = MasterProduct;

@@ -36,18 +36,14 @@ const createProduct = async (req, res) => {
         }
 
         // --- MASTER GODOWN LOGIC ---
-        // Check if this product already exists in the master godown
+        // Push every new item to the master godown as pending, regardless of whether it exists
         try {
-            const existingMaster = await MasterProduct.findOne({ name: { $regex: new RegExp('^' + name + '$', 'i') } });
-            if (!existingMaster) {
-                // Auto-contribute to global Godown
-                await MasterProduct.create({
-                    name,
-                    category,
-                    image
-                });
-                console.log(`📦 [Godown] New item auto-added: ${name}`);
-            }
+            await MasterProduct.create({
+                name,
+                category,
+                image
+            });
+            console.log(`📦 [Godown] New item pushed to approvals: ${name}`);
         } catch (err) {
             console.error("Master Godown error:", err);
             // Non-blocking error, continue to create product for shop

@@ -4,9 +4,13 @@ const MasterProduct = require('../models/MasterProduct');
 const getAllMasterProducts = async (req, res) => {
     try {
         const query = req.query.search || '';
+        const status = req.query.status;
         let filter = {};
         if (query) {
             filter.name = { $regex: query, $options: 'i' };
+        }
+        if (status) {
+            filter.status = status;
         }
         
         const products = await MasterProduct.find(filter).sort({ name: 1 });
@@ -77,9 +81,26 @@ const deleteMasterProduct = async (req, res) => {
     }
 };
 
+// Approve a master product (Super Admin only)
+const approveMasterProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await MasterProduct.findByIdAndUpdate(id, { status: 'approved' }, { new: true });
+        
+        if (!product) {
+            return res.status(404).json({ message: "Product not found in Godown" });
+        }
+
+        res.status(200).json({ message: "Product approved successfully", product });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
 module.exports = {
     getAllMasterProducts,
     createMasterProduct,
     updateMasterProduct,
-    deleteMasterProduct
+    deleteMasterProduct,
+    approveMasterProduct
 };

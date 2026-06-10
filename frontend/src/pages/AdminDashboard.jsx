@@ -155,10 +155,21 @@ const AdminDashboard = () => {
         } catch (err) { console.error(err); }
     };
 
+    const handleApproveGodownItem = async (id) => {
+        if (!window.confirm("Approve this item? It will be visible to all vendors.")) return;
+        try {
+            const res = await fetch(`/api/master-products/${id}/approve`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+            if (res.ok) fetchGodownItems();
+            else { const d = await res.json(); alert(d.message || 'Failed'); }
+        } catch (err) { console.error(err); }
+    };
+
     if (!user) return null;
 
     const openCount = shops.filter(s => s.isOpen).length;
-    const filteredGodown = godownItems.filter(i => (i.name || '').toLowerCase().includes((godownSearchQuery || '').toLowerCase()));
+    const approvedGodown = godownItems.filter(i => i.status !== 'pending');
+    const pendingGodown = godownItems.filter(i => i.status === 'pending');
+    const filteredGodown = approvedGodown.filter(i => (i.name || '').toLowerCase().includes((godownSearchQuery || '').toLowerCase()));
 
     // ===== RENDER =====
     return (
@@ -177,10 +188,10 @@ const AdminDashboard = () => {
 
             {/* ---- TABS ---- */}
             <div className="adm-tabbar">
-                {['onboard', 'shops', 'godown'].map(tab => (
+                {['onboard', 'shops', 'godown', 'approvals'].map(tab => (
                     <button key={tab} onClick={() => setActiveTab(tab)}
                         className={`adm-tabbar-item ${activeTab === tab ? 'adm-tabbar-item--active' : ''}`}>
-                        {tab === 'onboard' ? 'Onboard' : tab === 'shops' ? 'Shops' : 'Godown'}
+                        {tab === 'onboard' ? 'Onboard' : tab === 'shops' ? 'Shops' : tab === 'godown' ? 'Godown' : `Approvals (${pendingGodown.length})`}
                     </button>
                 ))}
             </div>
@@ -331,7 +342,7 @@ const AdminDashboard = () => {
                         </div>
                         {loadingGodownItems ? (
                             <div className="adm-loading">Loading inventory...</div>
-                        ) : godownItems.length === 0 ? (
+                        ) : approvedGodown.length === 0 ? (
                             <div className="adm-empty">Godown is empty.</div>
                         ) : (
                             <div className="adm-godown-grid">
@@ -348,6 +359,52 @@ const AdminDashboard = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* == APPROVALS == */}
+                {activeTab === 'approvals' && (
+                    <div className="adm-section" key="approvals">
+                        <div className="adm-section-head">
+                            <span className="adm-section-title">Pending Godown Approvals</span>
+                        </div>
+                        {loadingGodownItems ? (
+                            <div className="adm-loading">Loading approvals...</div>
+                        ) : pendingGodown.length === 0 ? (
+                            <div className="adm-empty">No pending items for approval!</div>
+                        ) : (
+                            <div className="adm-table-wrap">
+                                <table className="adm-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Image</th>
+                                            <th>Name</th>
+                                            <th>Category</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {pendingGodown.map(item => (
+                                            <tr key={item._id}>
+                                                <td>
+                                                    <div style={{width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', backgroundColor: '#f1f5f9'}}>
+                                                        {item.image ? <img src={item.image} alt={item.name} style={{width: '100%', height: '100%', objectFit: 'cover'}} /> : null}
+                                                    </div>
+                                                </td>
+                                                <td style={{fontWeight: '500', color: '#1e293b'}}>{item.name}</td>
+                                                <td>{item.category || '—'}</td>
+                                                <td>
+                                                    <div style={{display: 'flex', gap: '8px'}}>
+                                                        <button onClick={() => handleApproveGodownItem(item._id)} style={{padding: '6px 12px', background: '#10b981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '500'}}>Accept</button>
+                                                        <button onClick={() => handleDeleteGodownItem(item._id)} style={{padding: '6px 12px', background: '#ef4444', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '500'}}>Delete</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         )}
                     </div>

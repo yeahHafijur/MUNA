@@ -29,7 +29,7 @@ const GodownBrowser = () => {
             .then(shopData => setShop(shopData));
 
         // Godown items lao
-        fetch('/api/master-products')
+        fetch('/api/master-products?status=approved')
             .then(res => res.json())
             .then(data => setGodownItems(Array.isArray(data) ? data : []));
     }, [token, user, navigate]);

@@ -87,7 +87,7 @@ const VendorDashboard = () => {
             });
 
         // Fetch Godown Items
-        fetch('/api/master-products')
+        fetch('/api/master-products?status=approved')
             .then(res => res.json())
             .then(data => setGodownItems(Array.isArray(data) ? data : []));
 

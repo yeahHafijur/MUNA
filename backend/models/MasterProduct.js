@@ -14,6 +14,11 @@ const masterProductSchema = new mongoose.Schema({
     image: {
         type: String, // Global image link
         default: ''
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'approved'],
+        default: 'pending'
     }
 }, { timestamps: true });
 

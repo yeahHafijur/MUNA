@@ -10,7 +10,7 @@ const GOOGLE_CLIENT_ID = "739956516947-brhvingmj39r4ttur0rj1bvd354hmus9.apps.goo
 
 if ('serviceWorker' in navigator) {
   import('virtual:pwa-register').then(({ registerSW }) => {
-    registerSW({ immediate: true });
+    registerSW();
   }).catch(() => {});
 }
 

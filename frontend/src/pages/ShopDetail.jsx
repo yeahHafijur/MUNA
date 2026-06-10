@@ -63,7 +63,7 @@ const ShopDetail = () => {
     return (
         <div className="shopdetail-style-1">
             {/* Shop Banner */}
-            {shop && (
+            {shop && selectedCategory === null && !searchQuery && (
                 <div className="shopdetail-style-2">
                     {shop.image && (
                         <div className="shopdetail-style-3">

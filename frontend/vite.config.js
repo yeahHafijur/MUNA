@@ -14,7 +14,7 @@ export default defineConfig({
       srcDir: 'public',
       filename: 'sw.js',
       devOptions: {
-        enabled: true,
+        enabled: false,
         type: 'module',
       },
       manifest: {

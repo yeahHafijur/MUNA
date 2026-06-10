@@ -46,11 +46,11 @@ const Home = () => {
         const R = 6371; // km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2); 
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     };
 
@@ -98,12 +98,12 @@ const Home = () => {
                     </span>
 
                     <h1 className="home-style-9">
-                        Apne Gaon ki <br className="home-style-10" />
-                        <span className="home-style-11">Har Dukan,</span> <br />
-                        Ek Jagah!
+                        আপোনাৰ গাঁওৰ <br className="home-style-10" />
+                        <span className="home-style-11">প্ৰত্যেক খন দোকান,</span> <br />
+                        এক ঠাইত! ...
                     </h1>
                     <p className="home-style-12">
-                        Ghar baithe saman mangwao, seedha aapki dukan se 🚀
+                        আপোনাৰ প্ৰিয় দোকানৰ পৰা ঘৰতে বহি সামগ্ৰী অ'ৰ্ডাৰ কৰক
                     </p>
 
                     {/* Search Bar — inside hero */}
@@ -114,7 +114,7 @@ const Home = () => {
                             </svg>
                             <input
                                 type="text"
-                                placeholder="Dukan ka naam ya address search karein..."
+                                placeholder="Search shops near you..."
                                 className="home-style-16"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -148,7 +148,7 @@ const Home = () => {
             {/* Shop Heading */}
             <div className="home-style-28">
                 <h2 className="home-style-29">
-                    {searchQuery ? `"${searchQuery}" ke Results` : 'Aas-paas ki Dukanen'}
+                    {searchQuery ? `"${searchQuery}" ke Results` : 'Shops near you'}
                 </h2>
                 {searchQuery && (
                     <span className="home-style-30">{sortedShops.length} found</span>

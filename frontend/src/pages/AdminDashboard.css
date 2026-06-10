@@ -39,12 +39,12 @@
     width: 30px;
     height: 30px;
     border-radius: 8px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #f8cb46 0%, #e0b431 100%);
     display: grid;
     place-items: center;
     font-size: 13px;
     font-weight: 800;
-    color: #fff;
+    color: #111;
 }
 
 .adm-header-brand {
@@ -65,8 +65,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #a78bfa;
-    background: rgba(139,92,246,0.08);
+    color: #f8cb46;
+    background: rgba(248,203,70,0.08);
     padding: 4px 10px;
     border-radius: 5px;
 }
@@ -74,18 +74,18 @@
 .adm-header-signout {
     padding: 6px 14px;
     font-size: 12px;
-    font-weight: 600;
-    color: #94a3b8;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.06);
+    font-weight: 700;
+    color: #ef4444;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.2);
     border-radius: 7px;
     cursor: pointer;
     transition: all 0.15s;
 }
 .adm-header-signout:hover {
-    color: #f87171;
-    border-color: rgba(248,113,113,0.2);
-    background: rgba(248,113,113,0.05);
+    color: #fff;
+    border-color: #ef4444;
+    background: #ef4444;
 }
 
 /* ---- TAB BAR (below header) ---- */
@@ -123,7 +123,7 @@
     left: 20px;
     right: 20px;
     height: 2px;
-    background: #6366f1;
+    background: #f8cb46;
     border-radius: 2px 2px 0 0;
 }
 
@@ -166,7 +166,7 @@
     letter-spacing: -0.5px;
     margin-bottom: 2px;
 }
-.adm-stat-num--purple { color: #a78bfa; }
+.adm-stat-num--yellow { color: #f8cb46; }
 .adm-stat-num--green { color: #34d399; }
 
 .adm-stat-label {
@@ -240,7 +240,7 @@
     content: '';
     width: 3px;
     height: 12px;
-    background: #6366f1;
+    background: #f8cb46;
     border-radius: 2px;
 }
 
@@ -267,9 +267,9 @@
     color: #3f4a5c;
 }
 .adm-input:focus {
-    border-color: rgba(99,102,241,0.45);
-    background: rgba(99,102,241,0.04);
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.06);
+    border-color: rgba(248,203,70,0.45);
+    background: rgba(248,203,70,0.04);
+    box-shadow: 0 0 0 3px rgba(248,203,70,0.06);
 }
 
 .adm-input--mono {
@@ -294,13 +294,13 @@
     font-weight: 700;
     letter-spacing: 0.2px;
     cursor: pointer;
-    color: #fff;
-    background: linear-gradient(135deg, #6366f1, #7c3aed);
-    box-shadow: 0 2px 10px rgba(99,102,241,0.15);
+    color: #111;
+    background: linear-gradient(135deg, #f8cb46, #e0b431);
+    box-shadow: 0 2px 10px rgba(248,203,70,0.15);
     transition: all 0.2s;
 }
 .adm-submit:hover:not(:disabled) {
-    box-shadow: 0 4px 16px rgba(99,102,241,0.25);
+    box-shadow: 0 4px 16px rgba(248,203,70,0.25);
     transform: translateY(-1px);
 }
 .adm-submit:active { transform: translateY(0); }
@@ -386,8 +386,8 @@
     font-family: 'SF Mono', monospace;
     font-size: 11px;
     font-weight: 600;
-    color: #a78bfa;
-    background: rgba(139,92,246,0.06);
+    color: #f8cb46;
+    background: rgba(248,203,70,0.06);
     padding: 2px 7px;
     border-radius: 4px;
 }
@@ -459,7 +459,7 @@
     transition: border-color 0.15s;
 }
 .adm-search input::placeholder { color: #3f4a5c; }
-.adm-search input:focus { border-color: rgba(99,102,241,0.4); }
+.adm-search input:focus { border-color: rgba(248,203,70,0.4); }
 .adm-search-icon {
     position: absolute;
     left: 10px;
@@ -475,8 +475,8 @@
     padding: 8px 14px;
     font-size: 12px;
     font-weight: 700;
-    color: #fff;
-    background: #6366f1;
+    color: #111;
+    background: #f8cb46;
     border: none;
     border-radius: 7px;
     cursor: pointer;
@@ -484,7 +484,7 @@
     white-space: nowrap;
 }
 .adm-btn-add:hover {
-    background: #5558e6;
+    background: #e0b431;
 }
 
 .adm-godown-grid {
@@ -691,7 +691,7 @@
     transition: border-color 0.15s;
 }
 .adm-upload-box:hover {
-    border-color: rgba(99,102,241,0.35);
+    border-color: rgba(248,203,70,0.35);
 }
 .adm-upload-box img {
     width: 100%;

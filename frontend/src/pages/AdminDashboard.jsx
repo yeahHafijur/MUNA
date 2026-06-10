@@ -199,7 +199,7 @@ const AdminDashboard = () => {
                         <div className="adm-stat-label">Open Now</div>
                     </div>
                     <div className="adm-stat">
-                        <div className="adm-stat-num adm-stat-num--purple">{godownItems.length}</div>
+                        <div className="adm-stat-num adm-stat-num--yellow">{godownItems.length}</div>
                         <div className="adm-stat-label">Godown Items</div>
                     </div>
                 </div>

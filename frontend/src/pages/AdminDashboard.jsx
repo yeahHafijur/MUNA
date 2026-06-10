@@ -96,16 +96,22 @@ const AdminDashboard = () => {
         }
     };
 
-    useEffect(() => {
-        // Protect Route
-        if (!token || user?.role !== 'super_admin') {
-            navigate('/');
-            return;
+    const fetchShops = async () => {
+        try {
+            const res = await fetch('/api/shops?admin=true', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            setShops(Array.isArray(data) ? data : []);
+            setLoadingShops(false);
+        } catch (error) {
+            console.error('Error fetching shops:', error);
+            setShops([]);
+            setLoadingShops(false);
         }
-
-        fetchShops();
-        fetchGodownItems();
-    }, [token, user, navigate]);
+    };
 
     // --- GODOWN INVENTORY STATE & FUNCTIONS ---
     const [godownItems, setGodownItems] = useState([]);
@@ -113,7 +119,6 @@ const AdminDashboard = () => {
     const [editingGodownItem, setEditingGodownItem] = useState(null);
     const [godownSearchQuery, setGodownSearchQuery] = useState('');
 
-    // For Add and Edit Godown Items
     const [godownFormData, setGodownFormData] = useState({
         name: '',
         category: '',
@@ -212,24 +217,15 @@ const AdminDashboard = () => {
             console.error("Error deleting item:", error);
         }
     };
-    // ------------------------------------------
 
-    const fetchShops = async () => {
-        try {
-            const res = await fetch('/api/shops?admin=true', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await res.json();
-            setShops(Array.isArray(data) ? data : []);
-            setLoadingShops(false);
-        } catch (error) {
-            console.error('Error fetching shops:', error);
-            setShops([]);
-            setLoadingShops(false);
+    useEffect(() => {
+        if (!token || user?.role !== 'super_admin') {
+            navigate('/');
+            return;
         }
-    };
+        fetchShops();
+        fetchGodownItems();
+    }, [token, user, navigate]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -256,7 +252,6 @@ const AdminDashboard = () => {
             }
 
             alert(data.message);
-            // Reset form
             setFormData({
                 vendorName: '',
                 vendorEmail: '',
@@ -269,7 +264,6 @@ const AdminDashboard = () => {
                 shopLng: ''
             });
 
-            // Refresh shop list
             fetchShops();
 
         } catch (error) {
@@ -281,281 +275,304 @@ const AdminDashboard = () => {
 
     if (!user) return null;
 
+    const openShops = shops.filter(s => s.isOpen).length;
+
     return (
-        <div className="admin-container">
-            {/* Header */}
-            <div className="admin-header">
-                <div>
-                    <h1 className="admin-header-title">Super Admin Panel</h1>
-                    <p className="admin-header-subtitle">Manage the entire platform</p>
+        <div className="admin-page">
+            {/* ---- Top Bar ---- */}
+            <div className="admin-topbar">
+                <div className="admin-topbar-left">
+                    <div className="admin-topbar-logo">M</div>
+                    <div>
+                        <div className="admin-topbar-title">Admin Console</div>
+                        <div className="admin-topbar-subtitle">MUNA Platform Management</div>
+                    </div>
                 </div>
-                <div className="admin-header-actions">
-                    <span className="admin-god-mode-badge">God Mode</span>
-                    <button onClick={() => { logout(); navigate('/'); }} className="admin-logout-btn">Logout</button>
+                <div className="admin-topbar-right">
+                    <span className="admin-role-chip">Super Admin</span>
+                    <button onClick={() => { logout(); navigate('/'); }} className="admin-logout-btn">Sign Out</button>
                 </div>
             </div>
 
-            {/* Tabs */}
-            <div className="admin-tabs-container">
-                <button 
-                    onClick={() => setActiveTab('onboard')} 
-                    className={`admin-tab-btn ${activeTab === 'onboard' ? 'admin-tab-btn-purple-active' : 'admin-tab-btn-inactive'}`}
+            {/* ---- Stats ---- */}
+            <div className="admin-stats">
+                <div className="admin-stat-card">
+                    <div className="admin-stat-label">Total Shops</div>
+                    <div className="admin-stat-value">{shops.length}</div>
+                </div>
+                <div className="admin-stat-card">
+                    <div className="admin-stat-label">Open Now</div>
+                    <div className="admin-stat-value admin-stat-value--green">{openShops}</div>
+                </div>
+                <div className="admin-stat-card">
+                    <div className="admin-stat-label">Godown Items</div>
+                    <div className="admin-stat-value admin-stat-value--accent">{godownItems.length}</div>
+                </div>
+            </div>
+
+            {/* ---- Tabs ---- */}
+            <div className="admin-tabs">
+                <button
+                    onClick={() => setActiveTab('onboard')}
+                    className={`admin-tab ${activeTab === 'onboard' ? 'admin-tab--active' : ''}`}
                 >
-                    🚀 Onboard Vendor
+                    Onboard Vendor
                 </button>
-                <button 
-                    onClick={() => setActiveTab('shops')} 
-                    className={`admin-tab-btn ${activeTab === 'shops' ? 'admin-tab-btn-purple-active' : 'admin-tab-btn-inactive'}`}
+                <button
+                    onClick={() => setActiveTab('shops')}
+                    className={`admin-tab ${activeTab === 'shops' ? 'admin-tab--active' : ''}`}
                 >
-                    🏪 Active Shops
+                    Shops
                 </button>
-                <button 
-                    onClick={() => setActiveTab('godown')} 
-                    className={`admin-tab-btn ${activeTab === 'godown' ? 'admin-tab-btn-indigo-active' : 'admin-tab-btn-inactive'}`}
+                <button
+                    onClick={() => setActiveTab('godown')}
+                    className={`admin-tab ${activeTab === 'godown' ? 'admin-tab--active' : ''}`}
                 >
-                    📦 Godown Inventory
+                    Godown
                 </button>
             </div>
 
-            <div className="space-y-6">
-                {/* Onboarding Form */}
+            {/* ---- Content ---- */}
+            <div className="admin-content">
+
+                {/* == ONBOARD TAB == */}
                 {activeTab === 'onboard' && (
-                <div className="admin-card admin-card-onboard">
-                    <h2 className="admin-section-title">
-                        <span>🚀</span> Onboard New Vendor
-                    </h2>
-                    
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="admin-form-group">
-                            <h3 className="admin-form-group-title">1. Vendor Details</h3>
-                            <input type="text" name="vendorName" required placeholder="Vendor Full Name" className="admin-form-input admin-form-input-purple" value={formData.vendorName} onChange={handleChange} />
-                            <input type="email" name="vendorEmail" required placeholder="Vendor Google Email" className="admin-form-input admin-form-input-purple" value={formData.vendorEmail} onChange={handleChange} />
-                            <input type="tel" name="vendorPhone" required placeholder="Vendor Phone Number (10 digits)" className="admin-form-input admin-form-input-purple" value={formData.vendorPhone} onChange={handleChange} minLength="10" maxLength="10" />
+                    <div className="admin-panel" key="onboard">
+                        <div className="admin-panel-header">
+                            <span className="admin-panel-title">New Vendor Registration</span>
                         </div>
+                        <div className="admin-panel-body">
+                            <form onSubmit={handleSubmit} className="admin-form">
+                                <div className="admin-fieldset">
+                                    <div className="admin-fieldset-title">Vendor Information</div>
+                                    <div className="admin-fields">
+                                        <input type="text" name="vendorName" required placeholder="Full name" className="admin-input" value={formData.vendorName} onChange={handleChange} />
+                                        <input type="email" name="vendorEmail" required placeholder="Google email" className="admin-input" value={formData.vendorEmail} onChange={handleChange} />
+                                        <input type="tel" name="vendorPhone" required placeholder="Phone number (10 digits)" className="admin-input" value={formData.vendorPhone} onChange={handleChange} minLength="10" maxLength="10" />
+                                    </div>
+                                </div>
 
-                        <div className="admin-form-group">
-                            <h3 className="admin-form-group-title">2. Shop Details</h3>
-                            <input type="text" name="shopName" required placeholder="Shop Name" className="admin-form-input admin-form-input-purple" value={formData.shopName} onChange={handleChange} />
-                            <input type="text" name="shopAddress" required placeholder="Shop Address" className="admin-form-input admin-form-input-purple" value={formData.shopAddress} onChange={handleChange} />
-                            <input type="text" name="shopCategory" placeholder="Category (e.g. Kirana, Pharmacy)" className="admin-form-input admin-form-input-purple" value={formData.shopCategory} onChange={handleChange} />
-                            <input type="text" name="udyamNumber" placeholder="Udyam Number (Optional)" className="admin-form-input admin-form-input-purple admin-form-input-semibold" value={formData.udyamNumber} onChange={handleChange} />
-                            
-                            <div className="admin-form-row">
-                                <input type="number" step="any" name="shopLat" required placeholder="Latitude (Required)" className="admin-form-input-flex" value={formData.shopLat} onChange={handleChange} />
-                                <input type="number" step="any" name="shopLng" required placeholder="Longitude (Required)" className="admin-form-input-flex" value={formData.shopLng} onChange={handleChange} />
-                            </div>
+                                <div className="admin-fieldset">
+                                    <div className="admin-fieldset-title">Shop Information</div>
+                                    <div className="admin-fields">
+                                        <input type="text" name="shopName" required placeholder="Shop name" className="admin-input" value={formData.shopName} onChange={handleChange} />
+                                        <input type="text" name="shopAddress" required placeholder="Full address" className="admin-input" value={formData.shopAddress} onChange={handleChange} />
+                                        <input type="text" name="shopCategory" placeholder="Category — e.g. Kirana, Pharmacy" className="admin-input" value={formData.shopCategory} onChange={handleChange} />
+                                        <input type="text" name="udyamNumber" placeholder="Udyam number (optional)" className="admin-input admin-input--mono" value={formData.udyamNumber} onChange={handleChange} />
+                                        <div className="admin-input-row">
+                                            <input type="number" step="any" name="shopLat" required placeholder="Latitude" className="admin-input" value={formData.shopLat} onChange={handleChange} />
+                                            <input type="number" step="any" name="shopLng" required placeholder="Longitude" className="admin-input" value={formData.shopLng} onChange={handleChange} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" disabled={isSubmitting} className="admin-submit-btn">
+                                    {isSubmitting ? 'Creating...' : 'Create Vendor & Shop'}
+                                </button>
+                            </form>
                         </div>
-
-                        <button type="submit" disabled={isSubmitting} className="admin-submit-btn-purple">
-                            {isSubmitting ? 'ONBOARDING...' : 'CREATE VENDOR & SHOP'}
-                        </button>
-                    </form>
-                </div>
+                    </div>
                 )}
 
-                {/* Active Shops List */}
+                {/* == SHOPS TAB == */}
                 {activeTab === 'shops' && (
-                <div className="admin-card">
-                    <h2 className="admin-section-title">
-                        <span>🏪</span> Active Shops ({shops.length})
-                    </h2>
-                    
-                    {loadingShops ? (
-                        <p className="admin-loading-text">Loading shops...</p>
-                    ) : shops.length === 0 ? (
-                        <p className="admin-empty-text">No shops on the platform yet.</p>
-                    ) : (
-                        <div className="admin-shops-grid">
-                            {shops.map(shop => (
-                                <div key={shop._id} className="admin-shop-item">
-                                    <div className="admin-shop-header">
-                                        <div className="admin-shop-title-wrapper">
-                                            <h3 className="admin-shop-title">{shop.name}</h3>
-                                            {!shop.isActive && (
-                                                <span className="admin-badge-inactive">Inactive</span>
-                                            )}
-                                        </div>
-                                        <span className={`admin-badge-status ${shop.isOpen ? 'admin-badge-status-open' : 'admin-badge-status-closed'}`}>
-                                            {shop.isOpen ? 'OPEN' : 'CLOSED'}
-                                        </span>
-                                    </div>
-                                    <p className="admin-shop-address">{shop.address}</p>
-                                    
-                                    <div className="admin-shop-details">
-                                        <div className="admin-shop-detail-row">
-                                            <span className="admin-shop-detail-label">Vendor:</span>
-                                            <span className="admin-shop-detail-value">{shop.vendorId?.name || 'Unknown'}</span>
-                                        </div>
-                                        {shop.udyamNumber && (
-                                            <div className="admin-shop-detail-row">
-                                                <span className="admin-shop-detail-label">Udyam No:</span>
-                                                <span className="admin-shop-detail-highlight">{shop.udyamNumber}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="admin-shop-actions">
-                                        <button onClick={() => handleEditClick(shop)} className="admin-btn-edit">
-                                            ✏️ Edit
-                                        </button>
-                                        <button onClick={() => handleToggleActive(shop)} className={`admin-btn-toggle ${shop.isActive ? 'admin-btn-toggle-deactivate' : 'admin-btn-toggle-activate'}`}>
-                                            {shop.isActive ? 'Deactivate' : 'Activate'}
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                )}
-
-            {/* --- GODOWN INVENTORY MANAGEMENT --- */}
-            {activeTab === 'godown' && (
-            <div className="admin-card">
-                <div className="admin-godown-header">
-                    <h2 className="text-xl font-black text-gray-800 flex items-center gap-2">
-                        <span>📦</span> Global Godown Inventory
-                    </h2>
-                    <div className="admin-godown-actions">
-                        <div className="admin-search-wrapper">
-                            <input 
-                                type="text" 
-                                placeholder="Search items..." 
-                                className="admin-search-input"
-                                value={godownSearchQuery}
-                                onChange={(e) => setGodownSearchQuery(e.target.value)}
-                            />
-                            <span className="admin-search-icon">🔍</span>
-                        </div>
-                        <button 
-                            onClick={() => {
-                                setEditingGodownItem(null);
-                                setGodownFormData({ name: '', category: '', image: null, imagePreview: '' });
-                                document.getElementById('godownModal').showModal();
-                            }} 
-                            className="admin-btn-add-godown"
-                        >
-                            + Add New Item
-                        </button>
-                    </div>
-                </div>
-
-                {loadingGodownItems ? (
-                    <p className="admin-loading-text">Loading inventory...</p>
-                ) : godownItems.length === 0 ? (
-                    <p className="admin-empty-text">Godown is empty.</p>
-                ) : (
-                    <div className="admin-godown-grid">
-                        {godownItems.filter(item => (item.name || '').toLowerCase().includes((godownSearchQuery || '').toLowerCase())).map(item => (
-                            <div key={item._id} className="admin-godown-item group">
-                                <button onClick={() => handleDeleteGodownItem(item._id)} className="admin-godown-btn-delete">✕</button>
-                                <button onClick={() => { handleGodownEditClick(item); document.getElementById('godownModal').showModal(); }} className="admin-godown-btn-edit">✏️</button>
-
-                                <div className="admin-godown-img-wrapper">
-                                    {item.image ? (
-                                        <img src={item.image} alt={item.name} className="admin-godown-img" />
-                                    ) : (
-                                        <div className="admin-godown-img-placeholder">?</div>
-                                    )}
-                                </div>
-                                <h3 className="admin-godown-title">{item.name}</h3>
-                                {item.category && <p className="admin-godown-category">{item.category}</p>}
+                    <div className="admin-panel" key="shops">
+                        <div className="admin-panel-header">
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <span className="admin-panel-title">All Shops</span>
+                                <span className="admin-panel-count">{shops.length}</span>
                             </div>
-                        ))}
+                        </div>
+                        <div className="admin-panel-body">
+                            {loadingShops ? (
+                                <p className="admin-loading">Loading shops...</p>
+                            ) : shops.length === 0 ? (
+                                <p className="admin-empty">No shops on the platform yet.</p>
+                            ) : (
+                                <div className="admin-shops-list">
+                                    {shops.map(shop => (
+                                        <div key={shop._id} className="admin-shop-card">
+                                            <div className="admin-shop-card-top">
+                                                <div className="admin-shop-name">
+                                                    {shop.name}
+                                                    {!shop.isActive && (
+                                                        <span className="admin-badge admin-badge--inactive">Inactive</span>
+                                                    )}
+                                                </div>
+                                                <span className={`admin-badge ${shop.isOpen ? 'admin-badge--open' : 'admin-badge--closed'}`}>
+                                                    {shop.isOpen ? 'OPEN' : 'CLOSED'}
+                                                </span>
+                                            </div>
+                                            <p className="admin-shop-address">{shop.address}</p>
+
+                                            <div className="admin-shop-meta">
+                                                <div className="admin-shop-meta-row">
+                                                    <span className="admin-shop-meta-label">Vendor</span>
+                                                    <span className="admin-shop-meta-value">{shop.vendorId?.name || 'Unknown'}</span>
+                                                </div>
+                                                {shop.udyamNumber && (
+                                                    <div className="admin-shop-meta-row">
+                                                        <span className="admin-shop-meta-label">Udyam</span>
+                                                        <span className="admin-shop-meta-highlight">{shop.udyamNumber}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="admin-shop-actions">
+                                                <button onClick={() => handleEditClick(shop)} className="admin-btn admin-btn--edit">
+                                                    Edit
+                                                </button>
+                                                <button onClick={() => handleToggleActive(shop)} className={`admin-btn ${shop.isActive ? 'admin-btn--deactivate' : 'admin-btn--activate'}`}>
+                                                    {shop.isActive ? 'Deactivate' : 'Activate'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* == GODOWN TAB == */}
+                {activeTab === 'godown' && (
+                    <div className="admin-panel" key="godown">
+                        <div className="admin-panel-header">
+                            <span className="admin-panel-title">Global Godown</span>
+                            <div className="admin-godown-toolbar">
+                                <div className="admin-search-box">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                    </svg>
+                                    <input
+                                        type="text"
+                                        placeholder="Search items..."
+                                        value={godownSearchQuery}
+                                        onChange={(e) => setGodownSearchQuery(e.target.value)}
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setEditingGodownItem(null);
+                                        setGodownFormData({ name: '', category: '', image: null, imagePreview: '' });
+                                        document.getElementById('godownModal').showModal();
+                                    }}
+                                    className="admin-btn-add"
+                                >
+                                    + Add Item
+                                </button>
+                            </div>
+                        </div>
+                        <div className="admin-panel-body">
+                            {loadingGodownItems ? (
+                                <p className="admin-loading">Loading inventory...</p>
+                            ) : godownItems.length === 0 ? (
+                                <p className="admin-empty">Godown is empty.</p>
+                            ) : (
+                                <div className="admin-godown-grid">
+                                    {godownItems.filter(item => (item.name || '').toLowerCase().includes((godownSearchQuery || '').toLowerCase())).map(item => (
+                                        <div key={item._id} className="admin-godown-card">
+                                            <div className="admin-godown-card-actions">
+                                                <button onClick={() => { handleGodownEditClick(item); document.getElementById('godownModal').showModal(); }} className="admin-godown-icon-btn admin-godown-icon-btn--edit">✎</button>
+                                                <button onClick={() => handleDeleteGodownItem(item._id)} className="admin-godown-icon-btn admin-godown-icon-btn--delete">✕</button>
+                                            </div>
+
+                                            <div className="admin-godown-thumb">
+                                                {item.image ? (
+                                                    <img src={item.image} alt={item.name} />
+                                                ) : (
+                                                    <span className="admin-godown-thumb-placeholder">□</span>
+                                                )}
+                                            </div>
+                                            <div className="admin-godown-name">{item.name}</div>
+                                            {item.category && <div className="admin-godown-cat">{item.category}</div>}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
-            )}
-            </div>
 
-            {/* Godown Item Modal (Add/Edit) */}
-            <dialog id="godownModal" className="admin-modal-dialog">
-                <div className="admin-modal-content">
-                    <div className="admin-modal-header-indigo">
-                        <h2 className="admin-modal-title">{editingGodownItem ? 'Edit Godown Item' : 'Add Godown Item'}</h2>
+            {/* ---- Godown Modal (Add/Edit) ---- */}
+            <dialog id="godownModal" className="admin-dialog">
+                <div className="admin-modal">
+                    <div className="admin-modal-header">
+                        <span className="admin-modal-title">{editingGodownItem ? 'Edit Item' : 'Add Item'}</span>
                         <button onClick={() => {
                             document.getElementById('godownModal').close();
                             setEditingGodownItem(null);
-                        }} className="admin-modal-close-btn">
+                        }} className="admin-modal-close">
                             ✕
                         </button>
                     </div>
                     <form onSubmit={(e) => { handleGodownSubmit(e); document.getElementById('godownModal').close(); }} className="admin-modal-body">
-                        <div className="admin-modal-form-group">
-                            <div className="admin-img-upload-wrapper">
-                                <label className="admin-img-upload-label group">
-                                    <div className="admin-img-upload-preview group">
-                                        {godownFormData.imagePreview ? (
-                                            <img src={godownFormData.imagePreview} alt="Preview" className="admin-img-preview-img" />
-                                        ) : (
-                                            <span className="admin-img-upload-text">Click to add photo</span>
-                                        )}
-                                    </div>
-                                    <input id="godownImageInput" type="file" name="image" accept="image/*" onChange={handleGodownFormChange} className="hidden" />
-                                </label>
-                            </div>
-                            <div>
-                                <label className="admin-form-label">Item Name</label>
-                                <input type="text" name="name" required className="admin-form-input admin-form-input-indigo" value={godownFormData.name} onChange={handleGodownFormChange} placeholder="e.g. Aashirvaad Atta 5kg" />
-                            </div>
-                            <div>
-                                <label className="admin-form-label">Category (Optional)</label>
-                                <input type="text" name="category" className="admin-form-input admin-form-input-indigo" value={godownFormData.category} onChange={handleGodownFormChange} placeholder="e.g. Grocery" />
-                            </div>
+                        <div className="admin-img-upload">
+                            <label style={{ cursor: 'pointer' }}>
+                                <div className="admin-img-upload-area">
+                                    {godownFormData.imagePreview ? (
+                                        <img src={godownFormData.imagePreview} alt="Preview" />
+                                    ) : (
+                                        <span className="admin-img-upload-text">Add photo</span>
+                                    )}
+                                </div>
+                                <input id="godownImageInput" type="file" name="image" accept="image/*" onChange={handleGodownFormChange} style={{ display: 'none' }} />
+                            </label>
                         </div>
-                        <div className="admin-modal-footer">
-                            <button type="submit" className="admin-submit-btn-indigo">
-                                {editingGodownItem ? 'UPDATE ITEM' : 'ADD TO GODOWN'}
-                            </button>
+                        <div className="admin-modal-field">
+                            <label className="admin-modal-label">Item Name</label>
+                            <input type="text" name="name" required className="admin-input" value={godownFormData.name} onChange={handleGodownFormChange} placeholder="e.g. Aashirvaad Atta 5kg" />
                         </div>
+                        <div className="admin-modal-field">
+                            <label className="admin-modal-label">Category</label>
+                            <input type="text" name="category" className="admin-input" value={godownFormData.category} onChange={handleGodownFormChange} placeholder="e.g. Grocery" />
+                        </div>
+                        <button type="submit" className="admin-submit-btn">
+                            {editingGodownItem ? 'Update Item' : 'Add to Godown'}
+                        </button>
                     </form>
                 </div>
             </dialog>
 
-            {/* Edit Shop Modal */}
+            {/* ---- Edit Shop Modal ---- */}
             {editingShop && (
-                <div className="admin-modal-overlay">
-                    <div className="admin-modal-content">
-                        <div className="admin-modal-header-purple">
-                            <h2 className="admin-modal-title">Edit Shop Details</h2>
-                            <button onClick={() => setEditingShop(null)} className="admin-modal-close-btn">
-                                ✕
-                            </button>
+                <div className="admin-modal-backdrop">
+                    <div className="admin-modal">
+                        <div className="admin-modal-header">
+                            <span className="admin-modal-title">Edit Shop</span>
+                            <button onClick={() => setEditingShop(null)} className="admin-modal-close">✕</button>
                         </div>
                         <form onSubmit={handleEditSubmit} className="admin-modal-body">
-                            <div className="admin-modal-form-group">
-                                <div>
-                                    <label className="admin-form-label">Shop Name</label>
-                                    <input type="text" name="name" required className="admin-form-input admin-form-input-purple" value={editFormData.name} onChange={handleEditChange} />
+                            <div className="admin-modal-field">
+                                <label className="admin-modal-label">Shop Name</label>
+                                <input type="text" name="name" required className="admin-input" value={editFormData.name} onChange={handleEditChange} />
+                            </div>
+                            <div className="admin-modal-field">
+                                <label className="admin-modal-label">Address</label>
+                                <input type="text" name="address" required className="admin-input" value={editFormData.address} onChange={handleEditChange} />
+                            </div>
+                            <div className="admin-modal-field">
+                                <label className="admin-modal-label">Category</label>
+                                <input type="text" name="category" className="admin-input" value={editFormData.category} onChange={handleEditChange} />
+                            </div>
+                            <div className="admin-modal-field">
+                                <label className="admin-modal-label">Udyam Number</label>
+                                <input type="text" name="udyamNumber" className="admin-input admin-input--mono" value={editFormData.udyamNumber} onChange={handleEditChange} />
+                            </div>
+                            <div className="admin-input-row">
+                                <div className="admin-modal-field" style={{ flex: 1 }}>
+                                    <label className="admin-modal-label">Latitude</label>
+                                    <input type="number" step="any" name="lat" required className="admin-input" value={editFormData.lat} onChange={handleEditChange} />
                                 </div>
-                                <div>
-                                    <label className="admin-form-label">Address</label>
-                                    <input type="text" name="address" required className="admin-form-input admin-form-input-purple" value={editFormData.address} onChange={handleEditChange} />
-                                </div>
-                                <div>
-                                    <label className="admin-form-label">Category</label>
-                                    <input type="text" name="category" className="admin-form-input admin-form-input-purple" value={editFormData.category} onChange={handleEditChange} />
-                                </div>
-                                <div>
-                                    <label className="admin-form-label">Udyam Number</label>
-                                    <input type="text" name="udyamNumber" className="admin-form-input admin-form-input-purple" value={editFormData.udyamNumber} onChange={handleEditChange} />
-                                </div>
-                                <div className="admin-form-row">
-                                    <div className="flex-1">
-                                        <label className="admin-form-label">Latitude</label>
-                                        <input type="number" step="any" name="lat" required className="admin-form-input admin-form-input-purple" value={editFormData.lat} onChange={handleEditChange} />
-                                    </div>
-                                    <div className="flex-1">
-                                        <label className="admin-form-label">Longitude</label>
-                                        <input type="number" step="any" name="lng" required className="admin-form-input admin-form-input-purple" value={editFormData.lng} onChange={handleEditChange} />
-                                    </div>
+                                <div className="admin-modal-field" style={{ flex: 1 }}>
+                                    <label className="admin-modal-label">Longitude</label>
+                                    <input type="number" step="any" name="lng" required className="admin-input" value={editFormData.lng} onChange={handleEditChange} />
                                 </div>
                             </div>
-                            <div className="admin-modal-footer">
-                                <button type="submit" className="admin-submit-btn-purple">
-                                    SAVE CHANGES
-                                </button>
-                            </div>
+                            <button type="submit" className="admin-submit-btn">
+                                Save Changes
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -565,4 +582,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

@@ -3,18 +3,11 @@ import './SplashScreen.css';
 
 const SplashScreen = ({ onFinish }) => {
     const [fadeOut, setFadeOut] = useState(false);
-    const videoRef = useRef(null);
-
-    const [isVideoReady, setIsVideoReady] = useState(false);
-
     useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.play().catch(error => {
-                console.log("Video auto-play failed", error);
-                // If autoplay fails, skip splash
-                handleFinish();
-            });
-        }
+        const timer = setTimeout(() => {
+            handleFinish();
+        }, 2800); // 2.8 seconds total duration before fade out starts
+        return () => clearTimeout(timer);
     }, []);
 
     const handleFinish = () => {
@@ -70,6 +63,44 @@ const SplashScreen = ({ onFinish }) => {
                     user-select: none;
                     z-index: 1;
                 }
+                @keyframes letterPop {
+                    0% { transform: translateY(40px) scale(0.8); opacity: 0; filter: blur(10px); color: #fff; }
+                    60% { transform: translateY(-5px) scale(1.05); opacity: 1; filter: blur(0px); color: #6366f1; }
+                    100% { transform: translateY(0) scale(1); opacity: 1; color: #4338ca; }
+                }
+                .muna-logo-container {
+                    display: flex;
+                    gap: 6px;
+                    font-size: 4.5rem;
+                    font-weight: 900;
+                    font-family: 'Inter', system-ui, sans-serif;
+                    letter-spacing: -3px;
+                }
+                .muna-letter {
+                    display: inline-block;
+                    opacity: 0;
+                    animation: letterPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                    text-shadow: 0 10px 20px rgba(67, 56, 202, 0.2);
+                }
+                .muna-m { animation-delay: 0.1s; }
+                .muna-u { animation-delay: 0.25s; }
+                .muna-n { animation-delay: 0.4s; }
+                .muna-a { animation-delay: 0.55s; }
+                
+                @keyframes subtitleFade {
+                    0% { opacity: 0; transform: translateY(5px); letter-spacing: 2px; }
+                    100% { opacity: 1; transform: translateY(0); letter-spacing: 5px; }
+                }
+                .muna-subtitle {
+                    margin-top: 8px;
+                    font-size: 0.75rem;
+                    font-weight: 800;
+                    color: #f8cb46;
+                    text-transform: uppercase;
+                    opacity: 0;
+                    animation: subtitleFade 0.8s ease-out forwards;
+                    animation-delay: 1s;
+                }
                 `}
             </style>
             
@@ -102,17 +133,14 @@ const SplashScreen = ({ onFinish }) => {
                 </div>
             ))}
 
-            <div className={`relative w-[85vw] max-w-sm sm:max-w-md flex items-center justify-center transition-opacity duration-300 z-10 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
-                <video 
-                    ref={videoRef}
-                    className="splashscreen-style-1"
-                    src="/MunaIntro.mp4"
-                    playsInline
-                    muted
-                    autoPlay
-                    onCanPlay={() => setIsVideoReady(true)}
-                    onEnded={handleFinish}
-                />
+            <div className="relative z-10 flex flex-col items-center justify-center">
+                <div className="muna-logo-container">
+                    <span className="muna-letter muna-m">M</span>
+                    <span className="muna-letter muna-u">U</span>
+                    <span className="muna-letter muna-n">N</span>
+                    <span className="muna-letter muna-a">A</span>
+                </div>
+                <div className="muna-subtitle">GROCERY IN MINUTES</div>
             </div>
         </div>
     );

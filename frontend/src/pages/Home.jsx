@@ -126,17 +126,7 @@ const Home = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-                        
-                        {/* New Locate Me Button */}
-                        <button onClick={handleGetLocation} className="mt-3 w-full bg-[#f8cb46] text-black font-bold py-3 rounded-xl shadow-lg hover:bg-[#e0b431] transition-colors flex items-center justify-center gap-2">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {userLocation ? "Location Found (Update)" : "Find Shops Near Me"}
-                        </button>
-                        {locationError && <p className="text-red-300 text-xs mt-2 text-center">{locationError}</p>}
-                        
+
                         <div className="home-style-17">
                             <div className="home-style-18">
                                 <div className="home-style-19">🛍️</div>
@@ -157,11 +147,17 @@ const Home = () => {
                     <p className="home-style-23">{shops.filter(s => s.isOpen).length}</p>
                     <p className="home-style-24">Open Now</p>
                 </div>
-                <div className="home-style-25">
-                    <p className="home-style-26">5 KM</p>
-                    <p className="home-style-27">Delivery Range</p>
+                <div className="home-style-25 flex flex-col justify-center items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={handleGetLocation} title="Find shops near me">
+                    <svg className="w-6 h-6 text-indigo-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider text-center" style={{marginTop: 0}}>
+                        {userLocation ? "Location Set" : "Locate Me"}
+                    </p>
                 </div>
             </div>
+            {locationError && <p className="text-red-500 text-xs mt-2 text-center">{locationError}</p>}
 
             {/* Shop Heading */}
             <div className="home-style-28">

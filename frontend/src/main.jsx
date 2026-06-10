@@ -15,13 +15,11 @@ if ('serviceWorker' in navigator) {
 }
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <AuthProvider>
         <CartProvider>
           <App />
         </CartProvider>
       </AuthProvider>
-    </GoogleOAuthProvider>
-  </StrictMode>,
+    </GoogleOAuthProvider>,
 )

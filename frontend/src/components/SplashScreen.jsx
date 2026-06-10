@@ -64,23 +64,27 @@ const SplashScreen = ({ onFinish }) => {
                     z-index: 1;
                 }
                 @keyframes letterPop {
-                    0% { transform: translateY(40px) scale(0.8); opacity: 0; filter: blur(10px); color: #fff; }
-                    60% { transform: translateY(-5px) scale(1.05); opacity: 1; filter: blur(0px); color: #6366f1; }
-                    100% { transform: translateY(0) scale(1); opacity: 1; color: #4338ca; }
+                    0% { transform: translateY(40px) scale(0.8) rotate(-10deg); opacity: 0; filter: blur(10px); color: #fff; }
+                    50% { transform: translateY(-10px) scale(1.1) rotate(5deg); opacity: 1; filter: blur(0px); color: #ffe680; }
+                    100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; color: #f8cb46; }
                 }
                 .muna-logo-container {
                     display: flex;
-                    gap: 6px;
-                    font-size: 4.5rem;
+                    gap: 4px;
+                    font-size: 5.5rem;
                     font-weight: 900;
-                    font-family: 'Inter', system-ui, sans-serif;
-                    letter-spacing: -3px;
+                    font-family: 'Arial Black', 'Impact', 'Outfit', system-ui, sans-serif;
+                    letter-spacing: -4px;
+                    background: linear-gradient(135deg, #f8cb46, #e0b431, #f8cb46);
+                    background-size: 200% auto;
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    filter: drop-shadow(0 10px 15px rgba(248, 203, 70, 0.4));
                 }
                 .muna-letter {
                     display: inline-block;
                     opacity: 0;
-                    animation: letterPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-                    text-shadow: 0 10px 20px rgba(67, 56, 202, 0.2);
+                    animation: letterPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
                 }
                 .muna-m { animation-delay: 0.1s; }
                 .muna-u { animation-delay: 0.25s; }
@@ -88,18 +92,19 @@ const SplashScreen = ({ onFinish }) => {
                 .muna-a { animation-delay: 0.55s; }
                 
                 @keyframes subtitleFade {
-                    0% { opacity: 0; transform: translateY(5px); letter-spacing: 2px; }
-                    100% { opacity: 1; transform: translateY(0); letter-spacing: 5px; }
+                    0% { opacity: 0; transform: translateY(10px); letter-spacing: 2px; }
+                    100% { opacity: 1; transform: translateY(0); letter-spacing: 6px; }
                 }
                 .muna-subtitle {
-                    margin-top: 8px;
-                    font-size: 0.75rem;
-                    font-weight: 800;
-                    color: #f8cb46;
+                    margin-top: 5px;
+                    font-size: 0.8rem;
+                    font-weight: 900;
+                    color: #e0b431;
+                    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
                     text-transform: uppercase;
                     opacity: 0;
                     animation: subtitleFade 0.8s ease-out forwards;
-                    animation-delay: 1s;
+                    animation-delay: 1.1s;
                 }
                 `}
             </style>

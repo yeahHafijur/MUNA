@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import './ShopDetail.css';
 
 const ShopDetail = () => {
     const { id } = useParams();
@@ -60,26 +61,26 @@ const ShopDetail = () => {
     }, [products, searchQuery, selectedCategory]);
 
     return (
-        <div className="mt-4 pb-20">
+        <div className="shopdetail-style-1">
             {/* Shop Banner */}
             {shop && (
-                <div className="relative bg-gray-900 rounded-2xl p-6 sm:p-8 mb-6 overflow-hidden shadow-lg flex flex-col justify-end min-h-[160px]">
+                <div className="shopdetail-style-2">
                     {shop.image && (
-                        <div className="absolute inset-0 opacity-40">
-                            <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" />
+                        <div className="shopdetail-style-3">
+                            <img src={shop.image} alt={shop.name} className="shopdetail-style-4" />
                         </div>
                     )}
-                    <div className="relative z-10 text-white">
-                        <div className="flex justify-between items-start">
+                    <div className="shopdetail-style-5">
+                        <div className="shopdetail-style-6">
                             <div>
                                 <span className={`inline-block text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full mb-2 backdrop-blur-sm border ${shop.isOpen ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'bg-red-500/20 text-red-300 border-red-500/30'}`}>
                                     {shop.isOpen ? '● Open Now' : '● Closed'}
                                 </span>
-                                <h1 className="text-2xl sm:text-3xl font-black mb-1">{shop.name}</h1>
-                                <p className="text-gray-300 text-sm flex items-center gap-2">
+                                <h1 className="shopdetail-style-7">{shop.name}</h1>
+                                <p className="shopdetail-style-8">
                                     <span>📍 {shop.address}</span>
                                     {shop.vendorId?.phone && (
-                                        <span className="bg-white/20 px-2 py-0.5 rounded-md text-xs font-bold backdrop-blur-md">
+                                        <span className="shopdetail-style-9">
                                             📞 {shop.vendorId.phone}
                                         </span>
                                     )}
@@ -88,9 +89,9 @@ const ShopDetail = () => {
                             {shop.location?.coordinates && (
                                 <button 
                                     onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank')}
-                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-xl text-xs font-bold transition-colors backdrop-blur-md flex items-center gap-1.5"
+                                    className="shopdetail-style-10"
                                 >
-                                    <span className="text-lg">🗺️</span> <span className="hidden sm:inline">Directions</span>
+                                    <span className="shopdetail-style-11">🗺️</span> <span className="shopdetail-style-12">Directions</span>
                                 </button>
                             )}
                         </div>
@@ -99,15 +100,15 @@ const ShopDetail = () => {
             )}
 
             {/* Search & Back */}
-            <div className="mb-6">
-                <div className="flex justify-between items-end mb-3">
+            <div className="shopdetail-style-13">
+                <div className="shopdetail-style-14">
                     <div>
-                        <h2 className="text-xl font-black text-gray-800">Menu Items</h2>
+                        <h2 className="shopdetail-style-15">Menu Items</h2>
                     </div>
                     {selectedCategory && (
                         <button 
                             onClick={() => setSelectedCategory(null)}
-                            className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            className="shopdetail-style-16"
                         >
                             ← Back
                         </button>
@@ -117,28 +118,28 @@ const ShopDetail = () => {
                 <input 
                     type="text" 
                     placeholder="Search for items, categories..." 
-                    className="w-full bg-white border border-gray-200 rounded-xl p-3 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 transition-all shadow-sm"
+                    className="shopdetail-style-17"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
             </div>
 
             {loading ? (
-                <p className="text-gray-500 text-sm font-semibold animate-pulse">Loading menu...</p>
+                <p className="shopdetail-style-18">Loading menu...</p>
             ) : products.length === 0 ? (
-                <p className="text-gray-500 text-sm bg-white p-5 rounded-xl border border-gray-100 text-center">No products available in this shop right now.</p>
+                <p className="shopdetail-style-19">No products available in this shop right now.</p>
             ) : (
                 <>
                     {/* View 1: Category Cards (Shows only if no category is selected and no search query) */}
                     {selectedCategory === null && !searchQuery && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+                        <div className="shopdetail-style-20">
                             <div 
                                 onClick={() => setSelectedCategory('All')}
-                                className="bg-gradient-to-br from-yellow-500 to-yellow-500 p-5 rounded-2xl shadow-sm cursor-pointer transform hover:-translate-y-1 transition-transform flex flex-col justify-between h-32"
+                                className="shopdetail-style-21"
                             >
-                                <span className="text-3xl">🍔</span>
-                                <h3 className="font-black text-white text-lg">All Items</h3>
-                                <p className="text-xs text-yellow-100 font-bold">{products.length} items</p>
+                                <span className="shopdetail-style-22">🍔</span>
+                                <h3 className="shopdetail-style-23">All Items</h3>
+                                <p className="shopdetail-style-24">{products.length} items</p>
                             </div>
                             
                             {categories.map((cat, idx) => {
@@ -151,11 +152,11 @@ const ShopDetail = () => {
                                     <div 
                                         key={idx}
                                         onClick={() => setSelectedCategory(cat)}
-                                        className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm cursor-pointer transform hover:-translate-y-1 hover:border-indigo-300 transition-all flex flex-col justify-between h-32"
+                                        className="shopdetail-style-25"
                                     >
-                                        <span className="text-3xl">{emoji}</span>
-                                        <h3 className="font-black text-gray-800 text-lg leading-tight line-clamp-1">{cat}</h3>
-                                        <p className="text-xs text-gray-500 font-bold">{count} items</p>
+                                        <span className="shopdetail-style-26">{emoji}</span>
+                                        <h3 className="shopdetail-style-27">{cat}</h3>
+                                        <p className="shopdetail-style-28">{count} items</p>
                                     </div>
                                 )
                             })}
@@ -166,45 +167,45 @@ const ShopDetail = () => {
                     {(selectedCategory !== null || searchQuery) && (
                         <div>
                             {selectedCategory && !searchQuery && (
-                                <h2 className="text-xl font-black mb-4 flex items-center gap-2">
-                                    <span className="text-yellow-500">#</span>
+                                <h2 className="shopdetail-style-29">
+                                    <span className="shopdetail-style-30">#</span>
                                     {selectedCategory === 'All' ? 'All Menu Items' : selectedCategory}
                                 </h2>
                             )}
                             {searchQuery && (
-                                <h2 className="text-md font-bold text-gray-500 mb-4">
+                                <h2 className="shopdetail-style-31">
                                     Search results for "{searchQuery}" ({filteredProducts.length})
                                 </h2>
                             )}
 
                             {filteredProducts.length === 0 ? (
-                                <div className="text-center bg-white p-10 rounded-xl border border-gray-100">
-                                    <span className="text-4xl">🔍</span>
-                                    <p className="text-gray-500 font-bold mt-2">No items found matching your search.</p>
+                                <div className="shopdetail-style-32">
+                                    <span className="shopdetail-style-33">🔍</span>
+                                    <p className="shopdetail-style-34">No items found matching your search.</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                <div className="shopdetail-style-35">
                                     {filteredProducts.map(product => {
                                         const inCart = cartItems.find(item => item.productId === product._id);
                                         return (
-                                            <div key={product._id} className="bg-white p-2.5 rounded-xl shadow-sm border border-gray-100 flex flex-col relative group">
-                                                <div className="w-full h-24 sm:h-32 bg-gray-50 rounded-lg mb-2 flex items-center justify-center text-3xl sm:text-4xl overflow-hidden">
+                                            <div key={product._id} className="shopdetail-style-36 group">
+                                                <div className="shopdetail-style-37">
                                                     {product.image ? (
-                                                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                                                        <img src={product.image} alt={product.name} className="shopdetail-style-38" />
                                                     ) : "📦"}
                                                 </div>
 
-                                                <div className="flex-1">
-                                                    <span className="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50 px-1.5 py-0.5 rounded">
+                                                <div className="shopdetail-style-39">
+                                                    <span className="shopdetail-style-40">
                                                         {product.category || 'General'}
                                                     </span>
-                                                    <h3 className="font-bold text-gray-800 text-xs sm:text-sm leading-tight mt-1.5 line-clamp-2">
+                                                    <h3 className="shopdetail-style-41">
                                                         {product.name}
                                                     </h3>
                                                 </div>
 
-                                                <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
-                                                    <span className="font-black text-gray-900 text-sm sm:text-base">₹{product.price}</span>
+                                                <div className="shopdetail-style-42">
+                                                    <span className="shopdetail-style-43">₹{product.price}</span>
 
                                                     {product.inStock ? (
                                                         <button
@@ -218,7 +219,7 @@ const ShopDetail = () => {
                                                             {inCart ? `${inCart.quantity} Added` : 'ADD'}
                                                         </button>
                                                     ) : (
-                                                        <span className="text-[8px] sm:text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
+                                                        <span className="shopdetail-style-44">
                                                             OUT OF STOCK
                                                         </span>
                                                     )}

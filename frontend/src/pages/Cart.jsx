@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext'; // Token nikalne ke liye
 import { Link, useNavigate } from 'react-router-dom';
+import './Cart.css';
 
 const Cart = () => {
     // cartShopId bhi liya taaki backend ko pata chale kis dukan ka order hai
@@ -128,11 +129,11 @@ const Cart = () => {
 
     if (cartItems.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-64 mt-10">
-                <span className="text-6xl mb-4">🛒</span>
-                <h2 className="text-xl font-bold text-gray-800">Your cart is empty</h2>
-                <p className="text-gray-500 mt-2 mb-6">Let's add some fresh items!</p>
-                <Link to="/" className="bg-[#f8cb46] text-white font-bold px-6 py-2 rounded-lg shadow-sm hover:bg-yellow-400 transition-colors">
+            <div className="cart-style-1">
+                <span className="cart-style-2">🛒</span>
+                <h2 className="cart-style-3">Your cart is empty</h2>
+                <p className="cart-style-4">Let's add some fresh items!</p>
+                <Link to="/" className="cart-style-5">
                     Browse Shops
                 </Link>
             </div>
@@ -140,22 +141,22 @@ const Cart = () => {
     }
 
     return (
-        <div className="max-w-2xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h1 className="text-2xl font-black text-gray-800 mb-6">Checkout</h1>
+        <div className="cart-style-6">
+            <h1 className="cart-style-7">Checkout</h1>
 
             {/* Items List */}
-            <div className="space-y-4 mb-6">
+            <div className="cart-style-8">
                 {cartItems.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center border-b border-gray-100 pb-4">
+                    <div key={index} className="cart-style-9">
                         <div>
-                            <h3 className="font-bold text-gray-800">{item.name}</h3>
-                            <p className="text-sm text-gray-500">₹{item.price} x {item.quantity}</p>
+                            <h3 className="cart-style-10">{item.name}</h3>
+                            <p className="cart-style-11">₹{item.price} x {item.quantity}</p>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <span className="font-bold text-gray-800">₹{item.price * item.quantity}</span>
+                        <div className="cart-style-12">
+                            <span className="cart-style-13">₹{item.price * item.quantity}</span>
                             <button
                                 onClick={() => removeFromCart(item.productId)}
-                                className="text-red-500 hover:text-red-700 text-sm font-bold bg-red-50 px-2 py-1 rounded transition-colors"
+                                className="cart-style-14"
                             >
                                 Remove
                             </button>
@@ -165,32 +166,32 @@ const Cart = () => {
             </div>
 
             {/* Bill Summary */}
-            <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100 space-y-2">
-                <div className="flex justify-between text-gray-600 font-semibold">
+            <div className="cart-style-15">
+                <div className="cart-style-16">
                     <span>Item Total:</span>
                     <span>₹{getTotal()}</span>
                 </div>
                 {deliveryFee !== null && (
-                    <div className="flex justify-between text-gray-600 font-semibold">
+                    <div className="cart-style-17">
                         <span>Delivery Fee ({distance} km):</span>
                         <span>₹{deliveryFee}</span>
                     </div>
                 )}
-                <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between font-black text-lg text-gray-800">
+                <div className="cart-style-18">
                     <span>Grand Total:</span>
-                    <span className="text-green-600">₹{getTotal() + (deliveryFee || 0)}</span>
+                    <span className="cart-style-19">₹{getTotal() + (deliveryFee || 0)}</span>
                 </div>
             </div>
 
             {/* Address */}
-            <div className="mb-6">
-                <label className="block text-sm font-bold text-gray-700 mb-2">Delivery Location</label>
+            <div className="cart-style-20">
+                <label className="cart-style-21">Delivery Location</label>
                 
                 {/* GPS Location Button */}
-                <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-100">
+                <div className="cart-style-22">
                     <div>
-                        <p className="text-sm font-bold text-blue-800">Verify Distance</p>
-                        <p className="text-xs text-blue-600">We need your location to confirm delivery range.</p>
+                        <p className="cart-style-23">Verify Distance</p>
+                        <p className="cart-style-24">We need your location to confirm delivery range.</p>
                     </div>
                     <button 
                         onClick={handleGetLocation} 
@@ -204,11 +205,11 @@ const Cart = () => {
 
             {/* Missing Phone Number Input */}
             {user && !user.phone && (
-                <div className="mb-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                    <label className="block text-sm font-bold text-yellow-900 mb-2">Delivery Phone Number 📱</label>
-                    <p className="text-xs text-yellow-700 mb-3">Please provide a phone number so the delivery partner can contact you.</p>
-                    <div className="flex">
-                        <span className="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg font-bold">
+                <div className="cart-style-25">
+                    <label className="cart-style-26">Delivery Phone Number 📱</label>
+                    <p className="cart-style-27">Please provide a phone number so the delivery partner can contact you.</p>
+                    <div className="cart-style-28">
+                        <span className="cart-style-29">
                             +91
                         </span>
                         <input
@@ -217,7 +218,7 @@ const Cart = () => {
                             maxLength="10"
                             value={customerPhone}
                             onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, ''))}
-                            className="w-full border border-gray-200 rounded-r-lg p-3 outline-none focus:border-yellow-400 transition-colors font-semibold tracking-widest"
+                            className="cart-style-30"
                             placeholder="98765 43210"
                         />
                     </div>
@@ -225,10 +226,10 @@ const Cart = () => {
             )}
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="cart-style-31">
                 <button
                     onClick={clearCart}
-                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="cart-style-32"
                 >
                     Clear Cart
                 </button>

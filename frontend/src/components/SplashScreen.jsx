@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import './SplashScreen.css';
 
 const SplashScreen = ({ onFinish }) => {
     const [fadeOut, setFadeOut] = useState(false);
@@ -104,7 +105,7 @@ const SplashScreen = ({ onFinish }) => {
             <div className={`relative w-[85vw] max-w-sm sm:max-w-md flex items-center justify-center transition-opacity duration-300 z-10 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}>
                 <video 
                     ref={videoRef}
-                    className="w-full h-auto rounded-3xl shadow-2xl shadow-yellow-500/40"
+                    className="splashscreen-style-1"
                     src="/MunaIntro.mp4"
                     playsInline
                     muted

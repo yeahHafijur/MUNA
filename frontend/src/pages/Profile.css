@@ -1,0 +1,102 @@
+@reference "tailwindcss";
+.profile-style-1 {
+    @apply max-w-2xl mx-auto mt-6;
+}
+
+.profile-style-2 {
+    @apply bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 flex items-center justify-between;
+}
+
+.profile-style-3 {
+    @apply text-2xl font-black text-gray-800;
+}
+
+.profile-style-4 {
+    @apply text-gray-500 text-sm;
+}
+
+.profile-style-5 {
+    @apply flex flex-col items-end gap-2;
+}
+
+.profile-style-6 {
+    @apply bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+}
+
+.profile-style-7 {
+    @apply flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm;
+}
+
+.profile-style-8 {
+    @apply h-4 w-4;
+}
+
+.profile-style-9 {
+    @apply text-xl font-black text-gray-800 mb-4;
+}
+
+.profile-style-10 {
+    @apply text-gray-500 text-sm font-bold animate-pulse;
+}
+
+.profile-style-11 {
+    @apply bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center;
+}
+
+.profile-style-12 {
+    @apply text-4xl mb-2 block;
+}
+
+.profile-style-13 {
+    @apply text-gray-500 font-bold;
+}
+
+.profile-style-14 {
+    @apply space-y-4 mb-8;
+}
+
+.profile-style-15 {
+    @apply bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow;
+}
+
+.profile-style-16 {
+    @apply flex justify-between items-start mb-3 border-b border-gray-50 pb-3;
+}
+
+.profile-style-17 {
+    @apply font-bold text-gray-800 text-sm;
+}
+
+.profile-style-18 {
+    @apply text-xs text-gray-400 mt-1;
+}
+
+.profile-style-19 {
+    @apply space-y-2 mb-3;
+}
+
+.profile-style-20 {
+    @apply flex justify-between text-sm;
+}
+
+.profile-style-21 {
+    @apply text-gray-600 font-medium;
+}
+
+.profile-style-22 {
+    @apply font-bold text-gray-800;
+}
+
+.profile-style-23 {
+    @apply flex justify-between items-center pt-3 border-t border-gray-50;
+}
+
+.profile-style-24 {
+    @apply text-sm font-bold text-gray-500;
+}
+
+.profile-style-25 {
+    @apply font-black text-gray-800 text-lg;
+}
+
+

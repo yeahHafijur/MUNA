@@ -6,3 +6,9 @@ html, body {
   /* Prevent font scaling in landscape mode */
   -webkit-text-size-adjust: 100%;
 }
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
+import './Login.css';
 
 const Login = () => {
     const [phone, setPhone] = useState('');
@@ -143,19 +144,19 @@ const Login = () => {
     };
 
     return (
-        <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-            <div className="text-center mb-8">
-                <h2 className="text-3xl font-black text-gray-800 tracking-tight">MUNA</h2>
-                <p className="text-gray-500 text-sm mt-1">India's fastest delivery app</p>
+        <div className="login-style-1">
+            <div className="login-style-2">
+                <h2 className="login-style-3">MUNA</h2>
+                <p className="login-style-4">India's fastest delivery app</p>
             </div>
 
-            {error && <div className="bg-red-50 text-red-600 font-semibold p-3 rounded-lg text-sm mb-4 border border-red-100">{error}</div>}
+            {error && <div className="login-style-5">{error}</div>}
 
             {!showPhoneLogin && step === 1 ? (
                 /* ===== MAIN LOGIN SCREEN ===== */
-                <div className="space-y-5">
+                <div className="login-style-6">
                     {/* Google Sign-In Button */}
-                    <div className="flex justify-center">
+                    <div className="login-style-7">
                         <GoogleLogin
                             onSuccess={handleGoogleSuccess}
                             onError={handleGoogleError}
@@ -167,37 +168,37 @@ const Login = () => {
                         />
                     </div>
 
-                    {loading && <p className="text-center text-sm text-gray-500 animate-pulse font-bold">Logging in...</p>}
+                    {loading && <p className="login-style-8">Logging in...</p>}
 
                     {/* Divider */}
-                    <div className="flex items-center gap-3 my-4">
-                        <div className="flex-1 h-px bg-gray-200"></div>
-                        <span className="text-xs text-gray-400 font-bold uppercase">or</span>
-                        <div className="flex-1 h-px bg-gray-200"></div>
+                    <div className="login-style-9">
+                        <div className="login-style-10"></div>
+                        <span className="login-style-11">or</span>
+                        <div className="login-style-12"></div>
                     </div>
 
                     {/* Phone Login (Admin/Vendor ke liye) */}
                     <button
                         onClick={() => setShowPhoneLogin(true)}
-                        className="w-full border-2 border-gray-200 hover:border-yellow-400 text-gray-700 font-bold py-3 rounded-lg transition-colors text-sm"
+                        className="login-style-13"
                     >
                         📱 Login with Phone Number (Admin/Vendor)
                     </button>
 
-                    <p className="text-xs text-gray-400 text-center mt-4">
+                    <p className="login-style-14">
                         By continuing, you agree to our Terms of service & Privacy policy
                     </p>
                 </div>
             ) : showPhoneLogin && step === 1 ? (
                 /* ===== PHONE NUMBER ENTRY ===== */
-                <form onSubmit={handleSendOTP} className="space-y-4">
-                    <button type="button" onClick={() => setShowPhoneLogin(false)} className="text-yellow-600 text-xs font-bold hover:underline mb-2">
+                <form onSubmit={handleSendOTP} className="login-style-15">
+                    <button type="button" onClick={() => setShowPhoneLogin(false)} className="login-style-16">
                         ← Back to Google Login
                     </button>
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Phone Number</label>
-                        <div className="flex">
-                            <span className="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg font-bold">
+                        <label className="login-style-17">Phone Number</label>
+                        <div className="login-style-18">
+                            <span className="login-style-19">
                                 +91
                             </span>
                             <input
@@ -206,7 +207,7 @@ const Login = () => {
                                 maxLength="10"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                                className="w-full border border-gray-200 rounded-r-lg p-3 outline-none focus:border-yellow-400 transition-colors tracking-widest font-semibold"
+                                className="login-style-20"
                                 placeholder="98765 43210"
                             />
                         </div>
@@ -215,47 +216,47 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#f8cb46] hover:bg-yellow-400 text-black font-bold py-3 rounded-lg shadow-sm transition-colors mt-4 text-lg"
+                        className="login-style-21"
                     >
                         {loading ? 'Sending...' : 'Send OTP'}
                     </button>
-                    <p className="text-xs text-gray-400 text-center mt-2">
+                    <p className="login-style-22">
                         Admin/Vendor test: 9999999999 / OTP: 123456
                     </p>
                 </form>
             ) : (
                 /* ===== OTP VERIFICATION ===== */
-                <form onSubmit={handleVerifyOTP} className="space-y-4">
-                    <div className="text-center mb-6">
-                        <p className="text-sm text-gray-600 font-medium">We've sent an OTP to</p>
-                        <p className="font-bold text-gray-800">+91 {phone}</p>
-                        <button type="button" onClick={() => { setStep(1); setShowPhoneLogin(true); }} className="text-yellow-600 text-xs font-bold hover:underline mt-1">
+                <form onSubmit={handleVerifyOTP} className="login-style-23">
+                    <div className="login-style-24">
+                        <p className="login-style-25">We've sent an OTP to</p>
+                        <p className="login-style-26">+91 {phone}</p>
+                        <button type="button" onClick={() => { setStep(1); setShowPhoneLogin(true); }} className="login-style-27">
                             Change Number
                         </button>
                     </div>
                     {isNewUser && (
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
+                            <label className="login-style-28">Full Name</label>
                             <input
                                 type="text"
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full border border-gray-200 rounded-lg p-3 outline-none focus:border-yellow-400 transition-colors font-semibold"
+                                className="login-style-29"
                                 placeholder="E.g. Rahul Kumar"
                             />
                         </div>
                     )}
                     
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Enter OTP</label>
+                        <label className="login-style-30">Enter OTP</label>
                         <input
                             type="text"
                             required
                             maxLength="6"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                            className="w-full border border-gray-200 rounded-lg p-4 outline-none focus:border-yellow-400 transition-colors text-center text-2xl tracking-[0.5em] font-bold"
+                            className="login-style-31"
                             placeholder="••••••"
                             autoFocus
                         />
@@ -264,7 +265,7 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#f8cb46] hover:bg-yellow-400 text-black font-bold py-3 rounded-lg shadow-sm transition-colors mt-2 text-lg"
+                        className="login-style-32"
                     >
                         {loading ? 'Verifying...' : 'Verify OTP'}
                     </button>

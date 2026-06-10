@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
     const { user, token, logout } = useAuth();
@@ -281,36 +282,36 @@ const AdminDashboard = () => {
     if (!user) return null;
 
     return (
-        <div className="max-w-4xl mx-auto mt-6 pb-20">
+        <div className="admin-container">
             {/* Header */}
-            <div className="bg-purple-900 text-white p-6 rounded-xl mb-6 flex justify-between items-center shadow-lg">
+            <div className="admin-header">
                 <div>
-                    <h1 className="text-2xl font-black">Super Admin Panel</h1>
-                    <p className="text-purple-200 text-sm">Manage the entire platform</p>
+                    <h1 className="admin-header-title">Super Admin Panel</h1>
+                    <p className="admin-header-subtitle">Manage the entire platform</p>
                 </div>
-                <div className="flex items-center gap-4">
-                    <span className="hidden sm:inline-block bg-white text-purple-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">God Mode</span>
-                    <button onClick={() => { logout(); navigate('/'); }} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-sm transition-colors">Logout</button>
+                <div className="admin-header-actions">
+                    <span className="admin-god-mode-badge">God Mode</span>
+                    <button onClick={() => { logout(); navigate('/'); }} className="admin-logout-btn">Logout</button>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 mb-6 p-1 overflow-x-auto no-scrollbar">
+            <div className="admin-tabs-container">
                 <button 
                     onClick={() => setActiveTab('onboard')} 
-                    className={`flex-1 py-3 px-4 font-bold text-sm rounded-lg transition-colors whitespace-nowrap ${activeTab === 'onboard' ? 'bg-purple-100 text-purple-700' : 'text-gray-500 hover:bg-gray-50'}`}
+                    className={`admin-tab-btn ${activeTab === 'onboard' ? 'admin-tab-btn-purple-active' : 'admin-tab-btn-inactive'}`}
                 >
                     🚀 Onboard Vendor
                 </button>
                 <button 
                     onClick={() => setActiveTab('shops')} 
-                    className={`flex-1 py-3 px-4 font-bold text-sm rounded-lg transition-colors whitespace-nowrap ${activeTab === 'shops' ? 'bg-purple-100 text-purple-700' : 'text-gray-500 hover:bg-gray-50'}`}
+                    className={`admin-tab-btn ${activeTab === 'shops' ? 'admin-tab-btn-purple-active' : 'admin-tab-btn-inactive'}`}
                 >
                     🏪 Active Shops
                 </button>
                 <button 
                     onClick={() => setActiveTab('godown')} 
-                    className={`flex-1 py-3 px-4 font-bold text-sm rounded-lg transition-colors whitespace-nowrap ${activeTab === 'godown' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-50'}`}
+                    className={`admin-tab-btn ${activeTab === 'godown' ? 'admin-tab-btn-indigo-active' : 'admin-tab-btn-inactive'}`}
                 >
                     📦 Godown Inventory
                 </button>
@@ -319,33 +320,33 @@ const AdminDashboard = () => {
             <div className="space-y-6">
                 {/* Onboarding Form */}
                 {activeTab === 'onboard' && (
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-2xl mx-auto">
-                    <h2 className="text-xl font-black text-gray-800 mb-4 flex items-center gap-2">
+                <div className="admin-card admin-card-onboard">
+                    <h2 className="admin-section-title">
                         <span>🚀</span> Onboard New Vendor
                     </h2>
                     
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-3">
-                            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">1. Vendor Details</h3>
-                            <input type="text" name="vendorName" required placeholder="Vendor Full Name" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.vendorName} onChange={handleChange} />
-                            <input type="email" name="vendorEmail" required placeholder="Vendor Google Email" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.vendorEmail} onChange={handleChange} />
-                            <input type="tel" name="vendorPhone" required placeholder="Vendor Phone Number (10 digits)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.vendorPhone} onChange={handleChange} minLength="10" maxLength="10" />
+                        <div className="admin-form-group">
+                            <h3 className="admin-form-group-title">1. Vendor Details</h3>
+                            <input type="text" name="vendorName" required placeholder="Vendor Full Name" className="admin-form-input admin-form-input-purple" value={formData.vendorName} onChange={handleChange} />
+                            <input type="email" name="vendorEmail" required placeholder="Vendor Google Email" className="admin-form-input admin-form-input-purple" value={formData.vendorEmail} onChange={handleChange} />
+                            <input type="tel" name="vendorPhone" required placeholder="Vendor Phone Number (10 digits)" className="admin-form-input admin-form-input-purple" value={formData.vendorPhone} onChange={handleChange} minLength="10" maxLength="10" />
                         </div>
 
-                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-3">
-                            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">2. Shop Details</h3>
-                            <input type="text" name="shopName" required placeholder="Shop Name" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopName} onChange={handleChange} />
-                            <input type="text" name="shopAddress" required placeholder="Shop Address" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopAddress} onChange={handleChange} />
-                            <input type="text" name="shopCategory" placeholder="Category (e.g. Kirana, Pharmacy)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopCategory} onChange={handleChange} />
-                            <input type="text" name="udyamNumber" placeholder="Udyam Number (Optional)" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm font-semibold tracking-wide" value={formData.udyamNumber} onChange={handleChange} />
+                        <div className="admin-form-group">
+                            <h3 className="admin-form-group-title">2. Shop Details</h3>
+                            <input type="text" name="shopName" required placeholder="Shop Name" className="admin-form-input admin-form-input-purple" value={formData.shopName} onChange={handleChange} />
+                            <input type="text" name="shopAddress" required placeholder="Shop Address" className="admin-form-input admin-form-input-purple" value={formData.shopAddress} onChange={handleChange} />
+                            <input type="text" name="shopCategory" placeholder="Category (e.g. Kirana, Pharmacy)" className="admin-form-input admin-form-input-purple" value={formData.shopCategory} onChange={handleChange} />
+                            <input type="text" name="udyamNumber" placeholder="Udyam Number (Optional)" className="admin-form-input admin-form-input-purple admin-form-input-semibold" value={formData.udyamNumber} onChange={handleChange} />
                             
-                            <div className="flex flex-col sm:flex-row gap-2">
-                                <input type="number" step="any" name="shopLat" required placeholder="Latitude (Required)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLat} onChange={handleChange} />
-                                <input type="number" step="any" name="shopLng" required placeholder="Longitude (Required)" className="flex-1 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={formData.shopLng} onChange={handleChange} />
+                            <div className="admin-form-row">
+                                <input type="number" step="any" name="shopLat" required placeholder="Latitude (Required)" className="admin-form-input-flex" value={formData.shopLat} onChange={handleChange} />
+                                <input type="number" step="any" name="shopLng" required placeholder="Longitude (Required)" className="admin-form-input-flex" value={formData.shopLng} onChange={handleChange} />
                             </div>
                         </div>
 
-                        <button type="submit" disabled={isSubmitting} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-3 rounded-xl transition-colors shadow-sm">
+                        <button type="submit" disabled={isSubmitting} className="admin-submit-btn-purple">
                             {isSubmitting ? 'ONBOARDING...' : 'CREATE VENDOR & SHOP'}
                         </button>
                     </form>
@@ -354,50 +355,50 @@ const AdminDashboard = () => {
 
                 {/* Active Shops List */}
                 {activeTab === 'shops' && (
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-black text-gray-800 mb-4 flex items-center gap-2">
+                <div className="admin-card">
+                    <h2 className="admin-section-title">
                         <span>🏪</span> Active Shops ({shops.length})
                     </h2>
                     
                     {loadingShops ? (
-                        <p className="text-gray-500 animate-pulse font-bold text-sm">Loading shops...</p>
+                        <p className="admin-loading-text">Loading shops...</p>
                     ) : shops.length === 0 ? (
-                        <p className="text-gray-500 text-sm">No shops on the platform yet.</p>
+                        <p className="admin-empty-text">No shops on the platform yet.</p>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[700px] overflow-y-auto pr-2">
+                        <div className="admin-shops-grid">
                             {shops.map(shop => (
-                                <div key={shop._id} className="border border-gray-100 rounded-lg p-4 hover:shadow-sm transition-shadow">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <h3 className="font-bold text-gray-800 text-lg">{shop.name}</h3>
+                                <div key={shop._id} className="admin-shop-item">
+                                    <div className="admin-shop-header">
+                                        <div className="admin-shop-title-wrapper">
+                                            <h3 className="admin-shop-title">{shop.name}</h3>
                                             {!shop.isActive && (
-                                                <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">Inactive</span>
+                                                <span className="admin-badge-inactive">Inactive</span>
                                             )}
                                         </div>
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${shop.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                        <span className={`admin-badge-status ${shop.isOpen ? 'admin-badge-status-open' : 'admin-badge-status-closed'}`}>
                                             {shop.isOpen ? 'OPEN' : 'CLOSED'}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-500 mb-3">{shop.address}</p>
+                                    <p className="admin-shop-address">{shop.address}</p>
                                     
-                                    <div className="bg-gray-50 p-3 rounded-lg flex flex-col gap-2 text-sm mt-2">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-500">Vendor:</span>
-                                            <span className="font-semibold text-gray-800">{shop.vendorId?.name || 'Unknown'}</span>
+                                    <div className="admin-shop-details">
+                                        <div className="admin-shop-detail-row">
+                                            <span className="admin-shop-detail-label">Vendor:</span>
+                                            <span className="admin-shop-detail-value">{shop.vendorId?.name || 'Unknown'}</span>
                                         </div>
                                         {shop.udyamNumber && (
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-500">Udyam No:</span>
-                                                <span className="font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">{shop.udyamNumber}</span>
+                                            <div className="admin-shop-detail-row">
+                                                <span className="admin-shop-detail-label">Udyam No:</span>
+                                                <span className="admin-shop-detail-highlight">{shop.udyamNumber}</span>
                                             </div>
                                         )}
                                     </div>
 
-                                    <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                                        <button onClick={() => handleEditClick(shop)} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 rounded-lg text-sm transition-colors">
+                                    <div className="admin-shop-actions">
+                                        <button onClick={() => handleEditClick(shop)} className="admin-btn-edit">
                                             ✏️ Edit
                                         </button>
-                                        <button onClick={() => handleToggleActive(shop)} className={`flex-1 font-bold py-2 rounded-lg text-sm transition-colors ${shop.isActive ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}>
+                                        <button onClick={() => handleToggleActive(shop)} className={`admin-btn-toggle ${shop.isActive ? 'admin-btn-toggle-deactivate' : 'admin-btn-toggle-activate'}`}>
                                             {shop.isActive ? 'Deactivate' : 'Activate'}
                                         </button>
                                     </div>
@@ -410,21 +411,21 @@ const AdminDashboard = () => {
 
             {/* --- GODOWN INVENTORY MANAGEMENT --- */}
             {activeTab === 'godown' && (
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div className="admin-card">
+                <div className="admin-godown-header">
                     <h2 className="text-xl font-black text-gray-800 flex items-center gap-2">
                         <span>📦</span> Global Godown Inventory
                     </h2>
-                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                        <div className="relative flex-1 sm:w-64">
+                    <div className="admin-godown-actions">
+                        <div className="admin-search-wrapper">
                             <input 
                                 type="text" 
                                 placeholder="Search items..." 
-                                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg outline-none focus:border-indigo-500 text-sm"
+                                className="admin-search-input"
                                 value={godownSearchQuery}
                                 onChange={(e) => setGodownSearchQuery(e.target.value)}
                             />
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                            <span className="admin-search-icon">🔍</span>
                         </div>
                         <button 
                             onClick={() => {
@@ -432,7 +433,7 @@ const AdminDashboard = () => {
                                 setGodownFormData({ name: '', category: '', image: null, imagePreview: '' });
                                 document.getElementById('godownModal').showModal();
                             }} 
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm whitespace-nowrap"
+                            className="admin-btn-add-godown"
                         >
                             + Add New Item
                         </button>
@@ -440,25 +441,25 @@ const AdminDashboard = () => {
                 </div>
 
                 {loadingGodownItems ? (
-                    <p className="text-gray-500 animate-pulse font-bold text-sm">Loading inventory...</p>
+                    <p className="admin-loading-text">Loading inventory...</p>
                 ) : godownItems.length === 0 ? (
-                    <p className="text-gray-500 text-sm">Godown is empty.</p>
+                    <p className="admin-empty-text">Godown is empty.</p>
                 ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div className="admin-godown-grid">
                         {godownItems.filter(item => (item.name || '').toLowerCase().includes((godownSearchQuery || '').toLowerCase())).map(item => (
-                            <div key={item._id} className="border border-gray-100 rounded-xl p-3 flex flex-col items-center hover:shadow-md transition-shadow bg-gray-50 relative group">
-                                <button onClick={() => handleDeleteGodownItem(item._id)} className="absolute top-2 right-2 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center transition-all z-10 text-xs shadow-sm">✕</button>
-                                <button onClick={() => { handleGodownEditClick(item); document.getElementById('godownModal').showModal(); }} className="absolute top-2 left-2 bg-blue-100 hover:bg-blue-500 text-blue-600 hover:text-white rounded-full w-6 h-6 flex items-center justify-center transition-all z-10 text-xs shadow-sm">✏️</button>
+                            <div key={item._id} className="admin-godown-item group">
+                                <button onClick={() => handleDeleteGodownItem(item._id)} className="admin-godown-btn-delete">✕</button>
+                                <button onClick={() => { handleGodownEditClick(item); document.getElementById('godownModal').showModal(); }} className="admin-godown-btn-edit">✏️</button>
 
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full p-2 shadow-sm mb-3">
+                                <div className="admin-godown-img-wrapper">
                                     {item.image ? (
-                                        <img src={item.image} alt={item.name} className="w-full h-full object-contain rounded-full" />
+                                        <img src={item.image} alt={item.name} className="admin-godown-img" />
                                     ) : (
-                                        <div className="w-full h-full bg-gray-100 rounded-full flex items-center justify-center text-gray-400">?</div>
+                                        <div className="admin-godown-img-placeholder">?</div>
                                     )}
                                 </div>
-                                <h3 className="font-bold text-gray-800 text-sm text-center leading-tight">{item.name}</h3>
-                                {item.category && <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">{item.category}</p>}
+                                <h3 className="admin-godown-title">{item.name}</h3>
+                                {item.category && <p className="admin-godown-category">{item.category}</p>}
                             </div>
                         ))}
                     </div>
@@ -468,42 +469,42 @@ const AdminDashboard = () => {
             </div>
 
             {/* Godown Item Modal (Add/Edit) */}
-            <dialog id="godownModal" className="bg-transparent p-0 w-full max-w-md backdrop:bg-black/60 backdrop:backdrop-blur-sm">
-                <div className="bg-white rounded-2xl shadow-xl w-full overflow-hidden m-auto">
-                    <div className="bg-indigo-600 p-4 flex justify-between items-center">
-                        <h2 className="text-white font-black text-lg">{editingGodownItem ? 'Edit Godown Item' : 'Add Godown Item'}</h2>
+            <dialog id="godownModal" className="admin-modal-dialog">
+                <div className="admin-modal-content">
+                    <div className="admin-modal-header-indigo">
+                        <h2 className="admin-modal-title">{editingGodownItem ? 'Edit Godown Item' : 'Add Godown Item'}</h2>
                         <button onClick={() => {
                             document.getElementById('godownModal').close();
                             setEditingGodownItem(null);
-                        }} className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+                        }} className="admin-modal-close-btn">
                             ✕
                         </button>
                     </div>
-                    <form onSubmit={(e) => { handleGodownSubmit(e); document.getElementById('godownModal').close(); }} className="p-6 space-y-4">
-                        <div className="space-y-3">
-                            <div className="flex justify-center mb-4">
-                                <label className="cursor-pointer group relative">
-                                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center border-2 border-dashed border-gray-300 group-hover:border-indigo-500 overflow-hidden">
+                    <form onSubmit={(e) => { handleGodownSubmit(e); document.getElementById('godownModal').close(); }} className="admin-modal-body">
+                        <div className="admin-modal-form-group">
+                            <div className="admin-img-upload-wrapper">
+                                <label className="admin-img-upload-label group">
+                                    <div className="admin-img-upload-preview group">
                                         {godownFormData.imagePreview ? (
-                                            <img src={godownFormData.imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                                            <img src={godownFormData.imagePreview} alt="Preview" className="admin-img-preview-img" />
                                         ) : (
-                                            <span className="text-gray-400 text-xs text-center px-2">Click to add photo</span>
+                                            <span className="admin-img-upload-text">Click to add photo</span>
                                         )}
                                     </div>
                                     <input id="godownImageInput" type="file" name="image" accept="image/*" onChange={handleGodownFormChange} className="hidden" />
                                 </label>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">Item Name</label>
-                                <input type="text" name="name" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-indigo-500 text-sm" value={godownFormData.name} onChange={handleGodownFormChange} placeholder="e.g. Aashirvaad Atta 5kg" />
+                                <label className="admin-form-label">Item Name</label>
+                                <input type="text" name="name" required className="admin-form-input admin-form-input-indigo" value={godownFormData.name} onChange={handleGodownFormChange} placeholder="e.g. Aashirvaad Atta 5kg" />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">Category (Optional)</label>
-                                <input type="text" name="category" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-indigo-500 text-sm" value={godownFormData.category} onChange={handleGodownFormChange} placeholder="e.g. Grocery" />
+                                <label className="admin-form-label">Category (Optional)</label>
+                                <input type="text" name="category" className="admin-form-input admin-form-input-indigo" value={godownFormData.category} onChange={handleGodownFormChange} placeholder="e.g. Grocery" />
                             </div>
                         </div>
-                        <div className="pt-2">
-                            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-xl transition-colors shadow-sm">
+                        <div className="admin-modal-footer">
+                            <button type="submit" className="admin-submit-btn-indigo">
                                 {editingGodownItem ? 'UPDATE ITEM' : 'ADD TO GODOWN'}
                             </button>
                         </div>
@@ -513,45 +514,45 @@ const AdminDashboard = () => {
 
             {/* Edit Shop Modal */}
             {editingShop && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
-                        <div className="bg-purple-600 p-4 flex justify-between items-center">
-                            <h2 className="text-white font-black text-lg">Edit Shop Details</h2>
-                            <button onClick={() => setEditingShop(null)} className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+                <div className="admin-modal-overlay">
+                    <div className="admin-modal-content">
+                        <div className="admin-modal-header-purple">
+                            <h2 className="admin-modal-title">Edit Shop Details</h2>
+                            <button onClick={() => setEditingShop(null)} className="admin-modal-close-btn">
                                 ✕
                             </button>
                         </div>
-                        <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
-                            <div className="space-y-3">
+                        <form onSubmit={handleEditSubmit} className="admin-modal-body">
+                            <div className="admin-modal-form-group">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1">Shop Name</label>
-                                    <input type="text" name="name" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.name} onChange={handleEditChange} />
+                                    <label className="admin-form-label">Shop Name</label>
+                                    <input type="text" name="name" required className="admin-form-input admin-form-input-purple" value={editFormData.name} onChange={handleEditChange} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1">Address</label>
-                                    <input type="text" name="address" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.address} onChange={handleEditChange} />
+                                    <label className="admin-form-label">Address</label>
+                                    <input type="text" name="address" required className="admin-form-input admin-form-input-purple" value={editFormData.address} onChange={handleEditChange} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1">Category</label>
-                                    <input type="text" name="category" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.category} onChange={handleEditChange} />
+                                    <label className="admin-form-label">Category</label>
+                                    <input type="text" name="category" className="admin-form-input admin-form-input-purple" value={editFormData.category} onChange={handleEditChange} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1">Udyam Number</label>
-                                    <input type="text" name="udyamNumber" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.udyamNumber} onChange={handleEditChange} />
+                                    <label className="admin-form-label">Udyam Number</label>
+                                    <input type="text" name="udyamNumber" className="admin-form-input admin-form-input-purple" value={editFormData.udyamNumber} onChange={handleEditChange} />
                                 </div>
-                                <div className="flex flex-col sm:flex-row gap-2">
+                                <div className="admin-form-row">
                                     <div className="flex-1">
-                                        <label className="block text-xs font-bold text-gray-500 mb-1">Latitude</label>
-                                        <input type="number" step="any" name="lat" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.lat} onChange={handleEditChange} />
+                                        <label className="admin-form-label">Latitude</label>
+                                        <input type="number" step="any" name="lat" required className="admin-form-input admin-form-input-purple" value={editFormData.lat} onChange={handleEditChange} />
                                     </div>
                                     <div className="flex-1">
-                                        <label className="block text-xs font-bold text-gray-500 mb-1">Longitude</label>
-                                        <input type="number" step="any" name="lng" required className="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-purple-500 text-sm" value={editFormData.lng} onChange={handleEditChange} />
+                                        <label className="admin-form-label">Longitude</label>
+                                        <input type="number" step="any" name="lng" required className="admin-form-input admin-form-input-purple" value={editFormData.lng} onChange={handleEditChange} />
                                     </div>
                                 </div>
                             </div>
-                            <div className="pt-2">
-                                <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-3 rounded-xl transition-colors shadow-sm">
+                            <div className="admin-modal-footer">
+                                <button type="submit" className="admin-submit-btn-purple">
                                     SAVE CHANGES
                                 </button>
                             </div>
@@ -564,3 +565,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

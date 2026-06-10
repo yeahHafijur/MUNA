@@ -1,0 +1,218 @@
+@reference "tailwindcss";
+.home-style-1 {
+    @apply mt-4 pb-8;
+}
+
+.home-style-2 {
+    @apply relative bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 rounded-2xl p-6 sm:p-8 mb-6 overflow-hidden shadow-xl;
+}
+
+.home-style-3 {
+    @apply absolute -top-10 -right-10 w-44 h-44 bg-white/5 rounded-full blur-2xl;
+}
+
+.home-style-4 {
+    @apply absolute -bottom-12 -left-12 w-36 h-36 bg-yellow-400/10 rounded-full blur-xl;
+}
+
+.home-style-5 {
+    @apply absolute top-1/2 right-8 w-24 h-24 bg-yellow-400/10 rounded-full blur-lg;
+}
+
+.home-style-6 {
+    @apply absolute top-3 right-5 text-5xl sm:text-6xl opacity-10 select-none rotate-12;
+}
+
+.home-style-7 {
+    @apply relative z-10;
+}
+
+.home-style-8 {
+    @apply inline-block text-[10px] sm:text-xs font-bold bg-white/30 text-gray-800 px-3 py-1 rounded-full mb-3 backdrop-blur-sm border border-white/20 uppercase tracking-widest;
+}
+
+.home-style-9 {
+    @apply text-2xl sm:text-3xl font-black text-black leading-tight;
+}
+
+.home-style-10 {
+    @apply sm:hidden;
+}
+
+.home-style-11 {
+    @apply bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent;
+}
+
+.home-style-12 {
+    @apply text-sm text-gray-800 mt-2 font-medium max-w-md;
+}
+
+.home-style-13 {
+    @apply mt-5;
+}
+
+.home-style-14 {
+    @apply bg-white/95 backdrop-blur-md rounded-xl flex items-center gap-3 px-4 py-3 shadow-lg border border-white/20;
+}
+
+.home-style-15 {
+    @apply h-5 w-5 text-yellow-400 flex-shrink-0;
+}
+
+.home-style-16 {
+    @apply w-full outline-none text-gray-700 bg-transparent text-sm font-medium placeholder:text-gray-400;
+}
+
+.home-style-17 {
+    @apply text-gray-400 hover:text-gray-600 transition-colors text-lg;
+}
+
+.home-style-18 {
+    @apply grid grid-cols-3 gap-3 mb-6;
+}
+
+.home-style-19 {
+    @apply bg-white rounded-xl p-3 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow;
+}
+
+.home-style-20 {
+    @apply text-xl sm:text-2xl font-black text-gray-800;
+}
+
+.home-style-21 {
+    @apply text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider;
+}
+
+.home-style-22 {
+    @apply bg-white rounded-xl p-3 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow;
+}
+
+.home-style-23 {
+    @apply text-xl sm:text-2xl font-black text-emerald-600;
+}
+
+.home-style-24 {
+    @apply text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider;
+}
+
+.home-style-25 {
+    @apply bg-white rounded-xl p-3 text-center border border-gray-100 shadow-sm hover:shadow-md transition-shadow;
+}
+
+.home-style-26 {
+    @apply text-xl sm:text-2xl font-black bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent;
+}
+
+.home-style-27 {
+    @apply text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider;
+}
+
+.home-style-28 {
+    @apply flex items-center justify-between mb-4;
+}
+
+.home-style-29 {
+    @apply text-lg font-black text-gray-800;
+}
+
+.home-style-30 {
+    @apply text-xs font-bold text-gray-400;
+}
+
+.home-style-31 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.home-style-32 {
+    @apply bg-white rounded-2xl p-5 border border-gray-100 animate-pulse;
+}
+
+.home-style-33 {
+    @apply flex items-center gap-4;
+}
+
+.home-style-34 {
+    @apply w-16 h-16 bg-gray-200 rounded-xl;
+}
+
+.home-style-35 {
+    @apply flex-1 space-y-2;
+}
+
+.home-style-36 {
+    @apply h-4 bg-gray-200 rounded w-3/4;
+}
+
+.home-style-37 {
+    @apply h-3 bg-gray-100 rounded w-1/2;
+}
+
+.home-style-38 {
+    @apply bg-white p-10 rounded-2xl text-center border border-gray-100 shadow-sm;
+}
+
+.home-style-39 {
+    @apply text-5xl block mb-3;
+}
+
+.home-style-40 {
+    @apply text-gray-500 font-bold;
+}
+
+.home-style-41 {
+    @apply mt-3 text-sm font-bold text-yellow-500 hover:text-yellow-600 underline underline-offset-2;
+}
+
+.home-style-42 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.home-style-43 {
+    @apply block;
+}
+
+.home-style-44 {
+    @apply p-4 sm:p-5;
+}
+
+.home-style-45 {
+    @apply flex items-start gap-4;
+}
+
+.home-style-46 {
+    @apply absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm;
+}
+
+.home-style-47 {
+    @apply w-full h-full bg-emerald-400 rounded-full animate-ping opacity-75;
+}
+
+.home-style-48 {
+    @apply flex-1 min-w-0;
+}
+
+.home-style-49 {
+    @apply flex items-center gap-2 mb-1;
+}
+
+.home-style-50 {
+    @apply line-clamp-1 mb-1;
+}
+
+.home-style-51 {
+    @apply font-semibold text-[10px] bg-gray-100 inline-block px-1.5 py-0.5 rounded text-gray-600;
+}
+
+.home-style-52 {
+    @apply flex items-center gap-2 flex-wrap;
+}
+
+.home-style-53 {
+    @apply text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center gap-1;
+}
+
+.home-style-54 {
+    @apply h-4 w-4;
+}
+
+

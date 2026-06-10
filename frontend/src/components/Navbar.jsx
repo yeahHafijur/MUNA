@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext'; // Auth Context ko bulaya
+import { useAuth } from '../context/AuthContext';
+import './Navbar.css'; // Auth Context ko bulaya
 
 const Navbar = () => {
     const { cartItems } = useCart();
@@ -13,54 +14,54 @@ const Navbar = () => {
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
-        <nav className="bg-gradient-to-r from-yellow-400 to-[#f8cb46] sticky top-0 z-50 shadow-md border-b border-yellow-500">
-            <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <nav className="navbar-style-1">
+            <div className="navbar-style-2">
 
-                <div className="flex items-center gap-3">
+                <div className="navbar-style-3">
                     {/* Back Button (Sirf tab dikhega jab hum Home par nahi honge) */}
                     {location.pathname !== '/' && (
                         <button
                             onClick={() => navigate(-1)}
-                            className="bg-white/15 hover:bg-white/25 p-2 rounded-full transition-colors backdrop-blur-sm"
+                            className="navbar-style-4"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="navbar-style-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                         </button>
                     )}
 
                     {/* Logo and Text */}
-                    <Link to="/" className="flex items-center gap-2">
+                    <Link to="/" className="navbar-style-6">
                         <img 
                             src="/muna-logo.jpg" 
                             alt="MUNA" 
-                            className="h-10 w-auto object-contain rounded drop-shadow-sm"
+                            className="navbar-style-7"
                         />
-                        <div className="flex flex-col leading-none mt-1">
-                            <span className="text-sm font-black text-gray-900 tracking-tight">GROCERY</span>
-                            <span className="text-[10px] font-extrabold text-red-600 tracking-wider">IN MINUTES</span>
+                        <div className="navbar-style-8">
+                            <span className="navbar-style-9">GROCERY</span>
+                            <span className="navbar-style-10">IN MINUTES</span>
                         </div>
                     </Link>
                 </div>
 
                 {/* Right Side: Login / Profile & Cart */}
-                <div className="flex items-center gap-3">
+                <div className="navbar-style-11">
 
                     {/* Agar User login hai toh Profile par jane ka Button, warna Login button */}
                     {user ? (
-                        <div className="flex items-center gap-1 sm:gap-2">
+                        <div className="navbar-style-12">
                             <Link 
                                 to={user.role === 'super_admin' ? "/admin-dashboard" : user.role === 'vendor' ? "/vendor-dashboard" : "/profile"} 
-                                className="flex items-center gap-1 sm:gap-2 bg-black/5 hover:bg-black/10 px-2 sm:px-3 py-1.5 rounded-full transition-colors cursor-pointer border border-black/10"
+                                className="navbar-style-13"
                             >
-                                <span className="text-lg">{user.role === 'super_admin' ? '👑' : user.role === 'vendor' ? '🏪' : '👤'}</span>
-                                <span className="hidden sm:inline text-sm font-bold text-black">Hi, {user.name.split(' ')[0]}</span>
+                                <span className="navbar-style-14">{user.role === 'super_admin' ? '👑' : user.role === 'vendor' ? '🏪' : '👤'}</span>
+                                <span className="navbar-style-15">Hi, {user.name.split(' ')[0]}</span>
                             </Link>
                         </div>
                     ) : (
                         <Link
                             to="/login"
-                            className="text-sm font-bold text-black bg-white hover:bg-yellow-50 px-3 sm:px-4 py-2 rounded-lg transition-colors shadow-sm"
+                            className="navbar-style-16"
                         >
                             Login
                         </Link>
@@ -68,13 +69,13 @@ const Navbar = () => {
 
 
                     {/* Cart Button */}
-                    <Link to="/cart" className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-3 sm:px-4 rounded-lg flex items-center gap-1 sm:gap-2 transition-colors shadow-md ml-1 sm:ml-2 relative">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <Link to="/cart" className="navbar-style-17">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="navbar-style-18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
-                        <span className="hidden sm:inline">Cart {totalItems > 0 && `(${totalItems})`}</span>
+                        <span className="navbar-style-19">Cart {totalItems > 0 && `(${totalItems})`}</span>
                         {totalItems > 0 && (
-                            <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm animate-bounce sm:hidden">
+                            <span className="navbar-style-20">
                                 {totalItems}
                             </span>
                         )}

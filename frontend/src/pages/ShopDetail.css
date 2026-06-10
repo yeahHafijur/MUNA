@@ -1,0 +1,178 @@
+@reference "tailwindcss";
+.shopdetail-style-1 {
+    @apply mt-4 pb-20;
+}
+
+.shopdetail-style-2 {
+    @apply relative bg-gray-900 rounded-2xl p-6 sm:p-8 mb-6 overflow-hidden shadow-lg flex flex-col justify-end min-h-[160px];
+}
+
+.shopdetail-style-3 {
+    @apply absolute inset-0 opacity-40;
+}
+
+.shopdetail-style-4 {
+    @apply w-full h-full object-cover;
+}
+
+.shopdetail-style-5 {
+    @apply relative z-10 text-white;
+}
+
+.shopdetail-style-6 {
+    @apply flex justify-between items-start;
+}
+
+.shopdetail-style-7 {
+    @apply text-2xl sm:text-3xl font-black mb-1;
+}
+
+.shopdetail-style-8 {
+    @apply text-gray-300 text-sm flex items-center gap-2;
+}
+
+.shopdetail-style-9 {
+    @apply bg-white/20 px-2 py-0.5 rounded-md text-xs font-bold backdrop-blur-md;
+}
+
+.shopdetail-style-10 {
+    @apply bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-xl text-xs font-bold transition-colors backdrop-blur-md flex items-center gap-1.5;
+}
+
+.shopdetail-style-11 {
+    @apply text-lg;
+}
+
+.shopdetail-style-12 {
+    @apply hidden sm:inline;
+}
+
+.shopdetail-style-13 {
+    @apply mb-6;
+}
+
+.shopdetail-style-14 {
+    @apply flex justify-between items-end mb-3;
+}
+
+.shopdetail-style-15 {
+    @apply text-xl font-black text-gray-800;
+}
+
+.shopdetail-style-16 {
+    @apply bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors;
+}
+
+.shopdetail-style-17 {
+    @apply w-full bg-white border border-gray-200 rounded-xl p-3 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 transition-all shadow-sm;
+}
+
+.shopdetail-style-18 {
+    @apply text-gray-500 text-sm font-semibold animate-pulse;
+}
+
+.shopdetail-style-19 {
+    @apply text-gray-500 text-sm bg-white p-5 rounded-xl border border-gray-100 text-center;
+}
+
+.shopdetail-style-20 {
+    @apply grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8;
+}
+
+.shopdetail-style-21 {
+    @apply bg-gradient-to-br from-yellow-500 to-yellow-500 p-5 rounded-2xl shadow-sm cursor-pointer transform hover:-translate-y-1 transition-transform flex flex-col justify-between h-32;
+}
+
+.shopdetail-style-22 {
+    @apply text-3xl;
+}
+
+.shopdetail-style-23 {
+    @apply font-black text-white text-lg;
+}
+
+.shopdetail-style-24 {
+    @apply text-xs text-yellow-100 font-bold;
+}
+
+.shopdetail-style-25 {
+    @apply bg-white border border-gray-100 p-5 rounded-2xl shadow-sm cursor-pointer transform hover:-translate-y-1 hover:border-indigo-300 transition-all flex flex-col justify-between h-32;
+}
+
+.shopdetail-style-26 {
+    @apply text-3xl;
+}
+
+.shopdetail-style-27 {
+    @apply font-black text-gray-800 text-lg leading-tight line-clamp-1;
+}
+
+.shopdetail-style-28 {
+    @apply text-xs text-gray-500 font-bold;
+}
+
+.shopdetail-style-29 {
+    @apply text-xl font-black mb-4 flex items-center gap-2;
+}
+
+.shopdetail-style-30 {
+    @apply text-yellow-500;
+}
+
+.shopdetail-style-31 {
+    @apply text-base font-bold text-gray-500 mb-4;
+}
+
+.shopdetail-style-32 {
+    @apply text-center bg-white p-10 rounded-xl border border-gray-100;
+}
+
+.shopdetail-style-33 {
+    @apply text-4xl;
+}
+
+.shopdetail-style-34 {
+    @apply text-gray-500 font-bold mt-2;
+}
+
+.shopdetail-style-35 {
+    @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3;
+}
+
+.shopdetail-style-36 {
+    @apply bg-white p-2.5 rounded-xl shadow-sm border border-gray-100 flex flex-col relative ;
+}
+
+.shopdetail-style-37 {
+    @apply w-full h-24 sm:h-32 bg-gray-50 rounded-lg mb-2 flex items-center justify-center text-3xl sm:text-4xl overflow-hidden;
+}
+
+.shopdetail-style-38 {
+    @apply w-full h-full object-cover;
+}
+
+.shopdetail-style-39 {
+    @apply flex-1;
+}
+
+.shopdetail-style-40 {
+    @apply text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50 px-1.5 py-0.5 rounded;
+}
+
+.shopdetail-style-41 {
+    @apply font-bold text-gray-800 text-xs sm:text-sm leading-tight mt-1.5 line-clamp-2;
+}
+
+.shopdetail-style-42 {
+    @apply flex items-center justify-between mt-2 pt-2 border-t border-gray-50;
+}
+
+.shopdetail-style-43 {
+    @apply font-black text-gray-900 text-sm sm:text-base;
+}
+
+.shopdetail-style-44 {
+    @apply text-[8px] sm:text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded;
+}
+
+

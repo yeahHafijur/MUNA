@@ -126,13 +126,6 @@ const Home = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-
-                        <div className="home-style-17">
-                            <div className="home-style-18">
-                                <div className="home-style-19">🛍️</div>
-                                <span className="home-style-20">Kirana</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

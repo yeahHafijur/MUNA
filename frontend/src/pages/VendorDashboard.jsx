@@ -42,6 +42,11 @@ const VendorDashboard = () => {
     const [chargePerKm, setChargePerKm] = useState(5);
     const [maxRange, setMaxRange] = useState(5);
 
+    // Auto Schedule State
+    const [autoScheduleEnabled, setAutoScheduleEnabled] = useState(false);
+    const [openTime, setOpenTime] = useState('09:00');
+    const [closeTime, setCloseTime] = useState('21:00');
+
     const [shopImageFile, setShopImageFile] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -70,6 +75,11 @@ const VendorDashboard = () => {
                         setMinDistance(shopData.deliverySettings.minimumDistance ?? 2);
                         setChargePerKm(shopData.deliverySettings.chargePerKm ?? 5);
                         setMaxRange(shopData.deliverySettings.maxRange ?? 5);
+                    }
+                    if (shopData.autoSchedule) {
+                        setAutoScheduleEnabled(shopData.autoSchedule.enabled ?? false);
+                        setOpenTime(shopData.autoSchedule.openTime ?? '09:00');
+                        setCloseTime(shopData.autoSchedule.closeTime ?? '21:00');
                     }
                     fetchOrders(true); // initial fetch
                     fetchProducts(shopData._id);
@@ -302,6 +312,33 @@ const VendorDashboard = () => {
         }
     };
 
+    const handleUpdateSchedule = async (e) => {
+        if (e) e.preventDefault();
+        try {
+            const res = await fetch(`/api/shops/${shop._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ 
+                    autoSchedule: {
+                        enabled: autoScheduleEnabled,
+                        openTime,
+                        closeTime
+                    }
+                })
+            });
+            const updatedShop = await res.json();
+            if (res.ok) {
+                setShop(updatedShop);
+                alert("Schedule Settings updated successfully!");
+            } else {
+                alert(updatedShop.message || "Failed to update schedule");
+            }
+        } catch (error) {
+            console.error("Error updating schedule settings:", error);
+            alert("Failed to update schedule settings");
+        }
+    };
+
     const handleUpdateShopImage = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -356,7 +393,8 @@ const VendorDashboard = () => {
                     <div className="vendordashboard-style-11">
                         <button 
                             onClick={handleToggleShopStatus}
-                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${shop.isOpen ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'}`}
+                            disabled={autoScheduleEnabled}
+                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${shop.isOpen ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'} ${autoScheduleEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {shop.isOpen ? '🟢 Shop is Open' : '🔴 Shop is Closed'}
                         </button>
@@ -377,6 +415,40 @@ const VendorDashboard = () => {
                         >
                             🔔 Enable Push Alerts
                         </button>
+                    </div>
+
+                    {/* Schedule Settings Panel */}
+                    <div className="vendordashboard-schedule-panel mt-4 bg-white/5 p-4 rounded-xl border border-white/10 text-white w-full">
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="font-bold text-sm">⏰ Auto Open/Close Settings</span>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    className="sr-only peer"
+                                    checked={autoScheduleEnabled} 
+                                    onChange={(e) => setAutoScheduleEnabled(e.target.checked)} 
+                                />
+                                <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#f8cb46]"></div>
+                            </label>
+                        </div>
+                        {autoScheduleEnabled && (
+                            <div className="flex flex-col gap-3 mt-2 animate-fade-in">
+                                <div className="flex gap-3">
+                                    <div className="flex flex-col flex-1">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Open Time</label>
+                                        <input type="time" className="bg-black/20 border border-white/10 rounded-lg p-2 text-sm focus:border-[#f8cb46] outline-none" value={openTime} onChange={(e) => setOpenTime(e.target.value)} />
+                                    </div>
+                                    <div className="flex flex-col flex-1">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Close Time</label>
+                                        <input type="time" className="bg-black/20 border border-white/10 rounded-lg p-2 text-sm focus:border-[#f8cb46] outline-none" value={closeTime} onChange={(e) => setCloseTime(e.target.value)} />
+                                    </div>
+                                </div>
+                                <button className="bg-[#f8cb46] text-black font-bold py-2 rounded-lg text-sm mt-1 hover:bg-[#e0b431] transition-colors" onClick={handleUpdateSchedule}>Save Schedule</button>
+                                <p className="text-[10px] text-gray-400 mt-1 leading-tight">
+                                    ℹ️ Manual toggle is overridden. Shop will automatically open and close daily at these times.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="vendordashboard-style-15">

@@ -130,6 +130,12 @@ const updateShop = async (req, res) => {
                 ...req.body.deliverySettings
             };
         }
+        if (req.body.autoSchedule !== undefined) {
+            shop.autoSchedule = {
+                ...shop.autoSchedule,
+                ...req.body.autoSchedule
+            };
+        }
         
         const updatedShop = await shop.save();
         res.status(200).json(updatedShop);

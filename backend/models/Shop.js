@@ -41,6 +41,12 @@ const shopSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    autoSchedule: {
+        enabled: { type: Boolean, default: false },
+        openTime: { type: String, default: '09:00' }, // HH:mm 24hr format
+        closeTime: { type: String, default: '21:00' }, // HH:mm 24hr format
+        timezone: { type: String, default: 'Asia/Kolkata' }
+    },
     deliverySettings: {
         minimumCharge: { type: Number, default: 10 },
         minimumDistance: { type: Number, default: 2 }, // distance in km

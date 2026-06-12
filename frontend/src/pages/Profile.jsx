@@ -3,16 +3,22 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 
-/* ─── Icon Components ─── */
+/* ─── Sleek Icons ─── */
 const IconLogout = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
         <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
     </svg>
 );
 
-/* ─── Status Pill Helper ─── */
+const IconBox = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+);
+
+/* ─── Dark Mode Status Pill ─── */
 const StatusPill = ({ status }) => {
-    const cls = `usr-pill usr-pill--${status.replace(' ', '_')}`;
+    const cls = `dp-pill dp-pill--${status.replace(' ', '_')}`;
     const labels = {
         pending: '⏳ Pending',
         accepted: '👍 Accepted',
@@ -65,114 +71,129 @@ const Profile = () => {
     const totalSpent = deliveredOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
     return (
-        <div className="usr-root">
+        <div className="dp-root">
+            <div className="dp-layout">
 
-            {/* ════════ HEADER ════════ */}
-            <header className="usr-header">
-                <div className="usr-header-left">
-                    <div className="usr-avatar">
-                        {user.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="usr-info">
-                        <h1 className="usr-name">{user.name}</h1>
-                        <p className="usr-email">{user.email}</p>
-                        <span className="usr-role-badge">Customer Account</span>
-                    </div>
-                </div>
-                <button onClick={handleLogout} className="usr-logout-btn">
-                    <IconLogout /> Sign Out
-                </button>
-            </header>
-
-            {/* ════════ STATS ROW ════════ */}
-            <div className="usr-stats-row">
-                <div className="usr-stat-card">
-                    <div className="usr-stat-info">
-                        <div className="usr-stat-num">{orders.length}</div>
-                        <div className="usr-stat-label">Total Orders</div>
-                    </div>
-                    <div className="usr-stat-icon">🛍️</div>
-                </div>
-                <div className="usr-stat-card">
-                    <div className="usr-stat-info">
-                        <div className="usr-stat-num text-amber-500">{activeOrders.length}</div>
-                        <div className="usr-stat-label">Active Orders</div>
-                    </div>
-                    <div className="usr-stat-icon">🛵</div>
-                </div>
-                <div className="usr-stat-card">
-                    <div className="usr-stat-info">
-                        <div className="usr-stat-num text-green-600">₹{totalSpent}</div>
-                        <div className="usr-stat-label">Total Spent</div>
-                    </div>
-                    <div className="usr-stat-icon">💰</div>
-                </div>
-            </div>
-
-            {/* ════════ ORDERS SECTION ════════ */}
-            <div className="usr-section-title">
-                <span>📜</span> My Order History
-            </div>
-
-            {loading ? (
-                <div className="usr-loading">
-                    <div className="usr-spinner"></div>
-                    <p>Loading your profile...</p>
-                </div>
-            ) : orders.length === 0 ? (
-                <div className="usr-empty">
-                    <div className="usr-empty-icon">📭</div>
-                    <div className="usr-empty-title">No orders yet!</div>
-                    <div className="usr-empty-sub">Looks like you haven't bought anything from MUNA yet.</div>
-                    <button onClick={() => navigate('/')} className="usr-shop-btn">
-                        Start Shopping
-                    </button>
-                </div>
-            ) : (
-                <div className="usr-orders-grid">
-                    {orders.map(order => (
-                        <div key={order._id} className="usr-order-card">
-
-                            {/* Card Header */}
-                            <div className="usr-order-head">
-                                <div>
-                                    <div className="usr-order-id">Order #{order._id.slice(-6).toUpperCase()}</div>
-                                    <div className="usr-order-time">
-                                        {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                                            day: 'numeric', month: 'short', year: 'numeric',
-                                            hour: '2-digit', minute: '2-digit'
-                                        })}
-                                    </div>
-                                    <StatusPill status={order.status} />
-                                </div>
-                                <div className="usr-order-amount">
-                                    <div className="usr-amount-val">₹{order.totalAmount}</div>
-                                    <div className="usr-amount-lbl">Total Paid</div>
-                                </div>
+                {/* ════════ LEFT SIDEBAR: PROFILE ════════ */}
+                <aside className="dp-sidebar">
+                    <div className="dp-sidebar-inner">
+                        <div className="dp-avatar-wrapper">
+                            <div className="dp-avatar-glow"></div>
+                            <div className="dp-avatar">
+                                {user.name.charAt(0).toUpperCase()}
                             </div>
-
-                            {/* Card Body - Items */}
-                            <div className="usr-order-body">
-                                <div className="usr-shop-name">
-                                    🏪 {order.shopId?.name || "Local Shop"}
-                                </div>
-                                <div className="usr-items-list">
-                                    {order.items.map((item, idx) => (
-                                        <div key={idx} className="usr-item-row">
-                                            <span className="usr-item-name">
-                                                <span className="usr-item-qty">{item.quantity}×</span>
-                                                {item.name}
-                                            </span>
-                                            <span className="usr-item-price">₹{item.price * item.quantity}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
                         </div>
-                    ))}
-                </div>
-            )}
+
+                        <div className="dp-user-info">
+                            <h1 className="dp-name">{user.name}</h1>
+                            <p className="dp-email">{user.email}</p>
+                            <span className="dp-role-badge">Customer Account</span>
+                        </div>
+
+                        <div className="dp-divider"></div>
+
+                        <button onClick={handleLogout} className="dp-logout-btn">
+                            <IconLogout /> Sign Out Securely
+                        </button>
+                    </div>
+                </aside>
+
+                {/* ════════ RIGHT MAIN CONTENT ════════ */}
+                <main className="dp-main">
+
+                    {/* STATS GRID */}
+                    <div className="dp-stats-grid">
+                        <div className="dp-stat-card">
+                            <div className="dp-stat-icon-wrap"><IconBox /></div>
+                            <div>
+                                <div className="dp-stat-val">{orders.length}</div>
+                                <div className="dp-stat-lbl">Total Orders</div>
+                            </div>
+                        </div>
+                        <div className="dp-stat-card">
+                            <div className="dp-stat-icon-wrap text-amber-500">🛵</div>
+                            <div>
+                                <div className="dp-stat-val text-amber-400">{activeOrders.length}</div>
+                                <div className="dp-stat-lbl">In Progress</div>
+                            </div>
+                        </div>
+                        <div className="dp-stat-card">
+                            <div className="dp-stat-icon-wrap text-green-400">₹</div>
+                            <div>
+                                <div className="dp-stat-val text-green-400">{totalSpent}</div>
+                                <div className="dp-stat-lbl">Total Spent</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ORDERS SECTION */}
+                    <div className="dp-section-header">
+                        <h2 className="dp-section-title">Order History</h2>
+                    </div>
+
+                    {loading ? (
+                        <div className="dp-loading">
+                            <div className="dp-spinner"></div>
+                            <p>Syncing data...</p>
+                        </div>
+                    ) : orders.length === 0 ? (
+                        <div className="dp-empty">
+                            <div className="dp-empty-icon">🪐</div>
+                            <div className="dp-empty-text">Your orbit is empty.</div>
+                            <button onClick={() => navigate('/')} className="dp-shop-btn">
+                                Explore MUNA
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="dp-orders-list">
+                            {orders.map(order => (
+                                <div key={order._id} className="dp-order-card">
+
+                                    {/* Order Head */}
+                                    <div className="dp-order-head">
+                                        <div className="dp-order-meta">
+                                            <span className="dp-order-id">#{order._id.slice(-6).toUpperCase()}</span>
+                                            <span className="dp-order-dot">•</span>
+                                            <span className="dp-order-date">
+                                                {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                                                    day: 'numeric', month: 'short',
+                                                    hour: '2-digit', minute: '2-digit'
+                                                })}
+                                            </span>
+                                        </div>
+                                        <StatusPill status={order.status} />
+                                    </div>
+
+                                    {/* Order Body */}
+                                    <div className="dp-order-body">
+                                        <div className="dp-order-shop">
+                                            🏪 {order.shopId?.name || "Local Shop"}
+                                        </div>
+                                        <div className="dp-items">
+                                            {order.items.map((item, idx) => (
+                                                <div key={idx} className="dp-item-row">
+                                                    <div className="dp-item-name">
+                                                        <span className="dp-item-qty">{item.quantity}×</span>
+                                                        {item.name}
+                                                    </div>
+                                                    <div className="dp-item-price">₹{item.price * item.quantity}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Order Footer */}
+                                    <div className="dp-order-foot">
+                                        <div className="dp-total-lbl">Total Amount</div>
+                                        <div className="dp-total-val">₹{order.totalAmount}</div>
+                                    </div>
+
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </main>
+            </div>
         </div>
     );
 };

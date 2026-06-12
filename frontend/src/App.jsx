@@ -34,6 +34,7 @@ function App() {
           enable: false,
         },
         serviceWorkerParam: { scope: '/' },
+        serviceWorkerPath: '/sw.js',
       });
 
       console.log("[MUNA] OneSignal initialized successfully");

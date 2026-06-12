@@ -1,102 +1,198 @@
 @reference "tailwindcss";
-.profile-style-1 {
-    @apply max-w-2xl mx-auto mt-6;
+
+/* Main Layout */
+.usr-root {
+    @apply max-w-4xl mx-auto mt-6 px-2;
 }
 
-.profile-style-2 {
-    @apply bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 flex items-center justify-between;
+/* Header */
+.usr-header {
+    @apply bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 mb-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden;
 }
 
-.profile-style-3 {
-    @apply text-2xl font-black text-gray-800;
+.usr-header::before {
+    content: '';
+    @apply absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-400 to-orange-500;
 }
 
-.profile-style-4 {
-    @apply text-gray-500 text-sm;
+.usr-header-left {
+    @apply flex flex-col md:flex-row items-center gap-5 w-full md:w-auto;
 }
 
-.profile-style-5 {
-    @apply flex flex-col items-end gap-2;
+.usr-avatar {
+    @apply w-20 h-20 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 text-orange-600 flex items-center justify-center text-3xl font-black shadow-sm border-4 border-white outline outline-1 outline-gray-100;
 }
 
-.profile-style-6 {
-    @apply bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+.usr-info {
+    @apply flex flex-col items-center md:items-start text-center md:text-left;
 }
 
-.profile-style-7 {
-    @apply flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm;
+.usr-name {
+    @apply text-2xl font-black text-gray-800 tracking-tight;
 }
 
-.profile-style-8 {
-    @apply h-4 w-4;
+.usr-email {
+    @apply text-gray-500 font-medium text-sm mt-0.5;
 }
 
-.profile-style-9 {
-    @apply text-xl font-black text-gray-800 mb-4;
+.usr-role-badge {
+    @apply mt-2 inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
 }
 
-.profile-style-10 {
-    @apply text-gray-500 text-sm font-bold animate-pulse;
+.usr-logout-btn {
+    @apply flex items-center justify-center gap-2 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 px-5 py-2.5 rounded-xl text-sm font-bold transition-all w-full md:w-auto;
 }
 
-.profile-style-11 {
-    @apply bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center;
+/* Stats Row */
+.usr-stats-row {
+    @apply grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8;
 }
 
-.profile-style-12 {
-    @apply text-4xl mb-2 block;
+.usr-stat-card {
+    @apply bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between relative overflow-hidden;
 }
 
-.profile-style-13 {
-    @apply text-gray-500 font-bold;
+.usr-stat-info {
+    @apply z-10;
 }
 
-.profile-style-14 {
-    @apply space-y-4 mb-8;
+.usr-stat-num {
+    @apply text-3xl font-black text-gray-800 mb-1 tracking-tight;
 }
 
-.profile-style-15 {
-    @apply bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow;
+.usr-stat-label {
+    @apply text-xs font-bold text-gray-400 uppercase tracking-wider;
 }
 
-.profile-style-16 {
-    @apply flex justify-between items-start mb-3 border-b border-gray-50 pb-3;
+.usr-stat-icon {
+    @apply text-5xl opacity-10 absolute -right-3 -bottom-3 transform -rotate-12 select-none;
 }
 
-.profile-style-17 {
-    @apply font-bold text-gray-800 text-sm;
+/* Title & Loading */
+.usr-section-title {
+    @apply text-xl font-black text-gray-800 mb-5 flex items-center gap-2;
 }
 
-.profile-style-18 {
-    @apply text-xs text-gray-400 mt-1;
+.usr-loading {
+    @apply flex flex-col items-center justify-center py-20 text-gray-400 font-medium text-sm gap-3;
 }
 
-.profile-style-19 {
-    @apply space-y-2 mb-3;
+.usr-spinner {
+    @apply w-8 h-8 border-4 border-gray-100 border-t-amber-500 rounded-full animate-spin;
 }
 
-.profile-style-20 {
-    @apply flex justify-between text-sm;
+/* Empty State */
+.usr-empty {
+    @apply bg-white p-12 rounded-2xl shadow-sm border border-gray-100 text-center flex flex-col items-center justify-center;
 }
 
-.profile-style-21 {
-    @apply text-gray-600 font-medium;
+.usr-empty-icon {
+    @apply text-6xl mb-4 opacity-80;
 }
 
-.profile-style-22 {
-    @apply font-bold text-gray-800;
+.usr-empty-title {
+    @apply text-xl font-black text-gray-800 mb-2;
 }
 
-.profile-style-23 {
-    @apply flex justify-between items-center pt-3 border-t border-gray-50;
+.usr-empty-sub {
+    @apply text-sm text-gray-500 font-medium mb-6 max-w-xs;
 }
 
-.profile-style-24 {
-    @apply text-sm font-bold text-gray-500;
+.usr-shop-btn {
+    @apply bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-sm;
 }
 
-.profile-style-25 {
-    @apply font-black text-gray-800 text-lg;
+/* Orders Grid */
+.usr-orders-grid {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-5;
 }
 
+.usr-order-card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all overflow-hidden flex flex-col;
+}
 
+.usr-order-head {
+    @apply bg-gray-50/50 p-5 border-b border-gray-100 flex justify-between items-start transition-colors;
+}
+
+.usr-order-card:hover .usr-order-head {
+    @apply bg-amber-50/30;
+}
+
+.usr-order-id {
+    @apply font-black text-gray-800 text-sm tracking-tight;
+}
+
+.usr-order-time {
+    @apply text-xs text-gray-400 font-medium mt-1 mb-2;
+}
+
+.usr-order-amount {
+    @apply text-right flex flex-col items-end;
+}
+
+.usr-amount-val {
+    @apply text-lg font-black text-amber-600;
+}
+
+.usr-amount-lbl {
+    @apply text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5;
+}
+
+/* Order Body */
+.usr-order-body {
+    @apply p-5 flex-1 flex flex-col;
+}
+
+.usr-shop-name {
+    @apply text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 pb-3 border-b border-dashed border-gray-200;
+}
+
+.usr-items-list {
+    @apply space-y-2.5 mt-auto;
+}
+
+.usr-item-row {
+    @apply flex justify-between items-start text-sm;
+}
+
+.usr-item-qty {
+    @apply font-bold text-gray-400 mr-2 w-5 inline-block;
+}
+
+.usr-item-name {
+    @apply font-medium text-gray-700 flex-1 leading-snug pr-3;
+}
+
+.usr-item-price {
+    @apply font-bold text-gray-800 whitespace-nowrap;
+}
+
+/* Status Pills */
+.usr-pill {
+    @apply inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border;
+}
+
+.usr-pill--pending {
+    @apply bg-orange-50 text-orange-600 border-orange-100;
+}
+
+.usr-pill--accepted {
+    @apply bg-blue-50 text-blue-600 border-blue-100;
+}
+
+.usr-pill--preparing {
+    @apply bg-purple-50 text-purple-600 border-purple-100;
+}
+
+.usr-pill--out_for_delivery {
+    @apply bg-amber-50 text-amber-600 border-amber-100;
+}
+
+.usr-pill--delivered {
+    @apply bg-green-50 text-green-600 border-green-100;
+}
+
+.usr-pill--cancelled {
+    @apply bg-red-50 text-red-600 border-red-100;
+}

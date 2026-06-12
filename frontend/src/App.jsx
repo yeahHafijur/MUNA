@@ -31,7 +31,7 @@ function App() {
       await OneSignal.init({
         appId: "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
         notifyButton: {
-          enable: true,
+          enable: false,
         },
         serviceWorkerParam: { scope: '/' },
       });

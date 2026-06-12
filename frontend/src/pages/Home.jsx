@@ -26,6 +26,11 @@ const IcoCart = () => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
     </svg>
 );
+const IcoBell = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+);
 const IcoUser = () => (
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -178,26 +183,7 @@ const Home = () => {
                         </div>
                     </Link>
 
-                    {/* Actions */}
-                    <div className="mu-header-actions">
-                        {user ? (
-                            <Link to={profileLink} className="mu-profile-btn">
-                                <span className="mu-profile-emoji">{profileEmoji}</span>
-                                <span className="mu-profile-name">Hi, {user.name.split(' ')[0]}</span>
-                            </Link>
-                        ) : (
-                            <Link to="/login" className="mu-hdr-btn" title="Login">
-                                <IcoUser />
-                            </Link>
-                        )}
 
-                        <Link to="/cart" className="mu-hdr-btn" title="Cart">
-                            <IcoCart />
-                            {totalCartItems > 0 && (
-                                <span className="mu-hdr-btn-badge">{totalCartItems}</span>
-                            )}
-                        </Link>
-                    </div>
                 </div>
 
             </header>
@@ -389,6 +375,11 @@ const Home = () => {
                 <button className="mu-nav-item" onClick={() => document.getElementById('home-search')?.focus()}>
                     <span className="mu-nav-icon"><IcoSearch /></span>
                     Search
+                </button>
+
+                <button className="mu-nav-item" onClick={() => window.OneSignal && window.OneSignal.Slidedown.promptPush()}>
+                    <span className="mu-nav-icon"><IcoBell /></span>
+                    Alerts
                 </button>
 
                 <Link to="/cart" className="mu-nav-item">

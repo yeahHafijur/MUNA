@@ -200,29 +200,6 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Search */}
-                <div className="mu-search-bar">
-                    <div className="mu-search-wrap">
-                        <IcoSearch />
-                        <input
-                            id="home-search"
-                            type="text"
-                            placeholder="Search shops, categories..."
-                            className="mu-search-input"
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                        />
-                        {searchQuery && (
-                            <button
-                                className="mu-search-clear"
-                                onClick={() => setSearchQuery('')}
-                                aria-label="Clear search"
-                            >
-                                ✕
-                            </button>
-                        )}
-                    </div>
-                </div>
             </header>
 
             {/* ════════ SCROLLABLE BODY ════════ */}

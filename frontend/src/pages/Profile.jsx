@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Profile.css';
@@ -10,21 +10,15 @@ const IconLogout = () => (
     </svg>
 );
 
-const IconBox = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-    </svg>
-);
-
-/* ─── Dark Mode Status Pill ─── */
+/* ─── Status Pill ─── */
 const StatusPill = ({ status }) => {
-    const cls = `dp-pill dp-pill--${status.replace(' ', '_')}`;
+    const cls = `prf-pill prf-pill--${status.replace(' ', '_')}`;
     const labels = {
         pending: '⏳ Pending',
         accepted: '👍 Accepted',
         preparing: '🔥 Preparing',
         out_for_delivery: '🛵 On the Way',
-        delivered: '🎉 Delivered',
+        delivered: '✅ Delivered',
         cancelled: '❌ Cancelled',
     };
     return <span className={cls}>{labels[status] || status}</span>;
@@ -34,6 +28,7 @@ const Profile = () => {
     const { user, token, logout } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('orders');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -53,7 +48,7 @@ const Profile = () => {
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Error fetching orders:", err);
+                console.error("Orders fetch error:", err);
                 setLoading(false);
             });
     }, [token, navigate]);
@@ -71,128 +66,144 @@ const Profile = () => {
     const totalSpent = deliveredOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
     return (
-        <div className="dp-root">
-            <div className="dp-layout">
+        <div className="prf-root">
 
-                {/* ════════ LEFT SIDEBAR: PROFILE ════════ */}
-                <aside className="dp-sidebar">
-                    <div className="dp-sidebar-inner">
-                        <div className="dp-avatar-wrapper">
-                            <div className="dp-avatar-glow"></div>
-                            <div className="dp-avatar">
-                                {user.name.charAt(0).toUpperCase()}
-                            </div>
-                        </div>
-
-                        <div className="dp-user-info">
-                            <h1 className="dp-name">{user.name}</h1>
-                            <p className="dp-email">{user.email}</p>
-                            <span className="dp-role-badge">Customer Account</span>
-                        </div>
-
-                        <div className="dp-divider"></div>
-
-                        <button onClick={handleLogout} className="dp-logout-btn">
-                            <IconLogout /> Sign Out Securely
-                        </button>
+            {/* ════════ HEADER ════════ */}
+            <header className="prf-header">
+                <div className="prf-header-left">
+                    <div className="prf-avatar">
+                        {user.name.charAt(0).toUpperCase()}
                     </div>
-                </aside>
-
-                {/* ════════ RIGHT MAIN CONTENT ════════ */}
-                <main className="dp-main">
-
-                    {/* STATS GRID */}
-                    <div className="dp-stats-grid">
-                        <div className="dp-stat-card">
-                            <div className="dp-stat-icon-wrap"><IconBox /></div>
-                            <div>
-                                <div className="dp-stat-val">{orders.length}</div>
-                                <div className="dp-stat-lbl">Total Orders</div>
-                            </div>
-                        </div>
-                        <div className="dp-stat-card">
-                            <div className="dp-stat-icon-wrap text-amber-500">🛵</div>
-                            <div>
-                                <div className="dp-stat-val text-amber-400">{activeOrders.length}</div>
-                                <div className="dp-stat-lbl">In Progress</div>
-                            </div>
-                        </div>
-                        <div className="dp-stat-card">
-                            <div className="dp-stat-icon-wrap text-green-400">₹</div>
-                            <div>
-                                <div className="dp-stat-val text-green-400">{totalSpent}</div>
-                                <div className="dp-stat-lbl">Total Spent</div>
-                            </div>
-                        </div>
+                    <div className="prf-user-info">
+                        <div className="prf-user-name">{user.name}</div>
+                        <div className="prf-user-email">{user.email}</div>
                     </div>
+                </div>
+            </header>
 
-                    {/* ORDERS SECTION */}
-                    <div className="dp-section-header">
-                        <h2 className="dp-section-title">Order History</h2>
-                    </div>
+            {/* ════════ TAB BAR ════════ */}
+            <nav className="prf-tabbar">
+                <button
+                    className={`prf-tab ${activeTab === 'orders' ? 'prf-tab--active' : ''}`}
+                    onClick={() => setActiveTab('orders')}
+                >
+                    🛍️ My Orders
+                    {activeOrders.length > 0 && (
+                        <span className="prf-tab-badge">{activeOrders.length}</span>
+                    )}
+                </button>
 
-                    {loading ? (
-                        <div className="dp-loading">
-                            <div className="dp-spinner"></div>
-                            <p>Syncing data...</p>
+                <button
+                    className={`prf-tab ${activeTab === 'account' ? 'prf-tab--active' : ''}`}
+                    onClick={() => setActiveTab('account')}
+                >
+                    ⚙️ Account Settings
+                </button>
+            </nav>
+
+            {/* ════════ BODY ════════ */}
+            <div className="prf-body">
+                
+                {/* ─── ORDERS TAB ─── */}
+                {activeTab === 'orders' && (
+                    <div className="prf-tab-panel">
+                        {/* Stats Row */}
+                        <div className="prf-stats-row">
+                            <div className="prf-stat-card">
+                                <div className="prf-stat-num">{activeOrders.length}</div>
+                                <div className="prf-stat-label">Active Orders</div>
+                                <div className="prf-stat-icon">🛵</div>
+                            </div>
+                            <div className="prf-stat-card">
+                                <div className="prf-stat-num prf-stat-num--green">₹{totalSpent}</div>
+                                <div className="prf-stat-label">Total Spent</div>
+                                <div className="prf-stat-icon">💰</div>
+                            </div>
                         </div>
-                    ) : orders.length === 0 ? (
-                        <div className="dp-empty">
-                            <div className="dp-empty-icon">🪐</div>
-                            <div className="dp-empty-text">Your orbit is empty.</div>
-                            <button onClick={() => navigate('/')} className="dp-shop-btn">
-                                Explore MUNA
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="dp-orders-list">
-                            {orders.map(order => (
-                                <div key={order._id} className="dp-order-card">
 
-                                    {/* Order Head */}
-                                    <div className="dp-order-head">
-                                        <div className="dp-order-meta">
-                                            <span className="dp-order-id">#{order._id.slice(-6).toUpperCase()}</span>
-                                            <span className="dp-order-dot">•</span>
-                                            <span className="dp-order-date">
-                                                {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                                                    day: 'numeric', month: 'short',
-                                                    hour: '2-digit', minute: '2-digit'
-                                                })}
-                                            </span>
+                        {loading ? (
+                            <div className="prf-empty">
+                                <div className="prf-empty-icon">⏳</div>
+                                <div className="prf-empty-title">Loading Orders...</div>
+                            </div>
+                        ) : orders.length === 0 ? (
+                            <div className="prf-empty">
+                                <div className="prf-empty-icon">📭</div>
+                                <div className="prf-empty-title">No Orders Yet</div>
+                                <div className="prf-empty-sub">Looks like you haven't bought anything from MUNA yet.</div>
+                                <button onClick={() => navigate('/')} className="prf-shop-btn">
+                                    Start Shopping
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="prf-orders-grid">
+                                {orders.map(order => (
+                                    <div key={order._id} className="prf-order-card">
+                                        
+                                        <div className="prf-order-head">
+                                            <div>
+                                                <div className="prf-order-id">#{order._id.slice(-6).toUpperCase()}</div>
+                                                <div className="prf-order-date">
+                                                    {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                                                        day: 'numeric', month: 'short',
+                                                        hour: '2-digit', minute: '2-digit'
+                                                    })}
+                                                </div>
+                                            </div>
+                                            <StatusPill status={order.status} />
                                         </div>
-                                        <StatusPill status={order.status} />
-                                    </div>
 
-                                    {/* Order Body */}
-                                    <div className="dp-order-body">
-                                        <div className="dp-order-shop">
-                                            🏪 {order.shopId?.name || "Local Shop"}
-                                        </div>
-                                        <div className="dp-items">
+                                        <div className="prf-order-body">
+                                            <div className="prf-order-shop">
+                                                🏪 {order.shopId?.name || "Local Shop"}
+                                            </div>
                                             {order.items.map((item, idx) => (
-                                                <div key={idx} className="dp-item-row">
-                                                    <div className="dp-item-name">
-                                                        <span className="dp-item-qty">{item.quantity}×</span>
+                                                <div key={idx} className="prf-order-item">
+                                                    <span>
+                                                        <span className="prf-item-qty">{item.quantity}×</span>
                                                         {item.name}
-                                                    </div>
-                                                    <div className="dp-item-price">₹{item.price * item.quantity}</div>
+                                                    </span>
+                                                    <span className="prf-item-price">₹{item.price * item.quantity}</span>
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
 
-                                    {/* Order Footer */}
-                                    <div className="dp-order-foot">
-                                        <div className="dp-total-lbl">Total Amount</div>
-                                        <div className="dp-total-val">₹{order.totalAmount}</div>
-                                    </div>
+                                        <div className="prf-order-foot">
+                                            <div className="prf-total-label">Total Amount</div>
+                                            <div className="prf-total-val">₹{order.totalAmount}</div>
+                                        </div>
 
-                                </div>
-                            ))}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* ─── ACCOUNT TAB ─── */}
+                {activeTab === 'account' && (
+                    <div className="prf-tab-panel">
+                        <div className="prf-settings-list">
+                            <div className="prf-setting-item">
+                                <span>Edit Profile</span>
+                                <span>›</span>
+                            </div>
+                            <div className="prf-setting-item">
+                                <span>Saved Addresses</span>
+                                <span>›</span>
+                            </div>
+                            <div className="prf-setting-item">
+                                <span>Help & Support</span>
+                                <span>›</span>
+                            </div>
+                            <div className="prf-setting-item prf-setting-item--danger" onClick={handleLogout}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <IconLogout /> Sign Out
+                                </span>
+                            </div>
                         </div>
-                    )}
-                </main>
+                    </div>
+                )}
             </div>
         </div>
     );

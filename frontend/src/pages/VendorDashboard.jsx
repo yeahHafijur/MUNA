@@ -79,6 +79,7 @@ const VendorDashboard = () => {
     const [newProductCategory, setNewProductCategory] = useState('');
     const [newCategory, setNewCategory] = useState('');
     const [productSearchQuery, setProductSearchQuery] = useState('');
+    const [isAddingItem, setIsAddingItem] = useState(false);
 
     /* Delivery settings */
     const [minCharge, setMinCharge] = useState(10);
@@ -218,6 +219,8 @@ const VendorDashboard = () => {
 
     const handleAddProduct = async (e) => {
         e.preventDefault();
+        if (isAddingItem) return;
+        setIsAddingItem(true);
         const formData = new FormData();
         formData.append('name', newProductName);
         formData.append('price', Number(newProductPrice));
@@ -241,6 +244,8 @@ const VendorDashboard = () => {
         } catch (err) {
             console.error(err);
             alert('Error adding item. Check your connection.');
+        } finally {
+            setIsAddingItem(false);
         }
     };
 
@@ -624,8 +629,18 @@ const VendorDashboard = () => {
                                         />
                                     </div>
                                     <div style={{ gridColumn: '1 / -1', marginTop: 4 }}>
-                                        <button type="submit" id="vnd-add-item-btn" className="vnd-btn vnd-btn--primary vnd-btn-full">
-                                            + Create Item
+                                        <button 
+                                            type="submit" 
+                                            id="vnd-add-item-btn" 
+                                            className={`vnd-btn vnd-btn--primary vnd-btn-full ${isAddingItem ? 'opacity-75 cursor-not-allowed' : ''}`}
+                                            disabled={isAddingItem}
+                                        >
+                                            {isAddingItem ? (
+                                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                                    <span className="vnd-loading-spinner" style={{ width: '14px', height: '14px', borderWidth: '2px' }} />
+                                                    Adding...
+                                                </span>
+                                            ) : '+ Create Item'}
                                         </button>
                                     </div>
                                 </form>

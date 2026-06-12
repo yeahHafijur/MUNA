@@ -1,237 +1,365 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './ShopDetail.css';
 
+/* ─── Icon Components ─── */
+const IcoBack = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+);
+const IcoSearch = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+);
+const IcoCart = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+);
+const IcoArrow = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+);
+
+/* Category emoji map */
+const catEmojis = ['🍕', '🥗', '🍰', '🥤', '🌮', '🍛', '🍩', '🍟', '🧃', '🍿', '🧁', '🥘'];
+const getCatEmoji = (idx) => catEmojis[idx % catEmojis.length];
+
+/* ═══════════════════════════════════════════════════════════
+   SHOP DETAIL PAGE — Premium Full-Page Experience
+═══════════════════════════════════════════════════════════ */
 const ShopDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
+    const { addToCart, cartItems, getTotal } = useCart();
+
     const [shop, setShop] = useState(null);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // New states for Category and Search
-    const [selectedCategory, setSelectedCategory] = useState(null); // null = show categories, 'All' = all, '...' = specific
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { addToCart, cartItems } = useCart();
+    const totalCartItems = cartItems.reduce((s, i) => s + i.quantity, 0);
+    const cartTotal = getTotal();
 
+    /* ── Fetch data ── */
     useEffect(() => {
-        // Fetch Shop Details
-        fetch(`/api/shops/${id}`)
-            .then(res => res.json())
-            .then(data => setShop(data))
-            .catch(err => console.error("Error fetching shop:", err));
-
-        // Fetch Products
-        fetch(`/api/products/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                if(Array.isArray(data)) {
-                    setProducts(data);
-                } else {
-                    setProducts([]);
-                }
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Error fetching products:", err);
-                setLoading(false);
-            });
+        Promise.all([
+            fetch(`/api/shops/${id}`).then(r => r.json()),
+            fetch(`/api/products/${id}`).then(r => r.json())
+        ])
+        .then(([shopData, prodData]) => {
+            setShop(shopData);
+            setProducts(Array.isArray(prodData) ? prodData : []);
+            setLoading(false);
+        })
+        .catch(() => setLoading(false));
     }, [id]);
 
-    // Extract unique categories from products
+    /* ── Categories ── */
     const categories = useMemo(() => {
         const cats = new Set(products.map(p => p.category || 'General'));
-        return Array.from(cats);
+        return Array.from(cats).sort();
     }, [products]);
 
-    // Filter products based on search and selected category
+    /* ── Filtered products ── */
     const filteredProducts = useMemo(() => {
         return products.filter(p => {
-            const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                  (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()));
-            
-            const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-            
-            // If we are in the main view (selectedCategory === null), we don't show the product list unless there is a search query
             if (selectedCategory === null && !searchQuery) return false;
 
-            return matchesSearch && (selectedCategory ? matchesCategory : true);
+            const matchesSearch = !searchQuery ||
+                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (p.category || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+            const matchesCat = !selectedCategory || selectedCategory === 'All' ||
+                (p.category || 'General') === selectedCategory;
+
+            return matchesSearch && matchesCat;
         });
     }, [products, searchQuery, selectedCategory]);
 
+    /* ── Show product view? ── */
+    const showProducts = selectedCategory !== null || !!searchQuery;
+
+    /* ═══════════════════════════════════════════════════════
+       RENDER
+    ═══════════════════════════════════════════════════════ */
     return (
-        <div className="shopdetail-style-1">
-            {/* Shop Banner */}
-            {shop && selectedCategory === null && !searchQuery && (
-                <div className="shopdetail-style-2">
-                    {shop.image && (
-                        <div className="shopdetail-style-3">
-                            <img src={shop.image} alt={shop.name} className="shopdetail-style-4" />
-                        </div>
-                    )}
-                    <div className="shopdetail-style-5">
-                        <div className="shopdetail-style-6">
-                            <div>
-                                <span className={`inline-block text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full mb-2 backdrop-blur-sm border ${shop.isOpen ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'bg-red-500/20 text-red-300 border-red-500/30'}`}>
-                                    {shop.isOpen ? '● Open Now' : '● Closed'}
-                                </span>
-                                <h1 className="shopdetail-style-7">{shop.name}</h1>
-                                <p className="shopdetail-style-8">
-                                    <span>📍 {shop.address}</span>
-                                    {shop.vendorId?.phone && (
-                                        <span className="shopdetail-style-9">
-                                            📞 {shop.vendorId.phone}
-                                        </span>
-                                    )}
-                                </p>
-                            </div>
-                            {shop.location?.coordinates && (
-                                <button 
-                                    onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank')}
-                                    className="shopdetail-style-10"
-                                >
-                                    <span className="shopdetail-style-11">🗺️</span> <span className="shopdetail-style-12">Directions</span>
-                                </button>
+        <div className="sd">
+
+            {/* ════════ HEADER ════════ */}
+            <header className="sd-header">
+                <div className="sd-header-row">
+                    <button className="sd-back-btn" onClick={() => navigate(-1)}>
+                        <IcoBack />
+                    </button>
+                    <span className="sd-header-title">
+                        {shop?.name || 'Shop'}
+                    </span>
+                    <div className="sd-header-actions">
+                        <Link to="/cart" className="sd-hdr-btn" title="Cart">
+                            <IcoCart />
+                            {totalCartItems > 0 && (
+                                <span className="sd-hdr-badge">{totalCartItems}</span>
                             )}
-                        </div>
+                        </Link>
                     </div>
                 </div>
-            )}
+            </header>
 
-            {/* Search & Back */}
-            <div className="shopdetail-style-13">
-                <div className="shopdetail-style-14">
-                    <div>
-                        <h2 className="shopdetail-style-15">Menu Items</h2>
-                    </div>
-                    {selectedCategory && (
-                        <button 
-                            onClick={() => setSelectedCategory(null)}
-                            className="shopdetail-style-16"
-                        >
-                            ← Back
-                        </button>
-                    )}
-                </div>
-                
-                <input 
-                    type="text" 
-                    placeholder="Search for items, categories..." 
-                    className="shopdetail-style-17"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-            </div>
+            {/* ════════ SCROLLABLE BODY ════════ */}
+            <div className="sd-body">
 
-            {loading ? (
-                <p className="shopdetail-style-18">Loading menu...</p>
-            ) : products.length === 0 ? (
-                <p className="shopdetail-style-19">No products available in this shop right now.</p>
-            ) : (
-                <>
-                    {/* View 1: Category Cards (Shows only if no category is selected and no search query) */}
-                    {selectedCategory === null && !searchQuery && (
-                        <div className="shopdetail-style-20">
-                            <div 
-                                onClick={() => setSelectedCategory('All')}
-                                className="shopdetail-style-21"
-                            >
-                                <span className="shopdetail-style-22">🍔</span>
-                                <h3 className="shopdetail-style-23">All Items</h3>
-                                <p className="shopdetail-style-24">{products.length} items</p>
+                {loading ? (
+                    /* ── Skeleton ── */
+                    <>
+                        <div className="sd-skel-hero" />
+                        <div className="sd-skel">
+                            <div className="sd-skel-row">
+                                {[1,2,3,4].map(i => <div key={i} className="sd-skel-chip" />)}
                             </div>
-                            
-                            {categories.map((cat, idx) => {
-                                const count = products.filter(p => p.category === cat).length;
-                                // Simple emoji generator based on string hash or just standard
-                                const emojiList = ["🍕", "🥗", "🍰", "🥤", "🌮", "🍛", "🍩", "🍟"];
-                                const emoji = emojiList[idx % emojiList.length];
-                                
-                                return (
-                                    <div 
-                                        key={idx}
-                                        onClick={() => setSelectedCategory(cat)}
-                                        className="shopdetail-style-25"
-                                    >
-                                        <span className="shopdetail-style-26">{emoji}</span>
-                                        <h3 className="shopdetail-style-27">{cat}</h3>
-                                        <p className="shopdetail-style-28">{count} items</p>
+                        </div>
+                        <div className="sd-skel-grid">
+                            {[1,2,3,4].map(i => (
+                                <div key={i} className="sd-skel-card">
+                                    <div className="sd-skel-card-img" />
+                                    <div className="sd-skel-card-body">
+                                        <div className="sd-skel-line" />
+                                        <div className="sd-skel-line sd-skel-line--sm" />
                                     </div>
-                                )
-                            })}
-                        </div>
-                    )}
-
-                    {/* View 2: Product Grid (Shows if category selected OR search query active) */}
-                    {(selectedCategory !== null || searchQuery) && (
-                        <div>
-                            {selectedCategory && !searchQuery && (
-                                <h2 className="shopdetail-style-29">
-                                    <span className="shopdetail-style-30">#</span>
-                                    {selectedCategory === 'All' ? 'All Menu Items' : selectedCategory}
-                                </h2>
-                            )}
-                            {searchQuery && (
-                                <h2 className="shopdetail-style-31">
-                                    Search results for "{searchQuery}" ({filteredProducts.length})
-                                </h2>
-                            )}
-
-                            {filteredProducts.length === 0 ? (
-                                <div className="shopdetail-style-32">
-                                    <span className="shopdetail-style-33">🔍</span>
-                                    <p className="shopdetail-style-34">No items found matching your search.</p>
                                 </div>
-                            ) : (
-                                <div className="shopdetail-style-35">
-                                    {filteredProducts.map(product => {
-                                        const inCart = cartItems.find(item => item.productId === product._id);
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {/* ════════ HERO BANNER ════════ */}
+                        {shop && !showProducts && (
+                            <div className="sd-hero">
+                                {shop.image ? (
+                                    <img src={shop.image} alt={shop.name} className="sd-hero-img" />
+                                ) : (
+                                    <div className="sd-hero-placeholder">🏪</div>
+                                )}
+                                <div className="sd-hero-gradient" />
+                                <div className="sd-hero-content">
+                                    <span className={`sd-hero-status ${shop.isOpen ? 'sd-hero-status--open' : 'sd-hero-status--closed'}`}>
+                                        <span className="sd-hero-status-dot" />
+                                        {shop.isOpen ? 'Open Now' : 'Closed'}
+                                    </span>
+                                    <h1 className="sd-hero-name">{shop.name}</h1>
+                                    <div className="sd-hero-info">
+                                        <span className="sd-hero-info-item">📍 {shop.address}</span>
+                                        {shop.vendorId?.phone && (
+                                            <span className="sd-hero-info-item">📞 {shop.vendorId.phone}</span>
+                                        )}
+                                        {shop.location?.coordinates && (
+                                            <button
+                                                className="sd-hero-dir-btn"
+                                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank')}
+                                            >
+                                                🗺️ Directions
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* ════════ SEARCH ════════ */}
+                        <div className="sd-search">
+                            <div className="sd-search-wrap">
+                                <IcoSearch />
+                                <input
+                                    type="text"
+                                    placeholder="Search items, categories..."
+                                    className="sd-search-input"
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                />
+                                {searchQuery && (
+                                    <button className="sd-search-clear" onClick={() => setSearchQuery('')}>✕</button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* ════════ CATEGORY CHIPS ════════ */}
+                        {showProducts && (
+                            <div className="sd-cats">
+                                <div className="sd-cats-scroll">
+                                    <button
+                                        className={`sd-chip ${selectedCategory === null && !searchQuery ? 'sd-chip--active' : ''}`}
+                                        onClick={() => { setSelectedCategory(null); setSearchQuery(''); }}
+                                    >
+                                        ← Categories
+                                    </button>
+                                    <button
+                                        className={`sd-chip ${selectedCategory === 'All' ? 'sd-chip--active' : ''}`}
+                                        onClick={() => setSelectedCategory('All')}
+                                    >
+                                        🍔 All <span className="sd-chip-count">({products.length})</span>
+                                    </button>
+                                    {categories.map((cat, idx) => (
+                                        <button
+                                            key={cat}
+                                            className={`sd-chip ${selectedCategory === cat ? 'sd-chip--active' : ''}`}
+                                            onClick={() => setSelectedCategory(cat)}
+                                        >
+                                            {getCatEmoji(idx)} {cat}
+                                            <span className="sd-chip-count">
+                                                ({products.filter(p => (p.category || 'General') === cat).length})
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {products.length === 0 ? (
+                            /* ── No products ── */
+                            <div className="sd-empty">
+                                <span className="sd-empty-emoji">📦</span>
+                                <div className="sd-empty-title">No products available</div>
+                                <div className="sd-empty-sub">This shop hasn't added any items yet.</div>
+                            </div>
+                        ) : !showProducts ? (
+                            /* ═══════ VIEW 1: CATEGORY CARDS ═══════ */
+                            <>
+                                <div className="sd-sec-head">
+                                    <h2 className="sd-sec-title">Browse by Category</h2>
+                                    <span className="sd-sec-count">{categories.length + 1} categories</span>
+                                </div>
+                                <div className="sd-cat-grid">
+                                    {/* All Items card */}
+                                    <div
+                                        className="sd-cat-card sd-cat-card--all"
+                                        onClick={() => setSelectedCategory('All')}
+                                    >
+                                        <span className="sd-cat-emoji">🍔</span>
+                                        <div>
+                                            <div className="sd-cat-name">All Items</div>
+                                            <div className="sd-cat-count">{products.length} items</div>
+                                        </div>
+                                    </div>
+
+                                    {categories.map((cat, idx) => {
+                                        const count = products.filter(p => (p.category || 'General') === cat).length;
                                         return (
-                                            <div key={product._id} className="shopdetail-style-36 group">
-                                                <div className="shopdetail-style-37">
-                                                    {product.image ? (
-                                                        <img src={product.image} alt={product.name} className="shopdetail-style-38" />
-                                                    ) : "📦"}
-                                                </div>
-
-                                                <div className="shopdetail-style-39">
-                                                    <span className="shopdetail-style-40">
-                                                        {product.category || 'General'}
-                                                    </span>
-                                                    <h3 className="shopdetail-style-41">
-                                                        {product.name}
-                                                    </h3>
-                                                </div>
-
-                                                <div className="shopdetail-style-42">
-                                                    <span className="shopdetail-style-43">₹{product.price}</span>
-
-                                                    {product.inStock ? (
-                                                        <button
-                                                            onClick={() => addToCart(product, id)}
-                                                            className={`text-[10px] sm:text-xs font-bold px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-lg shadow-sm transition-colors ${
-                                                                inCart 
-                                                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
-                                                                : 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-600 hover:text-white'
-                                                            }`}
-                                                        >
-                                                            {inCart ? `${inCart.quantity} Added` : 'ADD'}
-                                                        </button>
-                                                    ) : (
-                                                        <span className="shopdetail-style-44">
-                                                            OUT OF STOCK
-                                                        </span>
-                                                    )}
+                                            <div
+                                                key={cat}
+                                                className="sd-cat-card"
+                                                onClick={() => setSelectedCategory(cat)}
+                                            >
+                                                <span className="sd-cat-emoji">{getCatEmoji(idx)}</span>
+                                                <div>
+                                                    <div className="sd-cat-name">{cat}</div>
+                                                    <div className="sd-cat-count">{count} items</div>
                                                 </div>
                                             </div>
-                                        )
+                                        );
                                     })}
                                 </div>
-                            )}
+                            </>
+                        ) : (
+                            /* ═══════ VIEW 2: PRODUCT GRID ═══════ */
+                            <>
+                                <div className="sd-sec-head">
+                                    <h2 className="sd-sec-title">
+                                        {searchQuery
+                                            ? `Results for "${searchQuery}"`
+                                            : selectedCategory === 'All'
+                                                ? 'All Items'
+                                                : selectedCategory}
+                                    </h2>
+                                    <span className="sd-sec-count">{filteredProducts.length} items</span>
+                                </div>
+
+                                {filteredProducts.length === 0 ? (
+                                    <div className="sd-empty">
+                                        <span className="sd-empty-emoji">🔍</span>
+                                        <div className="sd-empty-title">No items found</div>
+                                        <div className="sd-empty-sub">
+                                            {searchQuery ? 'Try a different search term' : 'No items in this category'}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="sd-prod-grid">
+                                        {filteredProducts.map((product, idx) => {
+                                            const inCart = cartItems.find(i => i.productId === product._id);
+                                            return (
+                                                <div
+                                                    key={product._id}
+                                                    className={`sd-prod ${!product.inStock ? 'sd-prod--oos' : ''}`}
+                                                    style={{ animationDelay: `${idx * 40}ms` }}
+                                                >
+                                                    {/* Image */}
+                                                    <div className="sd-prod-img">
+                                                        {product.image ? (
+                                                            <img src={product.image} alt={product.name} loading="lazy" />
+                                                        ) : (
+                                                            <div className="sd-prod-img-ph">📦</div>
+                                                        )}
+                                                        {!product.inStock && (
+                                                            <span className="sd-prod-oos-tag">Out of Stock</span>
+                                                        )}
+                                                        <span className="sd-prod-cat-tag">
+                                                            {product.category || 'General'}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Body */}
+                                                    <div className="sd-prod-body">
+                                                        <h3 className="sd-prod-name">{product.name}</h3>
+                                                        <div className="sd-prod-footer">
+                                                            <span className="sd-prod-price">
+                                                                <span className="sd-prod-price-symbol">₹</span>
+                                                                {product.price}
+                                                            </span>
+                                                            {product.inStock ? (
+                                                                <button
+                                                                    className={`sd-add-btn ${inCart ? 'sd-add-btn--added' : 'sd-add-btn--add'}`}
+                                                                    onClick={() => addToCart(product, id)}
+                                                                >
+                                                                    {inCart ? `${inCart.quantity} Added` : 'ADD'}
+                                                                </button>
+                                                            ) : (
+                                                                <span className="sd-add-btn sd-add-btn--oos">
+                                                                    Out of Stock
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </>
+                )}
+            </div>
+
+            {/* ════════ FLOATING CART BAR ════════ */}
+            {totalCartItems > 0 && (
+                <Link to="/cart" className="sd-cart-bar">
+                    <div className="sd-cart-bar-left">
+                        <span className="sd-cart-bar-count">{totalCartItems}</span>
+                        <div>
+                            <div className="sd-cart-bar-text">
+                                {totalCartItems} {totalCartItems === 1 ? 'item' : 'items'} added
+                            </div>
+                            <div className="sd-cart-bar-sub">from this shop</div>
                         </div>
-                    )}
-                </>
+                    </div>
+                    <div className="sd-cart-bar-right">
+                        View Cart <IcoArrow />
+                    </div>
+                </Link>
             )}
         </div>
     );

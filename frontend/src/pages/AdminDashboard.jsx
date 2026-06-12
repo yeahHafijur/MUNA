@@ -3,6 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 
+const IconBack = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+);
+
 const AdminDashboard = () => {
     const { user, token, logout } = useAuth();
     const navigate = useNavigate();
@@ -176,9 +182,14 @@ const AdminDashboard = () => {
         <div className="admin-root">
             {/* ---- HEADER ---- */}
             <div className="adm-header">
-                <div className="adm-header-left">
-                    <div className="adm-header-logo">M</div>
-                    <span className="adm-header-brand">Admin Console</span>
+                <div className="adm-header-left" style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+                    <button onClick={() => navigate('/')} style={{background: 'transparent', border: 'none', cursor: 'pointer', color: 'white', display: 'flex'}}>
+                        <IconBack />
+                    </button>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                        <div className="adm-header-logo">M</div>
+                        <span className="adm-header-brand">Admin Console</span>
+                    </div>
                 </div>
                 <div className="adm-header-right">
                     <span className="adm-header-tag">Super Admin</span>

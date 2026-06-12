@@ -21,13 +21,14 @@
 /* ---- FIXED HEADER ---- */
 .vnd-header {
     flex-shrink: 0;
-    height: 60px;
+    min-height: 60px;
     background: #16161e;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 12px 20px;
     gap: 12px;
     z-index: 10;
 }
@@ -36,7 +37,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    flex: 1;
+    flex: 1 1 240px;
     min-width: 0;
 }
 
@@ -124,6 +125,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
     flex-shrink: 0;
 }
 

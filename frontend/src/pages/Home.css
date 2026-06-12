@@ -1,144 +1,177 @@
 /* ======================================================
-   HOME PAGE — Warm MUNA Amber / Golden Theme
-   Light, clean, mobile-first, professional design
+   MUNA HOME — Premium App Shell
+   Full-page takeover · Warm amber/golden theme
+   Mobile-first · Native app feel
    ====================================================== */
 
-/* ---- Root ---- */
-.muna-home {
-    padding-bottom: 40px;
+/* ---- FULL PAGE SHELL ---- */
+.mu {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    background: #FFF7E6;
+    overflow: hidden;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
+    color: #1F1300;
 }
 
-/* ---- HERO BANNER ---- */
-.muna-hero {
-    position: relative;
-    background: linear-gradient(135deg, #f8cb46 0%, #f5b731 35%, #e9a020 70%, #d4911a 100%);
-    border-radius: 20px;
-    padding: 32px 24px 28px;
-    margin: 16px 0 20px;
-    overflow: hidden;
-    box-shadow:
-        0 8px 30px rgba(248, 203, 70, 0.35),
-        0 2px 8px rgba(0, 0, 0, 0.06);
+/* ---- TOP HEADER ---- */
+.mu-header {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #F8CB46 0%, #E8AD1C 100%);
+    padding: 0 16px;
+    z-index: 10;
+    box-shadow: 0 2px 16px rgba(200, 160, 30, 0.25);
 }
 
-/* Floating decorative blobs */
-.muna-hero-blob-1 {
-    position: absolute;
-    top: -30px;
-    right: -20px;
-    width: 140px;
-    height: 140px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    filter: blur(30px);
-    pointer-events: none;
-}
-.muna-hero-blob-2 {
-    position: absolute;
-    bottom: -40px;
-    left: -30px;
-    width: 120px;
-    height: 120px;
-    background: rgba(255, 200, 50, 0.15);
-    border-radius: 50%;
-    filter: blur(25px);
-    pointer-events: none;
-}
-.muna-hero-blob-3 {
-    position: absolute;
-    top: 40%;
-    right: 10%;
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 50%;
-    filter: blur(18px);
-    pointer-events: none;
-}
-.muna-hero-emoji {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    font-size: 52px;
-    opacity: 0.12;
-    transform: rotate(12deg);
-    user-select: none;
-    pointer-events: none;
+.mu-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0 6px;
+    gap: 10px;
 }
 
-.muna-hero-content {
-    position: relative;
-    z-index: 2;
+.mu-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
 }
-
-.muna-hero-tag {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #5a3e00;
-    background: rgba(255, 255, 255, 0.35);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    padding: 5px 12px;
-    border-radius: 20px;
-    margin-bottom: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+.mu-brand-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    object-fit: contain;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
-
-.muna-hero-title {
-    font-size: 26px;
+.mu-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+.mu-brand-name {
+    font-size: 14px;
     font-weight: 900;
-    line-height: 1.2;
-    color: #1a1000;
-    margin-bottom: 8px;
+    color: #1a0e00;
     letter-spacing: -0.5px;
 }
-.muna-hero-title-accent {
-    background: linear-gradient(90deg, #c0392b, #e74c3c);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-.muna-hero-title br.mobile-br { display: block; }
-
-.muna-hero-subtitle {
-    font-size: 13.5px;
-    font-weight: 500;
-    color: #3d2b00;
-    line-height: 1.5;
-    max-width: 420px;
-    margin-bottom: 20px;
+.mu-brand-sub {
+    font-size: 9px;
+    font-weight: 800;
+    color: #8B4513;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 1px;
 }
 
-/* Search bar inside hero */
-.muna-hero-search {
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1.5px solid rgba(255, 255, 255, 0.5);
-    border-radius: 14px;
+.mu-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mu-hdr-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: #5a3e00;
+    position: relative;
+    text-decoration: none;
+}
+.mu-hdr-btn:hover { background: rgba(255,255,255,0.55); }
+.mu-hdr-btn svg {
+    width: 18px;
+    height: 18px;
+}
+.mu-hdr-btn-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #dc2626;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    border: 2px solid #F8CB46;
+    line-height: 1;
+}
+
+.mu-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: #1a0e00;
+    transition: background 0.15s;
+    font-family: inherit;
+}
+.mu-profile-btn:hover { background: rgba(255,255,255,0.55); }
+.mu-profile-emoji {
+    font-size: 18px;
+    line-height: 1;
+}
+.mu-profile-name {
+    font-size: 11px;
+    font-weight: 700;
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Search bar in header */
+.mu-search-bar {
+    padding: 6px 0 12px;
+}
+.mu-search-wrap {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.2s, border-color 0.2s;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(255,255,255,0.6);
+    border-radius: 14px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s;
 }
-.muna-hero-search:focus-within {
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
-    border-color: rgba(255, 255, 255, 0.8);
+.mu-search-wrap:focus-within {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-color: rgba(255,255,255,0.9);
 }
-.muna-hero-search-icon {
+.mu-search-icon {
     width: 18px;
     height: 18px;
-    color: #c8940e;
+    color: #c89000;
     flex-shrink: 0;
 }
-.muna-hero-search input {
+.mu-search-input {
     flex: 1;
     border: none;
     background: transparent;
@@ -148,504 +181,636 @@
     outline: none;
     font-family: inherit;
 }
-.muna-hero-search input::placeholder {
-    color: #999;
+.mu-search-input::placeholder {
+    color: #aaa;
     font-weight: 400;
 }
-
-/* ---- STATS BAR ---- */
-.muna-stats {
+.mu-search-clear {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.08);
+    color: #666;
+    font-size: 11px;
+    cursor: pointer;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 24px;
+    place-items: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+    font-family: inherit;
 }
-.muna-stat-card {
+.mu-search-clear:hover { background: rgba(0,0,0,0.15); }
+
+/* ---- SCROLLABLE BODY ---- */
+.mu-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(200,170,100,0.2) transparent;
+    padding-bottom: 72px; /* space for bottom nav */
+}
+.mu-body::-webkit-scrollbar { width: 3px; }
+.mu-body::-webkit-scrollbar-thumb { background: rgba(200,170,100,0.2); border-radius: 4px; }
+
+/* ---- GREETING BANNER ---- */
+.mu-greeting {
+    padding: 20px 16px 16px;
+}
+.mu-greeting-text {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1F1300;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+.mu-greeting-text span {
+    display: inline-block;
+    animation: muWave 2s ease-in-out;
+}
+@keyframes muWave {
+    0%, 60%, 100% { transform: rotate(0deg); }
+    10% { transform: rotate(14deg); }
+    20% { transform: rotate(-8deg); }
+    30% { transform: rotate(14deg); }
+    40% { transform: rotate(-4deg); }
+    50% { transform: rotate(10deg); }
+}
+.mu-greeting-sub {
+    font-size: 13px;
+    color: #8C7A55;
+    font-weight: 500;
+}
+
+/* ---- QUICK STATS ---- */
+.mu-stats {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 16px;
+}
+.mu-stat {
+    flex: 1;
     background: #fff;
     border-radius: 14px;
     padding: 14px 12px;
     text-align: center;
-    border: 1.5px solid #f0e6c8;
-    box-shadow: 0 2px 10px rgba(248, 203, 70, 0.08);
+    border: 1.5px solid #F0E4C0;
+    box-shadow: 0 2px 8px rgba(200,170,100,0.06);
     transition: transform 0.2s, box-shadow 0.2s;
-    cursor: default;
 }
-.muna-stat-card:hover {
+.mu-stat:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(248, 203, 70, 0.15);
+    box-shadow: 0 4px 16px rgba(200,170,100,0.12);
 }
-.muna-stat-card--action {
+.mu-stat--action {
     cursor: pointer;
+    border-color: #E8D5A0;
+    background: linear-gradient(135deg, #FFF9EC, #FFF4DA);
 }
-.muna-stat-card--action:active {
-    transform: scale(0.97);
-}
-.muna-stat-num {
+.mu-stat--action:active { transform: scale(0.97); }
+.mu-stat-value {
     font-size: 22px;
     font-weight: 900;
-    color: #1a1000;
-    letter-spacing: -0.5px;
+    color: #1F1300;
     line-height: 1;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
+    letter-spacing: -0.5px;
 }
-.muna-stat-num--amber {
-    background: linear-gradient(135deg, #d49b10, #c8850a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.mu-stat-value--amber {
+    color: #C8850A;
 }
-.muna-stat-num--green {
+.mu-stat-value--green {
     color: #16a34a;
 }
-.muna-stat-label {
-    font-size: 9.5px;
+.mu-stat-icon-val {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+}
+.mu-stat-icon-val svg {
+    width: 22px;
+    height: 22px;
+    color: #C8850A;
+}
+.mu-stat-label {
+    font-size: 9px;
     font-weight: 700;
-    color: #8c7840;
+    color: #8C7A55;
     text-transform: uppercase;
     letter-spacing: 0.8px;
 }
-.muna-stat-icon {
-    margin-bottom: 4px;
-}
-.muna-stat-icon svg {
-    width: 22px;
-    height: 22px;
-    color: #d49b10;
-    margin: 0 auto;
-}
-
-.muna-location-err {
+.mu-loc-err {
     text-align: center;
     font-size: 11px;
     color: #dc2626;
+    padding: 0 16px 8px;
     font-weight: 500;
-    margin: -14px 0 16px;
-    padding: 0 8px;
 }
 
-/* ---- SECTION HEADING ---- */
-.muna-section-head {
+/* ---- CATEGORY CHIPS ---- */
+.mu-cats {
+    padding: 0 16px 14px;
+}
+.mu-cats-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 2px 0;
+}
+.mu-cats-scroll::-webkit-scrollbar { display: none; }
+.mu-chip {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 22px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1.5px solid #E8D5A0;
+    background: #fff;
+    color: #6B5020;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+    letter-spacing: -0.1px;
+}
+.mu-chip:hover {
+    background: #FFF4DA;
+    border-color: #D4B060;
+}
+.mu-chip--active {
+    background: linear-gradient(135deg, #F8CB46, #E5A817);
+    color: #1a0e00;
+    border-color: transparent;
+    box-shadow: 0 2px 10px rgba(228,168,23,0.3);
+}
+.mu-chip--active:hover {
+    background: linear-gradient(135deg, #F0C030, #D49810);
+}
+
+/* ---- SECTION HEADER ---- */
+.mu-sec-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
-    padding: 0 2px;
+    padding: 4px 16px 12px;
 }
-.muna-section-title {
-    font-size: 17px;
+.mu-sec-title {
+    font-size: 16px;
     font-weight: 800;
-    color: #1a1000;
+    color: #1F1300;
     letter-spacing: -0.3px;
 }
-.muna-section-count {
-    font-size: 11px;
+.mu-sec-count {
+    font-size: 10px;
     font-weight: 700;
-    color: #8c7840;
-    background: #fdf3d7;
-    padding: 3px 9px;
-    border-radius: 20px;
-    border: 1px solid #f0e0a0;
-}
-
-/* ---- SKELETON LOADER ---- */
-.muna-skeleton-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-}
-.muna-skeleton-card {
-    background: #fff;
+    color: #8C7A55;
+    background: #FDF3D7;
+    padding: 3px 10px;
     border-radius: 16px;
-    overflow: hidden;
-    border: 1.5px solid #f0e6c8;
-}
-.muna-skeleton-img {
-    width: 100%;
-    height: 160px;
-    background: linear-gradient(90deg, #f5ecd4 25%, #fdf3d7 50%, #f5ecd4 75%);
-    background-size: 200% 100%;
-    animation: munaShimmer 1.5s ease-in-out infinite;
-}
-.muna-skeleton-body {
-    padding: 16px;
-}
-.muna-skeleton-line {
-    height: 14px;
-    background: linear-gradient(90deg, #f5ecd4 25%, #fdf3d7 50%, #f5ecd4 75%);
-    background-size: 200% 100%;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    animation: munaShimmer 1.5s ease-in-out infinite;
-}
-.muna-skeleton-line--short {
-    width: 55%;
-    height: 11px;
-}
-@keyframes munaShimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    border: 1px solid #F0E0A0;
 }
 
-/* ---- EMPTY STATE ---- */
-.muna-empty {
-    background: #fff;
-    border-radius: 18px;
-    padding: 50px 24px;
-    text-align: center;
-    border: 1.5px solid #f0e6c8;
-    box-shadow: 0 2px 10px rgba(248, 203, 70, 0.06);
-}
-.muna-empty-emoji {
-    font-size: 44px;
-    display: block;
-    margin-bottom: 14px;
-    opacity: 0.7;
-}
-.muna-empty-text {
-    font-size: 14px;
-    font-weight: 600;
-    color: #6b5c30;
-    margin-bottom: 12px;
-}
-.muna-empty-btn {
-    display: inline-block;
-    font-size: 13px;
-    font-weight: 700;
-    color: #d49b10;
-    background: #fdf3d7;
-    padding: 8px 18px;
-    border-radius: 10px;
-    border: 1.5px solid #f0e0a0;
-    cursor: pointer;
-    transition: all 0.15s;
-}
-.muna-empty-btn:hover {
-    background: #f8e8b8;
-    color: #a67c08;
-}
-
-/* ---- SHOP CARDS GRID ---- */
-.muna-shop-grid {
+/* ---- SHOP CARD GRID ---- */
+.mu-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 14px;
+    padding: 0 16px 20px;
 }
 
-/* Shop card */
-.muna-shop-link {
-    display: block;
+.mu-card-link {
     text-decoration: none;
     color: inherit;
-    animation: munaCardIn 0.3s ease forwards;
-    opacity: 0;
+    display: block;
+    animation: muCardUp 0.35s ease both;
 }
-@keyframes munaCardIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+@keyframes muCardUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.muna-shop-card {
+.mu-card {
     background: #fff;
     border-radius: 18px;
     overflow: hidden;
-    border: 1.5px solid #f0e6c8;
-    box-shadow: 0 2px 10px rgba(248, 203, 70, 0.06);
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    border: 1.5px solid #F0E4C0;
+    box-shadow: 0 2px 10px rgba(200,170,100,0.06);
+    transition: transform 0.3s cubic-bezier(.25,.46,.45,.94), box-shadow 0.3s, border-color 0.3s;
 }
-.muna-shop-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgba(248, 203, 70, 0.18);
-    border-color: #f8cb46;
+.mu-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 12px 32px rgba(200,170,100,0.18),
+        0 2px 8px rgba(200,170,100,0.08);
+    border-color: #F8CB46;
 }
-.muna-shop-card--closed {
-    border-color: #e8e0d0;
+.mu-card--closed {
+    border-color: #E8E0D0;
+    opacity: 0.72;
 }
-.muna-shop-card--closed:hover {
-    border-color: #d8d0c0;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+.mu-card--closed:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    border-color: #DDD5C5;
+    opacity: 0.82;
 }
 
-/* Banner image */
-.muna-shop-banner {
+/* Banner image area */
+.mu-card-banner {
     position: relative;
     width: 100%;
-    height: 170px;
-    background: linear-gradient(135deg, #fef9eb, #fdf3d7);
+    height: 180px;
+    background: linear-gradient(135deg, #FEF9EB, #FDF3D7);
     overflow: hidden;
 }
-.muna-shop-banner img {
+.mu-card-banner img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s;
+    transition: transform 0.6s cubic-bezier(.25,.46,.45,.94);
 }
-.muna-shop-card:hover .muna-shop-banner img {
-    transform: scale(1.05);
+.mu-card:hover .mu-card-banner img {
+    transform: scale(1.06);
 }
-.muna-shop-banner--closed img {
-    filter: grayscale(0.6);
-    opacity: 0.75;
+.mu-card--closed .mu-card-banner img {
+    filter: grayscale(0.6) brightness(0.85);
 }
-.muna-shop-banner-placeholder {
+.mu-card-banner-ph {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 48px;
+    font-size: 52px;
+    background: linear-gradient(135deg, #FEF9EB, #FDF0D0, #FEF5E0);
 }
-.muna-shop-banner-placeholder--closed {
-    filter: grayscale(1);
+.mu-card--closed .mu-card-banner-ph {
+    filter: grayscale(0.8);
 }
 
-/* Status badge on banner */
-.muna-shop-status-badge {
+/* Overlays on banner */
+.mu-card-overlay-top {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
     display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, transparent 100%);
+}
+.mu-card-overlay-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 100%);
+}
+
+/* Status badge */
+.mu-badge {
+    display: inline-flex;
     align-items: center;
     gap: 5px;
     font-size: 10px;
     font-weight: 800;
     padding: 5px 10px;
     border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
 }
-.muna-badge--open {
-    background: rgba(22, 163, 74, 0.88);
+.mu-badge--open {
+    background: rgba(22,163,74,0.9);
     color: #fff;
-    border-color: rgba(22, 163, 74, 0.6);
-    box-shadow: 0 2px 10px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 2px 8px rgba(22,163,74,0.3);
 }
-.muna-badge--closed {
-    background: rgba(220, 38, 38, 0.85);
+.mu-badge--closed {
+    background: rgba(185,28,28,0.85);
     color: #fff;
-    border-color: rgba(220, 38, 38, 0.5);
 }
-.muna-badge-dot {
+.mu-badge-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: currentColor;
     flex-shrink: 0;
 }
-.muna-badge--open .muna-badge-dot {
-    animation: munaPulse 2s ease-in-out infinite;
+.mu-badge--open .mu-badge-dot {
+    animation: muPulse 1.8s ease-in-out infinite;
 }
-@keyframes munaPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.7); }
+@keyframes muPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
 }
 
-/* Distance tag on banner */
-.muna-distance-tag {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
+/* Distance tag */
+.mu-dist {
     font-size: 10px;
     font-weight: 700;
     color: #fff;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0,0,0,0.55);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     padding: 5px 10px;
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    letter-spacing: 0.2px;
+    letter-spacing: 0.1px;
+}
+
+/* Rating chip on banner */
+.mu-card-rating {
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 4px 9px;
+    border-radius: 8px;
+    letter-spacing: 0.1px;
 }
 
 /* Card body */
-.muna-shop-body {
-    padding: 14px 16px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.mu-card-body {
+    padding: 14px 14px 16px;
 }
-.muna-shop-row-1 {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
-}
-.muna-shop-name {
+
+.mu-card-name {
     font-size: 16px;
     font-weight: 800;
-    color: #1a1000;
-    line-height: 1.25;
-    flex: 1;
+    color: #1F1300;
+    margin-bottom: 4px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     letter-spacing: -0.2px;
 }
-.muna-shop-name--closed {
-    color: #8c8070;
-}
+.mu-card--closed .mu-card-name { color: #8C8070; }
 
-.muna-shop-rating {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 11px;
-    font-weight: 800;
-    flex-shrink: 0;
-    padding: 4px 9px;
-    border-radius: 8px;
-    letter-spacing: 0.1px;
-}
-.muna-shop-rating--open {
-    color: #b8860b;
-    background: #fdf3d7;
-    border: 1px solid #f0e0a0;
-}
-.muna-shop-rating--closed {
-    color: #999;
-    background: #f5f5f5;
-    border: 1px solid #e5e5e5;
-}
-
-.muna-shop-address {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.mu-card-addr {
     font-size: 12px;
+    color: #8C7A55;
     font-weight: 500;
-    color: #7a6b45;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    margin-bottom: 10px;
 }
-.muna-shop-address--closed {
-    color: #aaa;
-}
+.mu-card--closed .mu-card-addr { color: #aaa; }
 
 /* Tags row */
-.muna-shop-tags {
+.mu-card-tags {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-bottom: 2px;
 }
-.muna-shop-tags::-webkit-scrollbar { display: none; }
+.mu-card-tags::-webkit-scrollbar { display: none; }
 
-.muna-tag {
+.mu-tag {
     flex-shrink: 0;
     font-size: 10px;
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 7px;
-    letter-spacing: 0.2px;
     white-space: nowrap;
+    letter-spacing: 0.1px;
 }
-.muna-tag--cat {
-    color: #8b6914;
-    background: #fef9eb;
-    border: 1px solid #f0e0a0;
+.mu-tag--cat {
+    color: #8B6914;
+    background: #FEF9EB;
+    border: 1px solid #F0E0A0;
 }
-.muna-tag--cat-closed {
-    color: #999;
-    background: #f5f5f5;
-    border: 1px solid #e5e5e5;
-}
-.muna-tag--verified {
-    color: #2563eb;
+.mu-tag--verified {
+    color: #1d4ed8;
     background: #eff6ff;
     border: 1px solid #bfdbfe;
 }
-.muna-tag--verified-closed {
+.mu-tag--closed {
     color: #999;
     background: #f5f5f5;
-    border: 1px solid #e5e5e5;
+    border: 1px solid #e8e8e8;
 }
 
-.muna-directions-btn {
+.mu-dir-btn {
     margin-left: auto;
     flex-shrink: 0;
     font-size: 10px;
     font-weight: 700;
     padding: 5px 11px;
     border-radius: 8px;
-    border: 1.5px solid #f0e0a0;
-    background: #fef9eb;
-    color: #8b6914;
+    border: 1.5px solid #F0E0A0;
+    background: #FEF9EB;
+    color: #8B6914;
     cursor: pointer;
     transition: all 0.15s;
     text-decoration: none;
     display: inline-block;
+    font-family: inherit;
 }
-.muna-directions-btn:hover {
-    background: #f8e8b8;
-    border-color: #d4b060;
-    color: #6b4f0a;
+.mu-dir-btn:hover {
+    background: #F8E8B8;
+    border-color: #D4B060;
 }
-.muna-directions-btn--closed {
+.mu-dir-btn--closed {
     border-color: #e5e5e5;
     background: #f5f5f5;
     color: #999;
 }
 
+/* ---- SKELETON LOADER ---- */
+.mu-skel-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 0 16px 20px;
+}
+.mu-skel {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1.5px solid #F0E4C0;
+}
+.mu-skel-img {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(90deg, #F5ECD4 25%, #FDF3D7 50%, #F5ECD4 75%);
+    background-size: 300% 100%;
+    animation: muShimmer 1.8s ease-in-out infinite;
+}
+.mu-skel-body { padding: 14px; }
+.mu-skel-line {
+    height: 14px;
+    background: linear-gradient(90deg, #F0E8D0 25%, #F8F0DE 50%, #F0E8D0 75%);
+    background-size: 300% 100%;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    animation: muShimmer 1.8s ease-in-out infinite;
+}
+.mu-skel-line--sm { width: 50%; height: 11px; }
+@keyframes muShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ---- EMPTY STATE ---- */
+.mu-empty {
+    text-align: center;
+    padding: 50px 24px;
+    margin: 0 16px 20px;
+    background: #fff;
+    border-radius: 20px;
+    border: 1.5px solid #F0E4C0;
+}
+.mu-empty-emoji {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 14px;
+    opacity: 0.6;
+}
+.mu-empty-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1F1300;
+    margin-bottom: 6px;
+}
+.mu-empty-sub {
+    font-size: 13px;
+    color: #8C7A55;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+.mu-empty-btn {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a0e00;
+    background: linear-gradient(135deg, #F8CB46, #E5A817);
+    padding: 10px 22px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(228,168,23,0.25);
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.mu-empty-btn:hover {
+    box-shadow: 0 5px 20px rgba(228,168,23,0.35);
+    transform: translateY(-1px);
+}
+
+/* ---- BOTTOM NAV BAR ---- */
+.mu-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #fff;
+    border-top: 1.5px solid #F0E4C0;
+    display: flex;
+    align-items: stretch;
+    z-index: 20;
+    box-shadow: 0 -4px 20px rgba(200,170,100,0.08);
+    padding: 0 8px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.mu-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: #8C7A55;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: color 0.15s;
+    border: none;
+    background: none;
+    font-family: inherit;
+    position: relative;
+    padding: 0;
+}
+.mu-nav-item:hover { color: #5C4A28; }
+.mu-nav-item--active {
+    color: #C8850A;
+}
+.mu-nav-item--active::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 25%;
+    right: 25%;
+    height: 3px;
+    background: linear-gradient(90deg, #F8CB46, #E5A817);
+    border-radius: 0 0 4px 4px;
+}
+.mu-nav-icon {
+    width: 22px;
+    height: 22px;
+    position: relative;
+}
+.mu-nav-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #dc2626;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    border: 2px solid #fff;
+    line-height: 1;
+}
+
 /* ---- RESPONSIVE ---- */
 @media (min-width: 480px) {
-    .muna-hero {
-        padding: 36px 28px 32px;
-    }
-    .muna-hero-title {
-        font-size: 30px;
-    }
-    .muna-hero-title br.mobile-br {
-        display: none;
-    }
-    .muna-shop-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-    .muna-skeleton-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+    .mu-grid { grid-template-columns: 1fr 1fr; }
+    .mu-skel-grid { grid-template-columns: 1fr 1fr; }
+    .mu-greeting-text { font-size: 24px; }
+    .mu-header { padding: 0 20px; }
 }
 
 @media (min-width: 768px) {
-    .muna-hero {
-        padding: 40px 36px 36px;
-        border-radius: 24px;
-    }
-    .muna-hero-title {
-        font-size: 34px;
-    }
-    .muna-hero-emoji {
-        font-size: 64px;
-    }
-    .muna-stats {
-        gap: 14px;
-    }
-    .muna-stat-card {
-        padding: 18px 16px;
-    }
-    .muna-stat-num {
-        font-size: 26px;
-    }
+    .mu-header { padding: 0 24px; }
+    .mu-greeting { padding: 24px 20px 18px; }
+    .mu-greeting-text { font-size: 28px; }
+    .mu-stats { padding: 0 20px 18px; gap: 14px; }
+    .mu-cats { padding: 0 20px 16px; }
+    .mu-sec-head { padding: 4px 20px 14px; }
+    .mu-grid { padding: 0 20px 24px; gap: 16px; }
+    .mu-skel-grid { padding: 0 20px 24px; }
+    .mu-stat-value { font-size: 26px; }
+    .mu-card-banner { height: 200px; }
 }
 
 @media (min-width: 1024px) {
-    .muna-shop-grid {
-        grid-template-columns: 1fr 1fr 1fr;
-    }
-    .muna-skeleton-grid {
-        grid-template-columns: 1fr 1fr 1fr;
-    }
+    .mu-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .mu-skel-grid { grid-template-columns: 1fr 1fr 1fr; }
 }
+
+/* Hide scrollbar on body scroll */
+.mu-body.hide-scroll::-webkit-scrollbar { display: none; }
+.mu-body.hide-scroll { scrollbar-width: none; }

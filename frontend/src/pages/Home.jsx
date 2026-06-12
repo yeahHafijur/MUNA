@@ -1,297 +1,437 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import './Home.css';
 
 /* ─── Icon Components ─── */
-const IconSearch = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+const IcoSearch = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
 );
-const IconLocate = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+const IcoPin = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
 );
+const IcoHome = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
+    </svg>
+);
+const IcoCart = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+);
+const IcoUser = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+);
+const IcoShop = () => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    </svg>
+);
+
+/* ─── Time-based greeting ─── */
+const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 5) return { text: 'Late Night', emoji: '🌙' };
+    if (h < 12) return { text: 'Good Morning', emoji: '☀️' };
+    if (h < 17) return { text: 'Good Afternoon', emoji: '🌤️' };
+    if (h < 21) return { text: 'Good Evening', emoji: '🌇' };
+    return { text: 'Good Night', emoji: '🌙' };
+};
+
+/* ─── Distance formatter ─── */
+const fmtDist = (d) => d < 1 ? `${(d * 1000).toFixed(0)} m` : `${d.toFixed(1)} km`;
+
+/* ─── Haversine ─── */
+const haversine = (lat1, lon1, lat2, lon2) => {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
 
 /* ═══════════════════════════════════════════════════════════
-   HOME PAGE COMPONENT
+   HOME PAGE COMPONENT — Premium App Shell
 ═══════════════════════════════════════════════════════════ */
 const Home = () => {
+    const { user } = useAuth();
+    const { cartItems } = useCart();
+    const navigate = useNavigate();
+    const greeting = getGreeting();
+    const totalCartItems = cartItems.reduce((s, i) => s + i.quantity, 0);
+
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [userLocation, setUserLocation] = useState(null);
     const [locationError, setLocationError] = useState(null);
+    const [activeCategory, setActiveCategory] = useState('All');
 
-    /* ── Fetch all shops ── */
+    /* ── Fetch shops ── */
     useEffect(() => {
         fetch('/api/shops')
-            .then(res => res.json())
+            .then(r => r.json())
             .then(data => { setShops(data); setLoading(false); })
-            .catch(err => { console.error('Error fetching shops:', err); setLoading(false); });
+            .catch(() => setLoading(false));
     }, []);
 
     /* ── Geolocation ── */
-    const handleGetLocation = () => {
+    const handleLocate = () => {
         if (!('geolocation' in navigator)) {
-            setLocationError('Geolocation is not supported by your browser.');
+            setLocationError('Geolocation not supported.');
             return;
         }
         setLoading(true);
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
+            pos => {
                 setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
                 setLocationError(null);
                 setLoading(false);
             },
-            (err) => {
-                console.warn('Location error:', err.message);
-                setLocationError('Location permission denied. Showing all shops.');
+            () => {
+                setLocationError('Location denied. Showing all shops.');
                 setLoading(false);
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
     };
 
-    /* ── Distance calc (Haversine) ── */
-    const getDistance = (lat1, lon1, lat2, lon2) => {
-        if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
-        const R = 6371;
-        const dLat = ((lat2 - lat1) * Math.PI) / 180;
-        const dLon = ((lon2 - lon1) * Math.PI) / 180;
-        const a =
-            Math.sin(dLat / 2) ** 2 +
-            Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-            Math.sin(dLon / 2) ** 2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    };
-
-    const shopsWithDistance = shops.map(shop => {
-        let distance = Infinity;
-        if (userLocation && shop.location?.coordinates?.length === 2) {
-            distance = getDistance(
-                userLocation.lat, userLocation.lng,
-                shop.location.coordinates[1],
-                shop.location.coordinates[0]
-            );
-        }
-        return { ...shop, distance };
-    });
-
-    /* ── Filter + Sort ── */
-    const filteredShops = shopsWithDistance.filter(s =>
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.category || '').toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const sortedShops = [...filteredShops].sort((a, b) => {
-        if (a.isOpen === b.isOpen) return a.distance - b.distance;
-        return a.isOpen ? -1 : 1;
-    });
+    /* ── Derived data ── */
+    const categories = useMemo(() => {
+        const cats = new Set(shops.map(s => s.category || 'Kirana'));
+        return ['All', ...Array.from(cats).sort()];
+    }, [shops]);
 
     const openCount = shops.filter(s => s.isOpen).length;
 
-    /* ── Format distance ── */
-    const fmtDist = (d) => d < 1 ? `${(d * 1000).toFixed(0)} m` : `${d.toFixed(1)} km`;
+    const sortedShops = useMemo(() => {
+        let list = shops.map(shop => {
+            let distance = Infinity;
+            if (userLocation && shop.location?.coordinates?.length === 2) {
+                distance = haversine(
+                    userLocation.lat, userLocation.lng,
+                    shop.location.coordinates[1],
+                    shop.location.coordinates[0]
+                );
+            }
+            return { ...shop, distance };
+        });
+
+        // Search filter
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            list = list.filter(s =>
+                s.name.toLowerCase().includes(q) ||
+                s.address.toLowerCase().includes(q) ||
+                (s.category || '').toLowerCase().includes(q)
+            );
+        }
+
+        // Category filter
+        if (activeCategory !== 'All') {
+            list = list.filter(s => (s.category || 'Kirana') === activeCategory);
+        }
+
+        // Sort: open first, then by distance
+        return list.sort((a, b) => {
+            if (a.isOpen !== b.isOpen) return a.isOpen ? -1 : 1;
+            return a.distance - b.distance;
+        });
+    }, [shops, userLocation, searchQuery, activeCategory]);
+
+    /* ── Profile link target ── */
+    const profileLink = user
+        ? (user.role === 'super_admin' ? '/admin-dashboard' : user.role === 'vendor' ? '/vendor-dashboard' : '/profile')
+        : '/login';
+    const profileEmoji = user
+        ? (user.role === 'super_admin' ? '👑' : user.role === 'vendor' ? '🏪' : '👤')
+        : null;
 
     /* ═══════════════════════════════════════════════════════
        RENDER
     ═══════════════════════════════════════════════════════ */
     return (
-        <div className="muna-home">
+        <div className="mu">
 
-            {/* ════════ HERO ════════ */}
-            <div className="muna-hero">
-                <div className="muna-hero-blob-1" />
-                <div className="muna-hero-blob-2" />
-                <div className="muna-hero-blob-3" />
-                <div className="muna-hero-emoji">🛒</div>
+            {/* ════════ HEADER ════════ */}
+            <header className="mu-header">
+                <div className="mu-header-top">
+                    {/* Brand */}
+                    <Link to="/" className="mu-brand">
+                        <img src="/muna-logo.jpg" alt="MUNA" className="mu-brand-logo" />
+                        <div className="mu-brand-text">
+                            <span className="mu-brand-name">GROCERY</span>
+                            <span className="mu-brand-sub">In Minutes</span>
+                        </div>
+                    </Link>
 
-                <div className="muna-hero-content">
-                    <span className="muna-hero-tag">✨ Your Village, Your Store</span>
+                    {/* Actions */}
+                    <div className="mu-header-actions">
+                        {user ? (
+                            <Link to={profileLink} className="mu-profile-btn">
+                                <span className="mu-profile-emoji">{profileEmoji}</span>
+                                <span className="mu-profile-name">Hi, {user.name.split(' ')[0]}</span>
+                            </Link>
+                        ) : (
+                            <Link to="/login" className="mu-hdr-btn" title="Login">
+                                <IcoUser />
+                            </Link>
+                        )}
 
-                    <h1 className="muna-hero-title">
-                        আপোনাৰ গাঁওৰ <br className="mobile-br" />
-                        <span className="muna-hero-title-accent">প্ৰত্যেক খন দোকান,</span> <br />
-                        এক ঠাইত!
-                    </h1>
+                        <Link to="/cart" className="mu-hdr-btn" title="Cart">
+                            <IcoCart />
+                            {totalCartItems > 0 && (
+                                <span className="mu-hdr-btn-badge">{totalCartItems}</span>
+                            )}
+                        </Link>
+                    </div>
+                </div>
 
-                    <p className="muna-hero-subtitle">
-                        আপোনাৰ প্ৰিয় দোকানৰ পৰা ঘৰতে বহি সামগ্ৰী অ'ৰ্ডাৰ কৰক
-                    </p>
-
-                    {/* Search */}
-                    <div className="muna-hero-search">
-                        <IconSearch />
+                {/* Search */}
+                <div className="mu-search-bar">
+                    <div className="mu-search-wrap">
+                        <IcoSearch />
                         <input
-                            id="home-search-input"
+                            id="home-search"
                             type="text"
-                            placeholder="Search shops near you..."
+                            placeholder="Search shops, categories..."
+                            className="mu-search-input"
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
                         />
+                        {searchQuery && (
+                            <button
+                                className="mu-search-clear"
+                                onClick={() => setSearchQuery('')}
+                                aria-label="Clear search"
+                            >
+                                ✕
+                            </button>
+                        )}
                     </div>
                 </div>
-            </div>
+            </header>
 
-            {/* ════════ STATS ════════ */}
-            <div className="muna-stats">
-                <div className="muna-stat-card">
-                    <div className="muna-stat-num muna-stat-num--amber">{shops.length}</div>
-                    <div className="muna-stat-label">Total Shops</div>
-                </div>
-                <div className="muna-stat-card">
-                    <div className="muna-stat-num muna-stat-num--green">{openCount}</div>
-                    <div className="muna-stat-label">Open Now</div>
-                </div>
-                <div
-                    className="muna-stat-card muna-stat-card--action"
-                    onClick={handleGetLocation}
-                    title="Find shops near me"
-                    role="button"
-                    tabIndex={0}
-                >
-                    <div className="muna-stat-icon">
-                        <IconLocate />
-                    </div>
-                    <div className="muna-stat-label">
-                        {userLocation ? '✓ Located' : 'Locate Me'}
-                    </div>
-                </div>
-            </div>
-            {locationError && <p className="muna-location-err">{locationError}</p>}
+            {/* ════════ SCROLLABLE BODY ════════ */}
+            <div className="mu-body">
 
-            {/* ════════ SECTION HEADING ════════ */}
-            <div className="muna-section-head">
-                <h2 className="muna-section-title">
-                    {searchQuery ? `Results for "${searchQuery}"` : 'Shops near you'}
-                </h2>
-                {searchQuery && (
-                    <span className="muna-section-count">{sortedShops.length} found</span>
+                {/* Greeting */}
+                <div className="mu-greeting">
+                    <h1 className="mu-greeting-text">
+                        <span>{greeting.emoji}</span> {greeting.text}{user ? `, ${user.name.split(' ')[0]}` : ''}!
+                    </h1>
+                    <p className="mu-greeting-sub">
+                        আপোনাৰ প্ৰিয় দোকানৰ পৰা ঘৰতে বহি সামগ্ৰী অ'ৰ্ডাৰ কৰক
+                    </p>
+                </div>
+
+                {/* Stats */}
+                <div className="mu-stats">
+                    <div className="mu-stat">
+                        <div className="mu-stat-value mu-stat-value--amber">{shops.length}</div>
+                        <div className="mu-stat-label">Total Shops</div>
+                    </div>
+                    <div className="mu-stat">
+                        <div className="mu-stat-value mu-stat-value--green">{openCount}</div>
+                        <div className="mu-stat-label">Open Now</div>
+                    </div>
+                    <div
+                        className="mu-stat mu-stat--action"
+                        onClick={handleLocate}
+                        role="button"
+                        tabIndex={0}
+                        title="Find shops near me"
+                    >
+                        <div className="mu-stat-icon-val">
+                            <IcoPin />
+                        </div>
+                        <div className="mu-stat-label">
+                            {userLocation ? '✓ Located' : 'Locate Me'}
+                        </div>
+                    </div>
+                </div>
+                {locationError && <p className="mu-loc-err">{locationError}</p>}
+
+                {/* Category Chips */}
+                <div className="mu-cats">
+                    <div className="mu-cats-scroll">
+                        {categories.map(cat => (
+                            <button
+                                key={cat}
+                                className={`mu-chip ${activeCategory === cat ? 'mu-chip--active' : ''}`}
+                                onClick={() => setActiveCategory(cat)}
+                            >
+                                {cat === 'All' ? '🏠 All Shops' : cat}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Section Head */}
+                <div className="mu-sec-head">
+                    <h2 className="mu-sec-title">
+                        {searchQuery
+                            ? `"${searchQuery}"`
+                            : activeCategory !== 'All'
+                                ? activeCategory
+                                : 'Shops near you'}
+                    </h2>
+                    <span className="mu-sec-count">
+                        {sortedShops.length} {sortedShops.length === 1 ? 'shop' : 'shops'}
+                    </span>
+                </div>
+
+                {/* ── Content ── */}
+                {loading ? (
+                    <div className="mu-skel-grid">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="mu-skel">
+                                <div className="mu-skel-img" />
+                                <div className="mu-skel-body">
+                                    <div className="mu-skel-line" />
+                                    <div className="mu-skel-line mu-skel-line--sm" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : sortedShops.length === 0 ? (
+                    <div className="mu-empty">
+                        <span className="mu-empty-emoji">🔍</span>
+                        <div className="mu-empty-title">
+                            {searchQuery ? `No shops found for "${searchQuery}"` : 'No shops available'}
+                        </div>
+                        <div className="mu-empty-sub">
+                            {searchQuery ? 'Try a different search term' : 'Check back soon!'}
+                        </div>
+                        {(searchQuery || activeCategory !== 'All') && (
+                            <button
+                                className="mu-empty-btn"
+                                onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
+                            >
+                                Show All Shops
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="mu-grid">
+                        {sortedShops.map((shop, idx) => (
+                            <Link
+                                to={`/shop/${shop._id}`}
+                                key={shop._id}
+                                className="mu-card-link"
+                                style={{ animationDelay: `${idx * 50}ms` }}
+                            >
+                                <div className={`mu-card ${!shop.isOpen ? 'mu-card--closed' : ''}`}>
+
+                                    {/* Banner */}
+                                    <div className="mu-card-banner">
+                                        {shop.image ? (
+                                            <img src={shop.image} alt={shop.name} loading="lazy" />
+                                        ) : (
+                                            <div className="mu-card-banner-ph">🏪</div>
+                                        )}
+
+                                        {/* Top overlay: Status + Rating */}
+                                        <div className="mu-card-overlay-top">
+                                            <span className={`mu-badge ${shop.isOpen ? 'mu-badge--open' : 'mu-badge--closed'}`}>
+                                                <span className="mu-badge-dot" />
+                                                {shop.isOpen ? 'Open' : 'Closed'}
+                                            </span>
+                                            <span className="mu-card-rating">
+                                                ⭐ {shop.rating || '4.5'}
+                                            </span>
+                                        </div>
+
+                                        {/* Bottom overlay: Distance */}
+                                        {shop.distance !== Infinity && (
+                                            <div className="mu-card-overlay-bottom">
+                                                <span className="mu-dist">
+                                                    📍 {fmtDist(shop.distance)} away
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Body */}
+                                    <div className="mu-card-body">
+                                        <h3 className="mu-card-name">{shop.name}</h3>
+                                        <p className="mu-card-addr">📍 {shop.address}</p>
+
+                                        <div className="mu-card-tags">
+                                            <span className={`mu-tag ${shop.isOpen ? 'mu-tag--cat' : 'mu-tag--closed'}`}>
+                                                {shop.category || 'Kirana'}
+                                            </span>
+                                            {shop.udyamNumber && (
+                                                <span className={`mu-tag ${shop.isOpen ? 'mu-tag--verified' : 'mu-tag--closed'}`}>
+                                                    🛡️ Verified
+                                                </span>
+                                            )}
+                                            {shop.location?.coordinates && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        window.open(
+                                                            `https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`,
+                                                            '_blank'
+                                                        );
+                                                    }}
+                                                    className={`mu-dir-btn ${!shop.isOpen ? 'mu-dir-btn--closed' : ''}`}
+                                                >
+                                                    🗺️ Directions
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
                 )}
             </div>
 
-            {/* ════════ CONTENT ════════ */}
-            {loading ? (
-                /* ── Skeleton loader ── */
-                <div className="muna-skeleton-grid">
-                    {[1, 2, 3].map(i => (
-                        <div key={i} className="muna-skeleton-card">
-                            <div className="muna-skeleton-img" />
-                            <div className="muna-skeleton-body">
-                                <div className="muna-skeleton-line" />
-                                <div className="muna-skeleton-line muna-skeleton-line--short" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ) : sortedShops.length === 0 ? (
-                /* ── Empty state ── */
-                <div className="muna-empty">
-                    <span className="muna-empty-emoji">🔍</span>
-                    <p className="muna-empty-text">
-                        {searchQuery
-                            ? `No shops found for "${searchQuery}".`
-                            : 'No shops found right now.'}
-                    </p>
-                    {searchQuery && (
-                        <button
-                            onClick={() => setSearchQuery('')}
-                            className="muna-empty-btn"
-                        >
-                            Show all shops
-                        </button>
-                    )}
-                </div>
-            ) : (
-                /* ── Shop cards ── */
-                <div className="muna-shop-grid">
-                    {sortedShops.map((shop, index) => (
-                        <Link
-                            to={`/shop/${shop._id}`}
-                            key={shop._id}
-                            className="muna-shop-link"
-                            style={{ animationDelay: `${index * 50}ms` }}
-                        >
-                            <div className={`muna-shop-card ${!shop.isOpen ? 'muna-shop-card--closed' : ''}`}>
+            {/* ════════ BOTTOM NAV ════════ */}
+            <nav className="mu-nav">
+                <button className="mu-nav-item mu-nav-item--active" onClick={() => window.scrollTo(0, 0)}>
+                    <span className="mu-nav-icon"><IcoHome /></span>
+                    Home
+                </button>
 
-                                {/* Banner */}
-                                <div className={`muna-shop-banner ${!shop.isOpen ? 'muna-shop-banner--closed' : ''}`}>
-                                    {shop.image ? (
-                                        <img src={shop.image} alt={shop.name} loading="lazy" />
-                                    ) : (
-                                        <div className={`muna-shop-banner-placeholder ${!shop.isOpen ? 'muna-shop-banner-placeholder--closed' : ''}`}>
-                                            🏪
-                                        </div>
-                                    )}
+                <button className="mu-nav-item" onClick={() => document.getElementById('home-search')?.focus()}>
+                    <span className="mu-nav-icon"><IcoSearch /></span>
+                    Search
+                </button>
 
-                                    {/* Status badge */}
-                                    <span className={`muna-shop-status-badge ${shop.isOpen ? 'muna-badge--open' : 'muna-badge--closed'}`}>
-                                        <span className="muna-badge-dot" />
-                                        {shop.isOpen ? 'Open' : 'Closed'}
-                                    </span>
+                <Link to="/cart" className="mu-nav-item">
+                    <span className="mu-nav-icon">
+                        <IcoCart />
+                        {totalCartItems > 0 && (
+                            <span className="mu-nav-badge">{totalCartItems}</span>
+                        )}
+                    </span>
+                    Cart
+                </Link>
 
-                                    {/* Distance */}
-                                    {shop.distance !== Infinity && (
-                                        <span className="muna-distance-tag">
-                                            📍 {fmtDist(shop.distance)} away
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Body */}
-                                <div className="muna-shop-body">
-                                    {/* Name + Rating */}
-                                    <div className="muna-shop-row-1">
-                                        <h3 className={`muna-shop-name ${!shop.isOpen ? 'muna-shop-name--closed' : ''}`}>
-                                            {shop.name}
-                                        </h3>
-                                        <span className={`muna-shop-rating ${shop.isOpen ? 'muna-shop-rating--open' : 'muna-shop-rating--closed'}`}>
-                                            ⭐ {shop.rating || '4.5'}
-                                        </span>
-                                    </div>
-
-                                    {/* Address */}
-                                    <div className={`muna-shop-address ${!shop.isOpen ? 'muna-shop-address--closed' : ''}`}>
-                                        📍 {shop.address}
-                                    </div>
-
-                                    {/* Tags */}
-                                    <div className="muna-shop-tags">
-                                        <span className={`muna-tag ${shop.isOpen ? 'muna-tag--cat' : 'muna-tag--cat-closed'}`}>
-                                            {shop.category || 'Kirana'}
-                                        </span>
-
-                                        {shop.udyamNumber && (
-                                            <span className={`muna-tag ${shop.isOpen ? 'muna-tag--verified' : 'muna-tag--verified-closed'}`}>
-                                                🛡️ Verified
-                                            </span>
-                                        )}
-
-                                        {shop.location?.coordinates && (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    window.open(
-                                                        `https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`,
-                                                        '_blank'
-                                                    );
-                                                }}
-                                                className={`muna-directions-btn ${!shop.isOpen ? 'muna-directions-btn--closed' : ''}`}
-                                            >
-                                                🗺️ Directions
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            )}
+                <Link
+                    to={profileLink}
+                    className="mu-nav-item"
+                >
+                    <span className="mu-nav-icon"><IcoUser /></span>
+                    {user ? 'Profile' : 'Login'}
+                </Link>
+            </nav>
         </div>
     );
 };

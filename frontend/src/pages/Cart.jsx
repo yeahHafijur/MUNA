@@ -1,20 +1,39 @@
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext'; // Token nikalne ke liye
-import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './Cart.css';
 
+/* ─── Premium Icons ─── */
+const IconBack = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{width: '20px', height: '20px'}}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+);
+
+const IconTrash = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width: '14px', height: '14px'}}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+);
+
+const IconLocation = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{width: '16px', height: '16px'}}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+    </svg>
+);
+
 const Cart = () => {
-    // cartShopId bhi liya taaki backend ko pata chale kis dukan ka order hai
     const { cartItems, cartShopId, getTotal, removeFromCart, clearCart } = useCart();
-    const { user, token, login } = useAuth(); // Logged-in user, token, aur context update function
+    const { user, token, login } = useAuth();
 
     const [customerPhone, setCustomerPhone] = useState('');
-    const [gpsLocation, setGpsLocation] = useState(null); // GPS coordinates store karne ke liye
+    const [gpsLocation, setGpsLocation] = useState(null);
     const [deliveryFee, setDeliveryFee] = useState(null);
     const [distance, setDistance] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [locating, setLocating] = useState(false); // GPS fetching status
+    const [locating, setLocating] = useState(false);
     const navigate = useNavigate();
 
     const handleGetLocation = () => {
@@ -46,7 +65,7 @@ const Cart = () => {
                     setLocating(false);
                 },
                 (error) => {
-                    alert("Location nikalne me problem hui. Kripya apne phone ki Location On karein!");
+                    alert("Location fetch failed. Please turn on your device GPS!");
                     setLocating(false);
                 }
             );
@@ -62,7 +81,6 @@ const Cart = () => {
             return;
         }
 
-        // Agar user login nahi hai, toh pehle usko login par bhejo
         if (!token || !user) {
             alert("Please login first to place your order!");
             navigate('/login');
@@ -71,14 +89,13 @@ const Cart = () => {
 
         const isPhoneMissing = !user.phone;
         if (isPhoneMissing && (!customerPhone || customerPhone.length < 10)) {
-            alert("Please enter a valid 10-digit phone number so the delivery partner can contact you!");
+            alert("Please enter a valid 10-digit phone number!");
             return;
         }
 
         setLoading(true);
 
         try {
-            // Backend ko exactly yehi Format chahiye
             const orderData = {
                 shopId: cartShopId,
                 items: cartItems.map(item => ({
@@ -100,7 +117,7 @@ const Cart = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // VIP Pass
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(orderData)
             });
@@ -111,14 +128,12 @@ const Cart = () => {
                 throw new Error(data.message || 'Failed to place order');
             }
 
-            // Order Success! 
             if (isPhoneMissing) {
-                // Local context update kar do taaki dobara na maangna pade
                 login({ ...user, phone: customerPhone }, token);
             }
             
-            clearCart(); // Cart khali karo
-            navigate('/profile'); // Sidha profile par bhejo taaki status dekh sake
+            clearCart();
+            navigate('/profile');
 
         } catch (error) {
             alert(error.message);
@@ -129,116 +144,158 @@ const Cart = () => {
 
     if (cartItems.length === 0) {
         return (
-            <div className="cart-style-1">
-                <span className="cart-style-2">🛒</span>
-                <h2 className="cart-style-3">Your cart is empty</h2>
-                <p className="cart-style-4">Let's add some fresh items!</p>
-                <Link to="/" className="cart-style-5">
-                    Browse Shops
-                </Link>
+            <div className="crt-root" style={{background: '#ffffff'}}>
+                <header className="crt-header">
+                    <button className="crt-back-btn" onClick={() => navigate(-1)}>
+                        <IconBack />
+                    </button>
+                    <span className="crt-header-title">Checkout</span>
+                </header>
+                <div className="crt-empty">
+                    <div className="crt-empty-icon">🛒</div>
+                    <div className="crt-empty-title">Your cart is empty</div>
+                    <div className="crt-empty-sub">Good food is always cooking! Go ahead, order some yummy items from the menu.</div>
+                    <button className="crt-empty-btn" onClick={() => navigate('/')}>
+                        Browse Shops
+                    </button>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="cart-style-6">
-            <h1 className="cart-style-7">Checkout</h1>
-
-            {/* Items List */}
-            <div className="cart-style-8">
-                {cartItems.map((item, index) => (
-                    <div key={index} className="cart-style-9">
-                        <div>
-                            <h3 className="cart-style-10">{item.name}</h3>
-                            <p className="cart-style-11">₹{item.price} x {item.quantity}</p>
-                        </div>
-                        <div className="cart-style-12">
-                            <span className="cart-style-13">₹{item.price * item.quantity}</span>
-                            <button
-                                onClick={() => removeFromCart(item.productId)}
-                                className="cart-style-14"
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Bill Summary */}
-            <div className="cart-style-15">
-                <div className="cart-style-16">
-                    <span>Item Total:</span>
-                    <span>₹{getTotal()}</span>
-                </div>
-                {deliveryFee !== null && (
-                    <div className="cart-style-17">
-                        <span>Delivery Fee ({distance} km):</span>
-                        <span>₹{deliveryFee}</span>
-                    </div>
-                )}
-                <div className="cart-style-18">
-                    <span>Grand Total:</span>
-                    <span className="cart-style-19">₹{getTotal() + (deliveryFee || 0)}</span>
-                </div>
-            </div>
-
-            {/* Address */}
-            <div className="cart-style-20">
-                <label className="cart-style-21">Delivery Location</label>
-                
-                {/* GPS Location Button */}
-                <div className="cart-style-22">
-                    <div>
-                        <p className="cart-style-23">Verify Distance</p>
-                        <p className="cart-style-24">We need your location to confirm delivery range.</p>
-                    </div>
-                    <button 
-                        onClick={handleGetLocation} 
-                        disabled={locating}
-                        className={`text-sm font-bold px-4 py-2 rounded-lg transition-colors ${gpsLocation ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
-                    >
-                        {locating ? 'Locating...' : gpsLocation ? '📍 Location Saved' : '📍 Get My Location'}
-                    </button>
-                </div>
-            </div>
-
-            {/* Missing Phone Number Input */}
-            {user && !user.phone && (
-                <div className="cart-style-25">
-                    <label className="cart-style-26">Delivery Phone Number 📱</label>
-                    <p className="cart-style-27">Please provide a phone number so the delivery partner can contact you.</p>
-                    <div className="cart-style-28">
-                        <span className="cart-style-29">
-                            +91
-                        </span>
-                        <input
-                            type="tel"
-                            required
-                            maxLength="10"
-                            value={customerPhone}
-                            onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, ''))}
-                            className="cart-style-30"
-                            placeholder="98765 43210"
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="cart-style-31">
-                <button
-                    onClick={clearCart}
-                    className="cart-style-32"
-                >
-                    Clear Cart
+        <div className="crt-root">
+            {/* ---- HEADER ---- */}
+            <header className="crt-header">
+                <button className="crt-back-btn" onClick={() => navigate(-1)}>
+                    <IconBack />
                 </button>
+                <span className="crt-header-title">Checkout</span>
+            </header>
+
+            {/* ---- BODY ---- */}
+            <div className="crt-body">
+                
+                {/* ITEMS SECTION */}
+                <div className="crt-section">
+                    <div className="crt-section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                        Items in Cart
+                    </div>
+                    <div>
+                        {cartItems.map((item, index) => (
+                            <div key={index} className="crt-item">
+                                <div className="crt-item-info">
+                                    <div className="crt-item-name">{item.name}</div>
+                                    <div className="crt-item-meta">₹{item.price} × {item.quantity} qty</div>
+                                </div>
+                                <div className="crt-item-price-wrap">
+                                    <div className="crt-item-total">₹{item.price * item.quantity}</div>
+                                    <button onClick={() => removeFromCart(item.productId)} className="crt-remove-btn">
+                                        <IconTrash /> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* DELIVERY & PHONE SECTION */}
+                <div className="crt-section">
+                    <div className="crt-section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg>
+                        Delivery Details
+                    </div>
+                    
+                    <div className="crt-loc-box">
+                        <div className="crt-loc-text">
+                            <div className="crt-loc-title">Fetch Location</div>
+                            <div className="crt-loc-sub">Required to calculate distance</div>
+                        </div>
+                        <button 
+                            onClick={handleGetLocation} 
+                            disabled={locating}
+                            className={`crt-loc-btn ${gpsLocation ? 'crt-loc-btn--success' : ''}`}
+                        >
+                            <IconLocation />
+                            {locating ? 'Locating...' : gpsLocation ? 'Saved' : 'Get GPS'}
+                        </button>
+                    </div>
+
+                    {user && !user.phone && (
+                        <div style={{marginTop: '20px'}}>
+                            <div style={{fontSize: '13px', fontWeight: '800', color: '#0f172a'}}>Phone Number</div>
+                            <div style={{fontSize: '11px', color: '#64748b'}}>For delivery updates</div>
+                            <div className="crt-phone-input">
+                                <span className="crt-phone-prefix">+91</span>
+                                <input
+                                    type="tel"
+                                    required
+                                    maxLength="10"
+                                    value={customerPhone}
+                                    onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, ''))}
+                                    className="crt-phone-field"
+                                    placeholder="Enter 10 digits"
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* BILL RECEIPT SECTION */}
+                <div className="crt-section" style={{background: 'transparent', boxShadow: 'none', border: 'none', padding: '0'}}>
+                    <div className="crt-section-title" style={{marginBottom: '8px', paddingLeft: '4px'}}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Bill Summary
+                    </div>
+                    <div className="crt-bill">
+                        <div className="crt-bill-row">
+                            <span>Item Total</span>
+                            <span>₹{getTotal()}</span>
+                        </div>
+                        
+                        {deliveryFee !== null && (
+                            <div className="crt-bill-row" style={{marginTop: '8px'}}>
+                                <span>Delivery Fee <span style={{fontSize:'10px', color:'#9ca3af', marginLeft:'4px'}}>({distance} km)</span></span>
+                                <span>₹{deliveryFee}</span>
+                            </div>
+                        )}
+                        
+                        <div className="crt-bill-divider"></div>
+                        
+                        <div className="crt-bill-total">
+                            <span>To Pay</span>
+                            <span className="amt">₹{getTotal() + (deliveryFee || 0)}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {/* ---- FIXED BOTTOM BAR ---- */}
+            <div className="crt-bottom-bar">
+                <div className="crt-bottom-price">
+                    <span className="crt-bottom-price-lbl">Total</span>
+                    <span className="crt-bottom-price-val">₹{getTotal() + (deliveryFee || 0)}</span>
+                </div>
                 <button
                     onClick={handlePlaceOrder}
                     disabled={loading || deliveryFee === null}
-                    className={`flex-1 font-bold py-3 rounded-lg shadow-md transition-colors ${loading || deliveryFee === null ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                    className="crt-action-btn"
                 >
-                    {loading ? 'Placing Order...' : 'Place Order'}
+                    {loading ? (
+                        <>
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Placing...
+                        </>
+                    ) : (
+                        <>
+                            Place Order
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" style={{width: '18px', height: '18px'}}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </>
+                    )}
                 </button>
             </div>
         </div>

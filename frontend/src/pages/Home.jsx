@@ -191,14 +191,14 @@ const Home = () => {
             {/* ════════ SCROLLABLE BODY ════════ */}
             <div className="mu-body">
 
-                {/* Greeting */}
-                <div className="mu-greeting">
-                    <h1 className="mu-greeting-text">
-                        <span>{greeting.emoji}</span> {greeting.text}{user ? `, ${user.name.split(' ')[0]}` : ''}!
-                    </h1>
-                    <p className="mu-greeting-sub">
-                        আপোনাৰ প্ৰিয় দোকানৰ পৰা ঘৰতে বহি সামগ্ৰী অ'ৰ্ডাৰ কৰক
-                    </p>
+                {/* Slogan */}
+                <div className="mu-slogan" style={{ padding: '20px 20px 10px 20px' }}>
+                    <div style={{ fontSize: '28px', fontWeight: '900', color: '#1e293b', lineHeight: '1.1', letterSpacing: '-0.5px' }}>
+                        Your local market,
+                    </div>
+                    <div style={{ fontSize: '32px', fontWeight: '900', color: '#f59e0b', lineHeight: '1.2', letterSpacing: '-0.5px' }}>
+                        delivered in minutes ⚡
+                    </div>
                 </div>
 
                 {/* Stats */}

@@ -386,7 +386,7 @@ const Home = () => {
                     <span className="mu-nav-icon">
                         <IcoCart />
                         {totalCartItems > 0 && (
-                            <span className="mu-nav-badge">{totalCartItems}</span>
+                            <span key={totalCartItems} className="mu-nav-badge">{totalCartItems}</span>
                         )}
                     </span>
                     Cart

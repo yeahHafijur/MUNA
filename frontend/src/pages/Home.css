@@ -727,6 +727,12 @@
     place-items: center;
     border: 2px solid #fff;
     line-height: 1;
+    animation: muBadgeBounce 0.4s ease-out;
+}
+@keyframes muBadgeBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
 }
 
 /* ---- RESPONSIVE ---- */

@@ -85,6 +85,26 @@ const ShopDetail = () => {
     /* ── Show product view? ── */
     const showProducts = selectedCategory !== null || !!searchQuery;
 
+    /* ── Handle Add to Cart with Animation ── */
+    const handleAddClick = (e, product) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const flyEl = document.createElement('div');
+        flyEl.className = 'sd-fly-plus';
+        flyEl.textContent = '+1';
+        flyEl.style.left = `${rect.left + rect.width / 2}px`;
+        flyEl.style.top = `${rect.top}px`;
+        document.body.appendChild(flyEl);
+        
+        setTimeout(() => flyEl.remove(), 800);
+        
+        addToCart(product, id);
+        
+        // Vibrate on supported devices
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+    };
+
     /* ═══════════════════════════════════════════════════════
        RENDER
     ═══════════════════════════════════════════════════════ */
@@ -104,7 +124,7 @@ const ShopDetail = () => {
                         <Link to="/cart" className="sd-hdr-btn" title="Cart">
                             <IcoCart />
                             {totalCartItems > 0 && (
-                                <span className="sd-hdr-badge">{totalCartItems}</span>
+                                <span key={totalCartItems} className="sd-hdr-badge">{totalCartItems}</span>
                             )}
                         </Link>
                     </div>
@@ -322,7 +342,7 @@ const ShopDetail = () => {
                                                             {product.inStock ? (
                                                                 <button
                                                                     className={`sd-add-btn ${inCart ? 'sd-add-btn--added' : 'sd-add-btn--add'}`}
-                                                                    onClick={() => addToCart(product, id)}
+                                                                    onClick={(e) => handleAddClick(e, product)}
                                                                 >
                                                                     {inCart ? `${inCart.quantity} Added` : 'ADD'}
                                                                 </button>
@@ -346,7 +366,7 @@ const ShopDetail = () => {
 
             {/* ════════ FLOATING CART BAR ════════ */}
             {totalCartItems > 0 && (
-                <Link to="/cart" className="sd-cart-bar">
+                <Link to="/cart" key={totalCartItems} className="sd-cart-bar">
                     <div className="sd-cart-bar-left">
                         <span className="sd-cart-bar-count">{totalCartItems}</span>
                         <div>

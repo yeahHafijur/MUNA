@@ -16,7 +16,6 @@ self.addEventListener('install', (event) => {
       return cache.add(OFFLINE_PAGE);
     })
   );
-  self.skipWaiting();
 });
 
 // Cache image files
@@ -41,5 +40,5 @@ registerRoute(
 );
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  // Let the browser handle claiming clients naturally
 });

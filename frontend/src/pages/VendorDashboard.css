@@ -1097,7 +1097,7 @@
 
 /* ---- RESPONSIVE ---- */
 @media (max-width: 768px) {
-    .vnd-header { padding: 0 14px; height: 56px; }
+    .vnd-header { padding: 12px 14px; height: auto; min-height: auto; }
     .vnd-header-right .vnd-divider { display: none; }
     .vnd-tabbar { padding: 0 14px; }
     .vnd-tab { padding: 11px 12px; font-size: 12px; }
@@ -1117,8 +1117,7 @@
     .vnd-shop-name { font-size: 13px; }
     .vnd-verified-badge { display: none; }
     .vnd-shop-address { display: none; }
-    .vnd-status-btn { padding: 5px 9px; font-size: 10px; }
-    .vnd-status-btn span:not(.vnd-status-dot) { display: none; }
+    .vnd-status-btn { padding: 6px 12px; font-size: 11px; }
 
     .vnd-search-wrap { max-width: 100%; }
     .vnd-table-toolbar { flex-direction: column; align-items: stretch; }

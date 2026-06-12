@@ -402,7 +402,7 @@ const VendorDashboard = () => {
                     <div className="vnd-divider" />
 
                     {/* User info + logout */}
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#475569', whiteSpace: 'nowrap' }}>
+                    <span className="vnd-username">
                         {user.name}
                     </span>
                     <button

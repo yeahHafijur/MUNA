@@ -77,10 +77,17 @@ const createShop = async (req, res) => {
             };
         }
 
+        let finalImage = image;
+        if (image && image.startsWith('data:image')) {
+            const { uploadBase64 } = require('../utils/cloudinary');
+            const result = await uploadBase64(image, 'muna/shops');
+            finalImage = result.secure_url;
+        }
+
         const shop = await Shop.create({
             name,
             address,
-            image,
+            image: finalImage,
             location: locationData, // location save kar rahe hain
             vendorId: req.user._id
         });
@@ -106,7 +113,15 @@ const updateShop = async (req, res) => {
         // Jo data naya aya hai usse update karo, warna purana hi rehne do
         shop.name = req.body.name || shop.name;
         shop.address = req.body.address || shop.address;
-        shop.image = req.body.image || shop.image;
+        
+        let newImage = req.body.image || shop.image;
+        if (req.body.image && req.body.image.startsWith('data:image')) {
+            const { uploadBase64 } = require('../utils/cloudinary');
+            const result = await uploadBase64(req.body.image, 'muna/shops');
+            newImage = result.secure_url;
+        }
+        shop.image = newImage;
+        
         if (req.body.category !== undefined) shop.category = req.body.category;
         if (req.body.udyamNumber !== undefined) shop.udyamNumber = req.body.udyamNumber;
         if (req.body.isActive !== undefined) shop.isActive = req.body.isActive;
@@ -158,7 +173,10 @@ const updateShopImage = async (req, res) => {
             return res.status(400).json({ message: "Image upload failed" });
         }
 
-        shop.image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+        const { uploadStream } = require('../utils/cloudinary');
+        const result = await uploadStream(req.file.buffer, 'muna/shops');
+        shop.image = result.secure_url;
+        
         const updatedShop = await shop.save();
         
         res.status(200).json(updatedShop);

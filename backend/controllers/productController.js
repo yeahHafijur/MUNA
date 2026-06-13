@@ -23,8 +23,16 @@ const createProduct = async (req, res) => {
     try {
         const { name, price, category, stock } = req.body;
         
-        // Agar file upload hui hai toh usko base64 me convert karo
-        const image = req.file ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}` : req.body.image;
+        let image = req.body.image;
+        if (req.file) {
+            const { uploadStream } = require('../utils/cloudinary');
+            const result = await uploadStream(req.file.buffer, 'muna/products');
+            image = result.secure_url;
+        } else if (image && image.startsWith('data:image')) {
+            const { uploadBase64 } = require('../utils/cloudinary');
+            const result = await uploadBase64(image, 'muna/products');
+            image = result.secure_url;
+        }
 
         const shop = await Shop.findOne({
             vendorId: req.user._id
@@ -76,7 +84,14 @@ const updateProduct = async (req, res) => {
         product.name = req.body.name || product.name;
         product.price = req.body.price || product.price;
         product.category = req.body.category || product.category;
-        product.image = req.body.image || product.image;
+        
+        let newImage = req.body.image || product.image;
+        if (req.body.image && req.body.image.startsWith('data:image')) {
+            const { uploadBase64 } = require('../utils/cloudinary');
+            const result = await uploadBase64(req.body.image, 'muna/products');
+            newImage = result.secure_url;
+        }
+        product.image = newImage;
         product.inStock = req.body.inStock !== undefined ? req.body.inStock : product.inStock;
         const updatedProduct = await product.save();
         res.status(200).json(updatedProduct);

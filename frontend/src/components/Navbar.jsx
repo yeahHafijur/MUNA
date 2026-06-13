@@ -13,8 +13,9 @@ const Navbar = () => {
 
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    // Agar hum Search ya Login page par hain, toh Navbar mat dikhao
-    if (location.pathname === '/search' || location.pathname === '/login') {
+    // Agar inme se kisi page par hain, toh Navbar mat dikhao (kyunki unka apna header hai)
+    const hiddenPaths = ['/search', '/login', '/vendor-dashboard', '/admin-dashboard', '/cart', '/vendor-godown'];
+    if (hiddenPaths.includes(location.pathname)) {
         return null;
     }
 

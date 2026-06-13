@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.muna_opal.twa",
+        "sha256_cert_fingerprints": ["3D:80:1D:51:92:3C:5E:91:99:75:7F:A4:CF:E9:8A:ED:76:DE:B0:C0:75:73:1B:86:20:1B:5F:97:B4:B8:B4:7E"]
+      }
+}]

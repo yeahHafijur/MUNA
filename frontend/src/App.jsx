@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 import VendorDashboard from './pages/VendorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import GodownBrowser from './pages/GodownBrowser';
+import Search from './pages/Search';
 
 function App() {
   const [showSplash, setShowSplash] = useState(() => {
@@ -112,6 +113,7 @@ function App() {
             <Route path="/vendor-dashboard" element={<VendorDashboard />} />
             <Route path="/vendor-godown" element={<GodownBrowser />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/search" element={<Search />} />
 
 
             {/* Aage chal kar hum yahan Shop aur Cart ke routes add karenge */}

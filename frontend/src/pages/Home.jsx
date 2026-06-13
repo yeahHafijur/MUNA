@@ -372,7 +372,7 @@ const Home = () => {
                     Home
                 </button>
 
-                <button className="mu-nav-item" onClick={() => document.getElementById('home-search')?.focus()}>
+                <button className="mu-nav-item" onClick={() => navigate('/search')}>
                     <span className="mu-nav-icon"><IcoSearch /></span>
                     Search
                 </button>

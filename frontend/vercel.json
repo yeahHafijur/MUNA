@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://muna-backend-tu8x.onrender.com/api/$1"
+      "destination": "https://muna-5o5g.onrender.com/api/$1"
     },
     {
       "source": "/uploads/(.*)",
-      "destination": "https://muna-backend-tu8x.onrender.com/uploads/$1"
+      "destination": "https://muna-5o5g.onrender.com/uploads/$1"
     },
     {
       "source": "/(.*)",

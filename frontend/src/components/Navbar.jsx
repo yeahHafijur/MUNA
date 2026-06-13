@@ -13,6 +13,11 @@ const Navbar = () => {
 
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+    // Agar hum Search ya Login page par hain, toh Navbar mat dikhao
+    if (location.pathname === '/search' || location.pathname === '/login') {
+        return null;
+    }
+
     return (
         <nav className="navbar-style-1">
             <div className="navbar-style-2">

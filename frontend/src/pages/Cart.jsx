@@ -34,6 +34,13 @@ const Cart = () => {
     const [distance, setDistance] = useState(null);
     const [loading, setLoading] = useState(false);
     const [locating, setLocating] = useState(false);
+    
+    // Saved Locations
+    const [savingLocation, setSavingLocation] = useState(false);
+    const [locationName, setLocationName] = useState('Home');
+    const [showSavePrompt, setShowSavePrompt] = useState(false);
+    const [selectedSavedLoc, setSelectedSavedLoc] = useState(null);
+
     const navigate = useNavigate();
 
     const handleGetLocation = () => {
@@ -55,8 +62,11 @@ const Cart = () => {
                         if (res.ok) {
                             setDeliveryFee(data.deliveryFee);
                             setDistance(data.distance);
+                            setShowSavePrompt(true); // Ask if they want to save this new GPS location
+                            setSelectedSavedLoc(null); // Deselect any saved location
                         } else {
                             alert(data.message || "Could not calculate delivery fee");
+                            setGpsLocation(null);
                         }
                     } catch (error) {
                         console.error("Error calculating delivery fee:", error);
@@ -73,6 +83,64 @@ const Cart = () => {
             alert("Your browser does not support location services.");
             setLocating(false);
         }
+    };
+
+    const handleSelectSavedLocation = async (loc) => {
+        setLocating(true);
+        setGpsLocation({ lat: loc.lat, lng: loc.lng });
+        setSelectedSavedLoc(loc._id);
+        setShowSavePrompt(false);
+
+        try {
+            const res = await fetch(`/api/shops/${cartShopId}/calculate-delivery`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lat: loc.lat, lng: loc.lng })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setDeliveryFee(data.deliveryFee);
+                setDistance(data.distance);
+            } else {
+                alert(data.message || "Could not calculate delivery fee for this saved location");
+                setGpsLocation(null);
+                setSelectedSavedLoc(null);
+            }
+        } catch (error) {
+            console.error("Error calculating delivery fee:", error);
+        }
+        setLocating(false);
+    };
+
+    const handleSaveLocation = async () => {
+        if (!gpsLocation || !locationName) return;
+        setSavingLocation(true);
+        try {
+            const res = await fetch('/api/auth/save-location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: locationName,
+                    lat: gpsLocation.lat,
+                    lng: gpsLocation.lng,
+                    address: "Saved via Map"
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                login({ ...user, savedLocations: data.savedLocations }, token);
+                setShowSavePrompt(false);
+                alert("Location saved successfully!");
+            } else {
+                alert(data.message || "Could not save location");
+            }
+        } catch (error) {
+            alert("Error saving location");
+        }
+        setSavingLocation(false);
     };
 
     const handlePlaceOrder = async () => {
@@ -207,20 +275,60 @@ const Cart = () => {
                         Delivery Details
                     </div>
                     
+                    {user?.savedLocations && user.savedLocations.length > 0 && (
+                        <div style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a', marginBottom: '8px' }}>Saved Locations</div>
+                            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+                                {user.savedLocations.map(loc => (
+                                    <button 
+                                        key={loc._id}
+                                        onClick={() => handleSelectSavedLocation(loc)}
+                                        className={`crt-loc-btn ${selectedSavedLoc === loc._id ? 'crt-loc-btn--success' : ''}`}
+                                        style={{ whiteSpace: 'nowrap', padding: '6px 12px', fontSize: '12px' }}
+                                    >
+                                        📍 {loc.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="crt-loc-box">
                         <div className="crt-loc-text">
-                            <div className="crt-loc-title">Fetch Location</div>
-                            <div className="crt-loc-sub">Required to calculate distance</div>
+                            <div className="crt-loc-title">Fetch New Location</div>
+                            <div className="crt-loc-sub">Use current GPS to calculate distance</div>
                         </div>
                         <button 
                             onClick={handleGetLocation} 
                             disabled={locating}
-                            className={`crt-loc-btn ${gpsLocation ? 'crt-loc-btn--success' : ''}`}
+                            className={`crt-loc-btn ${gpsLocation && !selectedSavedLoc ? 'crt-loc-btn--success' : ''}`}
                         >
                             <IconLocation />
-                            {locating ? 'Locating...' : gpsLocation ? 'Saved' : 'Get GPS'}
+                            {locating ? 'Locating...' : (gpsLocation && !selectedSavedLoc) ? 'GPS Acquired' : 'Get GPS'}
                         </button>
                     </div>
+
+                    {showSavePrompt && gpsLocation && !selectedSavedLoc && user && (
+                        <div style={{ marginTop: '12px', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ fontSize: '12px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}>Save this location for next time?</div>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <input 
+                                    type="text" 
+                                    value={locationName} 
+                                    onChange={(e) => setLocationName(e.target.value)}
+                                    placeholder="e.g. Home, Office"
+                                    style={{ flex: 1, padding: '6px 10px', fontSize: '13px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                                />
+                                <button 
+                                    onClick={handleSaveLocation}
+                                    disabled={savingLocation || !locationName.trim()}
+                                    style={{ background: '#f59e0b', color: '#fff', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' }}
+                                >
+                                    {savingLocation ? 'Saving...' : 'Save'}
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {user && !user.phone && (
                         <div style={{marginTop: '20px'}}>

@@ -176,7 +176,7 @@ const Home = () => {
                 <div className="mu-header-top">
                     {/* Brand */}
                     <Link to="/" className="mu-brand">
-                        <img src="/muna-logo.jpg" alt="MUNA" className="mu-brand-logo" />
+                        <img src="/muna-logo-new.png" alt="MUNA" className="mu-brand-logo" />
                         <div className="mu-brand-text">
                             <span className="mu-brand-name">GROCERY</span>
                             <span className="mu-brand-sub">In Minutes</span>

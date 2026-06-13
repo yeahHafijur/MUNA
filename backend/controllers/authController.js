@@ -101,6 +101,7 @@ const verifyOTP = async (req, res) => {
         name: user.name,
         phone: user.phone,
         role: user.role,
+        savedLocations: user.savedLocations,
         token: token
     });
 };
@@ -163,6 +164,7 @@ const googleLogin = async (req, res) => {
             phone: user.phone,
             role: user.role,
             profilePic: user.profilePic,
+            savedLocations: user.savedLocations,
             token: token
         });
 
@@ -198,5 +200,52 @@ const savePlayerId = async (req, res) => {
     }
 };
 
-module.exports = { sendOTP, verifyOTP, googleLogin, savePlayerId };
+// Save a new location for the user
+const saveLocation = async (req, res) => {
+    try {
+        const { name, lat, lng, address } = req.body;
+        
+        if (!name || !lat || !lng) {
+            return res.status(400).json({ message: "Name, latitude, and longitude are required" });
+        }
 
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        user.savedLocations.push({ name, lat, lng, address });
+        await user.save();
+
+        res.status(200).json({ message: "Location saved successfully", savedLocations: user.savedLocations });
+    } catch (error) {
+        console.error("[SaveLocation] Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// Delete a saved location
+const deleteLocation = async (req, res) => {
+    try {
+        const { id } = req.params; // This will be the index or _id of the location
+        
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // Remove by sub-document id
+        user.savedLocations = user.savedLocations.filter(loc => loc._id.toString() !== id);
+        await user.save();
+
+        res.status(200).json({ message: "Location deleted successfully", savedLocations: user.savedLocations });
+    } catch (error) {
+        console.error("[DeleteLocation] Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+module.exports = {
+    sendOTP,
+    verifyOTP,
+    googleLogin,
+    savePlayerId,
+    saveLocation,
+    deleteLocation
+};

@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema({
         enum: ['customer', 'vendor', 'super_admin'],
         default: "customer"
     },
+    savedLocations: [{
+        name: { type: String, required: true }, // 'Home', 'Office'
+        lat: { type: Number, required: true },
+        lng: { type: Number, required: true },
+        address: { type: String }
+    }],
     createdAt: {
         type: Date,
         default: Date.now

@@ -8,9 +8,9 @@ const {
 } = require("../controllers/orderController");
 const { protect, authorize } = require("../middleware/authMiddleware");
 
-// 1. Customer Routes (Sirf customer access kar sakta hai)
-router.post("/", protect, authorize("customer"), placeOrder);
-router.get("/customer", protect, authorize("customer"), getCustomerOrders);
+// 1. Customer Routes (customer aur vendor dono access kar sakte hain)
+router.post("/", protect, authorize("customer", "vendor"), placeOrder);
+router.get("/customer", protect, authorize("customer", "vendor"), getCustomerOrders);
 
 // 2. Vendor Routes (Sirf vendor access kar sakta hai)
 router.get("/vendor", protect, authorize("vendor"), getVendorOrders);

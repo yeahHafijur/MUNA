@@ -38,7 +38,7 @@ const Navbar = () => {
                     {/* Logo and Text */}
                     <Link to="/" className="navbar-style-6">
                         <img 
-                            src="/muna-logo.jpg" 
+                            src="/muna-logo-new.png" 
                             alt="MUNA" 
                             className="navbar-style-7"
                         />
@@ -61,7 +61,12 @@ const Navbar = () => {
 
                     {/* Agar User login hai toh Profile par jane ka Button, warna Login button */}
                     {user ? (
-                        <div className="navbar-style-12">
+                        <div className="navbar-style-12" style={{ display: 'flex', gap: '6px' }}>
+                            {user.role === 'vendor' && (
+                                <Link to="/profile" className="navbar-style-13" title="Shopping Profile">
+                                    <span className="navbar-style-14">🛍️</span>
+                                </Link>
+                            )}
                             <Link 
                                 to={user.role === 'super_admin' ? "/admin-dashboard" : user.role === 'vendor' ? "/vendor-dashboard" : "/profile"} 
                                 className="navbar-style-13"

@@ -14,8 +14,12 @@ const protect = async (req, res, next) => {
             // JWT Secret se token ko verify karte hain
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Token me user ki ID hoti hai, usse hum database se user nikal kar request me save kar rahe hain (password chhod kar)
+            // Token me user ki ID hoti hai, usse hum database se user nikal kar request me save kar rahe hain
             req.user = await User.findById(decoded.id).select("-password");
+
+            if (!req.user) {
+                return res.status(401).json({ message: "Not authorized, user not found" });
+            }
 
             // Agar sab theek hai toh agle step (controller) par jane do
             next();

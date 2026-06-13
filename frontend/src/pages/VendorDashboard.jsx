@@ -409,6 +409,15 @@ const VendorDashboard = () => {
 
                     <div className="vnd-divider" />
 
+                    {/* Shopping Profile */}
+                    <button
+                        className="vnd-icon-btn"
+                        title="My Shopping Profile"
+                        onClick={() => navigate('/profile')}
+                    >
+                        🛍️
+                    </button>
+
                     {/* User info + logout */}
                     <span className="vnd-username">
                         {user.name}

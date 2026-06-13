@@ -15,7 +15,7 @@ const getProductsByShop = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({
-            message: "Server error", error: error.message
+            message: "Server error"
         })
     }
 };
@@ -60,7 +60,7 @@ const createProduct = async (req, res) => {
         });
         res.status(201).json(product);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 const updateProduct = async (req, res) => {
@@ -81,7 +81,7 @@ const updateProduct = async (req, res) => {
         const updatedProduct = await product.save();
         res.status(200).json(updatedProduct);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 // 4. Delete Product (Private)
@@ -98,7 +98,7 @@ const deleteProduct = async (req, res) => {
         await product.deleteOne();
         res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 module.exports = {

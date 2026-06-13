@@ -6,8 +6,8 @@ const otpStore = new Map();
 
 // Generate Token
 const generateToken = (id, role) => {
-    return jwt.sign({ id, role }, process.env.JWT_SECRET || 'secret123', {
-        expiresIn: '30d',
+    return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+        expiresIn: '7d',
     });
 };
 
@@ -168,7 +168,7 @@ const googleLogin = async (req, res) => {
 
     } catch (error) {
         console.error("Google Auth Error:", error);
-        res.status(500).json({ message: "Google login failed", error: error.message });
+        res.status(500).json({ message: "Google login failed" });
     }
 };
 
@@ -194,7 +194,7 @@ const savePlayerId = async (req, res) => {
         res.status(200).json({ message: "Player ID saved successfully" });
     } catch (error) {
         console.error("[SavePlayerId] ❌ Error:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 

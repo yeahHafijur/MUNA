@@ -24,7 +24,7 @@ const getAllShops = async (req, res) => {
         const shops = await Shop.find(filter).populate('vendorId', 'name email phone');
         res.status(200).json(shops);
     } catch (error) {
-        res.status(500).json({ message: "Server Error", error: error.message })
+        res.status(500).json({ message: "Server Error" })
     }
 };
 
@@ -36,7 +36,7 @@ const getShopById = async (req, res) => {
         }
         res.status(200).json(shop);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -50,7 +50,7 @@ const getMyShop = async (req, res) => {
         }
         res.status(200).json(shop);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -87,7 +87,7 @@ const createShop = async (req, res) => {
 
         res.status(201).json(shop);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -140,7 +140,7 @@ const updateShop = async (req, res) => {
         const updatedShop = await shop.save();
         res.status(200).json(updatedShop);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -163,7 +163,7 @@ const updateShopImage = async (req, res) => {
         
         res.status(200).json(updatedShop);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -218,7 +218,7 @@ const calculateDelivery = async (req, res) => {
 
         res.status(200).json({ distance: parseFloat(distance.toFixed(2)), deliveryFee: fee });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 

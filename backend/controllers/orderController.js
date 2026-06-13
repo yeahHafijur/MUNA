@@ -22,7 +22,7 @@ const sendOneSignalNotification = async (playerIds, heading, message) => {
 
     try {
         const payload = {
-            app_id: "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
+            app_id: process.env.ONESIGNAL_APP_ID,
             include_subscription_ids: playerIds,
             headings: { en: heading },
             contents: { en: message }
@@ -125,10 +125,21 @@ const placeOrder = async (req, res) => {
             fee += (extraKm * settings.chargePerKm);
         }
 
-        // Validate items total
+        // Securely calculate items total using DATABASE prices (not frontend prices)
         let itemsTotal = 0;
+        const verifiedItems = [];
         for (const item of items) {
-            itemsTotal += (item.price * item.quantity);
+            const dbProduct = await Product.findById(item.productId);
+            if (!dbProduct) {
+                return res.status(404).json({ message: `Product ${item.name} not found.` });
+            }
+            itemsTotal += (dbProduct.price * item.quantity);
+            verifiedItems.push({
+                productId: item.productId,
+                name: dbProduct.name,
+                price: dbProduct.price,
+                quantity: item.quantity
+            });
         }
 
         // Final total amount
@@ -136,9 +147,9 @@ const placeOrder = async (req, res) => {
 
         // Sab theek hai, toh ab Order banate hain!
         const order = await Order.create({
-            customerId: req.user._id, // Bouncer (authMiddleware) se customer ki id mil gayi
+            customerId: req.user._id,
             shopId,
-            items,
+            items: verifiedItems,
             totalAmount: finalTotalAmount,
             deliveryFee: fee,
             deliveryLocation
@@ -170,7 +181,8 @@ const placeOrder = async (req, res) => {
         res.status(201).json(order);
 
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error("placeOrder error:", error);
+        res.status(500).json({ message: "Something went wrong. Please try again." });
     }
 };
 
@@ -182,7 +194,7 @@ const getCustomerOrders = async (req, res) => {
             .sort('-createdAt'); // Naye orders upar dikhein
         res.status(200).json(orders);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -200,7 +212,7 @@ const getVendorOrders = async (req, res) => {
             .sort('-createdAt');
         res.status(200).json(orders);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -208,6 +220,13 @@ const getVendorOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
     try {
         const { status } = req.body;
+
+        // Validate status value
+        const validStatuses = ['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'];
+        if (!status || !validStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid status value" });
+        }
+
         const order = await Order.findById(req.params.id);
 
         if (!order) {
@@ -216,6 +235,9 @@ const updateOrderStatus = async (req, res) => {
 
         // Security: Kya ye order ishi vendor ki shop ka hai?
         const shop = await Shop.findOne({ vendorId: req.user._id });
+        if (!shop) {
+            return res.status(403).json({ message: "You don't have a shop" });
+        }
         if (order.shopId.toString() !== shop._id.toString()) {
             return res.status(403).json({ message: "You cannot update orders of another shop" });
         }
@@ -246,7 +268,8 @@ const updateOrderStatus = async (req, res) => {
 
         res.status(200).json(updatedOrder);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error("updateOrderStatus error:", error);
+        res.status(500).json({ message: "Something went wrong. Please try again." });
     }
 };
 

@@ -1,12 +1,37 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
-    const [cartShopId, setCartShopId] = useState(null); // Ye yaad rakhega ki kis dukan se order chal raha hai
+    // Initialize from localStorage if available
+    const [cartItems, setCartItems] = useState(() => {
+        try {
+            const saved = localStorage.getItem('cartItems');
+            return saved ? JSON.parse(saved) : [];
+        } catch {
+            return [];
+        }
+    });
+
+    const [cartShopId, setCartShopId] = useState(() => {
+        try {
+            return localStorage.getItem('cartShopId') || null;
+        } catch {
+            return null;
+        }
+    });
+
+    // Save to localStorage whenever cart state changes
+    useEffect(() => {
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+        if (cartShopId) {
+            localStorage.setItem('cartShopId', cartShopId);
+        } else {
+            localStorage.removeItem('cartShopId');
+        }
+    }, [cartItems, cartShopId]);
 
     const addToCart = (product, shopId) => {
         // THE ZOMATO / BLINKIT RULE: Single Shop Validation

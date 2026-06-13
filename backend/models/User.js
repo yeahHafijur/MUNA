@@ -7,10 +7,12 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
+        unique: true,
         sparse: true
     },
     email: {
         type: String,
+        unique: true,
         sparse: true
     },
     googleId: {
@@ -26,9 +28,6 @@ const userSchema = new mongoose.Schema({
     onesignalPlayerId: {
         type: String,
         default: null
-    },
-    password: {
-        type: String
     },
     role: {
         type: String,

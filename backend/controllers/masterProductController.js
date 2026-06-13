@@ -16,7 +16,7 @@ const getAllMasterProducts = async (req, res) => {
         const products = await MasterProduct.find(filter).sort({ name: 1 });
         res.status(200).json(products);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -34,7 +34,7 @@ const createMasterProduct = async (req, res) => {
 
         res.status(201).json({ message: "Product added to Godown successfully", product: newProduct });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -61,7 +61,7 @@ const updateMasterProduct = async (req, res) => {
         const updatedProduct = await product.save();
         res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -77,7 +77,7 @@ const deleteMasterProduct = async (req, res) => {
 
         res.status(200).json({ message: "Product deleted successfully from Godown" });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -93,7 +93,7 @@ const approveMasterProduct = async (req, res) => {
 
         res.status(200).json({ message: "Product approved successfully", product });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 

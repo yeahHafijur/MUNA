@@ -2,42 +2,70 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const mongoose = require("mongoose");
+const rateLimit = require("express-rate-limit");
+const cron = require("node-cron");
+const moment = require("moment-timezone");
 
 dotenv.config();
 
 const app = express();
 
-//middleware
-app.use(cors());
-app.use(express.json());
+// ---- SECURITY MIDDLEWARE ----
+
+// CORS — Only allow your own frontend origin
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'http://127.0.0.1:5173',
+    process.env.FRONTEND_URL   // Set this in .env for production (e.g. https://muna.app)
+].filter(Boolean);
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, curl, etc.)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true
+}));
+
+// Body size limit — prevent DoS via huge payloads
+app.use(express.json({ limit: '10mb' }));
+
+// Global rate limiter — 100 requests per 15 minutes per IP
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 200,
+    message: { message: "Too many requests. Please try again later." }
+});
+app.use('/api/', globalLimiter);
+
+// Strict rate limiter for auth routes — 10 requests per 15 minutes
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { message: "Too many login attempts. Please try again later." }
+});
+app.use('/api/auth/', authLimiter);
 
 // Serve uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// ---- ROUTES ----
 app.use('/api/auth', require('./routes/authRoutes'));
-
 app.use('/api/products', require('./routes/productRoutes'));
-
 app.use('/api/shops', require('./routes/shopRoutes'));
-
 app.use('/api/orders', require('./routes/orderRoutes'));
-
 app.use('/api/admin', require('./routes/adminRoutes'));
-
 app.use('/api/master-products', require('./routes/masterProductRoutes'));
-
 app.use('/api/notifications', require('./routes/notificationRoutes'));
-
 
 app.get("/", (req, res) => {
     res.send("MUNA is running")
-});
-
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });
 
 // Global 404 handler for API routes
@@ -48,23 +76,28 @@ app.use('/api', (req, res) => {
 // Global error handler to prevent HTML responses
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ message: err.message || "Internal Server Error" });
+    res.status(500).json({ message: "Something went wrong. Please try again." });
 });
 
-const mongoose = require("mongoose");
-const cron = require("node-cron");
-const moment = require("moment-timezone");
+// ---- DATABASE + SERVER START ----
+const PORT = process.env.PORT || 5000;
 const Shop = require("./models/Shop");
 
+// Connect to MongoDB FIRST, then start server
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log("MongoDB Connected");
-        console.log("🚀 MUNA BACKEND LIVE - ONESIGNAL NOTIFICATION ENABLED v1.1");
+
+        // Start the server only after DB is connected
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+
+        console.log("🚀 MUNA BACKEND LIVE - ONESIGNAL NOTIFICATION ENABLED v2.0");
         
         // Start Auto Shop Schedule Cron Job (Runs every minute)
         cron.schedule('* * * * *', async () => {
             try {
-                // Find all active shops with autoSchedule enabled
                 const shops = await Shop.find({ isActive: true, 'autoSchedule.enabled': true });
                 
                 let updatedCount = 0;
@@ -79,10 +112,8 @@ mongoose.connect(process.env.MONGO_URI)
                     let shouldBeOpen = false;
                     
                     if (openTime <= closeTime) {
-                        // Normal case: open at 09:00, close at 21:00
                         shouldBeOpen = currentTime >= openTime && currentTime < closeTime;
                     } else {
-                        // Overnight case: open at 22:00, close at 02:00
                         shouldBeOpen = currentTime >= openTime || currentTime < closeTime;
                     }
                     
@@ -94,12 +125,15 @@ mongoose.connect(process.env.MONGO_URI)
                 }
                 
                 if (updatedCount > 0) {
-                    console.log(`[Auto Schedule] Updated open/close status for ${updatedCount} shop(s).`);
+                    console.log(`[Auto Schedule] Updated status for ${updatedCount} shop(s).`);
                 }
             } catch (err) {
-                console.error("[Auto Schedule] Cron job error:", err);
+                console.error("[Auto Schedule] Cron job error:", err.message);
             }
         });
         console.log("⏱️  Auto Shop Scheduler Started");
     })
-    .catch((err) => console.log("Eroor is :", err));
+    .catch((err) => {
+        console.error("MongoDB connection error:", err.message);
+        process.exit(1);  // Exit if DB connection fails
+    });

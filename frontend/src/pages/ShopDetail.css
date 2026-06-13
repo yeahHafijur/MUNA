@@ -311,7 +311,7 @@
 
 /* ---- CATEGORY CHIPS (sticky below search) ---- */
 .sd-cats {
-    padding: 0 16px 12px;
+    padding: 0 16px 20px;
     background: #FFF7E6;
 }
 .sd-cats-scroll {
@@ -325,7 +325,7 @@
 .sd-cats-scroll::-webkit-scrollbar { display: none; }
 .sd-chip {
     flex-shrink: 0;
-    padding: 8px 16px;
+    padding: 10px 18px;
     border-radius: 22px;
     font-size: 12px;
     font-weight: 700;
@@ -439,7 +439,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4px 16px 10px;
+    padding: 4px 16px 16px;
 }
 .sd-sec-title {
     font-size: 16px;
@@ -593,7 +593,7 @@
 
 /* Add to cart button */
 .sd-add-btn {
-    padding: 6px 14px;
+    padding: 8px 16px;
     border-radius: 10px;
     font-size: 11px;
     font-weight: 800;
@@ -629,20 +629,20 @@
     100% { transform: translate(-50%, -40px) scale(1); opacity: 0; }
 }
 .sd-add-btn--add {
-    color: #16a34a;
-    background: #f0fdf4;
-    border-color: #bbf7d0;
+    color: #ffffff;
+    background: #16a34a;
+    border-color: #16a34a;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.2);
 }
 .sd-add-btn--add:hover {
-    background: #16a34a;
-    color: #fff;
-    border-color: #16a34a;
-    box-shadow: 0 2px 10px rgba(22,163,74,0.25);
+    background: #15803d;
+    border-color: #15803d;
+    box-shadow: 0 4px 12px rgba(22,163,74,0.3);
 }
 .sd-add-btn--added {
-    color: #b8860b;
-    background: #FEF9EB;
-    border-color: #F0E0A0;
+    color: #ffffff;
+    background: #15803d;
+    border-color: #15803d;
 }
 .sd-add-btn--oos {
     color: #dc2626;

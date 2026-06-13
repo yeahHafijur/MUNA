@@ -196,7 +196,7 @@ const Home = () => {
                     <div style={{ fontSize: '28px', fontWeight: '900', color: '#1e293b', lineHeight: '1.1', letterSpacing: '-0.5px' }}>
                         Your local market,
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: '900', color: '#f59e0b', lineHeight: '1.2', letterSpacing: '-0.5px' }}>
+                    <div style={{ fontSize: '32px', fontWeight: '900', color: '#ffffff', lineHeight: '1.2', letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
                         delivered in minutes ⚡
                     </div>
                 </div>

@@ -11,6 +11,10 @@ dotenv.config();
 
 const app = express();
 
+// Render and other cloud providers use reverse proxies.
+// We must trust the proxy for express-rate-limit to get the correct user IP.
+app.set('trust proxy', 1);
+
 // ---- SECURITY MIDDLEWARE ----
 
 // CORS — Only allow your own frontend origin
@@ -18,16 +22,23 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:4173',
     'http://127.0.0.1:5173',
-    process.env.FRONTEND_URL   // Set this in .env for production (e.g. https://muna.app)
+    process.env.FRONTEND_URL   // Set this in .env for production
 ].filter(Boolean);
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (mobile apps, curl, etc.)
         if (!origin) return callback(null, true);
+        
+        // Check exact match in allowedOrigins
         if (allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
+        
+        // Allow any vercel.app domain dynamically
+        if (origin.endsWith('.vercel.app')) {
+            return callback(null, true);
+        }
+
         return callback(new Error('Not allowed by CORS'));
     },
     credentials: true

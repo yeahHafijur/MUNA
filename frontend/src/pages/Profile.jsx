@@ -31,7 +31,7 @@ const StatusPill = ({ status }) => {
 };
 
 const Profile = () => {
-    const { user, token, logout } = useAuth();
+    const { user, token, logout, login } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('orders');
@@ -62,6 +62,24 @@ const Profile = () => {
     const handleLogout = () => {
         logout();
         navigate('/');
+    };
+
+    const handleDeleteLocation = async (id) => {
+        if (!window.confirm("Delete this saved location?")) return;
+        try {
+            const res = await fetch(`/api/auth/delete-location/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                login({ ...user, savedLocations: data.savedLocations }, token);
+            } else {
+                alert(data.message || "Failed to delete location");
+            }
+        } catch (error) {
+            console.error("Error deleting location:", error);
+        }
     };
 
     if (!user) return null;
@@ -197,11 +215,29 @@ const Profile = () => {
                                 <span>Edit Profile</span>
                                 <span>›</span>
                             </div>
-                            <div className="prf-setting-item">
-                                <span>Saved Addresses</span>
-                                <span>›</span>
+
+                            <div style={{ padding: '16px 12px 8px', fontSize: '13px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                Saved Addresses
                             </div>
-                            <div className="prf-setting-item">
+                            {user?.savedLocations && user.savedLocations.length > 0 ? (
+                                user.savedLocations.map(loc => (
+                                    <div key={loc._id} className="prf-setting-item" style={{ paddingLeft: '16px' }}>
+                                        <span style={{ fontWeight: '500' }}>📍 {loc.name}</span>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); handleDeleteLocation(loc._id); }}
+                                            style={{ color: '#ef4444', background: '#fee2e2', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="prf-setting-item" style={{ paddingLeft: '16px', color: '#94a3b8', fontSize: '13px' }}>
+                                    No saved addresses yet
+                                </div>
+                            )}
+
+                            <div className="prf-setting-item" style={{ marginTop: '16px' }}>
                                 <span>Help & Support</span>
                                 <span>›</span>
                             </div>

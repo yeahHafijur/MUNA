@@ -96,6 +96,14 @@
     padding: 0 20px;
     gap: 0;
     border-bottom: 1px solid rgba(255,255,255,0.04);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.adm-tabbar::-webkit-scrollbar {
+    display: none;
 }
 
 .adm-tabbar-item {

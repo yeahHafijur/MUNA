@@ -84,13 +84,21 @@ const Home = () => {
     const [userLocation, setUserLocation] = useState(null);
     const [locationError, setLocationError] = useState(null);
     const [activeCategory, setActiveCategory] = useState('All');
+    const [homeMsg, setHomeMsg] = useState({ line1: 'Your local market,', line2: 'delivered in minutes ⚡' });
 
-    /* ── Fetch shops ── */
+    /* ── Fetch shops & settings ── */
     useEffect(() => {
         fetch('/api/shops')
             .then(r => r.json())
             .then(data => { setShops(data); setLoading(false); })
             .catch(() => setLoading(false));
+
+        fetch('/api/settings/navbar-message')
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.line1) setHomeMsg(data);
+            })
+            .catch(e => console.error("Settings fetch error:", e));
     }, []);
 
     /* ── Geolocation ── */
@@ -194,10 +202,10 @@ const Home = () => {
                 {/* Slogan */}
                 <div className="mu-slogan" style={{ padding: '20px 20px 10px 20px' }}>
                     <div style={{ fontSize: '28px', fontWeight: '900', color: '#1e293b', lineHeight: '1.1', letterSpacing: '-0.5px' }}>
-                        Your local market,
+                        {homeMsg.line1}
                     </div>
                     <div style={{ fontSize: '32px', fontWeight: '900', color: '#ffffff', lineHeight: '1.2', letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-                        delivered in minutes ⚡
+                        {homeMsg.line2}
                     </div>
                 </div>
 

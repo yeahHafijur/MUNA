@@ -1,29 +1,14 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { useState, useEffect } from 'react';
 import './Navbar.css';
 
 const Navbar = () => {
     const { cartItems } = useCart();
     const { user, logout } = useAuth();
-    const [navbarMsg, setNavbarMsg] = useState({ line1: 'Your local market,', line2: 'delivered in minutes ⚡' });
 
     const navigate = useNavigate();
     const location = useLocation();
-
-    useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const res = await fetch('/api/settings/navbar-message');
-                const data = await res.json();
-                if (res.ok && data.line1) {
-                    setNavbarMsg(data);
-                }
-            } catch (e) { console.error("Error fetching navbar message", e); }
-        };
-        fetchSettings();
-    }, []);
 
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -58,8 +43,8 @@ const Navbar = () => {
                             className="navbar-style-7"
                         />
                         <div className="navbar-style-8">
-                            <span className="navbar-style-9">{navbarMsg.line1}</span>
-                            <span className="navbar-style-10">{navbarMsg.line2}</span>
+                            <span className="navbar-style-9">GROCERY</span>
+                            <span className="navbar-style-10">IN MINUTES</span>
                         </div>
                     </Link>
                 </div>

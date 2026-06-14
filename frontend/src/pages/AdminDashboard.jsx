@@ -38,6 +38,10 @@ const AdminDashboard = () => {
         name: '', category: '', image: null, imagePreview: ''
     });
 
+    // Settings state
+    const [navbarMsg, setNavbarMsg] = useState({ line1: '', line2: '' });
+    const [savingSettings, setSavingSettings] = useState(false);
+
     // ---- DATA FETCHING ----
     const fetchShops = async () => {
         try {
@@ -57,10 +61,19 @@ const AdminDashboard = () => {
         finally { setLoadingGodownItems(false); }
     };
 
+    const fetchSettings = async () => {
+        try {
+            const res = await fetch('/api/settings/navbar-message');
+            const data = await res.json();
+            if (res.ok) setNavbarMsg(data);
+        } catch (e) { console.error("Error fetching settings", e); }
+    };
+
     useEffect(() => {
         if (!token || user?.role !== 'super_admin') { navigate('/'); return; }
         fetchShops();
         fetchGodownItems();
+        fetchSettings();
     }, [token, user, navigate]);
 
     // ---- HANDLERS ----
@@ -172,6 +185,22 @@ const AdminDashboard = () => {
 
     if (!user) return null;
 
+    const handleSettingsSubmit = async (e) => {
+        e.preventDefault();
+        setSavingSettings(true);
+        try {
+            const res = await fetch('/api/settings/navbar-message', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(navbarMsg)
+            });
+            const data = await res.json();
+            if (res.ok) alert("Navbar message updated successfully!");
+            else alert(data.message || 'Failed to update settings');
+        } catch (err) { console.error(err); }
+        finally { setSavingSettings(false); }
+    };
+
     const openCount = shops.filter(s => s.isOpen).length;
     const approvedGodown = godownItems.filter(i => i.status !== 'pending');
     const pendingGodown = godownItems.filter(i => i.status === 'pending');
@@ -199,10 +228,10 @@ const AdminDashboard = () => {
 
             {/* ---- TABS ---- */}
             <div className="adm-tabbar">
-                {['onboard', 'shops', 'godown', 'approvals'].map(tab => (
+                {['onboard', 'shops', 'godown', 'approvals', 'settings'].map(tab => (
                     <button key={tab} onClick={() => setActiveTab(tab)}
                         className={`adm-tabbar-item ${activeTab === tab ? 'adm-tabbar-item--active' : ''}`}>
-                        {tab === 'onboard' ? 'Onboard' : tab === 'shops' ? 'Shops' : tab === 'godown' ? 'Godown' : `Approvals (${pendingGodown.length})`}
+                        {tab === 'onboard' ? 'Onboard' : tab === 'shops' ? 'Shops' : tab === 'godown' ? 'Godown' : tab === 'settings' ? 'Settings' : `Approvals (${pendingGodown.length})`}
                     </button>
                 ))}
             </div>
@@ -418,6 +447,45 @@ const AdminDashboard = () => {
                                 </table>
                             </div>
                         )}
+                    </div>
+                )}
+                {/* == SETTINGS == */}
+                {activeTab === 'settings' && (
+                    <div className="adm-section" key="settings">
+                        <div className="adm-section-head">
+                            <span className="adm-section-title">App Settings</span>
+                        </div>
+                        <div className="adm-form-wrap" style={{ maxWidth: '600px', margin: '0 auto' }}>
+                            <form onSubmit={handleSettingsSubmit}>
+                                <div className="adm-fieldset">
+                                    <div className="adm-fieldset-label">Dynamic Navbar Message</div>
+                                    <p style={{fontSize: '12px', color: '#64748b', marginBottom: '16px', marginTop: '-4px'}}>This message appears at the top of the home screen for all users.</p>
+                                    <div className="adm-fields">
+                                        <input 
+                                            type="text" 
+                                            required 
+                                            placeholder="Line 1 (e.g. Your local market,)" 
+                                            className="adm-input" 
+                                            value={navbarMsg.line1} 
+                                            onChange={(e) => setNavbarMsg({...navbarMsg, line1: e.target.value})} 
+                                        />
+                                        <input 
+                                            type="text" 
+                                            required 
+                                            placeholder="Line 2 (e.g. delivered in minutes ⚡)" 
+                                            className="adm-input" 
+                                            value={navbarMsg.line2} 
+                                            onChange={(e) => setNavbarMsg({...navbarMsg, line2: e.target.value})} 
+                                        />
+                                    </div>
+                                </div>
+                                <div className="adm-form-actions" style={{marginTop: '16px'}}>
+                                    <button type="submit" disabled={savingSettings} className="adm-submit">
+                                        {savingSettings ? 'Saving...' : 'Update Message'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 )}
             </div>

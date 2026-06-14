@@ -93,7 +93,7 @@ const Home = () => {
             .then(data => { setShops(data); setLoading(false); })
             .catch(() => setLoading(false));
 
-        fetch('/api/settings/navbar-message')
+        fetch(`/api/settings/navbar-message?t=${Date.now()}`)
             .then(r => r.json())
             .then(data => {
                 if (data && data.line1) setHomeMsg(data);

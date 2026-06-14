@@ -24,6 +24,7 @@ const updateNavbarMessage = async (req, res) => {
         
         if (setting) {
             setting.value = { line1, line2 };
+            setting.markModified('value');
             await setting.save();
         } else {
             setting = await Settings.create({

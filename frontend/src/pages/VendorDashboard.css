@@ -11,11 +11,11 @@
     z-index: 100;
     display: flex;
     flex-direction: column;
-    background: #0f0f14;
+    background: #fffbef;
     overflow: hidden;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
-    color: #e2e8f0;
+    color: #1e293b;
 }
 
 /* ---- FIXED HEADER (YELLOW) ---- */
@@ -60,7 +60,7 @@
     height: 42px;
     border-radius: 10px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.1);
     border: 2px solid #fff;
     flex-shrink: 0;
     cursor: pointer;
@@ -166,7 +166,7 @@
     white-space: nowrap;
     letter-spacing: 0.2px;
     color: #1a0e00;
-    background: rgba(255,255,255,0.4);
+    background: rgba(0,0,0,0.4);
 }
 .vnd-status-btn--open {
     color: #16a34a;
@@ -203,7 +203,7 @@
     height: 34px;
     border-radius: 8px;
     border: 1px solid rgba(0,0,0,0.1);
-    background: rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.3);
     color: #1a0e00;
     display: grid;
     place-items: center;
@@ -213,7 +213,7 @@
 }
 .vnd-icon-btn:hover {
     color: #000;
-    background: rgba(255,255,255,0.6);
+    background: rgba(0,0,0,0.6);
     border-color: rgba(0,0,0,0.2);
 }
 .vnd-icon-btn--danger {
@@ -245,11 +245,11 @@
 /* ---- TAB BAR ---- */
 .vnd-tabbar {
     flex-shrink: 0;
-    background: #16161e;
+    background: #ffffff;
     display: flex;
     align-items: stretch;
     padding: 0 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     overflow-x: auto;
     scrollbar-width: none;
 }
@@ -271,8 +271,8 @@
     gap: 7px;
     letter-spacing: -0.1px;
 }
-.vnd-tab:hover { color: #94a3b8; }
-.vnd-tab--active { color: #f1f5f9; }
+.vnd-tab:hover { color: #475569; }
+.vnd-tab--active { color: #0f172a; }
 .vnd-tab--active::after {
     content: '';
     position: absolute;
@@ -309,11 +309,11 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.05) transparent;
+    scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
 }
 .vnd-body::-webkit-scrollbar { width: 4px; }
 .vnd-body::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.08);
     border-radius: 4px;
 }
 
@@ -336,8 +336,8 @@
 }
 
 .vnd-stat-card {
-    background: #16161e;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     padding: 16px;
     position: relative;
@@ -386,8 +386,8 @@
 }
 
 .vnd-order-card {
-    background: #16161e;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 14px;
     overflow: hidden;
     display: flex;
@@ -414,12 +414,12 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 .vnd-order-id {
     font-size: 13px;
     font-weight: 800;
-    color: #f1f5f9;
+    color: #0f172a;
     letter-spacing: 0.5px;
 }
 .vnd-order-time {
@@ -473,7 +473,7 @@
 .vnd-customer-name {
     font-size: 12px;
     font-weight: 600;
-    color: #cbd5e1;
+    color: #334155;
 }
 .vnd-customer-phone {
     font-size: 11px;
@@ -482,11 +482,11 @@
 }
 .vnd-delivery-addr {
     background: rgba(255, 255, 255, 0.025);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 8px;
     padding: 8px 10px;
     font-size: 11px;
-    color: #64748b;
+    color: #475569;
     line-height: 1.45;
 }
 .vnd-map-link {
@@ -512,7 +512,7 @@
     font-size: 11.5px;
 }
 .vnd-item-name {
-    color: #94a3b8;
+    color: #475569;
 }
 .vnd-item-qty {
     color: #475569;
@@ -520,24 +520,24 @@
     font-weight: 600;
 }
 .vnd-item-price {
-    color: #e2e8f0;
+    color: #1e293b;
     font-weight: 600;
     white-space: nowrap;
 }
 
 .vnd-order-foot {
     padding: 10px 16px 14px;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 .vnd-status-select {
     width: 100%;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 8px;
     padding: 9px 12px;
     font-size: 12px;
     font-weight: 600;
-    color: #e2e8f0;
+    color: #1e293b;
     outline: none;
     cursor: pointer;
     appearance: none;
@@ -553,8 +553,8 @@
     box-shadow: 0 0 0 3px rgba(248, 203, 70, 0.05);
 }
 .vnd-status-select option {
-    background: #1a1a26;
-    color: #e2e8f0;
+    background: #ffffff;
+    color: #1e293b;
 }
 
 /* Empty state */
@@ -565,8 +565,8 @@
     justify-content: center;
     padding: 60px 20px;
     text-align: center;
-    background: #16161e;
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 14px;
 }
 .vnd-empty-icon {
@@ -577,19 +577,19 @@
 .vnd-empty-title {
     font-size: 14px;
     font-weight: 700;
-    color: #cbd5e1;
+    color: #334155;
     margin-bottom: 6px;
 }
 .vnd-empty-sub {
     font-size: 12px;
-    color: #3f4a5c;
+    color: #334155;
     font-weight: 500;
 }
 
 /* ---- SECTION CARD (for store management panels) ---- */
 .vnd-section-card {
-    background: #16161e;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 14px;
     overflow: hidden;
     margin-bottom: 16px;
@@ -597,17 +597,17 @@
 
 .vnd-section-head {
     padding: 14px 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.01);
+    background: rgba(0, 0, 0, 0.01);
 }
 .vnd-section-title {
     font-size: 13px;
     font-weight: 700;
-    color: #cbd5e1;
+    color: #334155;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -651,12 +651,12 @@
 .vnd-input {
     width: 100%;
     padding: 10px 13px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.11);
     border-radius: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: #e2e8f0;
+    color: #1e293b;
     outline: none;
     transition: all 0.15s;
     box-sizing: border-box;
@@ -694,12 +694,12 @@
 .vnd-select {
     width: 100%;
     padding: 10px 34px 10px 13px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.11);
     border-radius: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: #e2e8f0;
+    color: #1e293b;
     outline: none;
     appearance: none;
     -webkit-appearance: none;
@@ -716,8 +716,8 @@
     box-shadow: 0 0 0 3px rgba(248, 203, 70, 0.06);
 }
 .vnd-select option {
-    background: #1a1a26;
-    color: #e2e8f0;
+    background: #ffffff;
+    color: #1e293b;
 }
 
 /* Delivery fields 2-col grid */
@@ -760,13 +760,13 @@
     transform: none;
 }
 .vnd-btn--ghost {
-    color: #94a3b8;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: #475569;
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.11);
 }
 .vnd-btn--ghost:hover {
-    color: #e2e8f0;
-    background: rgba(255, 255, 255, 0.08);
+    color: #1e293b;
+    background: rgba(0, 0, 0, 0.12);
 }
 .vnd-btn--danger {
     color: #f87171;
@@ -823,7 +823,7 @@
 .vnd-toggle-label {
     font-size: 12px;
     font-weight: 600;
-    color: #94a3b8;
+    color: #475569;
 }
 .vnd-toggle {
     position: relative;
@@ -840,8 +840,8 @@
     position: absolute;
     inset: 0;
     border-radius: 11px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.11);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
 }
@@ -882,22 +882,22 @@
     color: #475569;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    background: rgba(255, 255, 255, 0.01);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.01);
     white-space: nowrap;
 }
 .vnd-table td {
     padding: 12px 16px;
     font-size: 12.5px;
-    color: #94a3b8;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: #475569;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     vertical-align: middle;
 }
 .vnd-table tbody tr {
     transition: background 0.1s;
 }
 .vnd-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(0, 0, 0, 0.03);
 }
 .vnd-table tbody tr:last-child td {
     border-bottom: none;
@@ -908,13 +908,13 @@
 .vnd-product-name {
     font-size: 13px;
     font-weight: 600;
-    color: #e2e8f0;
+    color: #1e293b;
 }
 .vnd-product-cat {
     font-size: 10px;
     font-weight: 600;
     color: #475569;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(0, 0, 0, 0.06);
     padding: 2px 7px;
     border-radius: 4px;
     margin-top: 3px;
@@ -964,7 +964,7 @@
     border-radius: 7px;
     border: 1px solid rgba(248, 113, 113, 0.1);
     background: transparent;
-    color: #3f4a5c;
+    color: #334155;
     display: grid;
     place-items: center;
     cursor: pointer;
@@ -992,7 +992,7 @@
     left: 11px;
     top: 50%;
     transform: translateY(-50%);
-    color: #3f4a5c;
+    color: #334155;
     pointer-events: none;
 }
 .vnd-search-icon svg {
@@ -1002,12 +1002,12 @@
 .vnd-search-input {
     width: 100%;
     padding: 8px 12px 8px 33px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.09);
     border-radius: 8px;
     font-size: 12px;
     font-weight: 500;
-    color: #e2e8f0;
+    color: #1e293b;
     outline: none;
     box-sizing: border-box;
     transition: border-color 0.15s;
@@ -1023,20 +1023,20 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    background: rgba(255, 255, 255, 0.01);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.01);
     flex-wrap: wrap;
 }
 .vnd-table-toolbar-title {
     font-size: 12px;
     font-weight: 700;
-    color: #94a3b8;
+    color: #475569;
 }
 .vnd-table-count {
     font-size: 10px;
     font-weight: 600;
-    color: #3f4a5c;
-    background: rgba(255, 255, 255, 0.04);
+    color: #334155;
+    background: rgba(0, 0, 0, 0.06);
     padding: 2px 7px;
     border-radius: 4px;
     margin-left: 6px;
@@ -1054,7 +1054,7 @@
 .vnd-loading {
     position: fixed;
     inset: 0;
-    background: #0f0f14;
+    background: #fffbef;
     display: flex;
     flex-direction: column;
     align-items: center;

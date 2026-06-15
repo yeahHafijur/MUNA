@@ -85,6 +85,7 @@ const VendorDashboard = () => {
     const [newCategory, setNewCategory] = useState('');
     const [productSearchQuery, setProductSearchQuery] = useState('');
     const [isAddingItem, setIsAddingItem] = useState(false);
+    const [productUploadProgress, setProductUploadProgress] = useState(0);
 
     /* Delivery settings */
     const [minCharge, setMinCharge] = useState(10);
@@ -99,6 +100,7 @@ const VendorDashboard = () => {
 
     /* Shop image */
     const [uploadingImage, setUploadingImage] = useState(false);
+    const [bannerUploadProgress, setBannerUploadProgress] = useState(0);
 
     /* ── Initial data load ── */
     useEffect(() => {
@@ -222,36 +224,48 @@ const VendorDashboard = () => {
         fetchProducts(shop._id);
     };
 
-    const handleAddProduct = async (e) => {
+    const handleAddProduct = (e) => {
         e.preventDefault();
         if (isAddingItem) return;
         setIsAddingItem(true);
+        setProductUploadProgress(0);
         const formData = new FormData();
         formData.append('name', newProductName);
         formData.append('price', Number(newProductPrice));
         formData.append('category', newProductCategory || (shop.customCategories?.[0] || 'General'));
         if (newProductImage) formData.append('image', newProductImage);
 
-        try {
-            const res = await fetch('/api/products', {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
-                body: formData,
-            });
-            if (!res.ok) { const d = await res.json(); alert(d.message || 'Failed to add item'); return; }
-            setNewProductName('');
-            setNewProductPrice('');
-            setNewProductImage(null);
-            setNewProductCategory('');
-            const inp = document.getElementById('vnd-img-input');
-            if (inp) inp.value = '';
-            fetchProducts(shop._id);
-        } catch (err) {
-            console.error(err);
-            alert('Error adding item. Check your connection.');
-        } finally {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/products', true);
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) setProductUploadProgress(Math.round((e.loaded / e.total) * 100));
+        };
+        xhr.onload = () => {
             setIsAddingItem(false);
-        }
+            if (xhr.status >= 200 && xhr.status < 300) {
+                setNewProductName('');
+                setNewProductPrice('');
+                setNewProductImage(null);
+                setNewProductCategory('');
+                const inp = document.getElementById('vnd-img-input');
+                if (inp) inp.value = '';
+                fetchProducts(shop._id);
+                setTimeout(() => setProductUploadProgress(0), 1000);
+            } else {
+                try {
+                    const d = JSON.parse(xhr.responseText);
+                    alert(d.message || 'Failed to add item');
+                } catch { alert('Failed to add item'); }
+                setProductUploadProgress(0);
+            }
+        };
+        xhr.onerror = () => {
+            setIsAddingItem(false);
+            setProductUploadProgress(0);
+            alert('Error adding item. Check your connection.');
+        };
+        xhr.send(formData);
     };
 
     const handleAddCategory = async (e) => {
@@ -306,23 +320,42 @@ const VendorDashboard = () => {
         else alert(updated.message || 'Failed to update schedule.');
     };
 
-    const handleUpdateShopImage = async (e) => {
+    const handleUpdateShopImage = (e) => {
         const file = e.target.files[0];
         if (!file) return;
         setUploadingImage(true);
+        setBannerUploadProgress(0);
         const fd = new FormData();
         fd.append('image', file);
-        try {
-            const res = await fetch(`/api/shops/${shop._id}/image`, {
-                method: 'PUT',
-                headers: { Authorization: `Bearer ${token}` },
-                body: fd,
-            });
-            const updated = await res.json();
-            if (res.ok) { setShop(updated); alert('Shop banner updated!'); }
-            else alert(updated.message || 'Failed to update banner.');
-        } catch (err) { console.error(err); }
-        finally { setUploadingImage(false); e.target.value = null; }
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', `/api/shops/${shop._id}/image`, true);
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        xhr.upload.onprogress = (evt) => {
+            if (evt.lengthComputable) setBannerUploadProgress(Math.round((evt.loaded / evt.total) * 100));
+        };
+        xhr.onload = () => {
+            setUploadingImage(false);
+            e.target.value = null;
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    setShop(JSON.parse(xhr.responseText));
+                    alert('Shop banner updated!');
+                } catch { alert('Shop banner updated!'); }
+            } else {
+                try {
+                    const updated = JSON.parse(xhr.responseText);
+                    alert(updated.message || 'Failed to update banner.');
+                } catch { alert('Failed to update banner.'); }
+            }
+            setTimeout(() => setBannerUploadProgress(0), 1000);
+        };
+        xhr.onerror = () => {
+            setUploadingImage(false);
+            e.target.value = null;
+            setBannerUploadProgress(0);
+        };
+        xhr.send(fd);
     };
 
     /* ── Computed ── */

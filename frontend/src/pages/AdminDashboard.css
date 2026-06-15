@@ -11,7 +11,7 @@
     z-index: 100;
     display: flex;
     flex-direction: column;
-    background: #111118;
+    background: #fffbef;
     overflow: hidden;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -21,8 +21,8 @@
 .adm-header {
     flex-shrink: 0;
     height: 56px;
-    background: #16161e;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -50,7 +50,7 @@
 .adm-header-brand {
     font-size: 15px;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #1e293b;
     letter-spacing: -0.3px;
 }
 
@@ -65,8 +65,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #f8cb46;
-    background: rgba(248,203,70,0.08);
+    color: #d97706; background: rgba(245,158,11,0.1);
     padding: 4px 10px;
     border-radius: 5px;
 }
@@ -91,11 +90,11 @@
 /* ---- TAB BAR (below header) ---- */
 .adm-tabbar {
     flex-shrink: 0;
-    background: #16161e;
+    background: #ffffff;
     display: flex;
     padding: 0 20px;
     gap: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
@@ -119,10 +118,10 @@
     white-space: nowrap;
 }
 .adm-tabbar-item:hover {
-    color: #94a3b8;
+    color: #64748b;
 }
 .adm-tabbar-item--active {
-    color: #e2e8f0;
+    color: #1e293b;
 }
 .adm-tabbar-item--active::after {
     content: '';
@@ -141,27 +140,27 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.06) transparent;
+    scrollbar-color: rgba(0,0,0,0.08) transparent;
 }
 .adm-body::-webkit-scrollbar {
     width: 5px;
 }
 .adm-body::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.06);
+    background: rgba(0,0,0,0.08);
     border-radius: 4px;
 }
 
 /* ---- STATS BAR ---- */
 .adm-stats-bar {
     display: flex;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    background: rgba(255,255,255,0.015);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: rgba(0,0,0,0.02);
 }
 
 .adm-stat {
     flex: 1;
     padding: 18px 20px;
-    border-right: 1px solid rgba(255,255,255,0.04);
+    border-right: 1px solid rgba(0,0,0,0.06);
 }
 .adm-stat:last-child {
     border-right: none;
@@ -170,7 +169,7 @@
 .adm-stat-num {
     font-size: 22px;
     font-weight: 800;
-    color: #f1f5f9;
+    color: #0f172a;
     letter-spacing: -0.5px;
     margin-bottom: 2px;
 }
@@ -196,8 +195,8 @@
 
 .adm-section-head {
     padding: 18px 20px;
-    background: rgba(255,255,255,0.015);
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: rgba(0,0,0,0.02);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -208,7 +207,7 @@
 .adm-section-title {
     font-size: 14px;
     font-weight: 700;
-    color: #cbd5e1;
+    color: #334155;
     letter-spacing: -0.1px;
 }
 
@@ -216,7 +215,7 @@
     font-size: 11px;
     font-weight: 600;
     color: #475569;
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.08);
     padding: 2px 8px;
     border-radius: 4px;
     margin-left: 8px;
@@ -261,18 +260,18 @@
 .adm-input {
     width: 100%;
     padding: 11px 14px;
-    background: rgba(255,255,255,0.035);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: #e2e8f0;
+    color: #1e293b;
     outline: none;
     transition: all 0.15s;
     box-sizing: border-box;
 }
 .adm-input::placeholder {
-    color: #3f4a5c;
+    color: #64748b;
 }
 .adm-input:focus {
     border-color: rgba(248,203,70,0.45);
@@ -336,16 +335,16 @@
     color: #475569;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    background: rgba(255,255,255,0.01);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: rgba(0,0,0,0.01);
     white-space: nowrap;
 }
 
 .adm-table td {
     padding: 14px 20px;
     font-size: 13px;
-    color: #cbd5e1;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    color: #334155;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
     vertical-align: middle;
 }
 
@@ -353,12 +352,12 @@
     transition: background 0.1s;
 }
 .adm-table tbody tr:hover {
-    background: rgba(255,255,255,0.02);
+    background: rgba(0,0,0,0.03);
 }
 
 .adm-table-name {
     font-weight: 600;
-    color: #e2e8f0;
+    color: #1e293b;
     font-size: 13px;
 }
 
@@ -416,13 +415,13 @@
     white-space: nowrap;
 }
 .adm-tbl-btn--edit {
-    color: #94a3b8;
+    color: #64748b;
     background: transparent;
-    border-color: rgba(255,255,255,0.07);
+    border-color: rgba(0,0,0,0.11);
 }
 .adm-tbl-btn--edit:hover {
-    color: #e2e8f0;
-    background: rgba(255,255,255,0.04);
+    color: #1e293b;
+    background: rgba(0,0,0,0.06);
 }
 .adm-tbl-btn--off {
     color: #f87171;
@@ -456,17 +455,17 @@
 .adm-search input {
     width: 100%;
     padding: 8px 12px 8px 34px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 7px;
     font-size: 12px;
     font-weight: 500;
-    color: #e2e8f0;
+    color: #1e293b;
     outline: none;
     box-sizing: border-box;
     transition: border-color 0.15s;
 }
-.adm-search input::placeholder { color: #3f4a5c; }
+.adm-search input::placeholder { color: #64748b; }
 .adm-search input:focus { border-color: rgba(248,203,70,0.4); }
 .adm-search-icon {
     position: absolute;
@@ -499,13 +498,13 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 1px;
-    background: rgba(255,255,255,0.03);
-    border-top: 1px solid rgba(255,255,255,0.04);
+    background: rgba(0,0,0,0.04);
+    border-top: 1px solid rgba(0,0,0,0.06);
     margin-top: 0;
 }
 
 .adm-godown-cell {
-    background: #111118;
+    background: #fffbef;
     padding: 16px 12px 12px;
     display: flex;
     flex-direction: column;
@@ -515,7 +514,7 @@
     transition: background 0.15s;
 }
 .adm-godown-cell:hover {
-    background: #181822;
+    background: #f1f5f9;
 }
 
 /* Godown item image */
@@ -523,8 +522,8 @@
     width: 52px;
     height: 52px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.08);
     overflow: hidden;
     display: grid;
     place-items: center;
@@ -538,13 +537,13 @@
 }
 .adm-godown-img-ph {
     font-size: 20px;
-    color: #2a2a3a;
+    color: #334155;
 }
 
 .adm-godown-name {
     font-size: 11px;
     font-weight: 700;
-    color: #cbd5e1;
+    color: #334155;
     line-height: 1.35;
     margin-bottom: 2px;
     word-break: break-word;
@@ -586,13 +585,13 @@
     letter-spacing: 0.5px;
 }
 .adm-godown-act-btn--edit {
-    color: #94a3b8;
-    background: rgba(255,255,255,0.04);
+    color: #64748b;
+    background: rgba(0,0,0,0.06);
     border-radius: 0 0 0 6px;
 }
 .adm-godown-act-btn--edit:hover {
-    color: #e2e8f0;
-    background: rgba(255,255,255,0.08);
+    color: #1e293b;
+    background: rgba(0,0,0,0.1);
 }
 .adm-godown-act-btn--del {
     color: #f87171;
@@ -622,8 +621,8 @@
 }
 
 .adm-modal {
-    background: #1a1a26;
-    border: 1px solid rgba(255,255,255,0.06);
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 14px;
     width: 100%;
     max-width: 400px;
@@ -636,13 +635,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
 .adm-modal-title {
     font-size: 14px;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #1e293b;
 }
 
 .adm-modal-x {
@@ -650,7 +649,7 @@
     height: 28px;
     border-radius: 6px;
     border: none;
-    background: rgba(255,255,255,0.04);
+    background: rgba(0,0,0,0.06);
     color: #64748b;
     font-size: 13px;
     cursor: pointer;
@@ -659,8 +658,8 @@
     transition: all 0.1s;
 }
 .adm-modal-x:hover {
-    color: #e2e8f0;
-    background: rgba(255,255,255,0.08);
+    color: #1e293b;
+    background: rgba(0,0,0,0.1);
 }
 
 .adm-modal-body {
@@ -690,8 +689,8 @@
     width: 72px;
     height: 72px;
     border-radius: 12px;
-    border: 2px dashed rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.02);
+    border: 2px dashed rgba(0,0,0,0.1);
+    background: rgba(0,0,0,0.03);
     display: grid;
     place-items: center;
     overflow: hidden;
@@ -708,7 +707,7 @@
 }
 .adm-upload-hint {
     font-size: 9px;
-    color: #3f4a5c;
+    color: #64748b;
     font-weight: 600;
     text-align: center;
     padding: 4px;
@@ -732,7 +731,7 @@ dialog.adm-dialog::backdrop {
     padding: 50px 20px;
     text-align: center;
     font-size: 13px;
-    color: #3f4a5c;
+    color: #64748b;
     font-weight: 500;
 }
 
@@ -751,7 +750,7 @@ dialog.adm-dialog::backdrop {
     .adm-tabbar-item { padding: 12px 14px; font-size: 12px; }
     .adm-header-tag { display: none; }
     .adm-stats-bar { flex-direction: column; }
-    .adm-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.04); padding: 12px 14px; }
+    .adm-stat { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.06); padding: 12px 14px; }
     .adm-stat:last-child { border-bottom: none; }
     .adm-section-head { padding: 14px; }
     .adm-form-wrap { padding: 14px; }

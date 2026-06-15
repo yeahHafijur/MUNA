@@ -5,29 +5,23 @@ const User = require('../models/User');
 
 // Function to send OneSignal push notification
 const sendOneSignalNotification = async (playerIds, heading, message) => {
-    console.log("[OneSignal] Attempting to send notification...");
-    console.log("[OneSignal] API Key present:", !!process.env.ONESIGNAL_REST_API_KEY);
-    console.log("[OneSignal] Player IDs:", playerIds);
-    console.log("[OneSignal] Heading:", heading);
-    console.log("[OneSignal] Message:", message);
-
     if (!process.env.ONESIGNAL_REST_API_KEY) {
-        console.log("[OneSignal] ❌ SKIPPED: ONESIGNAL_REST_API_KEY not found in environment!");
+        console.log("[OneSignal] ❌ SKIPPED: ONESIGNAL_REST_API_KEY missing in .env!");
         return;
     }
-    if (!playerIds || playerIds.length === 0 || playerIds[0] === null || playerIds[0] === undefined) {
-        console.log("[OneSignal] ❌ SKIPPED: No valid Player IDs provided!");
+    if (!playerIds || playerIds.length === 0 || !playerIds[0]) {
+        console.log("[OneSignal] ❌ SKIPPED: No valid Player IDs provided for this user!");
         return;
     }
 
     try {
         const payload = {
-            app_id: process.env.ONESIGNAL_APP_ID,
-            include_subscription_ids: playerIds,
+            app_id: process.env.ONESIGNAL_APP_ID || "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
+            include_player_ids: playerIds,       // 🔥 FIX: The battle-tested targeting field
+            include_subscription_ids: playerIds, // Keep for fallback compatibility
             headings: { en: heading },
             contents: { en: message }
         };
-        console.log("[OneSignal] Sending payload:", JSON.stringify(payload));
 
         const response = await fetch("https://onesignal.com/api/v1/notifications", {
             method: "POST",
@@ -37,10 +31,17 @@ const sendOneSignalNotification = async (playerIds, heading, message) => {
             },
             body: JSON.stringify(payload)
         });
+        
         const data = await response.json();
-        console.log("[OneSignal] ✅ Response:", JSON.stringify(data));
+        
+        // 🔥 FIX: Actually check if OneSignal rejected the payload
+        if (!response.ok) {
+            console.error("[OneSignal] ❌ Failed to Deliver. Errors:", data.errors);
+        } else {
+            console.log("[OneSignal] ✅ Notification Delivered:", data.id);
+        }
     } catch (error) {
-        console.error("[OneSignal] ❌ Error:", error);
+        console.error("[OneSignal] ❌ Network/Server Error:", error);
     }
 };
 

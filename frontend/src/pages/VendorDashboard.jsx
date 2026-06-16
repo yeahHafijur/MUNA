@@ -3,70 +3,14 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './VendorDashboard.css';
 
-/* ─── Utility: convert base64 to Uint8Array (push notifications) ─── */
-function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
-    return outputArray;
-}
+/* ─── SVG ICONS ─── */
+const IconBell = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>;
+const IconStore = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg>;
+const IconClipboard = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>;
+const IconSettings = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.252-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+const IconTrash = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>;
 
-/* ─── Icon Components ─── */
-const IconBack = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} className="w-5 h-5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-    </svg>
-);
-const IconLogout = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-    </svg>
-);
-const IconBell = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-    </svg>
-);
-const IconSearch = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-);
-const IconTrash = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-    </svg>
-);
-
-/* ─── Status pill helper ─── */
-const StatusPill = ({ status }) => {
-    const cls = `vnd-status-pill vnd-pill--${status.replace(' ', '_')}`;
-    const labels = {
-        pending: '⏳ Pending',
-        accepted: '✅ Accepted',
-        preparing: '🔥 Preparing',
-        out_for_delivery: '🛵 On the Way',
-        delivered: '🎉 Delivered',
-        cancelled: '❌ Cancelled',
-    };
-    return <span className={cls}>{labels[status] || status}</span>;
-};
-
-/* ─── Toggle Switch ─── */
-const Toggle = ({ checked, onChange }) => (
-    <label className="vnd-toggle">
-        <input type="checkbox" checked={checked} onChange={onChange} />
-        <span className="vnd-toggle-track">
-            <span className="vnd-toggle-thumb" />
-        </span>
-    </label>
-);
-
-/* ═══════════════════════════════════════════════════════════
-   VENDOR DASHBOARD COMPONENT
-═══════════════════════════════════════════════════════════ */
+/* ─── MAIN COMPONENT ─── */
 const VendorDashboard = () => {
     const { user, token, logout } = useAuth();
     const navigate = useNavigate();
@@ -74,39 +18,28 @@ const VendorDashboard = () => {
     const [shop, setShop] = useState(null);
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
-    const [activeTab, setActiveTab] = useState('orders');
+    const [activeTab, setActiveTab] = useState('orders'); // orders, inventory, settings
     const prevOrderCountRef = useRef(0);
 
-    /* Add-product form */
+    /* Form States */
     const [newProductName, setNewProductName] = useState('');
     const [newProductPrice, setNewProductPrice] = useState('');
     const [newProductImage, setNewProductImage] = useState(null);
     const [newProductCategory, setNewProductCategory] = useState('');
-    const [newCategory, setNewCategory] = useState('');
-    const [productSearchQuery, setProductSearchQuery] = useState('');
     const [isAddingItem, setIsAddingItem] = useState(false);
-    const [expandedOrderId, setExpandedOrderId] = useState(null);
-    const [productUploadProgress, setProductUploadProgress] = useState(0);
 
-    /* Delivery settings */
+    /* Delivery & Schedule Settings */
     const [minCharge, setMinCharge] = useState(10);
     const [minDistance, setMinDistance] = useState(2);
     const [chargePerKm, setChargePerKm] = useState(5);
     const [maxRange, setMaxRange] = useState(5);
-
-    /* Auto-schedule */
     const [autoScheduleEnabled, setAutoScheduleEnabled] = useState(false);
     const [openTime, setOpenTime] = useState('09:00');
     const [closeTime, setCloseTime] = useState('21:00');
 
-    /* Shop image */
-    const [uploadingImage, setUploadingImage] = useState(false);
-    const [bannerUploadProgress, setBannerUploadProgress] = useState(0);
-
-    /* ── Initial data load ── */
+    /* ── Initial Load ── */
     useEffect(() => {
         if (!token || user?.role !== 'vendor') { navigate('/'); return; }
-
         fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } })
             .then(r => r.json())
             .then(shopData => {
@@ -136,40 +69,7 @@ const VendorDashboard = () => {
         return () => clearInterval(id);
     }, [shop, token]);
 
-    /* ── Notification sound ── */
-    const playNotificationSound = () => {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const play = (freq, start, dur) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
-                gain.gain.setValueAtTime(0, ctx.currentTime + start);
-                gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + start + 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + dur);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start(ctx.currentTime + start);
-                osc.stop(ctx.currentTime + start + dur);
-            };
-            play(880, 0, 0.4);
-            play(1108.73, 0.15, 0.6);
-        } catch { /* ignore */ }
-    };
-
-    /* ── Enable push notifications ── */
-    const handleEnableNotifications = async () => {
-        try {
-            if (window.OneSignal) await window.OneSignal.Slidedown.promptPush();
-            else alert('Notification system is initializing. Please try again shortly.');
-        } catch (err) {
-            console.error(err);
-            alert('Failed to enable push notifications.');
-        }
-    };
-
-    /* ── Fetch orders ── */
+    /* ── Fetch Functions ── */
     const fetchOrders = (isInitial = false) => {
         fetch('/api/orders/vendor', { headers: { Authorization: `Bearer ${token}` } })
             .then(r => r.json())
@@ -177,27 +77,20 @@ const VendorDashboard = () => {
                 if (!Array.isArray(data)) return;
                 const liveCount = data.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length;
                 if (!isInitial && liveCount > prevOrderCountRef.current) {
-                    playNotificationSound();
-                    if ('Notification' in window && Notification.permission === 'granted') {
-                        new Notification('New Order Received! 🛒', {
-                            body: 'A new order just arrived at your shop.',
-                            icon: '/vite.svg',
-                        });
-                    }
+                    try { new Audio('/notification.mp3').play(); } catch {}
                 }
                 prevOrderCountRef.current = liveCount;
                 setOrders(data);
             });
     };
 
-    /* ── Fetch products ── */
     const fetchProducts = (shopId) => {
         fetch(`/api/products/${shopId}`)
             .then(r => r.json())
             .then(data => setProducts(Array.isArray(data) ? data : []));
     };
 
-    /* ── CRUD handlers ── */
+    /* ── Action Handlers ── */
     const handleUpdateOrderStatus = async (orderId, newStatus) => {
         await fetch(`/api/orders/${orderId}/status`, {
             method: 'PUT',
@@ -217,7 +110,7 @@ const VendorDashboard = () => {
     };
 
     const handleDeleteProduct = async (productId) => {
-        if (!window.confirm('Delete this item from your menu?')) return;
+        if (!window.confirm('Delete this item?')) return;
         await fetch(`/api/products/${productId}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` },
@@ -225,61 +118,26 @@ const VendorDashboard = () => {
         fetchProducts(shop._id);
     };
 
-    const handleAddProduct = (e) => {
+    const handleAddProduct = async (e) => {
         e.preventDefault();
-        if (isAddingItem) return;
         setIsAddingItem(true);
-        setProductUploadProgress(0);
         const formData = new FormData();
         formData.append('name', newProductName);
         formData.append('price', Number(newProductPrice));
-        formData.append('category', newProductCategory || (shop.customCategories?.[0] || 'General'));
+        formData.append('category', newProductCategory || 'General');
         if (newProductImage) formData.append('image', newProductImage);
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/products', true);
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-        xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) setProductUploadProgress(Math.round((e.loaded / e.total) * 100));
-        };
-        xhr.onload = () => {
+        try {
+            await fetch('/api/products', {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` },
+                body: formData,
+            });
+            setNewProductName(''); setNewProductPrice(''); setNewProductImage(null);
+            fetchProducts(shop._id);
+        } finally {
             setIsAddingItem(false);
-            if (xhr.status >= 200 && xhr.status < 300) {
-                setNewProductName('');
-                setNewProductPrice('');
-                setNewProductImage(null);
-                setNewProductCategory('');
-                const inp = document.getElementById('vnd-img-input');
-                if (inp) inp.value = '';
-                fetchProducts(shop._id);
-                setTimeout(() => setProductUploadProgress(0), 1000);
-            } else {
-                try {
-                    const d = JSON.parse(xhr.responseText);
-                    alert(d.message || 'Failed to add item');
-                } catch { alert('Failed to add item'); }
-                setProductUploadProgress(0);
-            }
-        };
-        xhr.onerror = () => {
-            setIsAddingItem(false);
-            setProductUploadProgress(0);
-            alert('Error adding item. Check your connection.');
-        };
-        xhr.send(formData);
-    };
-
-    const handleAddCategory = async (e) => {
-        e.preventDefault();
-        if (!newCategory.trim()) return;
-        const updated = [...(shop.customCategories || []), newCategory.trim()];
-        const res = await fetch(`/api/shops/${shop._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ customCategories: updated }),
-        });
-        setShop(await res.json());
-        setNewCategory('');
+        }
     };
 
     const handleToggleShopStatus = async () => {
@@ -297,619 +155,217 @@ const VendorDashboard = () => {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({
-                deliverySettings: {
-                    minimumCharge: Number(minCharge),
-                    minimumDistance: Number(minDistance),
-                    chargePerKm: Number(chargePerKm),
-                    maxRange: Number(maxRange),
-                },
+                deliverySettings: { minimumCharge: Number(minCharge), minimumDistance: Number(minDistance), chargePerKm: Number(chargePerKm), maxRange: Number(maxRange) }
             }),
         });
-        if (res.ok) { setShop(await res.json()); alert('Delivery settings saved!'); }
-        else alert('Failed to save delivery settings.');
+        if (res.ok) { setShop(await res.json()); alert('Settings Saved!'); }
     };
 
-    const handleUpdateSchedule = async (e) => {
-        if (e) e.preventDefault();
-        const res = await fetch(`/api/shops/${shop._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ autoSchedule: { enabled: autoScheduleEnabled, openTime, closeTime } }),
-        });
-        const updated = await res.json();
-        if (res.ok) { setShop(updated); alert('Schedule updated!'); }
-        else alert(updated.message || 'Failed to update schedule.');
-    };
+    /* ── Render Check ── */
+    if (!shop) return <div className="h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full"></div></div>;
 
-    const handleUpdateShopImage = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        setUploadingImage(true);
-        setBannerUploadProgress(0);
-        const fd = new FormData();
-        fd.append('image', file);
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', `/api/shops/${shop._id}/image`, true);
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-        xhr.upload.onprogress = (evt) => {
-            if (evt.lengthComputable) setBannerUploadProgress(Math.round((evt.loaded / evt.total) * 100));
-        };
-        xhr.onload = () => {
-            setUploadingImage(false);
-            e.target.value = null;
-            if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                    setShop(JSON.parse(xhr.responseText));
-                    alert('Shop banner updated!');
-                } catch { alert('Shop banner updated!'); }
-            } else {
-                try {
-                    const updated = JSON.parse(xhr.responseText);
-                    alert(updated.message || 'Failed to update banner.');
-                } catch { alert('Failed to update banner.'); }
-            }
-            setTimeout(() => setBannerUploadProgress(0), 1000);
-        };
-        xhr.onerror = () => {
-            setUploadingImage(false);
-            e.target.value = null;
-            setBannerUploadProgress(0);
-        };
-        xhr.send(fd);
-    };
-
-    /* ── Computed ── */
-    const liveOrders = orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled');
-    const completedOrders = orders.filter(o => o.status === 'delivered');
-    const revenue = completedOrders.reduce((s, o) => s + (o.totalAmount || 0), 0);
-
-    /* ── Filtered & sorted products ── */
-    const filteredProducts = [...products]
-        .filter(p => p.name.toLowerCase().includes(productSearchQuery.toLowerCase()))
-        .sort((a, b) => {
-            if (a.inStock === b.inStock) return 0;
-            return a.inStock ? 1 : -1; // OOS first
-        });
-
-    /* ── Loading screen ── */
-    if (!shop) return (
-        <div className="vnd-loading">
-            <div className="vnd-loading-logo">M</div>
-            <div className="vnd-loading-spinner" />
-            <p className="vnd-loading-text">Loading your dashboard…</p>
-        </div>
-    );
+    /* ── Order Kanban Categories ── */
+    const pendingOrders = orders.filter(o => o.status === 'pending');
+    const processingOrders = orders.filter(o => ['accepted', 'preparing'].includes(o.status));
+    const dispatchOrders = orders.filter(o => o.status === 'out_for_delivery');
 
     return (
-        <div className="vnd-root">
-
-            {/* ════════ HEADER ════════ */}
-            <header className="vnd-header">
-                <div className="vnd-header-left">
-                    <button onClick={() => navigate('/')} className="vnd-icon-btn" title="Back to Home" style={{marginRight: '8px', color: '#1a0e00'}}>
-                        <IconBack />
+        <div className="vs-layout">
+            
+            {/* ════════ LEFT SIDEBAR ════════ */}
+            <aside className="vs-sidebar">
+                <div className="vs-brand">
+                    <span className="font-black text-2xl tracking-tighter text-slate-900">MUNA <span className="text-amber-500">Partner</span></span>
+                </div>
+                
+                <nav className="vs-nav">
+                    <button onClick={() => setActiveTab('orders')} className={`vs-nav-item ${activeTab === 'orders' ? 'active' : ''}`}>
+                        <IconClipboard /> Live Orders 
+                        {pendingOrders.length > 0 && <span className="vs-badge">{pendingOrders.length}</span>}
                     </button>
-                    {/* Shop avatar (click to change image) */}
-                    <label className="vnd-shop-avatar" title="Change shop image">
-                        {shop.image
-                            ? <img src={shop.image} alt={shop.name} />
-                            : <span className="vnd-shop-avatar-ph">🏪</span>
-                        }
-                        <span className="vnd-shop-avatar-overlay">
-                            {uploadingImage ? '…' : '📷'}
-                        </span>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            style={{ display: 'none' }}
-                            onChange={handleUpdateShopImage}
-                            disabled={uploadingImage}
-                        />
-                    </label>
+                    <button onClick={() => setActiveTab('inventory')} className={`vs-nav-item ${activeTab === 'inventory' ? 'active' : ''}`}>
+                        <IconStore /> Inventory
+                    </button>
+                    <button onClick={() => setActiveTab('settings')} className={`vs-nav-item ${activeTab === 'settings' ? 'active' : ''}`}>
+                        <IconSettings /> Store Settings
+                    </button>
+                </nav>
 
-                    <div className="vnd-shop-info">
-                        <div className="vnd-shop-name">
-                            {shop.name}
-                            {shop.udyamNumber && (
-                                <span className="vnd-verified-badge">✓ Verified</span>
-                            )}
+                <div className="vs-sidebar-foot">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold">
+                            {user.name.charAt(0)}
                         </div>
-                        <div className="vnd-shop-address">{shop.address}</div>
+                        <div className="flex-1 truncate">
+                            <p className="text-sm font-bold text-slate-800 truncate">{user.name}</p>
+                            <button onClick={logout} className="text-xs text-red-500 font-bold hover:underline">Sign Out</button>
+                        </div>
                     </div>
                 </div>
+            </aside>
 
-                <div className="vnd-header-right">
-                    {/* Open / Closed toggle */}
-                    <button
-                        id="vnd-shop-status-btn"
-                        onClick={handleToggleShopStatus}
-                        className={`vnd-status-btn ${shop.isOpen ? 'vnd-status-btn--open' : 'vnd-status-btn--closed'}`}
-                    >
-                        <span className={`vnd-status-dot ${shop.isOpen ? 'vnd-status-dot--open' : 'vnd-status-dot--closed'}`} />
-                        <span>{shop.isOpen ? 'Open' : 'Closed'}</span>
-                    </button>
+            {/* ════════ MAIN CONTENT AREA ════════ */}
+            <main className="vs-main">
+                
+                {/* ── TOP HEADER ── */}
+                <header className="vs-header">
+                    <h1 className="text-xl font-black text-slate-800 capitalize">{activeTab}</h1>
+                    
+                    <div className="flex items-center gap-6">
+                        <button className="text-slate-500 hover:text-amber-500 transition">
+                            <IconBell />
+                        </button>
+                        <div className="w-px h-8 bg-slate-200"></div>
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Store Status</span>
+                            <button 
+                                onClick={handleToggleShopStatus}
+                                className={`px-4 py-2 rounded-full text-sm font-bold shadow-sm transition-colors ${shop.isOpen ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                            >
+                                {shop.isOpen ? '● Open (Accepting)' : '● Closed'}
+                            </button>
+                        </div>
+                    </div>
+                </header>
 
-                    {/* Bell (notifications) */}
-                    <button
-                        id="vnd-notify-btn"
-                        className="vnd-icon-btn"
-                        title="Enable notifications"
-                        onClick={handleEnableNotifications}
-                    >
-                        <IconBell />
-                    </button>
+                {/* ── DYNAMIC WORKSPACE ── */}
+                <div className="vs-workspace">
 
-                    <div className="vnd-divider" />
+                    {/* === TAB 1: KANBAN LIVE ORDERS === */}
+                    {activeTab === 'orders' && (
+                        <div className="vs-kanban-board">
+                            
+                            {/* Column 1: NEW */}
+                            <div className="vs-kanban-col">
+                                <div className="vs-kcol-head border-l-4 border-amber-500">
+                                    <h3>New Orders</h3>
+                                    <span>{pendingOrders.length}</span>
+                                </div>
+                                <div className="vs-kcol-body">
+                                    {pendingOrders.length === 0 ? <p className="vs-empty">No new orders</p> : null}
+                                    {pendingOrders.map(order => (
+                                        <div key={order._id} className="vs-order-card border-t-4 border-amber-400">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="font-mono font-bold text-slate-700 text-sm">#{order._id.slice(-5).toUpperCase()}</span>
+                                                <span className="font-bold text-amber-600">₹{order.totalAmount}</span>
+                                            </div>
+                                            <div className="text-xs text-slate-500 mb-3 line-clamp-2">
+                                                {order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => handleUpdateOrderStatus(order._id, 'accepted')} className="vs-btn-primary flex-1">Accept</button>
+                                                <button onClick={() => handleUpdateOrderStatus(order._id, 'cancelled')} className="vs-btn-danger px-3">Reject</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
 
-                    {/* Shopping Profile */}
-                    <button
-                        className="vnd-icon-btn"
-                        title="My Shopping Profile"
-                        onClick={() => navigate('/profile')}
-                    >
-                        🛍️
-                    </button>
+                            {/* Column 2: PREPARING */}
+                            <div className="vs-kanban-col">
+                                <div className="vs-kcol-head border-l-4 border-blue-500">
+                                    <h3>Processing</h3>
+                                    <span>{processingOrders.length}</span>
+                                </div>
+                                <div className="vs-kcol-body">
+                                    {processingOrders.map(order => (
+                                        <div key={order._id} className="vs-order-card border-t-4 border-blue-400">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="font-mono font-bold text-slate-700 text-sm">#{order._id.slice(-5).toUpperCase()}</span>
+                                                <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase">{order.status}</span>
+                                            </div>
+                                            <div className="text-xs text-slate-500 mb-3">
+                                                📍 {order.deliveryLocation?.address || 'View on Map'}
+                                            </div>
+                                            {order.status === 'accepted' ? (
+                                                <button onClick={() => handleUpdateOrderStatus(order._id, 'preparing')} className="vs-btn-secondary w-full">Start Preparing</button>
+                                            ) : (
+                                                <button onClick={() => handleUpdateOrderStatus(order._id, 'out_for_delivery')} className="vs-btn-primary w-full bg-blue-600 hover:bg-blue-700">Dispatch Order</button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
 
-                    {/* User info + logout */}
-                    <span className="vnd-username">
-                        {user.name}
-                    </span>
-                    <button
-                        id="vnd-logout-btn"
-                        className="vnd-icon-btn vnd-icon-btn--danger"
-                        title="Sign out"
-                        onClick={() => { logout(); navigate('/'); }}
-                    >
-                        <IconLogout />
-                    </button>
-                </div>
-            </header>
+                            {/* Column 3: OUT FOR DELIVERY */}
+                            <div className="vs-kanban-col">
+                                <div className="vs-kcol-head border-l-4 border-emerald-500">
+                                    <h3>On The Way</h3>
+                                    <span>{dispatchOrders.length}</span>
+                                </div>
+                                <div className="vs-kcol-body">
+                                    {dispatchOrders.map(order => (
+                                        <div key={order._id} className="vs-order-card border-t-4 border-emerald-400">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="font-mono font-bold text-slate-700 text-sm">#{order._id.slice(-5).toUpperCase()}</span>
+                                                <span className="font-bold text-slate-800">₹{order.totalAmount}</span>
+                                            </div>
+                                            <div className="text-xs font-bold text-slate-600 mb-3">
+                                                📞 {order.customerId?.phone || 'No Contact'}
+                                            </div>
+                                            <button onClick={() => handleUpdateOrderStatus(order._id, 'delivered')} className="vs-btn-primary w-full bg-emerald-500 hover:bg-emerald-600">Mark Delivered</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
 
-            {/* ════════ TAB BAR ════════ */}
-            <nav className="vnd-tabbar">
-                <button
-                    id="vnd-tab-orders"
-                    className={`vnd-tab ${activeTab === 'orders' ? 'vnd-tab--active' : ''}`}
-                    onClick={() => setActiveTab('orders')}
-                >
-                    📋 Live Orders
-                    {liveOrders.length > 0 && (
-                        <span className="vnd-tab-badge">{liveOrders.length}</span>
+                        </div>
                     )}
-                </button>
 
-                <button
-                    id="vnd-tab-store"
-                    className={`vnd-tab ${activeTab === 'store' ? 'vnd-tab--active' : ''}`}
-                    onClick={() => setActiveTab('store')}
-                >
-                    🏪 Store Management
-                </button>
-
-                <button
-                    id="vnd-tab-settings"
-                    className={`vnd-tab ${activeTab === 'settings' ? 'vnd-tab--active' : ''}`}
-                    onClick={() => setActiveTab('settings')}
-                >
-                    ⚙️ Settings
-                </button>
-            </nav>
-
-            {/* ════════ BODY ════════ */}
-            <div className="vnd-body">
-
-                {/* ─── ORDERS TAB ─── */}
-                {activeTab === 'orders' && (
-                    <div className="vnd-tab-panel">
-                        {/* Stats Row */}
-                        <div className="vnd-stats-row">
-                            <div className="vnd-stat-card">
-                                <div className="vnd-stat-num">{liveOrders.length}</div>
-                                <div className="vnd-stat-label">Live Orders</div>
-                                <div className="vnd-stat-icon">📋</div>
-                            </div>
-                            <div className="vnd-stat-card">
-                                <div className="vnd-stat-num vnd-stat-num--green">{completedOrders.length}</div>
-                                <div className="vnd-stat-label">Delivered</div>
-                                <div className="vnd-stat-icon">✅</div>
-                            </div>
-                            <div className="vnd-stat-card">
-                                <div className="vnd-stat-num">₹{revenue}</div>
-                                <div className="vnd-stat-label">Revenue</div>
-                                <div className="vnd-stat-icon">💰</div>
-                            </div>
-                        </div>
-
-                        {/* Live Orders Section */}
-                        <div className="vnd-section-card" style={{marginTop: "24px"}}>
-                            <div className="vnd-section-head">
-                                <div className="vnd-section-title">
-                                    <span className="vnd-section-title-icon">🔥</span>
-                                    Live Orders
+                    {/* === TAB 2: INVENTORY === */}
+                    {activeTab === 'inventory' && (
+                        <div className="vs-inventory-tab">
+                            {/* Toolbar */}
+                            <div className="flex justify-between items-end mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div>
+                                    <h2 className="text-lg font-black text-slate-800">Store Catalog</h2>
+                                    <p className="text-sm text-slate-500">Manage your items, stock, and pricing.</p>
                                 </div>
-                            </div>
-                            <div className="vnd-section-body" style={{padding: 0}}>
-                                {liveOrders.length === 0 ? (
-                                    <div style={{padding: "32px", textAlign: "center", color: "#64748b"}}>No active orders at the moment.</div>
-                                ) : (
-                                    <div className="vnd-order-list">
-                                        {liveOrders.map(order => (
-                                            <div
-                                                key={order._id}
-                                                className={`vnd-order-list-item ${expandedOrderId === order._id ? 'expanded' : ''} ${order.status === 'pending' ? 'new' : ''}`}
-                                                style={{ borderBottom: '1px solid #e2e8f0', background: expandedOrderId === order._id ? '#f8fafc' : 'white', transition: 'background 0.2s', borderLeft: order.status === 'pending' ? '4px solid #3b82f6' : '4px solid transparent' }}
-                                            >
-                                                {/* Single Line Header */}
-                                                <div 
-                                                    className="vnd-order-list-header" 
-                                                    onClick={() => setExpandedOrderId(expandedOrderId === order._id ? null : order._id)}
-                                                    style={{ display: 'flex', alignItems: 'center', padding: '16px', cursor: 'pointer', gap: '16px' }}
-                                                >
-                                                    <div style={{fontWeight: "600", width: '80px', color: '#1e293b'}}>#{order._id.slice(-6).toUpperCase()}</div>
-                                                    <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                                                        <div style={{fontWeight: "600", color: "#1e293b"}}>{order.customerId?.name || "Guest Customer"}</div>
-                                                        <div style={{fontSize: "12px", color: "#64748b"}}>
-                                                            {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                            {' · '}
-                                                            {new Date(order.createdAt).toLocaleDateString([], { day: 'numeric', month: 'short' })}
-                                                        </div>
-                                                    </div>
-                                                    <div style={{width: '140px', display: 'flex', justifyContent: 'center'}}>
-                                                         <StatusPill status={order.status} />
-                                                    </div>
-                                                    <div style={{fontWeight: "600", width: '80px', textAlign: 'right', color: '#0f172a'}}>
-                                                        ₹{order.totalAmount}
-                                                    </div>
-                                                    <div style={{color: "#94a3b8", marginLeft: "8px", width: '24px', textAlign: 'center'}}>
-                                                        {expandedOrderId === order._id ? "▲" : "▼"}
-                                                    </div>
-                                                </div>
-
-                                                {/* Expanded Body */}
-                                                {expandedOrderId === order._id && (
-                                                    <div className="vnd-order-list-body" style={{ padding: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                                                        <div style={{flex: '1 1 300px'}}>
-                                                            {/* Customer */}
-                                                            <div style={{marginBottom: '16px'}}>
-                                                                <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '4px'}}>Customer Details</div>
-                                                                <div className="vnd-customer-name">{order.customerId?.name || 'Guest Customer'}</div>
-                                                                <div className="vnd-customer-phone">📞 {order.customerId?.phone || 'N/A'}</div>
-                                                            </div>
-
-                                                            {/* Delivery address */}
-                                                            <div>
-                                                                <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '4px'}}>Delivery Address</div>
-                                                                <div className="vnd-delivery-addr">
-                                                                    📍 {order.deliveryLocation?.address || 'Address not provided'}
-                                                                    {order.deliveryLocation?.lat && (
-                                                                        <div style={{marginTop: '8px'}}>
-                                                                            <a
-                                                                                href={`https://www.google.com/maps?q=${order.deliveryLocation.lat},${order.deliveryLocation.lng}`}
-                                                                                target="_blank"
-                                                                                rel="noreferrer"
-                                                                                className="vnd-map-link"
-                                                                                style={{color: '#3b82f6', textDecoration: 'none', fontWeight: '500'}}
-                                                                            >
-                                                                                Open in Maps →
-                                                                            </a>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div style={{flex: '1 1 300px'}}>
-                                                            <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '8px'}}>Order Items</div>
-                                                            {/* Items */}
-                                                            <div className="vnd-items-list" style={{maxHeight: '200px', overflowY: 'auto', paddingRight: '8px'}}>
-                                                                {order.items.map((item, i) => (
-                                                                    <div key={i} className="vnd-item-row" style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px dashed #e2e8f0'}}>
-                                                                        <span className="vnd-item-name" style={{display: 'flex', gap: '8px'}}>
-                                                                            <span className="vnd-item-qty" style={{fontWeight: '600', color: '#6366f1'}}>{item.quantity}×</span>
-                                                                            {item.name}
-                                                                        </span>
-                                                                        <span className="vnd-item-price" style={{fontWeight: '500', color: '#0f172a'}}>₹{item.price * item.quantity}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-
-                                                            {/* Status selector */}
-                                                            <div className="vnd-order-foot" style={{marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px'}}>
-                                                                <div style={{fontWeight: '600', color: '#1e293b'}}>Update Status:</div>
-                                                                <select
-                                                                    value={order.status}
-                                                                    onChange={e => handleUpdateOrderStatus(order._id, e.target.value)}
-                                                                    className="vnd-status-select"
-                                                                    style={{flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f1f5f9', fontWeight: '500', cursor: 'pointer'}}
-                                                                >
-                                                                    <option value="pending">⏳ Pending</option>
-                                                                    <option value="accepted">✅ Accepted</option>
-                                                                    <option value="preparing">🔥 Preparing</option>
-                                                                    <option value="out_for_delivery">🛵 Out for Delivery</option>
-                                                                    <option value="delivered">🎉 Delivered</option>
-                                                                    <option value="cancelled">❌ Cancelled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Past Orders Section */}
-                        <div className="vnd-section-card" style={{marginTop: "24px"}}>
-                            <div className="vnd-section-head">
-                                <div className="vnd-section-title">
-                                    <span className="vnd-section-title-icon">📦</span>
-                                    Past Orders
-                                </div>
-                            </div>
-                            <div className="vnd-section-body" style={{padding: 0}}>
-                                {orders.filter(o => o.status === 'delivered' || o.status === 'cancelled').length === 0 ? (
-                                    <div style={{padding: "32px", textAlign: "center", color: "#64748b"}}>No past orders.</div>
-                                ) : (
-                                    <div className="vnd-order-list">
-                                        {orders.filter(o => o.status === 'delivered' || o.status === 'cancelled').map(order => (
-                                            <div
-                                                key={order._id}
-                                                className={`vnd-order-list-item ${expandedOrderId === order._id ? 'expanded' : ''}`}
-                                                style={{ borderBottom: '1px solid #e2e8f0', background: expandedOrderId === order._id ? '#f8fafc' : 'white', transition: 'background 0.2s', opacity: 0.8 }}
-                                            >
-                                                {/* Single Line Header */}
-                                                <div 
-                                                    className="vnd-order-list-header" 
-                                                    onClick={() => setExpandedOrderId(expandedOrderId === order._id ? null : order._id)}
-                                                    style={{ display: 'flex', alignItems: 'center', padding: '16px', cursor: 'pointer', gap: '16px' }}
-                                                >
-                                                    <div style={{fontWeight: "600", width: '80px', color: '#1e293b'}}>#{order._id.slice(-6).toUpperCase()}</div>
-                                                    <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                                                        <div style={{fontWeight: "600", color: "#1e293b"}}>{order.customerId?.name || "Guest Customer"}</div>
-                                                        <div style={{fontSize: "12px", color: "#64748b"}}>
-                                                            {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                            {' · '}
-                                                            {new Date(order.createdAt).toLocaleDateString([], { day: 'numeric', month: 'short' })}
-                                                        </div>
-                                                    </div>
-                                                    <div style={{width: '140px', display: 'flex', justifyContent: 'center'}}>
-                                                         <StatusPill status={order.status} />
-                                                    </div>
-                                                    <div style={{fontWeight: "600", width: '80px', textAlign: 'right', color: '#0f172a'}}>
-                                                        ₹{order.totalAmount}
-                                                    </div>
-                                                    <div style={{color: "#94a3b8", marginLeft: "8px", width: '24px', textAlign: 'center'}}>
-                                                        {expandedOrderId === order._id ? "▲" : "▼"}
-                                                    </div>
-                                                </div>
-
-                                                {/* Expanded Body */}
-                                                {expandedOrderId === order._id && (
-                                                    <div className="vnd-order-list-body" style={{ padding: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                                                        <div style={{flex: '1 1 300px'}}>
-                                                            {/* Customer */}
-                                                            <div style={{marginBottom: '16px'}}>
-                                                                <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '4px'}}>Customer Details</div>
-                                                                <div className="vnd-customer-name">{order.customerId?.name || 'Guest Customer'}</div>
-                                                                <div className="vnd-customer-phone">📞 {order.customerId?.phone || 'N/A'}</div>
-                                                            </div>
-
-                                                            {/* Delivery address */}
-                                                            <div>
-                                                                <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '4px'}}>Delivery Address</div>
-                                                                <div className="vnd-delivery-addr">
-                                                                    📍 {order.deliveryLocation?.address || 'Address not provided'}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div style={{flex: '1 1 300px'}}>
-                                                            <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '8px'}}>Order Items</div>
-                                                            {/* Items */}
-                                                            <div className="vnd-items-list" style={{maxHeight: '200px', overflowY: 'auto', paddingRight: '8px'}}>
-                                                                {order.items.map((item, i) => (
-                                                                    <div key={i} className="vnd-item-row" style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px dashed #e2e8f0'}}>
-                                                                        <span className="vnd-item-name" style={{display: 'flex', gap: '8px'}}>
-                                                                            <span className="vnd-item-qty" style={{fontWeight: '600', color: '#6366f1'}}>{item.quantity}×</span>
-                                                                            {item.name}
-                                                                        </span>
-                                                                        <span className="vnd-item-price" style={{fontWeight: '500', color: '#0f172a'}}>₹{item.price * item.quantity}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* ─── STORE MANAGEMENT TAB ─── */}
-                {activeTab === 'store' && (
-                    <div className="vnd-tab-panel">
-
-                        {/* ── Add Item ── */}
-                        <div className="vnd-section-card">
-                            <div className="vnd-section-head">
-                                <div className="vnd-section-title">
-                                    <span className="vnd-section-title-icon">➕</span>
-                                    Add New Item
-                                </div>
-                                <button
-                                    id="vnd-godown-btn"
-                                    onClick={() => navigate('/vendor-godown')}
-                                    className="vnd-btn vnd-btn--godown vnd-btn-sm"
-                                >
+                                <button onClick={() => navigate('/vendor-godown')} className="vs-btn-primary bg-slate-800 hover:bg-slate-900">
                                     📦 Import from Godown
                                 </button>
                             </div>
-                            <div className="vnd-section-body">
-                                <form onSubmit={handleAddProduct} className="vnd-add-form-grid">
-                                    <div>
-                                        <label className="vnd-label">Item Name</label>
-                                        <input
-                                            type="text"
-                                            required
-                                            placeholder="e.g. Paneer Tikka"
-                                            className="vnd-input"
-                                            value={newProductName}
-                                            onChange={e => setNewProductName(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="vnd-label">Category</label>
-                                        <select
-                                            className="vnd-select"
-                                            value={newProductCategory}
-                                            onChange={e => setNewProductCategory(e.target.value)}
-                                        >
-                                            {shop.customCategories?.length > 0
-                                                ? shop.customCategories.map((c, i) => <option key={i} value={c}>{c}</option>)
-                                                : <option value="General">General</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="vnd-label">Price (₹)</label>
-                                        <input
-                                            type="number"
-                                            required
-                                            placeholder="0"
-                                            className="vnd-input"
-                                            value={newProductPrice}
-                                            onChange={e => setNewProductPrice(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="vnd-label">Photo</label>
-                                        <input
-                                            id="vnd-img-input"
-                                            type="file"
-                                            accept="image/*"
-                                            className="vnd-input"
-                                            onChange={e => setNewProductImage(e.target.files[0])}
-                                        />
-                                    </div>
-                                    <div style={{ gridColumn: '1 / -1', marginTop: 4 }}>
-                                        <button 
-                                            type="submit" 
-                                            id="vnd-add-item-btn" 
-                                            className={`vnd-btn vnd-btn--primary vnd-btn-full ${isAddingItem ? 'opacity-75 cursor-not-allowed' : ''}`}
-                                            disabled={isAddingItem}
-                                        >
-                                            {isAddingItem ? (
-                                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                                    <span className="vnd-loading-spinner" style={{ width: '14px', height: '14px', borderWidth: '2px' }} />
-                                                    Adding...
-                                                </span>
-                                            ) : '+ Create Item'}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
 
-                        {/* ── Category Manager ── */}
-                        <div className="vnd-section-card">
-                            <div className="vnd-section-head">
-                                <div className="vnd-section-title">
-                                    <span className="vnd-section-title-icon">🏷️</span>
-                                    Menu Categories
-                                </div>
-                            </div>
-                            <div className="vnd-section-body">
-                                <form onSubmit={handleAddCategory} style={{ display: 'flex', gap: 10 }}>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Starters, Drinks…"
-                                        className="vnd-input"
-                                        style={{ flex: 1 }}
-                                        value={newCategory}
-                                        onChange={e => setNewCategory(e.target.value)}
-                                    />
-                                    <button type="submit" id="vnd-add-cat-btn" className="vnd-btn vnd-btn--ghost" style={{ flexShrink: 0 }}>
-                                        + Add
-                                    </button>
-                                </form>
-                                <div className="vnd-cat-wrap">
-                                    {shop.customCategories?.length > 0
-                                        ? shop.customCategories.map((cat, i) => (
-                                            <span key={i} className="vnd-cat-pill">🏷 {cat}</span>
-                                        ))
-                                        : <span style={{ fontSize: 12, color: '#3f4a5c' }}>No categories added yet.</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                            {/* Add Quick Product */}
+                            <form onSubmit={handleAddProduct} className="flex gap-3 mb-6 bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                                <input type="text" placeholder="Item Name" required value={newProductName} onChange={e=>setNewProductName(e.target.value)} className="vs-input flex-1" />
+                                <input type="number" placeholder="Price ₹" required value={newProductPrice} onChange={e=>setNewProductPrice(e.target.value)} className="vs-input w-24" />
+                                <select value={newProductCategory} onChange={e=>setNewProductCategory(e.target.value)} className="vs-input w-32">
+                                    <option value="">Category</option>
+                                    <option value="Grocery">Grocery</option>
+                                    <option value="Snacks">Snacks</option>
+                                </select>
+                                <button type="submit" disabled={isAddingItem} className="vs-btn-primary shrink-0">
+                                    {isAddingItem ? 'Adding...' : '+ Add Item'}
+                                </button>
+                            </form>
 
-                        {/* ── Menu List ── */}
-                        <div className="vnd-section-card">
-                            <div className="vnd-table-toolbar">
-                                <div>
-                                    <span className="vnd-table-toolbar-title">Menu Items</span>
-                                    <span className="vnd-table-count">{products.length}</span>
-                                </div>
-                                <div className="vnd-search-wrap">
-                                    <span className="vnd-search-icon"><IconSearch /></span>
-                                    <input
-                                        type="text"
-                                        placeholder="Search items…"
-                                        className="vnd-search-input"
-                                        value={productSearchQuery}
-                                        onChange={e => setProductSearchQuery(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="vnd-table-wrap">
-                                <table className="vnd-table">
+                            {/* Data Grid */}
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                                <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr>
-                                            <th>Item</th>
-                                            <th>Price</th>
-                                            <th style={{ textAlign: 'center' }}>Stock</th>
-                                            <th style={{ textAlign: 'right' }}>Action</th>
+                                        <tr className="bg-slate-50 border-b border-slate-200">
+                                            <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Item Name</th>
+                                            <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Price</th>
+                                            <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Stock Status</th>
+                                            <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {filteredProducts.length === 0 ? (
-                                            <tr>
-                                                <td colSpan="4" style={{ textAlign: 'center', padding: '40px 0', color: '#3f4a5c' }}>
-                                                    No items found
+                                    <tbody className="divide-y divide-slate-100">
+                                        {products.map(p => (
+                                            <tr key={p._id} className="hover:bg-slate-50 transition-colors">
+                                                <td className="p-4">
+                                                    <div className="font-bold text-slate-800">{p.name}</div>
+                                                    <div className="text-xs text-slate-400">{p.category}</div>
                                                 </td>
-                                            </tr>
-                                        ) : filteredProducts.map(product => (
-                                            <tr key={product._id} className={!product.inStock ? 'vnd-row--oos' : ''}>
-                                                <td>
-                                                    <div className="vnd-product-name">{product.name}</div>
-                                                    <div className="vnd-product-cat">{product.category}</div>
-                                                </td>
-                                                <td>
-                                                    <span className="vnd-product-price">₹{product.price}</span>
-                                                </td>
-                                                <td style={{ textAlign: 'center' }}>
-                                                    <button
-                                                        onClick={() => handleToggleStock(product._id, product.inStock)}
-                                                        className={`vnd-stock-btn ${product.inStock ? 'vnd-stock-btn--in' : 'vnd-stock-btn--out'}`}
-                                                    >
-                                                        {product.inStock ? 'In Stock' : 'Out of Stock'}
+                                                <td className="p-4 font-bold text-slate-700">₹{p.price}</td>
+                                                <td className="p-4 text-center">
+                                                    <button onClick={() => handleToggleStock(p._id, p.inStock)} className={`px-3 py-1 rounded-full text-xs font-bold border transition ${p.inStock ? 'bg-green-50 text-green-700 border-green-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                                                        {p.inStock ? 'In Stock' : 'Out of Stock'}
                                                     </button>
                                                 </td>
-                                                <td style={{ textAlign: 'right' }}>
-                                                    <button
-                                                        onClick={() => handleDeleteProduct(product._id)}
-                                                        className="vnd-del-btn"
-                                                        title="Delete item"
-                                                    >
+                                                <td className="p-4 text-right">
+                                                    <button onClick={() => handleDeleteProduct(p._id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
                                                         <IconTrash />
                                                     </button>
                                                 </td>
@@ -919,142 +375,38 @@ const VendorDashboard = () => {
                                 </table>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* ─── SETTINGS TAB ─── */}
-                {activeTab === 'settings' && (
-                    <div className="vnd-tab-panel">
-                        <div className="vnd-mgmt-grid">
-
-                            {/* Delivery Settings */}
-                            <div className="vnd-section-card">
-                                <div className="vnd-section-head">
-                                    <div className="vnd-section-title">
-                                        <span className="vnd-section-title-icon">🛵</span>
-                                        Delivery Rules
-                                    </div>
-                                </div>
-                                <div className="vnd-section-body">
-                                    <form onSubmit={handleUpdateDeliverySettings}>
-                                        <div className="vnd-fields-grid">
-                                            <div className="vnd-field">
-                                                <label className="vnd-label">Min Order (₹)</label>
-                                                <input type="number" required className="vnd-input" value={minCharge} onChange={e => setMinCharge(e.target.value)} />
-                                            </div>
-                                            <div className="vnd-field">
-                                                <label className="vnd-label">Free Upto (km)</label>
-                                                <input type="number" step="0.1" required className="vnd-input" value={minDistance} onChange={e => setMinDistance(e.target.value)} />
-                                            </div>
-                                            <div className="vnd-field">
-                                                <label className="vnd-label">Charge / km (₹)</label>
-                                                <input type="number" required className="vnd-input" value={chargePerKm} onChange={e => setChargePerKm(e.target.value)} />
-                                            </div>
-                                            <div className="vnd-field">
-                                                <label className="vnd-label">Max Range (km)</label>
-                                                <input type="number" step="0.1" required className="vnd-input" value={maxRange} onChange={e => setMaxRange(e.target.value)} />
-                                            </div>
-                                        </div>
-                                        <button type="submit" id="vnd-save-delivery-btn" className="vnd-btn vnd-btn--primary vnd-btn-full">
-                                            💾 Save Delivery Settings
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-
-                            {/* Auto Schedule */}
-                            <div className="vnd-section-card">
-                                <div className="vnd-section-head">
-                                    <div className="vnd-section-title">
-                                        <span className="vnd-section-title-icon">🕐</span>
-                                        Auto Schedule
-                                    </div>
-                                </div>
-                                <div className="vnd-section-body">
-                                    <form onSubmit={handleUpdateSchedule}>
-                                        <div className="vnd-toggle-row">
-                                            <span className="vnd-toggle-label">Enable Auto Open / Close</span>
-                                            <Toggle
-                                                checked={autoScheduleEnabled}
-                                                onChange={e => setAutoScheduleEnabled(e.target.checked)}
-                                            />
-                                        </div>
-                                        <div className="vnd-fields-grid">
-                                            <div className="vnd-field">
-                                                <label className="vnd-label">Open Time</label>
-                                                <input
-                                                    type="time"
-                                                    className="vnd-input"
-                                                    value={openTime}
-                                                    onChange={e => setOpenTime(e.target.value)}
-                                                    disabled={!autoScheduleEnabled}
-                                                    style={!autoScheduleEnabled ? { opacity: 0.4 } : {}}
-                                                />
-                                            </div>
-                                            <div className="vnd-field">
-                                                <label className="vnd-label">Close Time</label>
-                                                <input
-                                                    type="time"
-                                                    className="vnd-input"
-                                                    value={closeTime}
-                                                    onChange={e => setCloseTime(e.target.value)}
-                                                    disabled={!autoScheduleEnabled}
-                                                    style={!autoScheduleEnabled ? { opacity: 0.4 } : {}}
-                                                />
-                                            </div>
-                                        </div>
-                                        <button type="submit" id="vnd-save-schedule-btn" className="vnd-btn vnd-btn--primary vnd-btn-full">
-                                            💾 Save Schedule
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Shop Danger Zone / Info */}
-                        <div className="vnd-section-card">
-                            <div className="vnd-section-head">
-                                <div className="vnd-section-title">
-                                    <span className="vnd-section-title-icon">🏪</span>
-                                    Shop Info
-                                </div>
-                            </div>
-                            <div className="vnd-section-body">
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                    {/* === TAB 3: SETTINGS === */}
+                    {activeTab === 'settings' && (
+                        <div className="max-w-2xl">
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
+                                <h3 className="text-lg font-black text-slate-800 mb-4 border-b pb-2">Delivery Rules</h3>
+                                <form onSubmit={handleUpdateDeliverySettings} className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <div className="vnd-label">Shop Name</div>
-                                        <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>{shop.name}</div>
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Min Order (₹)</label>
+                                        <input type="number" value={minCharge} onChange={e=>setMinCharge(e.target.value)} className="vs-input mt-1 w-full" />
                                     </div>
                                     <div>
-                                        <div className="vnd-label">Status</div>
-                                        <div style={{ fontSize: 13, fontWeight: 600, color: shop.isOpen ? '#4ade80' : '#f87171' }}>
-                                            {shop.isOpen ? '● Open for Orders' : '● Store Closed'}
-                                        </div>
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Free Upto (km)</label>
+                                        <input type="number" step="0.1" value={minDistance} onChange={e=>setMinDistance(e.target.value)} className="vs-input mt-1 w-full" />
                                     </div>
-                                    {shop.udyamNumber && (
-                                        <div style={{ gridColumn: '1 / -1' }}>
-                                            <div className="vnd-label">Udyam Number</div>
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: '#f8cb46', fontFamily: 'monospace' }}>{shop.udyamNumber}</div>
-                                        </div>
-                                    )}
-                                    <div style={{ gridColumn: '1 / -1' }}>
-                                        <div className="vnd-label">Address</div>
-                                        <div style={{ fontSize: 13, color: '#94a3b8' }}>{shop.address}</div>
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Charge / km (₹)</label>
+                                        <input type="number" value={chargePerKm} onChange={e=>setChargePerKm(e.target.value)} className="vs-input mt-1 w-full" />
                                     </div>
-                                </div>
-                                <button
-                                    id="vnd-toggle-status-settings-btn"
-                                    onClick={handleToggleShopStatus}
-                                    className={`vnd-btn vnd-btn-full ${shop.isOpen ? 'vnd-btn--danger' : 'vnd-btn--primary'}`}
-                                >
-                                    {shop.isOpen ? '🔴 Close Store Now' : '🟢 Open Store Now'}
-                                </button>
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Max Range (km)</label>
+                                        <input type="number" step="0.1" value={maxRange} onChange={e=>setMaxRange(e.target.value)} className="vs-input mt-1 w-full" />
+                                    </div>
+                                    <button type="submit" className="vs-btn-primary col-span-2 mt-2">Save Delivery Rules</button>
+                                </form>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-            </div>
+                </div>
+            </main>
         </div>
     );
 };

@@ -1,4 +1,4 @@
-﻿/* ======================================================
+/* ======================================================
    VENDOR DASHBOARD â€” Full-Page Takeover Layout
    Dark theme with MUNA amber/golden accent
    Mobile-first, fully responsive
@@ -1129,3 +1129,144 @@
     .vnd-table-toolbar-title { display: none; }
 }
 .vnd-order-list-header:hover { background: #f1f5f9 !important; }
+
+/* ── KANBAN BOARD STYLES ── */
+.vnd-kanban-board {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+@media (min-width: 768px) {
+    .vnd-kanban-board {
+        flex-direction: row;
+        align-items: stretch;
+        overflow-x: auto;
+    }
+}
+.vnd-kanban-col {
+    flex: 1;
+    min-width: 300px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
+.vnd-kcol-head {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-radius: 12px 12px 0 0;
+}
+.vnd-kcol-head h3 {
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+.vnd-kcol-head span {
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+.vnd-kcol-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    overflow-y: auto;
+}
+.vnd-kcol-empty {
+    text-align: center;
+    padding: 32px 0;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ── KANBAN CARD ── */
+.vnd-kanban-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.vnd-kanban-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+.vnd-kanban-card.new {
+    border-left: 4px solid #3b82f6;
+}
+.vnd-kcard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.vnd-kcard-id {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 14px;
+}
+.vnd-kcard-amount {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 14px;
+}
+.vnd-kcard-customer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.vnd-kcard-items {
+    font-size: 13px;
+    color: #475569;
+    background: #f8fafc;
+    padding: 8px;
+    border-radius: 6px;
+    line-height: 1.4;
+}
+.vnd-kcard-address {
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+}
+.vnd-kcard-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+.vnd-kcard-actions .vnd-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-align: center;
+}
+.vnd-btn-primary { background: #3b82f6; color: white; }
+.vnd-btn-primary:hover { background: #2563eb; }
+.vnd-btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1 !important; }
+.vnd-btn-secondary:hover { background: #e2e8f0; }
+.vnd-btn-danger { background: #fee2e2; color: #dc2626; }
+.vnd-btn-danger:hover { background: #fecaca; }
+.vnd-btn-success { background: #10b981; color: white; }
+.vnd-btn-success:hover { background: #059669; }

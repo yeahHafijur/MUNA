@@ -522,125 +522,90 @@ const VendorDashboard = () => {
                             </div>
                         </div>
 
-                        {/* Live Orders Section */}
-                        <div className="vnd-section-card" style={{marginTop: "24px"}}>
-                            <div className="vnd-section-head">
-                                <div className="vnd-section-title">
-                                    <span className="vnd-section-title-icon">🔥</span>
-                                    Live Orders
-                                </div>
-                            </div>
-                            <div className="vnd-section-body" style={{padding: 0}}>
-                                {liveOrders.length === 0 ? (
-                                    <div style={{padding: "32px", textAlign: "center", color: "#64748b"}}>No active orders at the moment.</div>
-                                ) : (
-                                    <div className="vnd-order-list">
-                                        {liveOrders.map(order => (
-                                            <div
-                                                key={order._id}
-                                                className={`vnd-order-list-item ${expandedOrderId === order._id ? 'expanded' : ''} ${order.status === 'pending' ? 'new' : ''}`}
-                                                style={{ borderBottom: '1px solid #e2e8f0', background: expandedOrderId === order._id ? '#f8fafc' : 'white', transition: 'background 0.2s', borderLeft: order.status === 'pending' ? '4px solid #3b82f6' : '4px solid transparent' }}
-                                            >
-                                                {/* Single Line Header */}
-                                                <div 
-                                                    className="vnd-order-list-header" 
-                                                    onClick={() => setExpandedOrderId(expandedOrderId === order._id ? null : order._id)}
-                                                    style={{ display: 'flex', alignItems: 'center', padding: '16px', cursor: 'pointer', gap: '16px' }}
-                                                >
-                                                    <div style={{fontWeight: "600", width: '80px', color: '#1e293b'}}>#{order._id.slice(-6).toUpperCase()}</div>
-                                                    <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                                                        <div style={{fontWeight: "600", color: "#1e293b"}}>{order.customerId?.name || "Guest Customer"}</div>
-                                                        <div style={{fontSize: "12px", color: "#64748b"}}>
-                                                            {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                            {' · '}
-                                                            {new Date(order.createdAt).toLocaleDateString([], { day: 'numeric', month: 'short' })}
-                                                        </div>
-                                                    </div>
-                                                    <div style={{width: '140px', display: 'flex', justifyContent: 'center'}}>
-                                                         <StatusPill status={order.status} />
-                                                    </div>
-                                                    <div style={{fontWeight: "600", width: '80px', textAlign: 'right', color: '#0f172a'}}>
-                                                        ₹{order.totalAmount}
-                                                    </div>
-                                                    <div style={{color: "#94a3b8", marginLeft: "8px", width: '24px', textAlign: 'center'}}>
-                                                        {expandedOrderId === order._id ? "▲" : "▼"}
-                                                    </div>
-                                                </div>
+                        {/* Live Orders Section - KANBAN */}
+                        {(() => {
+                            const pendingOrders = liveOrders.filter(o => o.status === 'pending');
+                            const processingOrders = liveOrders.filter(o => ['accepted', 'preparing'].includes(o.status));
+                            const dispatchOrders = liveOrders.filter(o => o.status === 'out_for_delivery');
 
-                                                {/* Expanded Body */}
-                                                {expandedOrderId === order._id && (
-                                                    <div className="vnd-order-list-body" style={{ padding: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                                                        <div style={{flex: '1 1 300px'}}>
-                                                            {/* Customer */}
-                                                            <div style={{marginBottom: '16px'}}>
-                                                                <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '4px'}}>Customer Details</div>
-                                                                <div className="vnd-customer-name">{order.customerId?.name || 'Guest Customer'}</div>
-                                                                <div className="vnd-customer-phone">📞 {order.customerId?.phone || 'N/A'}</div>
-                                                            </div>
-
-                                                            {/* Delivery address */}
-                                                            <div>
-                                                                <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '4px'}}>Delivery Address</div>
-                                                                <div className="vnd-delivery-addr">
-                                                                    📍 {order.deliveryLocation?.address || 'Address not provided'}
-                                                                    {order.deliveryLocation?.lat && (
-                                                                        <div style={{marginTop: '8px'}}>
-                                                                            <a
-                                                                                href={`https://www.google.com/maps?q=${order.deliveryLocation.lat},${order.deliveryLocation.lng}`}
-                                                                                target="_blank"
-                                                                                rel="noreferrer"
-                                                                                className="vnd-map-link"
-                                                                                style={{color: '#3b82f6', textDecoration: 'none', fontWeight: '500'}}
-                                                                            >
-                                                                                Open in Maps →
-                                                                            </a>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div style={{flex: '1 1 300px'}}>
-                                                            <div style={{fontWeight: '600', color: '#1e293b', marginBottom: '8px'}}>Order Items</div>
-                                                            {/* Items */}
-                                                            <div className="vnd-items-list" style={{maxHeight: '200px', overflowY: 'auto', paddingRight: '8px'}}>
-                                                                {order.items.map((item, i) => (
-                                                                    <div key={i} className="vnd-item-row" style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px dashed #e2e8f0'}}>
-                                                                        <span className="vnd-item-name" style={{display: 'flex', gap: '8px'}}>
-                                                                            <span className="vnd-item-qty" style={{fontWeight: '600', color: '#6366f1'}}>{item.quantity}×</span>
-                                                                            {item.name}
-                                                                        </span>
-                                                                        <span className="vnd-item-price" style={{fontWeight: '500', color: '#0f172a'}}>₹{item.price * item.quantity}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-
-                                                            {/* Status selector */}
-                                                            <div className="vnd-order-foot" style={{marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px'}}>
-                                                                <div style={{fontWeight: '600', color: '#1e293b'}}>Update Status:</div>
-                                                                <select
-                                                                    value={order.status}
-                                                                    onChange={e => handleUpdateOrderStatus(order._id, e.target.value)}
-                                                                    className="vnd-status-select"
-                                                                    style={{flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f1f5f9', fontWeight: '500', cursor: 'pointer'}}
-                                                                >
-                                                                    <option value="pending">⏳ Pending</option>
-                                                                    <option value="accepted">✅ Accepted</option>
-                                                                    <option value="preparing">🔥 Preparing</option>
-                                                                    <option value="out_for_delivery">🛵 Out for Delivery</option>
-                                                                    <option value="delivered">🎉 Delivered</option>
-                                                                    <option value="cancelled">❌ Cancelled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
+                            const renderKanbanCard = (order) => (
+                                <div key={order._id} className={`vnd-kanban-card ${order.status === 'pending' ? 'new' : ''}`}>
+                                    <div className="vnd-kcard-header">
+                                        <span className="vnd-kcard-id">#{order._id.slice(-5).toUpperCase()}</span>
+                                        <span className="vnd-kcard-amount">₹{order.totalAmount}</span>
                                     </div>
-                                )}
-                            </div>
-                        </div>
+                                    <div className="vnd-kcard-customer">
+                                        <div style={{fontWeight: '600', color: '#1e293b'}}>{order.customerId?.name || "Guest Customer"}</div>
+                                        <div style={{fontSize: '12px', color: '#64748b'}}>📞 {order.customerId?.phone || 'N/A'}</div>
+                                    </div>
+                                    <div className="vnd-kcard-items">
+                                        {order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                                    </div>
+                                    {order.deliveryLocation?.address && (
+                                        <div className="vnd-kcard-address">
+                                            📍 {order.deliveryLocation.address}
+                                        </div>
+                                    )}
+                                    <div className="vnd-kcard-actions">
+                                        {order.status === 'pending' && (
+                                            <>
+                                                <button onClick={() => handleUpdateOrderStatus(order._id, 'accepted')} className="vnd-btn vnd-btn-primary" style={{flex: 1}}>Accept</button>
+                                                <button onClick={() => handleUpdateOrderStatus(order._id, 'cancelled')} className="vnd-btn vnd-btn-danger">Reject</button>
+                                            </>
+                                        )}
+                                        {order.status === 'accepted' && (
+                                            <button onClick={() => handleUpdateOrderStatus(order._id, 'preparing')} className="vnd-btn vnd-btn-secondary" style={{width: '100%'}}>Start Preparing</button>
+                                        )}
+                                        {order.status === 'preparing' && (
+                                            <button onClick={() => handleUpdateOrderStatus(order._id, 'out_for_delivery')} className="vnd-btn vnd-btn-primary" style={{width: '100%'}}>Dispatch Order</button>
+                                        )}
+                                        {order.status === 'out_for_delivery' && (
+                                            <button onClick={() => handleUpdateOrderStatus(order._id, 'delivered')} className="vnd-btn vnd-btn-success" style={{width: '100%'}}>Mark Delivered</button>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+
+                            return (
+                                <div className="vnd-kanban-board">
+                                    {/* Column 1: NEW */}
+                                    <div className="vnd-kanban-col" style={{borderTop: '4px solid #f59e0b'}}>
+                                        <div className="vnd-kcol-head">
+                                            <h3 style={{color: '#d97706'}}>New Orders</h3>
+                                            <span>{pendingOrders.length}</span>
+                                        </div>
+                                        <div className="vnd-kcol-body">
+                                            {pendingOrders.length === 0 && <div className="vnd-kcol-empty">No new orders</div>}
+                                            {pendingOrders.map(renderKanbanCard)}
+                                        </div>
+                                    </div>
+
+                                    {/* Column 2: PROCESSING */}
+                                    <div className="vnd-kanban-col" style={{borderTop: '4px solid #3b82f6'}}>
+                                        <div className="vnd-kcol-head">
+                                            <h3 style={{color: '#2563eb'}}>Processing</h3>
+                                            <span>{processingOrders.length}</span>
+                                        </div>
+                                        <div className="vnd-kcol-body">
+                                            {processingOrders.length === 0 && <div className="vnd-kcol-empty">No active processing</div>}
+                                            {processingOrders.map(renderKanbanCard)}
+                                        </div>
+                                    </div>
+
+                                    {/* Column 3: OUT FOR DELIVERY */}
+                                    <div className="vnd-kanban-col" style={{borderTop: '4px solid #10b981'}}>
+                                        <div className="vnd-kcol-head">
+                                            <h3 style={{color: '#059669'}}>On The Way</h3>
+                                            <span>{dispatchOrders.length}</span>
+                                        </div>
+                                        <div className="vnd-kcol-body">
+                                            {dispatchOrders.length === 0 && <div className="vnd-kcol-empty">No orders in transit</div>}
+                                            {dispatchOrders.map(renderKanbanCard)}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })()}
 
                         {/* Past Orders Section */}
                         <div className="vnd-section-card" style={{marginTop: "24px"}}>

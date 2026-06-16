@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin-dashboard
+Disallow: /vendor-dashboard
+
+Sitemap: https://www.munastore.in/sitemap.xml

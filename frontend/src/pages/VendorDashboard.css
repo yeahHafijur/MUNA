@@ -1,4 +1,4 @@
-/* ======================================================
+﻿/* ======================================================
    VENDOR DASHBOARD â€” Full-Page Takeover Layout
    Dark theme with MUNA amber/golden accent
    Mobile-first, fully responsive
@@ -1129,41 +1129,41 @@
     .vnd-table-toolbar-title { display: none; }
 }
 .vnd-order-list-header:hover { background: #f1f5f9 !important; }
-
-/* ── KANBAN BOARD STYLES ── */
+/* â”€â”€ KANBAN BOARD STYLES â”€â”€ */
 .vnd-kanban-board {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
+    gap: 24px;
+    padding: 0;
 }
 @media (min-width: 768px) {
     .vnd-kanban-board {
         flex-direction: row;
-        align-items: stretch;
+        align-items: flex-start;
         overflow-x: auto;
     }
 }
 .vnd-kanban-col {
     flex: 1;
     min-width: 300px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
 }
 .vnd-kcol-head {
-    padding: 12px 16px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 0 0 16px 0;
+    border-bottom: none;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 8px;
     align-items: center;
-    background: white;
-    border-radius: 12px 12px 0 0;
+    background: transparent;
+    border-radius: 0;
 }
 .vnd-kcol-head h3 {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1178,12 +1178,12 @@
     font-weight: 700;
 }
 .vnd-kcol-body {
-    padding: 12px;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     flex: 1;
-    overflow-y: auto;
+    overflow-y: visible;
 }
 .vnd-kcol-empty {
     text-align: center;
@@ -1193,7 +1193,7 @@
     font-weight: 500;
 }
 
-/* ── KANBAN CARD ── */
+/* â”€â”€ KANBAN CARD â”€â”€ */
 .vnd-kanban-card {
     background: white;
     border: 1px solid #e2e8f0;
@@ -1270,3 +1270,4 @@
 .vnd-btn-danger:hover { background: #fecaca; }
 .vnd-btn-success { background: #10b981; color: white; }
 .vnd-btn-success:hover { background: #059669; }
+

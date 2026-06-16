@@ -1,5 +1,5 @@
-/* ======================================================
-   VENDOR DASHBOARD — Full-Page Takeover Layout
+﻿/* ======================================================
+   VENDOR DASHBOARD â€” Full-Page Takeover Layout
    Dark theme with MUNA amber/golden accent
    Mobile-first, fully responsive
    ====================================================== */
@@ -1128,3 +1128,4 @@
     .vnd-add-form-grid { grid-template-columns: 1fr; }
     .vnd-table-toolbar-title { display: none; }
 }
+.vnd-order-list-header:hover { background: #f1f5f9 !important; }

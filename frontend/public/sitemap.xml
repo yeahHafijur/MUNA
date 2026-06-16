@@ -10,4 +10,19 @@
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
    </url>
+   <url>
+      <loc>https://www.munastore.in/terms-and-conditions</loc>
+      <changefreq>monthly</changefreq>
+      <priority>0.5</priority>
+   </url>
+   <url>
+      <loc>https://www.munastore.in/about-us</loc>
+      <changefreq>monthly</changefreq>
+      <priority>0.6</priority>
+   </url>
+   <url>
+      <loc>https://www.munastore.in/contact</loc>
+      <changefreq>monthly</changefreq>
+      <priority>0.6</priority>
+   </url>
 </urlset>

@@ -81,6 +81,27 @@ app.get("/", (req, res) => {
     res.send("MUNA is running")
 });
 
+app.get('/api/sitemap.xml', async (req, res) => {
+    try {
+        const Shop = require('./models/Shop');
+        const shops = await Shop.find({ isActive: true });
+        
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+        shops.forEach(shop => {
+            xml += `\n    <url>\n        <loc>https://www.munastore.in/shop/${shop._id}</loc>\n        <changefreq>weekly</changefreq>\n        <priority>0.8</priority>\n    </url>`;
+        });
+
+        xml += `\n</urlset>`;
+
+        res.header('Content-Type', 'application/xml');
+        res.send(xml);
+    } catch (error) {
+        console.error("Sitemap generation error:", error);
+        res.status(500).end();
+    }
+});
+
 // Global 404 handler for API routes
 app.use('/api', (req, res) => {
     res.status(404).json({ message: `Route ${req.originalUrl} not found` });

@@ -28,21 +28,13 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('token', userToken);
 
-        // 🔥 NEW: Sync OneSignal ID immediately the moment they log in!
-        if (window.OneSignal && window.OneSignal.User && window.OneSignal.User.PushSubscription && window.OneSignal.User.PushSubscription.id) {
-            try {
-                await fetch('/api/auth/save-player-id', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${userToken}`
-                    },
-                    body: JSON.stringify({ playerId: window.OneSignal.User.PushSubscription.id })
-                });
-                console.log("[MUNA Auth] Push ID Synced instantly after login!");
-            } catch (err) {
-                console.error("Failed to sync push ID", err);
-            }
+        // 🔥 NEW: Use OneSignal External ID system
+        if (window.OneSignal) {
+            window.OneSignal.login(userData._id).then(() => {
+                console.log(`[MUNA Auth] Logged into OneSignal with ID: ${userData._id}`);
+            }).catch(err => {
+                console.error("[MUNA Auth] Failed to login to OneSignal", err);
+            });
         }
     };
 
@@ -52,6 +44,13 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+
+        // Logout from OneSignal
+        if (window.OneSignal) {
+            window.OneSignal.logout().then(() => {
+                console.log("[MUNA Auth] Logged out from OneSignal");
+            }).catch(err => console.error(err));
+        }
     };
 
     return (

@@ -174,32 +174,7 @@ const googleLogin = async (req, res) => {
     }
 };
 
-// Save OneSignal Player ID for push notifications
-const savePlayerId = async (req, res) => {
-    try {
-        const { playerId } = req.body;
-        console.log("[SavePlayerId] Received request. Player ID:", playerId, "User:", req.user?._id);
-        
-        if (!playerId) {
-            return res.status(400).json({ message: "Player ID is required" });
-        }
-
-        const user = await User.findById(req.user._id);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        user.onesignalPlayerId = playerId;
-        await user.save();
-
-        console.log(`[SavePlayerId] ✅ Saved Player ID for user ${user.name} (${user.role}): ${playerId}`);
-        res.status(200).json({ message: "Player ID saved successfully" });
-    } catch (error) {
-        console.error("[SavePlayerId] ❌ Error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-};
-
+// Removed savePlayerId logic
 // Save a new location for the user
 const saveLocation = async (req, res) => {
     try {
@@ -245,7 +220,6 @@ module.exports = {
     sendOTP,
     verifyOTP,
     googleLogin,
-    savePlayerId,
     saveLocation,
     deleteLocation
 };

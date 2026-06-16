@@ -13,6 +13,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import GodownBrowser from './pages/GodownBrowser';
 import Search from './pages/Search';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Notifications from './pages/Notifications';
 
 function App() {
   const [showSplash, setShowSplash] = useState(() => {
@@ -38,59 +39,7 @@ function App() {
         serviceWorkerParam: { scope: '/' },
         serviceWorkerPath: '/sw.js',
       });
-
       console.log("[MUNA] OneSignal initialized successfully");
-
-      // Function to sync player ID to backend
-      const syncPlayerId = async (source) => {
-        try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-            console.log("[MUNA] No auth token found, skipping player ID sync");
-            return;
-          }
-
-          const sub = OneSignal.User.PushSubscription;
-          const playerId = sub.id;
-          const optedIn = sub.optedIn;
-
-          console.log(`[MUNA] Sync attempt from: ${source}`);
-          console.log(`[MUNA] Player ID: ${playerId}`);
-          console.log(`[MUNA] Opted In: ${optedIn}`);
-
-          if (!playerId) {
-            console.log("[MUNA] No Player ID yet, will retry...");
-            return;
-          }
-
-          const res = await fetch('/api/auth/save-player-id', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ playerId })
-          });
-          const data = await res.json();
-          console.log("[MUNA] Player ID sync response:", data);
-        } catch (err) {
-          console.error("[MUNA] Failed to sync Player ID:", err);
-        }
-      };
-
-      // Listen for subscription changes
-      OneSignal.User.PushSubscription.addEventListener("change", (event) => {
-        console.log("[MUNA] PushSubscription changed:", event);
-        syncPlayerId("subscription-change-event");
-      });
-
-      // Try immediately
-      syncPlayerId("initial");
-
-      // Retry after 3 seconds (subscription may take a moment)
-      setTimeout(() => syncPlayerId("retry-3s"), 3000);
-      // Retry after 8 seconds
-      setTimeout(() => syncPlayerId("retry-8s"), 8000);
     });
   }, []);
 
@@ -115,6 +64,7 @@ function App() {
             <Route path="/vendor-godown" element={<GodownBrowser />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
             {/* Aage chal kar hum yahan Shop aur Cart ke routes add karenge */}

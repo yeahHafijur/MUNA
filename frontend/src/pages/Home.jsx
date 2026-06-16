@@ -385,7 +385,7 @@ const Home = () => {
                     Search
                 </button>
 
-                <button className="mu-nav-item" onClick={() => window.OneSignal && window.OneSignal.Slidedown.promptPush()}>
+                <button className="mu-nav-item" onClick={() => navigate('/notifications')}>
                     <span className="mu-nav-icon"><IcoBell /></span>
                     Alerts
                 </button>

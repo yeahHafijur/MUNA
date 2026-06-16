@@ -3,22 +3,26 @@ const Product = require('../models/Product');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
 
-// Function to send OneSignal push notification
-const sendOneSignalNotification = async (playerIds, heading, message) => {
+const Notification = require('../models/Notification');
+
+// Function to send OneSignal push notification using External IDs
+const sendOneSignalNotification = async (userIds, heading, message) => {
     if (!process.env.ONESIGNAL_REST_API_KEY) {
         console.log("[OneSignal] ❌ SKIPPED: ONESIGNAL_REST_API_KEY missing in .env!");
         return;
     }
-    if (!playerIds || playerIds.length === 0 || !playerIds[0]) {
-        console.log("[OneSignal] ❌ SKIPPED: No valid Player IDs provided for this user!");
+    if (!userIds || userIds.length === 0 || !userIds[0]) {
+        console.log("[OneSignal] ❌ SKIPPED: No valid User IDs provided!");
         return;
     }
 
     try {
         const payload = {
             app_id: process.env.ONESIGNAL_APP_ID || "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
-            include_player_ids: playerIds,       // 🔥 FIX: The battle-tested targeting field
-            include_subscription_ids: playerIds, // Keep for fallback compatibility
+            target_channel: "push",
+            include_aliases: {
+                external_id: userIds.map(id => id.toString())
+            },
             headings: { en: heading },
             contents: { en: message }
         };
@@ -34,7 +38,6 @@ const sendOneSignalNotification = async (playerIds, heading, message) => {
         
         const data = await response.json();
         
-        // 🔥 FIX: Actually check if OneSignal rejected the payload
         if (!response.ok) {
             console.error("[OneSignal] ❌ Failed to Deliver. Errors:", data.errors);
         } else {
@@ -42,6 +45,25 @@ const sendOneSignalNotification = async (playerIds, heading, message) => {
         }
     } catch (error) {
         console.error("[OneSignal] ❌ Network/Server Error:", error);
+    }
+};
+
+// Helper to send push and save to DB
+const sendAndSaveNotification = async (userIds, heading, message, actionUrl = "") => {
+    await sendOneSignalNotification(userIds, heading, message);
+    
+    try {
+        const notificationsToInsert = userIds.map(id => ({
+            userId: id,
+            title: heading,
+            message: message,
+            actionUrl: actionUrl,
+            isRead: false
+        }));
+        await Notification.insertMany(notificationsToInsert);
+        console.log(`[DB] ✅ Saved ${notificationsToInsert.length} notifications to database.`);
+    } catch (error) {
+        console.error("[DB] ❌ Failed to save notification:", error);
     }
 };
 
@@ -159,11 +181,12 @@ const placeOrder = async (req, res) => {
         // 🔔 PUSH NOTIFICATION ALERT TO VENDOR
         try {
             const vendor = await User.findById(shop.vendorId);
-            if (vendor && vendor.onesignalPlayerId) {
-                await sendOneSignalNotification(
-                    [vendor.onesignalPlayerId], 
+            if (vendor) {
+                await sendAndSaveNotification(
+                    [vendor._id], 
                     "🎉 Naya Order Aaya Hai!", 
-                    `Total: ₹${finalTotalAmount} (${items.length} items)`
+                    `Total: ₹${finalTotalAmount} (${items.length} items)`,
+                    "/vendor-dashboard"
                 );
             }
         } catch (pushErr) {
@@ -249,7 +272,7 @@ const updateOrderStatus = async (req, res) => {
         // 🔔 PUSH NOTIFICATION ALERT TO CUSTOMER
         try {
             const customer = await User.findById(order.customerId);
-            if (customer && customer.onesignalPlayerId) {
+            if (customer) {
                 let statusMessage = "Your order status has been updated.";
                 if (status === 'accepted') statusMessage = "Yay! Your order has been accepted by the shop.";
                 else if (status === 'packed') statusMessage = "Your order is packed and ready!";
@@ -257,10 +280,11 @@ const updateOrderStatus = async (req, res) => {
                 else if (status === 'delivered') statusMessage = "Your order has been delivered. Enjoy! 🎉";
                 else if (status === 'cancelled') statusMessage = "Your order was cancelled.";
 
-                await sendOneSignalNotification(
-                    [customer.onesignalPlayerId], 
+                await sendAndSaveNotification(
+                    [customer._id], 
                     "Order Update 📦", 
-                    statusMessage
+                    statusMessage,
+                    "/profile"
                 );
             }
         } catch (pushErr) {

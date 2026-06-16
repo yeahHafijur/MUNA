@@ -158,16 +158,7 @@ const VendorDashboard = () => {
         } catch { /* ignore */ }
     };
 
-    /* ── Enable push notifications ── */
-    const handleEnableNotifications = async () => {
-        try {
-            if (window.OneSignal) await window.OneSignal.Slidedown.promptPush();
-            else alert('Notification system is initializing. Please try again shortly.');
-        } catch (err) {
-            console.error(err);
-            alert('Failed to enable push notifications.');
-        }
-    };
+
 
     /* ── Fetch orders ── */
     const fetchOrders = (isInitial = false) => {
@@ -435,8 +426,8 @@ const VendorDashboard = () => {
                     <button
                         id="vnd-notify-btn"
                         className="vnd-icon-btn"
-                        title="Enable notifications"
-                        onClick={handleEnableNotifications}
+                        title="Notifications"
+                        onClick={() => navigate('/notifications')}
                     >
                         <IconBell />
                     </button>

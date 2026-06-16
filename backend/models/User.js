@@ -21,14 +21,6 @@ const userSchema = new mongoose.Schema({
     profilePic: {
         type: String
     },
-    pushSubscription: {
-        type: Object,
-        default: null
-    },
-    onesignalPlayerId: {
-        type: String,
-        default: null
-    },
     role: {
         type: String,
         enum: ['customer', 'vendor', 'super_admin'],

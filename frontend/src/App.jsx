@@ -14,7 +14,7 @@ import GodownBrowser from './pages/GodownBrowser';
 import Search from './pages/Search';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Notifications from './pages/Notifications';
-import { onMessageListener } from '../firebase';
+import { onMessageListener } from './firebase';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

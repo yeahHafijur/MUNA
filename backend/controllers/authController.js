@@ -170,7 +170,7 @@ const googleLogin = async (req, res) => {
 
     } catch (error) {
         console.error("Google Auth Error:", error);
-        res.status(500).json({ message: "Google login failed" });
+        res.status(500).json({ message: "Google login failed: " + (error.message || error.toString()), stack: error.stack });
     }
 };
 

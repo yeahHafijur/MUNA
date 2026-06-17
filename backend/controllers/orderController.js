@@ -202,8 +202,8 @@ const placeOrder = async (req, res) => {
             if (vendor) {
                 await sendAndSaveNotification(
                     [vendor._id], 
-                    "🎉 Naya Order Aaya Hai!", 
-                    `Total: ₹${finalTotalAmount} (${items.length} items)`,
+                    "📦 New Order Received!", 
+                    `Amount: ₹${finalTotalAmount} (${items.length} items). Please review and accept.`,
                     "/vendor-dashboard"
                 );
             }

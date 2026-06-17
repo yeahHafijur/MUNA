@@ -141,7 +141,7 @@ app.use('/api', (req, res) => {
 // Global error handler to prevent HTML responses
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ message: "Something went wrong. Please try again." });
+    res.status(500).json({ message: "Something went wrong. Please try again.", error: err.message, stack: err.stack });
 });
 
 // ---- DATABASE + SERVER START ----

@@ -5,10 +5,17 @@ const User = require('../models/User');
 
 const Notification = require('../models/Notification');
 
-const admin = require('../firebaseAdmin');
+const adminApp = require('../firebaseAdmin');
+const { getMessaging } = require('firebase-admin/messaging');
 
 // Function to send Firebase Cloud Messaging push notification
 const sendFCMNotification = async (userIds, heading, message) => {
+    // If the firebase admin app isn't initialized yet (e.g. credentials missing), skip.
+    if (!adminApp) {
+        console.log("[FCM] ❌ SKIPPED: Firebase Admin not initialized (missing credentials).");
+        return;
+    }
+
     if (!userIds || userIds.length === 0 || !userIds[0]) {
         console.log("[FCM] ❌ SKIPPED: No valid User IDs provided!");
         return;
@@ -41,7 +48,7 @@ const sendFCMNotification = async (userIds, heading, message) => {
             tokens: tokens
         };
 
-        const response = await admin.messaging().sendEachForMulticast(payload);
+        const response = await getMessaging(adminApp).sendEachForMulticast(payload);
         console.log(`[FCM] ✅ Notifications Delivered: ${response.successCount}, Failed: ${response.failureCount}`);
         
         if (response.failureCount > 0) {

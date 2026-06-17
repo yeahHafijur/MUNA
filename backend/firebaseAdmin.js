@@ -1,4 +1,4 @@
-const admin = require("firebase-admin");
+const { initializeApp, getApps, cert } = require("firebase-admin/app");
 
 let serviceAccount = null;
 
@@ -18,10 +18,12 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     }
 }
 
-if (serviceAccount && !admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
+let appInstance = null;
+
+if (serviceAccount && getApps().length === 0) {
+    appInstance = initializeApp({
+        credential: cert(serviceAccount)
     });
 }
 
-module.exports = admin;
+module.exports = appInstance;

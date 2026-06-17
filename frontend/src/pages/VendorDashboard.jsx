@@ -104,6 +104,20 @@ const VendorDashboard = () => {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [bannerUploadProgress, setBannerUploadProgress] = useState(0);
 
+    /* ── Edit Product ── */
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [editProductName, setEditProductName] = useState('');
+    const [editProductPrice, setEditProductPrice] = useState('');
+    const [editProductCategory, setEditProductCategory] = useState('');
+    const [editProductImage, setEditProductImage] = useState(null);
+    const [editProductUploading, setEditProductUploading] = useState(false);
+
+    /* ── Manage Categories ── */
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [newCatName, setNewCatName] = useState('');
+    const [newCatImage, setNewCatImage] = useState(null);
+    const [catUploading, setCatUploading] = useState(false);
+
     /* ── Initial data load ── */
     useEffect(() => {
         if (!token || user?.role !== 'vendor') { navigate('/'); return; }
@@ -355,6 +369,116 @@ const VendorDashboard = () => {
             setBannerUploadProgress(0);
         };
         xhr.send(fd);
+    };
+
+    /* ── Edit Product Handlers ── */
+    const openEditProductModal = (product) => {
+        setEditingProduct(product);
+        setEditProductName(product.name);
+        setEditProductPrice(product.price);
+        setEditProductCategory(product.category);
+        setEditProductImage(null); // Keep null unless they upload a new one
+        setEditProductUploading(false);
+    };
+
+    const handleEditProductImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => setEditProductImage(reader.result);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSaveProductEdit = async (e) => {
+        e.preventDefault();
+        setEditProductUploading(true);
+        try {
+            const payload = {
+                name: editProductName,
+                price: Number(editProductPrice),
+                category: editProductCategory,
+            };
+            if (editProductImage) payload.image = editProductImage;
+
+            const res = await fetch(`/api/products/${editingProduct._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const updatedProduct = await res.json();
+                setProducts(products.map(p => p._id === updatedProduct._id ? updatedProduct : p));
+                setEditingProduct(null);
+                alert("Product updated successfully!");
+            } else {
+                alert("Failed to update product.");
+            }
+        } catch (error) {
+            alert("Error updating product.");
+        } finally {
+            setEditProductUploading(false);
+        }
+    };
+
+    /* ── Manage Custom Categories Handlers ── */
+    const handleAddCustomCategory = async (e) => {
+        e.preventDefault();
+        if (!newCatName || !newCatImage) return alert("Please provide a name and an image.");
+        setCatUploading(true);
+        
+        try {
+            const existingCategories = shop.categoriesConfig || [];
+            if (existingCategories.some(c => c.name.toLowerCase() === newCatName.toLowerCase())) {
+                setCatUploading(false);
+                return alert("A category with this name already exists.");
+            }
+
+            const updatedConfig = [...existingCategories, { name: newCatName, image: newCatImage }];
+
+            const res = await fetch(`/api/shops/${shop._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ categoriesConfig: updatedConfig })
+            });
+
+            if (res.ok) {
+                const updatedShop = await res.json();
+                setShop(updatedShop);
+                setNewCatName('');
+                setNewCatImage(null);
+                alert("Custom category added!");
+            } else {
+                alert("Failed to add category.");
+            }
+        } catch (error) {
+            alert("Error adding category.");
+        } finally {
+            setCatUploading(false);
+        }
+    };
+
+    const handleDeleteCustomCategory = async (catName) => {
+        if (!window.confirm(`Delete custom logo for ${catName}?`)) return;
+        
+        try {
+            const existingCategories = shop.categoriesConfig || [];
+            const updatedConfig = existingCategories.filter(c => c.name !== catName);
+
+            const res = await fetch(`/api/shops/${shop._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ categoriesConfig: updatedConfig })
+            });
+
+            if (res.ok) {
+                setShop(await res.json());
+            } else {
+                alert("Failed to delete category.");
+            }
+        } catch (error) {
+            alert("Error deleting category.");
+        }
     };
 
     /* ── Computed ── */
@@ -873,6 +997,14 @@ const VendorDashboard = () => {
                                                 </td>
                                                 <td style={{ textAlign: 'right' }}>
                                                     <button
+                                                        onClick={() => openEditProductModal(product)}
+                                                        className="vnd-edit-btn"
+                                                        title="Edit item"
+                                                        style={{ marginRight: '8px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px' }}
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleDeleteProduct(product._id)}
                                                         className="vnd-del-btn"
                                                         title="Delete item"
@@ -893,6 +1025,51 @@ const VendorDashboard = () => {
                 {activeTab === 'settings' && (
                     <div className="vnd-tab-panel">
                         <div className="vnd-mgmt-grid">
+
+                            {/* Manage Custom Categories */}
+                            <div className="vnd-section-card" style={{ gridColumn: '1 / -1' }}>
+                                <div className="vnd-section-head">
+                                    <div className="vnd-section-title">
+                                        <span className="vnd-section-title-icon">🎨</span>
+                                        Manage Custom Categories
+                                    </div>
+                                </div>
+                                <div className="vnd-section-body">
+                                    <form onSubmit={handleAddCustomCategory} style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
+                                        <div className="vnd-field" style={{ flex: 1, minWidth: '200px' }}>
+                                            <label className="vnd-label">Category Name</label>
+                                            <input type="text" required className="vnd-input" placeholder="e.g. Special Thali" value={newCatName} onChange={e => setNewCatName(e.target.value)} />
+                                        </div>
+                                        <div className="vnd-field" style={{ flex: 1, minWidth: '200px' }}>
+                                            <label className="vnd-label">Category Logo</label>
+                                            <input type="file" required accept="image/*" className="vnd-input" onChange={e => {
+                                                const file = e.target.files[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => setNewCatImage(reader.result);
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }} />
+                                        </div>
+                                        <button type="submit" disabled={catUploading} className="vnd-btn vnd-btn--primary" style={{ padding: '0 20px', height: '42px', whiteSpace: 'nowrap' }}>
+                                            {catUploading ? 'Uploading...' : 'Add Category'}
+                                        </button>
+                                    </form>
+
+                                    {/* List existing custom categories */}
+                                    {shop.categoriesConfig && shop.categoriesConfig.length > 0 && (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+                                            {shop.categoriesConfig.map(cat => (
+                                                <div key={cat.name} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#1e293b', padding: '8px 12px', borderRadius: '8px', border: '1px solid #334155' }}>
+                                                    <img src={cat.image} alt={cat.name} style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '50%' }} />
+                                                    <span style={{ fontSize: '14px', fontWeight: 500, color: '#f8fafc' }}>{cat.name}</span>
+                                                    <button type="button" onClick={() => handleDeleteCustomCategory(cat.name)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', marginLeft: 'auto', fontSize: '16px' }} title="Delete">✕</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
                             {/* Delivery Settings */}
                             <div className="vnd-section-card">
@@ -1022,6 +1199,50 @@ const VendorDashboard = () => {
                 )}
 
             </div>
+
+            {/* ─── EDIT PRODUCT MODAL ─── */}
+            {editingProduct && (
+                <div className="vnd-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="vnd-modal-content" style={{ background: '#1e293b', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '500px' }}>
+                        <h3 style={{ marginTop: 0, marginBottom: '20px', fontSize: '20px', color: '#f8fafc' }}>Edit Item</h3>
+                        <form onSubmit={handleSaveProductEdit}>
+                            <div className="vnd-field" style={{ marginBottom: '15px' }}>
+                                <label className="vnd-label">Item Name</label>
+                                <input type="text" required className="vnd-input" value={editProductName} onChange={e => setEditProductName(e.target.value)} />
+                            </div>
+                            <div className="vnd-field" style={{ marginBottom: '15px' }}>
+                                <label className="vnd-label">Price (₹)</label>
+                                <input type="number" required className="vnd-input" value={editProductPrice} onChange={e => setEditProductPrice(e.target.value)} />
+                            </div>
+                            <div className="vnd-field" style={{ marginBottom: '15px' }}>
+                                <label className="vnd-label">Category</label>
+                                <input type="text" required className="vnd-input" value={editProductCategory} onChange={e => setEditProductCategory(e.target.value)} />
+                                {shop.categoriesConfig && shop.categoriesConfig.length > 0 && (
+                                    <div style={{ marginTop: '5px', display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                                        {shop.categoriesConfig.map(cat => (
+                                            <span key={cat.name} onClick={() => setEditProductCategory(cat.name)} style={{ fontSize: '12px', background: '#334155', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', color: '#cbd5e1' }}>
+                                                {cat.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="vnd-field" style={{ marginBottom: '20px' }}>
+                                <label className="vnd-label">New Photo (Optional)</label>
+                                <input type="file" accept="image/*" className="vnd-input" onChange={handleEditProductImageChange} />
+                                {editProductImage && <img src={editProductImage} alt="preview" style={{ marginTop: '10px', height: '60px', borderRadius: '8px' }} />}
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                                <button type="button" onClick={() => setEditingProduct(null)} className="vnd-btn" style={{ background: '#475569' }}>Cancel</button>
+                                <button type="submit" disabled={editProductUploading} className="vnd-btn vnd-btn--primary">
+                                    {editProductUploading ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };

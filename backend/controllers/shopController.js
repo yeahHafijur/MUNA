@@ -136,6 +136,9 @@ const updateShop = async (req, res) => {
         if (req.body.customCategories !== undefined) {
             shop.customCategories = req.body.customCategories;
         }
+        if (req.body.categoriesConfig !== undefined) {
+            shop.categoriesConfig = req.body.categoriesConfig;
+        }
         if (req.body.isOpen !== undefined) {
             shop.isOpen = req.body.isOpen;
         }

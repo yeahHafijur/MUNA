@@ -66,6 +66,14 @@ const ShopDetail = () => {
         return Array.from(cats).sort();
     }, [products]);
 
+    const getCatImage = (catName) => {
+        if (shop?.categoriesConfig) {
+            const config = shop.categoriesConfig.find(c => c.name.toLowerCase() === catName.toLowerCase());
+            if (config && config.image) return config.image;
+        }
+        return null;
+    };
+
     /* ── Filtered products ── */
     const filteredProducts = useMemo(() => {
         return products.filter(p => {
@@ -223,18 +231,26 @@ const ShopDetail = () => {
                                     >
                                         🍔 All <span className="sd-chip-count">({products.length})</span>
                                     </button>
-                                    {categories.map((cat, idx) => (
-                                        <button
-                                            key={cat}
-                                            className={`sd-chip ${selectedCategory === cat ? 'sd-chip--active' : ''}`}
-                                            onClick={() => setSelectedCategory(cat)}
-                                        >
-                                            {getCatEmoji(idx)} {cat}
-                                            <span className="sd-chip-count">
-                                                ({products.filter(p => (p.category || 'General') === cat).length})
-                                            </span>
-                                        </button>
-                                    ))}
+                                    {categories.map((cat, idx) => {
+                                        const customImg = getCatImage(cat);
+                                        return (
+                                            <button
+                                                key={cat}
+                                                className={`sd-chip ${selectedCategory === cat ? 'sd-chip--active' : ''}`}
+                                                onClick={() => setSelectedCategory(cat)}
+                                            >
+                                                {customImg ? (
+                                                    <img src={customImg} alt={cat} style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover', display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '4px' }} />
+                                                ) : (
+                                                    <span style={{ marginRight: '4px' }}>{getCatEmoji(idx)}</span>
+                                                )}
+                                                {cat}
+                                                <span className="sd-chip-count">
+                                                    ({products.filter(p => (p.category || 'General') === cat).length})
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
@@ -268,13 +284,18 @@ const ShopDetail = () => {
 
                                     {categories.map((cat, idx) => {
                                         const count = products.filter(p => (p.category || 'General') === cat).length;
+                                        const customImg = getCatImage(cat);
                                         return (
                                             <div
                                                 key={cat}
                                                 className="sd-cat-card"
                                                 onClick={() => setSelectedCategory(cat)}
                                             >
-                                                <span className="sd-cat-emoji">{getCatEmoji(idx)}</span>
+                                                {customImg ? (
+                                                    <img src={customImg} alt={cat} className="sd-cat-emoji" style={{ width: '40px', height: '40px', padding: 0, objectFit: 'cover' }} />
+                                                ) : (
+                                                    <span className="sd-cat-emoji">{getCatEmoji(idx)}</span>
+                                                )}
                                                 <div>
                                                     <div className="sd-cat-name">{cat}</div>
                                                     <div className="sd-cat-count">{count} items</div>

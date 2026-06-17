@@ -61,22 +61,12 @@ const Notifications = () => {
         }
     };
 
-    const enablePush = async () => {
-        if (window.OneSignal) {
-            await window.OneSignal.Slidedown.promptPush();
-        }
-    };
+
 
     return (
         <div className="p-4 max-w-lg mx-auto">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
-                <button 
-                    onClick={enablePush} 
-                    className="text-xs bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium shadow-sm active:scale-95 transition-transform"
-                >
-                    🔔 Enable Push
-                </button>
             </div>
 
             {loading ? (

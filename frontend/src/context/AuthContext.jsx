@@ -22,6 +22,31 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(getInitialUser);
     const [token, setToken] = useState(getInitialToken);
 
+    // Auto-sync FCM token on app load for already logged in users
+    useEffect(() => {
+        const syncFCMToken = async () => {
+            if (user && token) {
+                try {
+                    const fcmToken = await requestFirebaseNotificationPermission();
+                    if (fcmToken) {
+                        await fetch('/api/auth/fcm-token', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ fcmToken })
+                        });
+                        console.log("[MUNA Auth] FCM Token auto-synced on startup");
+                    }
+                } catch (err) {
+                    console.error("[MUNA Auth] Auto-sync FCM failed", err);
+                }
+            }
+        };
+        syncFCMToken();
+    }, [user, token]);
+
     // Login hone par Token aur User data save karne ka function
     const login = async (userData, userToken) => {
         setUser(userData);

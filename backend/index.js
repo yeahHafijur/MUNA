@@ -22,6 +22,8 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:4173',
     'http://127.0.0.1:5173',
+    'https://munastore.in',
+    'https://www.munastore.in',
     process.env.FRONTEND_URL   // Set this in .env for production
 ].filter(Boolean);
 

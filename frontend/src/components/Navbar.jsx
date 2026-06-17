@@ -50,55 +50,57 @@ const Navbar = () => {
                 </div>
 
                 {/* Right Side: Login / Profile & Cart */}
-                <div className="navbar-style-11">
+                {location.pathname !== '/notifications' && (
+                    <div className="navbar-style-11">
 
-                    {/* Search Button */}
-                    <Link to="/search" className="navbar-style-16" style={{ marginRight: '8px', padding: '8px', display: 'flex', alignItems: 'center' }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </Link>
-
-                    {/* Agar User login hai toh Profile par jane ka Button, warna Login button */}
-                    {user ? (
-                        <div className="navbar-style-12" style={{ display: 'flex', gap: '6px' }}>
-                            {user.role === 'vendor' && (
-                                <Link to="/profile" className="navbar-style-13" title="Shopping Profile">
-                                    <span className="navbar-style-14">🛍️</span>
-                                </Link>
-                            )}
-                            <Link 
-                                to={user.role === 'super_admin' ? "/admin-dashboard" : user.role === 'vendor' ? "/vendor-dashboard" : "/profile"} 
-                                className="navbar-style-13"
-                            >
-                                <span className="navbar-style-14">{user.role === 'super_admin' ? '👑' : user.role === 'vendor' ? '🏪' : '👤'}</span>
-                                <span className="navbar-style-15">Hi, {user.name.split(' ')[0]}</span>
-                            </Link>
-                        </div>
-                    ) : (
-                        <Link
-                            to="/login"
-                            className="navbar-style-16"
-                        >
-                            Login
+                        {/* Search Button */}
+                        <Link to="/search" className="navbar-style-16" style={{ marginRight: '8px', padding: '8px', display: 'flex', alignItems: 'center' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </Link>
-                    )}
 
-
-                    {/* Cart Button */}
-                    <Link to="/cart" className="navbar-style-17">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="navbar-style-18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <span className="navbar-style-19">Cart {totalItems > 0 && `(${totalItems})`}</span>
-                        {totalItems > 0 && (
-                            <span className="navbar-style-20">
-                                {totalItems}
-                            </span>
+                        {/* Agar User login hai toh Profile par jane ka Button, warna Login button */}
+                        {user ? (
+                            <div className="navbar-style-12" style={{ display: 'flex', gap: '6px' }}>
+                                {user.role === 'vendor' && (
+                                    <Link to="/profile" className="navbar-style-13" title="Shopping Profile">
+                                        <span className="navbar-style-14">🛍️</span>
+                                    </Link>
+                                )}
+                                <Link 
+                                    to={user.role === 'super_admin' ? "/admin-dashboard" : user.role === 'vendor' ? "/vendor-dashboard" : "/profile"} 
+                                    className="navbar-style-13"
+                                >
+                                    <span className="navbar-style-14">{user.role === 'super_admin' ? '👑' : user.role === 'vendor' ? '🏪' : '👤'}</span>
+                                    <span className="navbar-style-15">Hi, {user.name.split(' ')[0]}</span>
+                                </Link>
+                            </div>
+                        ) : (
+                            <Link
+                                to="/login"
+                                className="navbar-style-16"
+                            >
+                                Login
+                            </Link>
                         )}
-                    </Link>
 
-                </div>
+
+                        {/* Cart Button */}
+                        <Link to="/cart" className="navbar-style-17">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="navbar-style-18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <span className="navbar-style-19">Cart {totalItems > 0 && `(${totalItems})`}</span>
+                            {totalItems > 0 && (
+                                <span className="navbar-style-20">
+                                    {totalItems}
+                                </span>
+                            )}
+                        </Link>
+
+                    </div>
+                )}
 
             </div>
         </nav>

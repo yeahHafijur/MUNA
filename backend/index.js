@@ -160,7 +160,7 @@ mongoose.connect(process.env.MONGO_URI)
             console.log(`Server is running on port ${PORT}`);
         });
 
-        console.log("🚀 MUNA BACKEND LIVE - ONESIGNAL NOTIFICATION ENABLED v2.0");
+        console.log("🚀 MUNA BACKEND LIVE - FCM NOTIFICATION ENABLED v2.1");
         
         // Start Auto Shop Schedule Cron Job (Runs every minute)
         cron.schedule('* * * * *', async () => {

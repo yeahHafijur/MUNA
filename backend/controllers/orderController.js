@@ -5,52 +5,63 @@ const User = require('../models/User');
 
 const Notification = require('../models/Notification');
 
-// Function to send OneSignal push notification using External IDs
-const sendOneSignalNotification = async (userIds, heading, message) => {
-    if (!process.env.ONESIGNAL_REST_API_KEY) {
-        console.log("[OneSignal] ❌ SKIPPED: ONESIGNAL_REST_API_KEY missing in .env!");
-        return;
-    }
+const admin = require('../firebaseAdmin');
+
+// Function to send Firebase Cloud Messaging push notification
+const sendFCMNotification = async (userIds, heading, message) => {
     if (!userIds || userIds.length === 0 || !userIds[0]) {
-        console.log("[OneSignal] ❌ SKIPPED: No valid User IDs provided!");
+        console.log("[FCM] ❌ SKIPPED: No valid User IDs provided!");
         return;
     }
 
     try {
+        // Fetch users from DB to get their FCM tokens
+        const users = await User.find({ _id: { $in: userIds } });
+        let tokens = [];
+        
+        users.forEach(user => {
+            if (user.fcmTokens && user.fcmTokens.length > 0) {
+                tokens = tokens.concat(user.fcmTokens);
+            }
+        });
+
+        // Deduplicate tokens just in case
+        tokens = [...new Set(tokens)];
+
+        if (tokens.length === 0) {
+            console.log("[FCM] ❌ SKIPPED: No FCM tokens found for the given users.");
+            return;
+        }
+
         const payload = {
-            app_id: process.env.ONESIGNAL_APP_ID || "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
-            target_channel: "push",
-            include_aliases: {
-                external_id: userIds.map(id => id.toString())
+            notification: {
+                title: heading,
+                body: message
             },
-            headings: { en: heading },
-            contents: { en: message }
+            tokens: tokens
         };
 
-        const response = await fetch("https://onesignal.com/api/v1/notifications", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Basic ${process.env.ONESIGNAL_REST_API_KEY}`
-            },
-            body: JSON.stringify(payload)
-        });
+        const response = await admin.messaging().sendEachForMulticast(payload);
+        console.log(`[FCM] ✅ Notifications Delivered: ${response.successCount}, Failed: ${response.failureCount}`);
         
-        const data = await response.json();
-        
-        if (!response.ok) {
-            console.error("[OneSignal] ❌ Failed to Deliver. Errors:", data.errors);
-        } else {
-            console.log("[OneSignal] ✅ Notification Delivered:", data.id);
+        if (response.failureCount > 0) {
+            const failedTokens = [];
+            response.responses.forEach((resp, idx) => {
+                if (!resp.success) {
+                    failedTokens.push(tokens[idx]);
+                }
+            });
+            console.error("[FCM] ❌ Failed tokens:", failedTokens);
+            // Optionally, remove failed tokens from DB here to keep it clean
         }
     } catch (error) {
-        console.error("[OneSignal] ❌ Network/Server Error:", error);
+        console.error("[FCM] ❌ Firebase Error:", error);
     }
 };
 
 // Helper to send push and save to DB
 const sendAndSaveNotification = async (userIds, heading, message, actionUrl = "") => {
-    await sendOneSignalNotification(userIds, heading, message);
+    await sendFCMNotification(userIds, heading, message);
     
     try {
         const notificationsToInsert = userIds.map(id => ({

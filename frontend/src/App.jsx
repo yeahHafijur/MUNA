@@ -14,6 +14,9 @@ import GodownBrowser from './pages/GodownBrowser';
 import Search from './pages/Search';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Notifications from './pages/Notifications';
+import { onMessageListener } from '../firebase';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [showSplash, setShowSplash] = useState(() => {
@@ -26,25 +29,18 @@ function App() {
     sessionStorage.setItem('hasSeenSplash', 'true');
     setShowSplash(false);
   };
-
-  // Initialize OneSignal
   useEffect(() => {
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "f7ec7ea5-0da8-4703-b112-26e3707c3da1",
-        notifyButton: {
-          enable: false,
-        },
-        serviceWorkerParam: { scope: '/' },
-        serviceWorkerPath: '/sw.js',
-      });
-      console.log("[MUNA] OneSignal initialized successfully");
-    });
+    onMessageListener()
+      .then((payload) => {
+        console.log('[App.jsx] Received foreground message ', payload);
+        toast.info(`${payload.notification.title}: ${payload.notification.body}`);
+      })
+      .catch((err) => console.log('failed: ', err));
   }, []);
 
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={5000} />
       <ScrollToTop />
       {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
       

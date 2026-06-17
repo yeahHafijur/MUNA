@@ -216,10 +216,39 @@ const deleteLocation = async (req, res) => {
     }
 };
 
+// Save FCM token for push notifications
+const saveFcmToken = async (req, res) => {
+    try {
+        const { fcmToken } = req.body;
+        if (!fcmToken) {
+            return res.status(400).json({ message: "FCM token is required" });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        if (!user.fcmTokens) {
+            user.fcmTokens = [];
+        }
+
+        // Add token if not already present
+        if (!user.fcmTokens.includes(fcmToken)) {
+            user.fcmTokens.push(fcmToken);
+            await user.save();
+        }
+
+        res.status(200).json({ message: "FCM token saved successfully" });
+    } catch (error) {
+        console.error("[SaveFcmToken] Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 module.exports = {
     sendOTP,
     verifyOTP,
     googleLogin,
     saveLocation,
-    deleteLocation
+    deleteLocation,
+    saveFcmToken
 };

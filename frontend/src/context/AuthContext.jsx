@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { requestFirebaseNotificationPermission } from '../firebase';
 
 const AuthContext = createContext();
 
@@ -28,13 +29,23 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('token', userToken);
 
-        // 🔥 NEW: Use OneSignal External ID system
-        if (window.OneSignal) {
-            window.OneSignal.login(userData._id).then(() => {
-                console.log(`[MUNA Auth] Logged into OneSignal with ID: ${userData._id}`);
-            }).catch(err => {
-                console.error("[MUNA Auth] Failed to login to OneSignal", err);
-            });
+        // Firebase Cloud Messaging logic
+        try {
+            const fcmToken = await requestFirebaseNotificationPermission();
+            if (fcmToken) {
+                // Send FCM token to backend
+                await fetch('/api/auth/fcm-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userToken}`
+                    },
+                    body: JSON.stringify({ fcmToken })
+                });
+                console.log("[MUNA Auth] FCM Token saved to backend");
+            }
+        } catch (err) {
+            console.error("[MUNA Auth] Failed to initialize FCM", err);
         }
     };
 
@@ -44,13 +55,7 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
-
-        // Logout from OneSignal
-        if (window.OneSignal) {
-            window.OneSignal.logout().then(() => {
-                console.log("[MUNA Auth] Logged out from OneSignal");
-            }).catch(err => console.error(err));
-        }
+        // FCM token is kept on the device, but the user is logged out locally
     };
 
     return (

@@ -78,6 +78,7 @@ app.use('/api/master-products', require('./routes/masterProductRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/search', require('./routes/searchRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/categories', require('./routes/categoryRoutes'));
 
 app.get("/", (req, res) => {
     res.send("MUNA is running")

@@ -16,7 +16,7 @@ router.get("/:shopId", getProductsByShop);
 router.post("/", protect, authorize("vendor"), upload.single('image'), createProduct);
 
 // Yahan galti se deleteProduct likh diya tha, isey updateProduct karna hai
-router.put("/:id", protect, authorize("vendor"), updateProduct);
+router.put("/:id", protect, authorize("vendor"), upload.single('image'), updateProduct);
 
 // Aur ye naya route delete ke liye add karna hai
 router.delete("/:id", protect, authorize("vendor"), deleteProduct);

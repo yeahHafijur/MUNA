@@ -240,19 +240,67 @@ const getCustomerOrders = async (req, res) => {
     }
 };
 
-// 3. Get Vendor's Orders (Vendor apne Dashboard me dekhega)
+// 3. Get Vendor's Orders (with pagination, search, filters)
 const getVendorOrders = async (req, res) => {
     try {
-        // Pehle dekho vendor ki dukan kaunsi hai
         const shop = await Shop.findOne({ vendorId: req.user._id });
         if (!shop) {
             return res.status(404).json({ message: "You don't have any shop." });
         }
 
-        const orders = await Order.find({ shopId: shop._id })
-            .populate('customerId', 'name email phone') // Customer ka naam aur number
+        const { page = 1, limit = 20, status, search, from, to } = req.query;
+
+        let filter = { shopId: shop._id };
+
+        // Status filter
+        if (status && status !== 'all') {
+            filter.status = status;
+        }
+
+        // Date range filter
+        if (from || to) {
+            filter.createdAt = {};
+            if (from) filter.createdAt.$gte = new Date(from);
+            if (to) filter.createdAt.$lte = new Date(to + 'T23:59:59.999Z');
+        }
+
+        let query = Order.find(filter)
+            .populate('customerId', 'name email phone')
             .sort('-createdAt');
-        res.status(200).json(orders);
+
+        // Search by order ID suffix or customer name
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            // We need to first populate, then filter — or use aggregation
+            // For simplicity: fetch with populate, then filter in memory for small datasets
+            // For production scale, use aggregation pipeline
+        }
+
+        const total = await Order.countDocuments(filter);
+        const skip = (Number(page) - 1) * Number(limit);
+        
+        const orders = await query.skip(skip).limit(Number(limit));
+
+        // If search is provided, do client-side filtering on populated fields
+        let filteredOrders = orders;
+        if (search) {
+            const searchLower = search.toLowerCase();
+            filteredOrders = orders.filter(o => 
+                o._id.toString().toLowerCase().includes(searchLower) ||
+                (o.customerId?.name || '').toLowerCase().includes(searchLower) ||
+                (o.customerId?.phone || '').includes(search)
+            );
+        }
+
+        res.status(200).json({
+            orders: filteredOrders,
+            pagination: {
+                total,
+                page: Number(page),
+                limit: Number(limit),
+                pages: Math.ceil(total / Number(limit))
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
@@ -292,10 +340,10 @@ const updateOrderStatus = async (req, res) => {
             const customer = await User.findById(order.customerId);
             if (customer) {
                 let statusMessage = "Your order status has been updated.";
-                if (status === 'accepted') statusMessage = "Yay! Your order has been accepted by the shop.";
-                else if (status === 'packed') statusMessage = "Your order is packed and ready!";
-                else if (status === 'out_for_delivery') statusMessage = "Your order is out for delivery! 🛵";
-                else if (status === 'delivered') statusMessage = "Your order has been delivered. Enjoy! 🎉";
+                if (status === 'accepted') statusMessage = "Your order has been accepted by the store!";
+                else if (status === 'preparing') statusMessage = "Your order is being prepared!";
+                else if (status === 'out_for_delivery') statusMessage = "Your order is out for delivery!";
+                else if (status === 'delivered') statusMessage = "Your order has been delivered. Thank you!";
                 else if (status === 'cancelled') statusMessage = "Your order was cancelled.";
 
                 await sendAndSaveNotification(

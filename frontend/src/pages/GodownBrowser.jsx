@@ -1,178 +1,153 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
-import './GodownBrowser.css';
+import { toast } from 'react-toastify';
+import './vendor/VendorLayout.css'; // Use the new unified CSS
 
 const GodownBrowser = () => {
-    const { user, token } = useAuth();
+    const { token, user } = useAuth();
     const navigate = useNavigate();
 
-    const [godownItems, setGodownItems] = useState([]);
+    const [masterItems, setMasterItems] = useState([]);
     const [shop, setShop] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    
-    // For pricing modal
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [customPrice, setCustomPrice] = useState('');
+    const [activeCategory, setActiveCategory] = useState('All');
+    const [loadingMap, setLoadingMap] = useState({});
 
+    // Fetch master products
     useEffect(() => {
-        if (!token || user?.role !== 'vendor') {
-            navigate('/');
-            return;
-        }
+        fetch('/api/master-products')
+            .then(r => r.json())
+            .then(data => setMasterItems(data))
+            .catch(() => toast.error('Failed to load Godown items'));
+    }, []);
 
-        // Vendor ki dukan lao
-        fetch('/api/shops/my-shop', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-            .then(res => res.json())
-            .then(shopData => setShop(shopData));
-
-        // Godown items lao
-        fetch('/api/master-products?status=approved')
-            .then(res => res.json())
-            .then(data => setGodownItems(Array.isArray(data) ? data : []));
+    // Fetch shop details to verify vendor
+    useEffect(() => {
+        if (!token || !user) { navigate('/login'); return; }
+        fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(data => { if (data._id) setShop(data); else { toast.error("Create a shop first"); navigate('/'); } })
+            .catch(() => toast.error('Failed to load shop details'));
     }, [token, user, navigate]);
 
-    const handleAddToShop = async (e) => {
-        e.preventDefault();
-        if (!selectedItem || !customPrice) return;
+    // Derived unique categories from master items
+    const categories = ['All', ...new Set(masterItems.map(item => item.category || 'General'))];
 
-        const formData = new FormData();
-        formData.append('name', selectedItem.name);
-        formData.append('price', Number(customPrice));
-        formData.append('category', selectedItem.category);
-        if (selectedItem.image) {
-            formData.append('image', selectedItem.image); // String URL
+    const filteredItems = masterItems.filter(item => {
+        const matchCat = activeCategory === 'All' || item.category === activeCategory;
+        const matchQuery = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchCat && matchQuery;
+    });
+
+    const handleImport = async (item) => {
+        if (!shop) return;
+        setLoadingMap(prev => ({ ...prev, [item._id]: true }));
+
+        try {
+            // First, ensure the category exists in the shop's Category collection
+            const catRes = await fetch('/api/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ name: item.category || 'General' })
+            });
+            let catId = '';
+            if (catRes.ok) {
+                const cat = await catRes.json();
+                catId = cat._id;
+            } else if (catRes.status === 400) {
+                // Category probably already exists, fetch it
+                const allCatsRes = await fetch(`/api/categories/${shop._id}`);
+                const allCats = await allCatsRes.json();
+                const existing = allCats.find(c => c.name === (item.category || 'General'));
+                if (existing) catId = existing._id;
+            }
+
+            // Now create the product with the proper categoryId
+            const prodRes = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({
+                    name: item.name,
+                    price: 0, // Default to 0, vendor will edit later
+                    categoryId: catId,
+                    category: item.category || 'General', // Fallback string
+                    image: item.image,
+                    stock: 0
+                })
+            });
+
+            if (prodRes.ok) {
+                toast.success(`${item.name} imported! Don't forget to set its price in your catalog.`);
+            } else {
+                toast.error('Failed to import item');
+            }
+        } catch (error) {
+            toast.error('Error importing item');
         }
 
-        await fetch('/api/products', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
-            body: formData
-        });
-
-        // Close modal and show success (can just alert for now or reset)
-        setSelectedItem(null);
-        setCustomPrice('');
-        alert(`${selectedItem.name} added to your shop!`);
+        setLoadingMap(prev => ({ ...prev, [item._id]: false }));
     };
 
-    // Grouping by category
-    const filteredItems = godownItems.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const groupedItems = filteredItems.reduce((acc, item) => {
-        if (!acc[item.category]) acc[item.category] = [];
-        acc[item.category].push(item);
-        return acc;
-    }, {});
+    if (!shop) return <div className="v-loading"><div className="v-loading-spinner" /><div className="v-loading-text">Loading...</div></div>;
 
     return (
-        <div className="godownbrowser-style-1 fade-in animate-in">
-            <div className="godownbrowser-style-2">
+        <div style={{ padding: '0 0 20px 0', maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
-                    <h1 className="godownbrowser-style-3">Master Godown 📦</h1>
-                    <p className="godownbrowser-style-4">Select items to instantly add to your shop menu</p>
+                    <h1 style={{ fontSize: '20px', fontWeight: 800 }}>Master Godown</h1>
+                    <p style={{ fontSize: '13px', color: 'var(--v-text-muted)' }}>Import pre-approved items to your catalog instantly.</p>
                 </div>
-                <Link to="/vendor-dashboard" className="godownbrowser-style-5">
-                    Back to Dashboard
-                </Link>
+                <button className="v-btn v-btn-ghost" onClick={() => navigate('/vendor/menu')}>← Back to Catalog</button>
             </div>
 
-            {/* Search Bar */}
-            <div className="godownbrowser-style-6">
-                <div className="godownbrowser-style-7">
-                    <span className="godownbrowser-style-8">🔍</span>
-                    <input 
-                        type="text" 
-                        placeholder="Search for any item in Godown (e.g. Rice, Milk, Biscuit)..." 
-                        className="godownbrowser-style-9"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
+            {/* Category Chips */}
+            <div className="v-chipbar" style={{ marginBottom: '16px' }}>
+                {categories.map(cat => (
+                    <button
+                        key={cat}
+                        className={`v-chip ${activeCategory === cat ? 'active' : ''}`}
+                        onClick={() => setActiveCategory(cat)}
+                    >
+                        {cat}
+                    </button>
+                ))}
             </div>
 
-            {/* Category Groups */}
-            <div className="godownbrowser-style-10">
-                {Object.keys(groupedItems).length === 0 ? (
-                    <div className="godownbrowser-style-11">
-                        <span className="godownbrowser-style-12">👀</span>
-                        <h3 className="godownbrowser-style-13">No items found</h3>
-                        <p className="godownbrowser-style-14">You can create custom items directly from the Vendor Dashboard.</p>
-                    </div>
-                ) : (
-                    Object.entries(groupedItems).map(([category, items]) => (
-                        <div key={category} className="godownbrowser-style-15">
-                            {/* Category Header (Not sticky to prevent overlap) */}
-                            <div className="godownbrowser-style-16">
-                                <h2 className="godownbrowser-style-17">{category}</h2>
-                                <span className="godownbrowser-style-18">{items.length} items</span>
+            {/* Search */}
+            <div className="v-searchbar" style={{ marginBottom: '24px' }}>
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <input placeholder="Search Godown items..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+            </div>
+
+            {filteredItems.length === 0 ? (
+                <div className="v-empty">
+                    <div className="v-empty-icon">📦</div>
+                    <div className="v-empty-title">No items found</div>
+                    <div className="v-empty-text">We couldn't find anything matching your search.</div>
+                </div>
+            ) : (
+                <div className="v-product-grid">
+                    {filteredItems.map(item => (
+                        <div key={item._id} className="v-product-card">
+                            <div className="v-product-card-img">
+                                {item.image ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📷'}
                             </div>
-                            
-                            {/* Items Grid with better spacing */}
-                            <div className="godownbrowser-style-19">
-                                {items.map((item) => (
-                                    <div 
-                                        key={item._id} 
-                                        className="godownbrowser-style-20 group"
-                                        onClick={() => setSelectedItem(item)}
+                            <div className="v-product-card-body">
+                                <div className="v-product-card-name">{item.name}</div>
+                                <div className="v-product-card-cat">{item.category}</div>
+                                <div className="v-product-card-footer" style={{ marginTop: '12px' }}>
+                                    <button 
+                                        className="v-btn v-btn-primary v-btn-full" 
+                                        onClick={() => handleImport(item)}
+                                        disabled={loadingMap[item._id]}
                                     >
-                                        <div className="godownbrowser-style-21 group">
-                                            {item.image ? <img src={item.image} className="godownbrowser-style-22" /> : "📦"}
-                                        </div>
-                                        <h3 className="godownbrowser-style-23">{item.name}</h3>
-                                        <button className="godownbrowser-style-24 group">
-                                            + ADD ITEM
-                                        </button>
-                                    </div>
-                                ))}
+                                        {loadingMap[item._id] ? 'Importing...' : 'Import to Catalog'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    ))
-                )}
-            </div>
-
-            {/* Pricing Modal */}
-            {selectedItem && (
-                <div className="godownbrowser-style-25">
-                    <div className="godownbrowser-style-26">
-                        <div className="godownbrowser-style-27">
-                            <button 
-                                onClick={() => setSelectedItem(null)}
-                                className="godownbrowser-style-28"
-                            >
-                                ✕
-                            </button>
-                            <div className="godownbrowser-style-29">
-                                {selectedItem.image ? <img src={selectedItem.image} className="godownbrowser-style-30" /> : "📦"}
-                            </div>
-                            <h2 className="godownbrowser-style-31">{selectedItem.name}</h2>
-                            <p className="godownbrowser-style-32">{selectedItem.category}</p>
-                        </div>
-                        
-                        <form onSubmit={handleAddToShop} className="godownbrowser-style-33">
-                            <label className="godownbrowser-style-34">
-                                Aap kitne me bechenge? (₹)
-                            </label>
-                            <input 
-                                type="number" 
-                                required
-                                autoFocus
-                                placeholder="e.g. 50"
-                                className="godownbrowser-style-35"
-                                value={customPrice}
-                                onChange={(e) => setCustomPrice(e.target.value)}
-                            />
-                            
-                            <button 
-                                type="submit" 
-                                className="godownbrowser-style-36"
-                            >
-                                ADD TO SHOP MENU
-                            </button>
-                        </form>
-                    </div>
+                    ))}
                 </div>
             )}
         </div>
@@ -180,6 +155,3 @@ const GodownBrowser = () => {
 };
 
 export default GodownBrowser;
-
-
-

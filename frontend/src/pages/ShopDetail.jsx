@@ -25,9 +25,7 @@ const IcoArrow = () => (
     </svg>
 );
 
-/* Category emoji map */
-const catEmojis = ['🍕', '🥗', '🍰', '🥤', '🌮', '🍛', '🍩', '🍟', '🧃', '🍿', '🧁', '🥘'];
-const getCatEmoji = (idx) => catEmojis[idx % catEmojis.length];
+/* Removed food emojis */
 
 /* ═══════════════════════════════════════════════════════════
    SHOP DETAIL PAGE — Premium Full-Page Experience
@@ -39,6 +37,7 @@ const ShopDetail = () => {
 
     const [shop, setShop] = useState(null);
     const [products, setProducts] = useState([]);
+    const [categoriesList, setCategoriesList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -50,45 +49,57 @@ const ShopDetail = () => {
     useEffect(() => {
         Promise.all([
             fetch(`/api/shops/${id}`).then(r => r.json()),
-            fetch(`/api/products/${id}`).then(r => r.json())
+            fetch(`/api/products/${id}`).then(r => r.json()),
+            fetch(`/api/categories/${id}`).then(r => r.json())
         ])
-        .then(([shopData, prodData]) => {
+        .then(([shopData, prodData, catData]) => {
             setShop(shopData);
             setProducts(Array.isArray(prodData) ? prodData : []);
+            setCategoriesList(Array.isArray(catData) ? catData : []);
             setLoading(false);
         })
         .catch(() => setLoading(false));
     }, [id]);
 
     /* ── Categories ── */
+    // Still support legacy string categories fallback
     const categories = useMemo(() => {
-        const cats = new Set(products.map(p => p.category || 'General'));
-        return Array.from(cats).sort();
-    }, [products]);
+        const prodCatNames = new Set(products.map(p => {
+            if (!p.category) return 'General';
+            return typeof p.category === 'object' ? (p.category.name || 'General') : p.category;
+        }));
+        
+        // Merge API categories with any legacy ones found in products
+        categoriesList.forEach(c => prodCatNames.add(c.name));
+        return Array.from(prodCatNames).sort();
+    }, [products, categoriesList]);
 
     const getCatImage = (catName) => {
-        if (shop?.categoriesConfig) {
-            const config = shop.categoriesConfig.find(c => c.name.toLowerCase() === catName.toLowerCase());
-            if (config && config.image) return config.image;
-        }
-        return null;
+        const cat = categoriesList.find(c => c.name === catName);
+        return cat ? cat.image : null;
     };
 
     /* ── Filtered products ── */
     const filteredProducts = useMemo(() => {
         return products.filter(p => {
-            if (selectedCategory === null && !searchQuery) return false;
-
-            const matchesSearch = !searchQuery ||
-                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (p.category || '').toLowerCase().includes(searchQuery.toLowerCase());
-
-            const matchesCat = !selectedCategory || selectedCategory === 'All' ||
-                (p.category || 'General') === selectedCategory;
-
-            return matchesSearch && matchesCat;
+            // Category filter
+            const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
+            if (selectedCategory && selectedCategory !== 'All' && pCatName !== selectedCategory) return false;
+            
+            // Search filter
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                const nameMatch = p.name.toLowerCase().includes(query);
+                const catMatch = pCatName.toLowerCase().includes(query);
+                if (!nameMatch && !catMatch) return false;
+            }
+            
+            return true;
+        }).sort((a, b) => {
+            if (a.inStock === b.inStock) return 0;
+            return a.inStock ? 1 : -1;
         });
-    }, [products, searchQuery, selectedCategory]);
+    }, [products, selectedCategory, searchQuery]);
 
     /* ── Show product view? ── */
     const showProducts = selectedCategory !== null || !!searchQuery;
@@ -229,7 +240,7 @@ const ShopDetail = () => {
                                         className={`sd-chip ${selectedCategory === 'All' ? 'sd-chip--active' : ''}`}
                                         onClick={() => setSelectedCategory('All')}
                                     >
-                                        🍔 All <span className="sd-chip-count">({products.length})</span>
+                                        📦 All <span className="sd-chip-count">({products.length})</span>
                                     </button>
                                     {categories.map((cat, idx) => {
                                         const customImg = getCatImage(cat);
@@ -242,11 +253,14 @@ const ShopDetail = () => {
                                                 {customImg ? (
                                                     <img src={customImg} alt={cat} style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover', display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '4px' }} />
                                                 ) : (
-                                                    <span style={{ marginRight: '4px' }}>{getCatEmoji(idx)}</span>
+                                                    <span style={{ marginRight: '4px', fontSize: '16px' }}>🏷</span>
                                                 )}
                                                 {cat}
                                                 <span className="sd-chip-count">
-                                                    ({products.filter(p => (p.category || 'General') === cat).length})
+                                                    ({products.filter(p => {
+                                                        const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
+                                                        return pCatName === cat;
+                                                    }).length})
                                                 </span>
                                             </button>
                                         );

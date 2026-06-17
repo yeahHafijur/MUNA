@@ -21,7 +21,7 @@ const getProductsByShop = async (req, res) => {
 };
 const createProduct = async (req, res) => {
     try {
-        const { name, price, category, stock } = req.body;
+        const { name, price, category, categoryId, stock } = req.body;
         
         let image = req.body.image;
         if (req.file) {
@@ -39,29 +39,31 @@ const createProduct = async (req, res) => {
         });
         if (!shop) {
             return res.status(400).json({
-                message: "You are not a shop owner,create a shop first to add product"
+                message: "You are not a shop owner, create a shop first to add product"
             })
         }
 
+        // Resolve category: prefer categoryId (ObjectId), fallback to string
+        const resolvedCategory = categoryId || category;
+
         // --- MASTER GODOWN LOGIC ---
-        // Push every new item to the master godown as pending, regardless of whether it exists
         try {
+            const catName = typeof resolvedCategory === 'string' ? resolvedCategory : (category || 'General');
             await MasterProduct.create({
                 name,
-                category,
+                category: catName,
                 image
             });
-            console.log(`📦 [Godown] New item pushed to approvals: ${name}`);
+            console.log(`[Godown] New item pushed to approvals: ${name}`);
         } catch (err) {
             console.error("Master Godown error:", err);
-            // Non-blocking error, continue to create product for shop
         }
         // ---------------------------
 
         const product = await Product.create({
             name,
             price,
-            category,
+            category: resolvedCategory,
             image,
             stock,
             shopId: shop._id
@@ -82,16 +84,28 @@ const updateProduct = async (req, res) => {
             return res.status(403).json({ message: "You cannot update products of another shop!" });
         }
         product.name = req.body.name || product.name;
-        product.price = req.body.price || product.price;
-        product.category = req.body.category || product.category;
+        product.price = req.body.price !== undefined ? req.body.price : product.price;
         
-        let newImage = req.body.image || product.image;
-        if (req.body.image && req.body.image.startsWith('data:image')) {
+        // Support both categoryId (ObjectId) and legacy category (string)
+        if (req.body.categoryId) {
+            product.category = req.body.categoryId;
+        } else if (req.body.category) {
+            product.category = req.body.category;
+        }
+        
+        // Handle image: multipart file, base64, or URL
+        if (req.file) {
+            const { uploadStream } = require('../utils/cloudinary');
+            const result = await uploadStream(req.file.buffer, 'muna/products');
+            product.image = result.secure_url;
+        } else if (req.body.image && req.body.image.startsWith('data:image')) {
             const { uploadBase64 } = require('../utils/cloudinary');
             const result = await uploadBase64(req.body.image, 'muna/products');
-            newImage = result.secure_url;
+            product.image = result.secure_url;
+        } else if (req.body.image) {
+            product.image = req.body.image;
         }
-        product.image = newImage;
+
         product.inStock = req.body.inStock !== undefined ? req.body.inStock : product.inStock;
         const updatedProduct = await product.save();
         res.status(200).json(updatedProduct);

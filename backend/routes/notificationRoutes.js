@@ -3,6 +3,7 @@ const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const { 
     getNotifications, 
+    getUnreadCount,
     markAsRead, 
     markAllAsRead, 
     deleteNotification 
@@ -10,6 +11,9 @@ const {
 
 // Get all notifications for user
 router.get('/', protect, getNotifications);
+
+// Get unread notification count
+router.get('/unread-count', protect, getUnreadCount);
 
 // Mark a specific notification as read
 router.put('/:id/read', protect, markAsRead);

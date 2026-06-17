@@ -85,6 +85,7 @@ const Home = () => {
     const [locationError, setLocationError] = useState(null);
     const [activeCategory, setActiveCategory] = useState('All');
     const [homeMsg, setHomeMsg] = useState({ line1: 'Your local market,', line2: 'delivered in minutes ⚡' });
+    const [unreadCount, setUnreadCount] = useState(0);
 
     /* ── Fetch shops & settings ── */
     useEffect(() => {
@@ -99,7 +100,19 @@ const Home = () => {
                 if (data && data.line1) setHomeMsg(data);
             })
             .catch(e => console.error("Settings fetch error:", e));
-    }, []);
+            
+        if (user) {
+            const token = localStorage.getItem('token');
+            if (token) {
+                fetch('/api/notifications/unread-count', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(r => r.json())
+                .then(data => { if (data.count !== undefined) setUnreadCount(data.count); })
+                .catch(e => console.error("Error fetching unread count:", e));
+            }
+        }
+    }, [user]);
 
     /* ── Geolocation ── */
     const handleLocate = () => {
@@ -386,7 +399,12 @@ const Home = () => {
                 </button>
 
                 <button className="mu-nav-item" onClick={() => navigate('/notifications')}>
-                    <span className="mu-nav-icon"><IcoBell /></span>
+                    <span className="mu-nav-icon" style={{ position: 'relative' }}>
+                        <IcoBell />
+                        {unreadCount > 0 && (
+                            <span className="mu-nav-badge">{unreadCount}</span>
+                        )}
+                    </span>
                     Alerts
                 </button>
 

@@ -87,6 +87,7 @@ const VendorDashboard = () => {
     const [isAddingItem, setIsAddingItem] = useState(false);
     const [expandedOrderId, setExpandedOrderId] = useState(null);
     const [productUploadProgress, setProductUploadProgress] = useState(0);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     /* Delivery settings */
     const [minCharge, setMinCharge] = useState(10);
@@ -179,6 +180,12 @@ const VendorDashboard = () => {
                 prevOrderCountRef.current = liveCount;
                 setOrders(data);
             });
+            
+        // Also fetch unread count
+        fetch('/api/notifications/unread-count', { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(data => { if (data.count !== undefined) setUnreadCount(data.count); })
+            .catch(() => {});
     };
 
     /* ── Fetch products ── */
@@ -428,8 +435,12 @@ const VendorDashboard = () => {
                         className="vnd-icon-btn"
                         title="Notifications"
                         onClick={() => navigate('/notifications')}
+                        style={{ position: 'relative' }}
                     >
                         <IconBell />
+                        {unreadCount > 0 && (
+                            <span style={{ position: 'absolute', top: -2, right: -2, background: '#ef4444', color: 'white', fontSize: '10px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', border: '2px solid white' }}>{unreadCount}</span>
+                        )}
                     </button>
 
                     <div className="vnd-divider" />

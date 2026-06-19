@@ -11,7 +11,22 @@ const getProductsByShop = async (req, res) => {
         if (!products || products.length === 0) {
             return res.status(404).json({ message: "no products found" })
         }
-        res.status(200).json(products);
+
+        // Manually populate category since the field is Mixed
+        const mongoose = require('mongoose');
+        const Category = require('../models/Category');
+        const populatedProducts = await Promise.all(products.map(async p => {
+            const prodObj = p.toObject();
+            if (prodObj.category && mongoose.Types.ObjectId.isValid(prodObj.category)) {
+                try {
+                    const catInfo = await Category.findById(prodObj.category);
+                    if (catInfo) prodObj.category = catInfo;
+                } catch (err) { }
+            }
+            return prodObj;
+        }));
+
+        res.status(200).json(populatedProducts);
 
     } catch (error) {
         res.status(500).json({

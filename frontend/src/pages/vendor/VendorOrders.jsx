@@ -98,7 +98,18 @@ const VendorOrders = () => {
                 {order.items.map(i => `${i.quantity}× ${i.name}`).join(', ')}
             </div>
             {order.deliveryLocation?.address && (
-                <div className="v-order-card-addr">📍 {order.deliveryLocation.address}</div>
+                <div 
+                    className="v-order-card-addr"
+                    style={order.deliveryLocation.coordinates ? { cursor: 'pointer', color: 'var(--v-info)', textDecoration: 'underline' } : {}}
+                    onClick={(e) => {
+                        if (order.deliveryLocation.coordinates) {
+                            e.stopPropagation();
+                            window.open(`https://www.google.com/maps/search/?api=1&query=${order.deliveryLocation.coordinates[1]},${order.deliveryLocation.coordinates[0]}`, '_blank');
+                        }
+                    }}
+                >
+                    📍 {order.deliveryLocation.address}
+                </div>
             )}
             <div className="v-order-card-actions">
                 {order.status === 'pending' && (
@@ -240,7 +251,17 @@ const VendorOrders = () => {
                                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                                                                 <div>
                                                                     <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--v-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>Delivery Address</div>
-                                                                    <div style={{ fontSize: '13px' }}>{order.deliveryLocation?.address || 'N/A'}</div>
+                                                                    <div 
+                                                                        style={{ fontSize: '13px', cursor: order.deliveryLocation?.coordinates ? 'pointer' : 'default', color: order.deliveryLocation?.coordinates ? 'var(--v-info)' : 'inherit', textDecoration: order.deliveryLocation?.coordinates ? 'underline' : 'none' }}
+                                                                        onClick={(e) => {
+                                                                            if (order.deliveryLocation?.coordinates) {
+                                                                                e.stopPropagation();
+                                                                                window.open(`https://www.google.com/maps/search/?api=1&query=${order.deliveryLocation.coordinates[1]},${order.deliveryLocation.coordinates[0]}`, '_blank');
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        📍 {order.deliveryLocation?.address || 'N/A'}
+                                                                    </div>
                                                                 </div>
                                                                 <div>
                                                                     <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--v-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>Items</div>

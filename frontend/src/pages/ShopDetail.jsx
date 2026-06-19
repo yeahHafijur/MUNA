@@ -297,7 +297,10 @@ const ShopDetail = () => {
                                     </div>
 
                                     {categories.map((cat, idx) => {
-                                        const count = products.filter(p => (p.category || 'General') === cat).length;
+                                        const count = products.filter(p => {
+                                            const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
+                                            return pCatName === cat;
+                                        }).length;
                                         const customImg = getCatImage(cat);
                                         return (
                                             <div
@@ -308,7 +311,7 @@ const ShopDetail = () => {
                                                 {customImg ? (
                                                     <img src={customImg} alt={cat} className="sd-cat-emoji" style={{ width: '40px', height: '40px', padding: 0, objectFit: 'cover' }} />
                                                 ) : (
-                                                    <span className="sd-cat-emoji">{getCatEmoji(idx)}</span>
+                                                    <span className="sd-cat-emoji" style={{ fontSize: '28px' }}>🏷</span>
                                                 )}
                                                 <div>
                                                     <div className="sd-cat-name">{cat}</div>
@@ -362,7 +365,7 @@ const ShopDetail = () => {
                                                             <span className="sd-prod-oos-tag">Out of Stock</span>
                                                         )}
                                                         <span className="sd-prod-cat-tag">
-                                                            {product.category || 'General'}
+                                                            {typeof product.category === 'object' ? (product.category?.name || 'General') : (product.category || 'General')}
                                                         </span>
                                                     </div>
 

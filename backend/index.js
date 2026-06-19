@@ -6,10 +6,14 @@ const mongoose = require("mongoose");
 const rateLimit = require("express-rate-limit");
 const cron = require("node-cron");
 const moment = require("moment-timezone");
+const compression = require("compression");
 
 dotenv.config();
 
 const app = express();
+
+// Compress all responses for extreme performance
+app.use(compression());
 
 // Render and other cloud providers use reverse proxies.
 // We must trust the proxy for express-rate-limit to get the correct user IP.

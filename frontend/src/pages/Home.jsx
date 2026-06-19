@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { optimizeImage } from '../utils/imageUtils';
 import './Home.css';
 
 /* ─── Icon Components ─── */
@@ -322,11 +323,13 @@ const Home = () => {
 
                                     {/* Banner */}
                                     <div className="mu-card-banner">
-                                        {shop.image ? (
-                                            <img src={shop.image} alt={shop.name} loading="lazy" />
-                                        ) : (
-                                            <div className="mu-card-banner-ph">🏪</div>
-                                        )}
+                                        <div className="mu-shop-img-box">
+                                            {shop.image ? (
+                                                <img src={optimizeImage(shop.image)} alt={shop.name} loading="lazy" />
+                                            ) : (
+                                                <div className="mu-card-banner-ph">🏪</div>
+                                            )}
+                                        </div>
 
                                         {/* Top overlay: Status + Rating */}
                                         <div className="mu-card-overlay-top">

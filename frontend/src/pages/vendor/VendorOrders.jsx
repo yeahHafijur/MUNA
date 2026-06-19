@@ -72,12 +72,24 @@ const VendorOrders = () => {
     useEffect(() => { if (activeView === 'history') fetchHistory(); }, [activeView, fetchHistory]);
 
     const handleStatus = async (orderId, newStatus) => {
-        await fetch(`/api/orders/${orderId}/status`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ status: newStatus }),
-        });
-        fetchLive();
+        // Optimistic UI Update: Instantly update the UI
+        setOrders(prev => prev.map(order => 
+            order._id === orderId ? { ...order, status: newStatus } : order
+        ));
+
+        // Network Request in the background
+        try {
+            await fetch(`/api/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            // Fetch live silently to ensure sync
+            fetchLive();
+        } catch (error) {
+            // Revert state if failed (optional, but good practice)
+            fetchLive();
+        }
     };
 
     // Computed live

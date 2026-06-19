@@ -11,7 +11,8 @@ const orderSchema = new mongoose.Schema({
     shopId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Shop',
-        required: true
+        required: true,
+        index: true
     },
     // 3. Kya kya order kiya? (Items ka array)
     items: [
@@ -46,7 +47,8 @@ const orderSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: ['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'],
-        default: 'pending'
+        default: 'pending',
+        index: true
     },
     // 7. Payment status
     paymentStatus: {

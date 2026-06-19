@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { optimizeImage } from '../utils/imageUtils';
 import './ShopDetail.css';
 
 /* ─── Icon Components ─── */
@@ -180,7 +181,7 @@ const ShopDetail = () => {
                         {shop && !showProducts && (
                             <div className="sd-hero">
                                 {shop.image ? (
-                                    <img src={shop.image} alt={shop.name} className="sd-hero-img" />
+                                    <img src={optimizeImage(shop.image)} alt={shop.name} className="sd-hero-img" />
                                 ) : (
                                     <div className="sd-hero-placeholder">🏪</div>
                                 )}
@@ -251,7 +252,7 @@ const ShopDetail = () => {
                                                 onClick={() => setSelectedCategory(cat)}
                                             >
                                                 {customImg ? (
-                                                    <img src={customImg} alt={cat} style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover', display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '4px' }} />
+                                                    <img src={optimizeImage(customImg)} alt={cat} style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover', display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '4px' }} />
                                                 ) : (
                                                     <span style={{ marginRight: '4px', fontSize: '16px' }}>🏷</span>
                                                 )}
@@ -309,7 +310,7 @@ const ShopDetail = () => {
                                                 onClick={() => setSelectedCategory(cat)}
                                             >
                                                 {customImg ? (
-                                                    <img src={customImg} alt={cat} className="sd-cat-emoji" style={{ width: '40px', height: '40px', padding: 0, objectFit: 'cover' }} />
+                                                    <img src={optimizeImage(customImg)} alt={cat} className="sd-cat-emoji" style={{ width: '40px', height: '40px', padding: 0, objectFit: 'cover' }} />
                                                 ) : (
                                                     <span className="sd-cat-emoji" style={{ fontSize: '28px' }}>🏷</span>
                                                 )}
@@ -357,7 +358,7 @@ const ShopDetail = () => {
                                                     {/* Image */}
                                                     <div className="sd-prod-img">
                                                         {product.image ? (
-                                                            <img src={product.image} alt={product.name} loading="lazy" />
+                                                            <img src={optimizeImage(product.image)} alt={product.name} loading="lazy" />
                                                         ) : (
                                                             <div className="sd-prod-img-ph">📦</div>
                                                         )}

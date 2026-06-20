@@ -199,6 +199,12 @@ const Profile = () => {
                                                             <span className="prf-item-price">₹{item.price * item.quantity}</span>
                                                         </div>
                                                     ))}
+                                                    {order.instructions && (
+                                                        <div style={{ background: '#fef9c3', border: '1px solid #fde047', padding: '10px', borderRadius: '8px', fontSize: '13px', color: '#854d0e', marginTop: '12px' }}>
+                                                            <strong style={{ display: 'block', marginBottom: '4px' }}>📝 Your Instructions:</strong>
+                                                            {order.instructions}
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 <div className="prf-order-foot">

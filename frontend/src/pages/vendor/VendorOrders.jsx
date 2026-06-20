@@ -92,6 +92,48 @@ const VendorOrders = () => {
         }
     };
 
+    const handlePrint = (order) => {
+        const printWindow = window.open('', '_blank');
+        const itemsHtml = order.items.map(i => `<div class="item"><span>${i.quantity}x ${i.name}</span><span>₹${i.price * i.quantity}</span></div>`).join('');
+        const subtotal = order.totalAmount - order.deliveryFee;
+        
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Bill #${order._id.slice(-5).toUpperCase()}</title>
+                    <style>
+                        body { font-family: 'Courier New', Courier, monospace; padding: 20px; width: 300px; margin: auto; }
+                        h2 { text-align: center; margin-bottom: 5px; }
+                        .text-center { text-align: center; }
+                        .divider { border-bottom: 1px dashed #000; margin: 10px 0; }
+                        .item { display: flex; justify-content: space-between; margin: 5px 0; font-size: 14px;}
+                        .total { font-weight: bold; font-size: 16px; margin-top: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>MUNA DELIVERY</h2>
+                    <div class="text-center">Order #${order._id.slice(-5).toUpperCase()}</div>
+                    <div class="text-center">${new Date(order.createdAt).toLocaleString()}</div>
+                    <div class="divider"></div>
+                    <div><b>Customer:</b> ${order.customerId?.name || 'Guest'}</div>
+                    <div><b>Phone:</b> ${order.customerId?.phone || 'N/A'}</div>
+                    <div><b>Address:</b> ${order.deliveryLocation?.address || 'N/A'}</div>
+                    <div class="divider"></div>
+                    ${itemsHtml}
+                    <div class="divider"></div>
+                    <div class="item"><span>Subtotal</span><span>₹${subtotal}</span></div>
+                    <div class="item"><span>Delivery Fee</span><span>₹${order.deliveryFee}</span></div>
+                    <div class="item total"><span>Total</span><span>₹${order.totalAmount}</span></div>
+                    <div class="divider"></div>
+                    <div class="text-center">Thank you for shopping!</div>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => { printWindow.print(); printWindow.close(); }, 250);
+    };
+
     // Computed live
     const liveOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.status));
     const pendingOrders = liveOrders.filter(o => o.status === 'pending');
@@ -112,11 +154,11 @@ const VendorOrders = () => {
             {order.deliveryLocation?.address && (
                 <div 
                     className="v-order-card-addr"
-                    style={order.deliveryLocation.coordinates ? { cursor: 'pointer', color: 'var(--v-info)', textDecoration: 'underline' } : {}}
+                    style={(order.deliveryLocation?.lat && order.deliveryLocation?.lng) ? { cursor: 'pointer', color: 'var(--v-info)', textDecoration: 'underline' } : {}}
                     onClick={(e) => {
-                        if (order.deliveryLocation.coordinates) {
+                        if (order.deliveryLocation?.lat && order.deliveryLocation?.lng) {
                             e.stopPropagation();
-                            window.open(`https://www.google.com/maps/search/?api=1&query=${order.deliveryLocation.coordinates[1]},${order.deliveryLocation.coordinates[0]}`, '_blank');
+                            window.open(`https://www.google.com/maps/search/?api=1&query=${order.deliveryLocation.lat},${order.deliveryLocation.lng}`, '_blank');
                         }
                     }}
                 >
@@ -264,11 +306,11 @@ const VendorOrders = () => {
                                                                 <div>
                                                                     <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--v-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>Delivery Address</div>
                                                                     <div 
-                                                                        style={{ fontSize: '13px', cursor: order.deliveryLocation?.coordinates ? 'pointer' : 'default', color: order.deliveryLocation?.coordinates ? 'var(--v-info)' : 'inherit', textDecoration: order.deliveryLocation?.coordinates ? 'underline' : 'none' }}
+                                                                        style={{ fontSize: '13px', cursor: (order.deliveryLocation?.lat && order.deliveryLocation?.lng) ? 'pointer' : 'default', color: (order.deliveryLocation?.lat && order.deliveryLocation?.lng) ? 'var(--v-info)' : 'inherit', textDecoration: (order.deliveryLocation?.lat && order.deliveryLocation?.lng) ? 'underline' : 'none' }}
                                                                         onClick={(e) => {
-                                                                            if (order.deliveryLocation?.coordinates) {
+                                                                            if (order.deliveryLocation?.lat && order.deliveryLocation?.lng) {
                                                                                 e.stopPropagation();
-                                                                                window.open(`https://www.google.com/maps/search/?api=1&query=${order.deliveryLocation.coordinates[1]},${order.deliveryLocation.coordinates[0]}`, '_blank');
+                                                                                window.open(`https://www.google.com/maps/search/?api=1&query=${order.deliveryLocation.lat},${order.deliveryLocation.lng}`, '_blank');
                                                                             }
                                                                         }}
                                                                     >
@@ -289,6 +331,14 @@ const VendorOrders = () => {
                                                                             <span>₹{order.deliveryFee}</span>
                                                                         </div>
                                                                     )}
+                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', padding: '6px 0', borderTop: '1px solid var(--v-border)', marginTop: '4px', fontWeight: 700 }}>
+                                                                        <span>Total Amount</span>
+                                                                        <span>₹{order.totalAmount}</span>
+                                                                    </div>
+                                                                    <button onClick={() => handlePrint(order)} style={{ marginTop: '12px', padding: '6px 12px', background: 'var(--v-surface)', border: '1px solid var(--v-border)', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"></path></svg>
+                                                                        Print POS Bill
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </td>

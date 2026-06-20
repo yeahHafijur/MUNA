@@ -21,9 +21,18 @@ const getAllShops = async (req, res) => {
             }
         }
 
-        const shops = await Shop.find(filter)
-            .select('name address image category isOpen location rating udyamNumber')
-            .lean();
+        let query = Shop.find(filter);
+        
+        if (Object.keys(filter).length === 0) {
+            // Admin view: need all fields including isActive and vendorId
+            query = query.select('name address image category isOpen isActive location rating udyamNumber vendorId')
+                         .populate('vendorId', 'name email phone');
+        } else {
+            // Public view: only active shops, basic fields
+            query = query.select('name address image category isOpen location rating udyamNumber');
+        }
+        
+        const shops = await query.lean();
         res.status(200).json(shops);
     } catch (error) {
         res.status(500).json({ message: "Server Error" })

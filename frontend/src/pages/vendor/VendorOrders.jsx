@@ -11,6 +11,7 @@ const VendorOrders = () => {
     const [orders, setOrders] = useState([]);
     const [activeView, setActiveView] = useState('live'); // 'live' | 'history'
     const [expandedId, setExpandedId] = useState(null);
+    const [updatingStatusId, setUpdatingStatusId] = useState(null);
     const prevLiveRef = useRef(0);
 
     // History filters
@@ -126,21 +127,31 @@ const VendorOrders = () => {
                 </div>
             )}
             <div className="v-order-card-actions">
-                {order.status === 'pending' && (
+                {updatingStatusId === order._id ? (
+                    <div style={{ padding: '10px', textAlign: 'center', color: 'var(--v-text-muted)', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#f1f5f9', borderRadius: '6px' }}>
+                        <div className="v-spinner" style={{ width: '16px', height: '16px', border: '2px solid var(--v-text-muted)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                        Updating...
+                    </div>
+                ) : (
                     <>
-                        <button className="v-btn v-btn-success" onClick={() => handleStatus(order._id, 'accepted')}>Accept</button>
-                        <button className="v-btn v-btn-danger v-btn-sm" onClick={() => handleStatus(order._id, 'cancelled')}>Reject</button>
+                        {order.status === 'pending' && (
+                            <>
+                                <button className="v-btn v-btn-success" onClick={() => handleStatus(order._id, 'accepted')}>Accept</button>
+                                <button className="v-btn v-btn-danger v-btn-sm" onClick={() => handleStatus(order._id, 'cancelled')}>Reject</button>
+                            </>
+                        )}
+                        {order.status === 'accepted' && (
+                            <button className="v-btn v-btn-primary v-btn-full" onClick={() => handleStatus(order._id, 'preparing')}>Start Preparing</button>
+                        )}
+                        {order.status === 'preparing' && (
+                            <button className="v-btn v-btn-primary v-btn-full" onClick={() => handleStatus(order._id, 'out_for_delivery')}>Dispatch</button>
+                        )}
+                        {order.status === 'out_for_delivery' && (
+                            <button className="v-btn v-btn-success v-btn-full" onClick={() => handleStatus(order._id, 'delivered')}>Mark Delivered</button>
+                        )}
                     </>
                 )}
-                {order.status === 'accepted' && (
-                    <button className="v-btn v-btn-primary v-btn-full" onClick={() => handleStatus(order._id, 'preparing')}>Start Preparing</button>
-                )}
-                {order.status === 'preparing' && (
-                    <button className="v-btn v-btn-primary v-btn-full" onClick={() => handleStatus(order._id, 'out_for_delivery')}>Dispatch</button>
-                )}
-                {order.status === 'out_for_delivery' && (
-                    <button className="v-btn v-btn-success v-btn-full" onClick={() => handleStatus(order._id, 'delivered')}>Mark Delivered</button>
-                )}
+                <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
             </div>
         </div>
     );

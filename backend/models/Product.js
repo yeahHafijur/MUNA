@@ -28,4 +28,7 @@ const productSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+productSchema.index({ shopId: 1, inStock: 1 });
+productSchema.index({ name: 'text', category: 'text' });
+
 module.exports = mongoose.model('Product', productSchema);

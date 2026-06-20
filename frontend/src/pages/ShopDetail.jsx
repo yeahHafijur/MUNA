@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { optimizeImage } from '../utils/imageUtils';
@@ -36,31 +37,33 @@ const ShopDetail = () => {
     const navigate = useNavigate();
     const { addToCart, cartItems, getTotal } = useCart();
 
-    const [shop, setShop] = useState(null);
-    const [products, setProducts] = useState([]);
-    const [categoriesList, setCategoriesList] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     const totalCartItems = cartItems.reduce((s, i) => s + i.quantity, 0);
     const cartTotal = getTotal();
 
-    /* ── Fetch data ── */
-    useEffect(() => {
-        Promise.all([
-            fetch(`/api/shops/${id}`).then(r => r.json()),
-            fetch(`/api/products/${id}`).then(r => r.json()),
-            fetch(`/api/categories/${id}`).then(r => r.json())
-        ])
-        .then(([shopData, prodData, catData]) => {
-            setShop(shopData);
-            setProducts(Array.isArray(prodData) ? prodData : []);
-            setCategoriesList(Array.isArray(catData) ? catData : []);
-            setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }, [id]);
+    /* ── Fetch data with React Query ── */
+    const { data: shop, isLoading: shopLoading } = useQuery({
+        queryKey: ['shop', id],
+        queryFn: () => fetch(`/api/shops/${id}`).then(r => r.json()),
+    });
+
+    const { data: productsData = [], isLoading: productsLoading } = useQuery({
+        queryKey: ['products', id],
+        queryFn: () => fetch(`/api/products/${id}`).then(r => r.json()),
+    });
+    // Ensure products is an array
+    const products = Array.isArray(productsData) ? productsData : [];
+
+    const { data: categoriesData = [], isLoading: categoriesLoading } = useQuery({
+        queryKey: ['categories', id],
+        queryFn: () => fetch(`/api/categories/${id}`).then(r => r.json()),
+    });
+    // Ensure categoriesList is an array
+    const categoriesList = Array.isArray(categoriesData) ? categoriesData : [];
+
+    const loading = shopLoading || productsLoading || categoriesLoading;
 
     /* ── Categories ── */
     // Still support legacy string categories fallback

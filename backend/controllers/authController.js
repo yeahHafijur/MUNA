@@ -107,6 +107,9 @@ const verifyOTP = async (req, res) => {
 };
 
 // Google Sign-In: Verify Google credential token and login/register user
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 const googleLogin = async (req, res) => {
     const { credential } = req.body;
 
@@ -115,12 +118,13 @@ const googleLogin = async (req, res) => {
     }
 
     try {
-        // Decode Google JWT token (the token is already verified by Google on frontend)
-        // We verify it here by calling Google's tokeninfo endpoint
-        const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
-        const payload = await googleRes.json();
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
 
-        if (payload.error_description) {
+        if (!payload) {
             return res.status(401).json({ message: "Invalid Google token" });
         }
 
@@ -233,6 +237,10 @@ const saveFcmToken = async (req, res) => {
 
         // Add token if not already present
         if (!user.fcmTokens.includes(fcmToken)) {
+            // Keep only the latest 5 tokens to prevent unbounded growth
+            if (user.fcmTokens.length >= 5) {
+                user.fcmTokens.shift();
+            }
             user.fcmTokens.push(fcmToken);
             await user.save();
         }

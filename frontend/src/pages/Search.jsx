@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { toast } from 'react-toastify';
+import { optimizeImage } from '../utils/imageUtils';
 import './Search.css';
 
 const IcoSearch = () => (
@@ -110,7 +112,7 @@ const Search = () => {
         e.stopPropagation();
         
         if (!product.shopIsOpen) {
-            alert("This shop is currently closed.");
+            toast.warning("This shop is currently closed.");
             return;
         }
 
@@ -178,7 +180,7 @@ const Search = () => {
                             {results.shops.map(shop => (
                                 <Link to={`/shop/${shop._id}`} key={`shop-${shop._id}`} className="search-shop-card">
                                     <div className="search-shop-banner">
-                                        {shop.image ? <img src={shop.image} alt={shop.name} /> : <div className="search-shop-placeholder"><IcoShop /></div>}
+                                        {shop.image ? <img src={optimizeImage(shop.image)} alt={shop.name} /> : <div className="search-shop-placeholder"><IcoShop /></div>}
                                         <div className="search-shop-overlay"></div>
                                         <div className={`search-shop-status ${shop.isOpen ? 'status-open' : 'status-closed'}`}>
                                             {shop.isOpen ? 'Open' : 'Closed'}
@@ -206,7 +208,7 @@ const Search = () => {
                                 <div key={`prod-${product._id}`} className={`search-product-card ${!product.inStock || !product.shopIsOpen ? 'product-unavailable' : ''}`}>
                                     <Link to={`/shop/${product.shopId}`} className="search-product-img-wrap">
                                         {product.image ? (
-                                            <img src={product.image} alt={product.name} />
+                                            <img src={optimizeImage(product.image, 200)} alt={product.name} />
                                         ) : (
                                             <div className="search-product-placeholder"><IcoProduct /></div>
                                         )}

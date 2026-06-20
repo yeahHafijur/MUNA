@@ -7,10 +7,12 @@ const rateLimit = require("express-rate-limit");
 const cron = require("node-cron");
 const moment = require("moment-timezone");
 const compression = require("compression");
+const helmet = require("helmet");
 
 dotenv.config();
 
 const app = express();
+app.use(helmet());
 
 // Compress all responses for extreme performance
 app.use(compression());
@@ -68,6 +70,20 @@ const authLimiter = rateLimit({
     message: { message: "Too many login attempts. Please try again later." }
 });
 app.use('/api/auth/', authLimiter);
+
+app.use('/api/shops', (req, res, next) => {
+    if (req.method === 'GET') {
+        res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    }
+    next();
+});
+
+app.use('/api/settings', (req, res, next) => {
+    if (req.method === 'GET') {
+        res.set('Cache-Control', 'public, max-age=300');
+    }
+    next();
+});
 
 // Serve uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -148,7 +164,7 @@ app.use('/api', (req, res) => {
 // Global error handler to prevent HTML responses
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ message: "Something went wrong. Please try again.", error: err.message, stack: err.stack });
+    res.status(500).json({ message: "Something went wrong. Please try again." });
 });
 
 // ---- DATABASE + SERVER START ----

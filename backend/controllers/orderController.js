@@ -114,11 +114,15 @@ const placeOrder = async (req, res) => {
         }
 
         // --- ZOMATO/SWIGGY LOGIC (Single Shop & In-Stock Check) ---
-        for (let i = 0; i < items.length; i++) {
-            const product = await Product.findById(items[i].productId);
+        const productIds = items.map(i => i.productId);
+        const dbProducts = await Product.find({ _id: { $in: productIds } }).lean();
+        const productMap = new Map(dbProducts.map(p => [p._id.toString(), p]));
+
+        for (const item of items) {
+            const product = productMap.get(item.productId.toString());
 
             if (!product) {
-                return res.status(404).json({ message: `Product ${items[i].name} not found.` });
+                return res.status(404).json({ message: `Product ${item.name} not found.` });
             }
 
             // Rule 1: Kya ye product usi dukan ka hai jis dukan se order ho raha hai?

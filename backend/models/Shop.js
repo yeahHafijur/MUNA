@@ -70,4 +70,8 @@ const shopSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+shopSchema.index({ isActive: 1, isOpen: 1 });
+shopSchema.index({ 'autoSchedule.enabled': 1 });
+shopSchema.index({ vendorId: 1 });
+
 module.exports = mongoose.model('Shop', shopSchema);

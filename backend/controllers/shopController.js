@@ -21,7 +21,9 @@ const getAllShops = async (req, res) => {
             }
         }
 
-        const shops = await Shop.find(filter).populate('vendorId', 'name email phone');
+        const shops = await Shop.find(filter)
+            .select('name address image category isOpen location rating udyamNumber')
+            .lean();
         res.status(200).json(shops);
     } catch (error) {
         res.status(500).json({ message: "Server Error" })

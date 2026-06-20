@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const CartContext = createContext();
 
@@ -36,7 +37,10 @@ export const CartProvider = ({ children }) => {
     const addToCart = (product, shopId) => {
         // THE ZOMATO / BLINKIT RULE: Single Shop Validation
         if (cartShopId && cartShopId !== shopId) {
-            alert("You can only order from one shop at a time! Please clear your cart first to order from a different shop.");
+            toast.warning("You can only order from one shop at a time! Please clear your cart first to order from a different shop.", {
+                position: "bottom-center",
+                autoClose: 4000,
+            });
             return false;
         }
 

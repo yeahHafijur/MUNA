@@ -12,6 +12,10 @@ const globalSearch = async (req, res) => {
 
         const safeQuery = query.trim();
 
+        // Escape special characters to prevent NoSQL injection
+        const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const sanitizedQuery = escapeRegex(safeQuery);
+
         // 1. Search Shops using Atlas Search (Fallback to Regex if index is building)
         let shops = [];
         try {
@@ -20,7 +24,7 @@ const globalSearch = async (req, res) => {
                     $search: {
                         index: "default",
                         text: {
-                            query: safeQuery,
+                            query: safeQuery, // Atlas Search handles escaping
                             path: ["name", "category"],
                             fuzzy: { maxEdits: 1 }
                         }
@@ -32,8 +36,8 @@ const globalSearch = async (req, res) => {
             console.log("Atlas Search failed for shops (falling back to regex):", searchErr.message);
             shops = await Shop.find({
                 $or: [
-                    { name: { $regex: safeQuery, $options: 'i' } },
-                    { category: { $regex: safeQuery, $options: 'i' } }
+                    { name: { $regex: sanitizedQuery, $options: 'i' } },
+                    { category: { $regex: sanitizedQuery, $options: 'i' } }
                 ]
             }).limit(10);
         }
@@ -86,8 +90,8 @@ const globalSearch = async (req, res) => {
                 {
                     $match: {
                         $or: [
-                            { name: { $regex: safeQuery, $options: 'i' } },
-                            { category: { $regex: safeQuery, $options: 'i' } }
+                            { name: { $regex: sanitizedQuery, $options: 'i' } },
+                            { category: { $regex: sanitizedQuery, $options: 'i' } }
                         ]
                     }
                 },

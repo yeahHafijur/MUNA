@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -79,41 +80,31 @@ const Home = () => {
     const greeting = getGreeting();
     const totalCartItems = cartItems.reduce((s, i) => s + i.quantity, 0);
 
-    const [shops, setShops] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
     const [userLocation, setUserLocation] = useState(null);
     const [locationError, setLocationError] = useState(null);
     const [activeCategory, setActiveCategory] = useState('All');
-    const [homeMsg, setHomeMsg] = useState({ line1: 'Your local market,', line2: 'delivered in minutes ⚡' });
-    const [unreadCount, setUnreadCount] = useState(0);
+    const [searchQuery, setSearchQuery] = useState('');
 
-    /* ── Fetch shops & settings ── */
-    useEffect(() => {
-        fetch('/api/shops')
-            .then(r => r.json())
-            .then(data => { setShops(data); setLoading(false); })
-            .catch(() => setLoading(false));
+    /* ── Fetch shops & settings with React Query ── */
+    const { data: shops = [], isLoading: loading } = useQuery({
+        queryKey: ['shops'],
+        queryFn: () => fetch('/api/shops').then(r => r.json()),
+    });
 
-        fetch(`/api/settings/navbar-message?t=${Date.now()}`)
-            .then(r => r.json())
-            .then(data => {
-                if (data && data.line1) setHomeMsg(data);
-            })
-            .catch(e => console.error("Settings fetch error:", e));
-            
-        if (user) {
-            const token = localStorage.getItem('token');
-            if (token) {
-                fetch('/api/notifications/unread-count', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
-                .then(r => r.json())
-                .then(data => { if (data.count !== undefined) setUnreadCount(data.count); })
-                .catch(e => console.error("Error fetching unread count:", e));
-            }
-        }
-    }, [user]);
+    const { data: homeMsg = { line1: 'Your local market,', line2: 'delivered in minutes ⚡' } } = useQuery({
+        queryKey: ['navbar-message'],
+        queryFn: () => fetch('/api/settings/navbar-message').then(r => r.json()),
+    });
+
+    const token = localStorage.getItem('token');
+    const { data: unreadData } = useQuery({
+        queryKey: ['unread-count', user?._id],
+        queryFn: () => fetch('/api/notifications/unread-count', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).then(r => r.json()),
+        enabled: !!user && !!token,
+    });
+    const unreadCount = unreadData?.count || 0;
 
     /* ── Geolocation ── */
     const handleLocate = () => {

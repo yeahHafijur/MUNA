@@ -73,7 +73,11 @@ app.use('/api/auth/', authLimiter);
 
 app.use('/api/shops', (req, res, next) => {
     if (req.method === 'GET') {
-        res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+        if (req.path === '/my-shop') {
+            res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        } else {
+            res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+        }
     }
     next();
 });

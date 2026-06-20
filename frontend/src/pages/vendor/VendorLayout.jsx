@@ -28,7 +28,13 @@ const VendorLayout = () => {
     useEffect(() => {
         if (!token || user?.role !== 'vendor') { navigate('/'); return; }
 
-        fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } })
+        fetch(`/api/shops/my-shop?t=${new Date().getTime()}`, { 
+            headers: { 
+                Authorization: `Bearer ${token}`,
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            } 
+        })
             .then(r => r.json())
             .then(data => { if (data._id) setShop(data); });
     }, [token, user, navigate]);

@@ -41,7 +41,7 @@ const Login = () => {
 
             // Role ke hisaab se redirect
             if (data.role === 'vendor') {
-                navigate('/vendor-dashboard');
+                navigate('/vendor');
             } else if (data.role === 'super_admin') {
                 navigate('/admin-dashboard');
             } else {

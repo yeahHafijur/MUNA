@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import SplashScreen from './components/SplashScreen';
@@ -85,14 +85,16 @@ const AppContent = () => {
               <Route path="orders" element={<VendorOrders />} />
               <Route path="menu" element={<VendorMenu />} />
               <Route path="settings" element={<VendorSettings />} />
-              <Route path="godown" element={<GodownBrowser />} />
             </Route>
+            
+            {/* Godown standalone full page route */}
+            <Route path="/vendor/godown" element={<GodownBrowser />} />
 
-            {/* KEEP OLD ROUTES AS REDIRECTS OR FALLBACKS TEMPORARILY */}
-            <Route path="/vendor-dashboard" element={<VendorLayout />} />
-            <Route path="/vendor-godown" element={<GodownBrowser />} />
+            {/* KEEP OLD ROUTES AS REDIRECTS TEMPORARILY */}
+            <Route path="/vendor-dashboard" element={<Navigate to="/vendor" replace />} />
+            <Route path="/vendor-godown" element={<Navigate to="/vendor/godown" replace />} />
 
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin-dashboard" element={<Navigate to="/admin" replace />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </Suspense>

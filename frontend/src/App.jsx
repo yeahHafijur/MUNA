@@ -63,7 +63,7 @@ const AppContent = () => {
           <Navbar />
           <div className="max-w-4xl mx-auto p-4 pb-20">
             <Suspense fallback={
-              <div className="flex flex-col items-center justify-center h-[70vh]">
+              <div className="fixed inset-0 z-[9999] bg-[#fdfaf3] flex flex-col items-center justify-center h-screen w-screen">
                 <div className="relative flex items-center justify-center mb-4">
                   <div className="absolute w-16 h-16 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
                   <div className="absolute w-12 h-12 rounded-full bg-yellow-500 opacity-40 animate-pulse"></div>

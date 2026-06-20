@@ -107,6 +107,9 @@ const VendorLayout = () => {
                     ))}
                 </nav>
                 <div className="v-sidebar-bottom">
+                    <button className="v-sidebar-link" onClick={() => navigate('/profile')}>
+                        <span>👤 My Customer Profile</span>
+                    </button>
                     <button className="v-sidebar-link" onClick={() => { logout(); navigate('/'); }}>
                         <IcoLogout />
                         <span>Sign Out</span>
@@ -181,6 +184,10 @@ const VendorLayout = () => {
                 <div className="v-modal-overlay" onClick={() => setMobileMenuOpen(false)}>
                     <div className="v-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '100%', borderRadius: '14px 14px 0 0' }}>
                         <div className="v-modal-body" style={{ padding: '16px' }}>
+                            <button className="v-sidebar-link" style={{ width: '100%', marginBottom: '4px' }} onClick={() => { navigate('/profile'); setMobileMenuOpen(false); }}>
+                                <span>👤 My Profile & Orders</span>
+                            </button>
+                            <div className="v-sidebar-divider" />
                             <button className="v-sidebar-link" style={{ width: '100%', marginBottom: '4px' }} onClick={() => { navigate('/vendor/godown'); setMobileMenuOpen(false); }}>
                                 <IcoGodown /> <span>Godown</span>
                             </button>

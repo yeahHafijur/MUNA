@@ -82,6 +82,13 @@ app.use('/api/shops', (req, res, next) => {
     next();
 });
 
+app.use('/api/orders', (req, res, next) => {
+    if (req.method === 'GET') {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    }
+    next();
+});
+
 app.use('/api/settings', (req, res, next) => {
     if (req.method === 'GET') {
         res.set('Cache-Control', 'public, max-age=300');

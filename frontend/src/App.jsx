@@ -62,7 +62,16 @@ const AppContent = () => {
         <div className="min-h-screen bg-gray-50 font-sans">
           <Navbar />
           <div className="max-w-4xl mx-auto p-4 pb-20">
-            <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>}>
+            <Suspense fallback={
+              <div className="flex flex-col items-center justify-center h-[70vh]">
+                <div className="relative flex items-center justify-center mb-4">
+                  <div className="absolute w-16 h-16 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
+                  <div className="absolute w-12 h-12 rounded-full bg-yellow-500 opacity-40 animate-pulse"></div>
+                  <div className="z-10 text-4xl animate-bounce" style={{ animationDuration: '1s' }}>🛍️</div>
+                </div>
+                <div className="text-yellow-600 font-black tracking-[0.2em] text-xs animate-pulse">LOADING</div>
+              </div>
+            }>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/shop/:id" element={<ShopDetail />} />
@@ -78,7 +87,16 @@ const AppContent = () => {
         </div>
       ) : (
         // DASHBOARD LAYOUT (Full width, no global Navbar)
-        <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>}>
+        <Suspense fallback={
+          <div className="flex flex-col items-center justify-center h-screen bg-[#fdfaf3]">
+            <div className="relative flex items-center justify-center mb-4">
+              <div className="absolute w-16 h-16 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
+              <div className="absolute w-12 h-12 rounded-full bg-yellow-500 opacity-40 animate-pulse"></div>
+              <div className="z-10 text-4xl animate-bounce" style={{ animationDuration: '1s' }}>🛍️</div>
+            </div>
+            <div className="text-yellow-600 font-black tracking-[0.2em] text-xs animate-pulse">LOADING</div>
+          </div>
+        }>
           <Routes>
             <Route path="/vendor" element={<VendorLayout />}>
               <Route index element={<VendorHome />} />

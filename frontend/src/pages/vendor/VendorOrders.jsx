@@ -72,6 +72,36 @@ const VendorOrders = () => {
     useEffect(() => { fetchLive(); const id = setInterval(fetchLive, 12000); return () => clearInterval(id); }, [fetchLive]);
     useEffect(() => { if (activeView === 'history') fetchHistory(); }, [activeView, fetchHistory]);
 
+    const handleStatus = async (orderId, newStatus) => {
+        setUpdatingStatusId(orderId);
+        
+        // Optimistic UI Update
+        setOrders(prev => prev.map(order => 
+            order._id === orderId ? { ...order, status: newStatus } : order
+        ));
+
+        try {
+            const res = await fetch(`/api/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            
+            if (!res.ok) {
+                const data = await res.json();
+                alert(`Error: ${data.message || 'Failed to update status'}`);
+            }
+            
+            fetchLive();
+        } catch (error) {
+            console.error(error);
+            alert("Network error while updating status.");
+            fetchLive();
+        } finally {
+            setUpdatingStatusId(null);
+        }
+    };
+
     const handleWhatsAppShare = (order) => {
         const subtotal = order.totalAmount - order.deliveryFee;
         const itemsList = order.items.map(i => `${i.quantity}x ${i.name} (₹${i.price * i.quantity})`).join('\n');

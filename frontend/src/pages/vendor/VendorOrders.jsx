@@ -12,6 +12,7 @@ const VendorOrders = () => {
     const [activeView, setActiveView] = useState('live'); // 'live' | 'history'
     const [expandedId, setExpandedId] = useState(null);
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
+    const [confirmAction, setConfirmAction] = useState(null);
     const prevLiveRef = useRef(0);
 
     // History filters
@@ -72,10 +73,23 @@ const VendorOrders = () => {
     useEffect(() => { fetchLive(); const id = setInterval(fetchLive, 12000); return () => clearInterval(id); }, [fetchLive]);
     useEffect(() => { if (activeView === 'history') fetchHistory(); }, [activeView, fetchHistory]);
 
-    const handleStatus = async (orderId, newStatus) => {
+    const CONFIRM_CONFIG = {
+        accepted: { emoji: '✅', title: 'Accept Order?', desc: 'This order will move to the Accepted column.', color: '#16a34a' },
+        cancelled: { emoji: '❌', title: 'Reject Order?', desc: 'This order will be cancelled and the customer will be notified.', color: '#dc2626' },
+        out_for_delivery: { emoji: '🚚', title: 'Out for Delivery?', desc: 'Mark this order as dispatched for delivery.', color: '#2563eb' },
+        delivered: { emoji: '🎉', title: 'Mark Delivered?', desc: 'Confirm that this order has been delivered successfully.', color: '#16a34a' },
+    };
+
+    const requestConfirm = (orderId, newStatus) => {
+        setConfirmAction({ orderId, newStatus });
+    };
+
+    const handleConfirm = async () => {
+        if (!confirmAction) return;
+        const { orderId, newStatus } = confirmAction;
+        setConfirmAction(null);
         setUpdatingStatusId(orderId);
         
-        // Optimistic UI Update
         setOrders(prev => prev.map(order => 
             order._id === orderId ? { ...order, status: newStatus } : order
         ));
@@ -166,13 +180,13 @@ const VendorOrders = () => {
                     <>
                         {order.status === 'pending' && (
                             <>
-                                <button className="v-btn v-btn-success" onClick={() => handleStatus(order._id, 'accepted')}>Accept</button>
-                                <button className="v-btn v-btn-danger v-btn-sm" onClick={() => handleStatus(order._id, 'cancelled')}>Reject</button>
+                                <button className="v-btn v-btn-success" onClick={() => requestConfirm(order._id, 'accepted')}>Accept</button>
+                                <button className="v-btn v-btn-danger v-btn-sm" onClick={() => requestConfirm(order._id, 'cancelled')}>Reject</button>
                             </>
                         )}
                         {(order.status === 'accepted' || order.status === 'preparing') && (
                             <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-                                <button className="v-btn v-btn-primary" style={{ flex: 1, padding: '10px 0', fontSize: '12px', fontWeight: 700 }} onClick={() => handleStatus(order._id, 'out_for_delivery')}>🚚 Out for Delivery</button>
+                                <button className="v-btn v-btn-primary" style={{ flex: 1, padding: '10px 0', fontSize: '12px', fontWeight: 700 }} onClick={() => requestConfirm(order._id, 'out_for_delivery')}>🚚 Out for Delivery</button>
                                 <button 
                                     onClick={() => handleWhatsAppShare(order)} 
                                     style={{ flex: 1, padding: '10px 0', background: '#25D366', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: 700 }}
@@ -183,7 +197,7 @@ const VendorOrders = () => {
                             </div>
                         )}
                         {order.status === 'out_for_delivery' && (
-                            <button className="v-btn v-btn-success v-btn-full" onClick={() => handleStatus(order._id, 'delivered')}>Mark Delivered</button>
+                            <button className="v-btn v-btn-success v-btn-full" onClick={() => requestConfirm(order._id, 'delivered')}>Mark Delivered</button>
                         )}
                     </>
                 )}
@@ -369,6 +383,33 @@ const VendorOrders = () => {
                     </div>
                 </div>
             )}
+            {/* ═══ CONFIRMATION MODAL ═══ */}
+            {confirmAction && (() => {
+                const cfg = CONFIRM_CONFIG[confirmAction.newStatus] || { emoji: '❓', title: 'Are you sure?', desc: '', color: '#2563eb' };
+                return (
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', animation: 'fadeIn .2s ease' }}>
+                        <div style={{ background: 'white', borderRadius: '16px', padding: '28px 24px', maxWidth: '340px', width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', animation: 'popIn .25s cubic-bezier(.34,1.56,.64,1)' }}>
+                            <div style={{ fontSize: '48px', marginBottom: '12px' }}>{cfg.emoji}</div>
+                            <div style={{ fontSize: '18px', fontWeight: 800, marginBottom: '6px', color: '#1e293b' }}>{cfg.title}</div>
+                            <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '24px', lineHeight: 1.5 }}>{cfg.desc}</div>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button 
+                                    onClick={() => setConfirmAction(null)} 
+                                    style={{ flex: 1, padding: '12px', border: '1.5px solid #e2e8f0', borderRadius: '10px', background: 'white', fontWeight: 700, fontSize: '14px', cursor: 'pointer', color: '#64748b' }}
+                                >Cancel</button>
+                                <button 
+                                    onClick={handleConfirm} 
+                                    style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '10px', background: cfg.color, color: 'white', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}
+                                >Yes, Confirm</button>
+                            </div>
+                        </div>
+                        <style>{`
+                            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                            @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+                        `}</style>
+                    </div>
+                );
+            })()}
         </div>
     );
 };

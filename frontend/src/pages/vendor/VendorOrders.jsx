@@ -73,25 +73,25 @@ const VendorOrders = () => {
 
     const handleWhatsAppShare = (order) => {
         const subtotal = order.totalAmount - order.deliveryFee;
-        const itemsList = order.items.map(i => `${i.quantity}x ${i.name} (₹${i.price * i.quantity})`).join('%0A');
+        const itemsList = order.items.map(i => `${i.quantity}x ${i.name} (₹${i.price * i.quantity})`).join('\n');
         
         let mapsLink = "Not available";
         if (order.deliveryLocation?.lat && order.deliveryLocation?.lng) {
             mapsLink = `https://www.google.com/maps/search/?api=1&query=${order.deliveryLocation.lat},${order.deliveryLocation.lng}`;
         }
 
-        const text = `*🚨 NEW DELIVERY ORDER 🚨*%0A%0A` +
-                     `*Order ID:* #${order._id.slice(-5).toUpperCase()}%0A` +
-                     `*Customer:* ${order.customerId?.name || 'Guest'}%0A` +
-                     `*Phone:* ${order.customerId?.phone || 'N/A'}%0A%0A` +
-                     `*Address:* ${order.deliveryLocation?.address || 'N/A'}%0A` +
-                     `*📍 GPS Location:* ${mapsLink}%0A%0A` +
-                     `*📦 Items:*%0A${itemsList}%0A%0A` +
-                     `*Subtotal:* ₹${subtotal}%0A` +
-                     `*Delivery Fee:* ₹${order.deliveryFee}%0A` +
+        const textToEncode = `*🚨 NEW DELIVERY ORDER 🚨*\n\n` +
+                     `*Order ID:* #${order._id.slice(-5).toUpperCase()}\n` +
+                     `*Customer:* ${order.customerId?.name || 'Guest'}\n` +
+                     `*Phone:* ${order.customerId?.phone || 'N/A'}\n\n` +
+                     `*Address:* ${order.deliveryLocation?.address || 'N/A'}\n` +
+                     `*📍 GPS Location:* ${mapsLink}\n\n` +
+                     `*📦 Items:*\n${itemsList}\n\n` +
+                     `*Subtotal:* ₹${subtotal}\n` +
+                     `*Delivery Fee:* ₹${order.deliveryFee}\n` +
                      `*✅ TOTAL:* ₹${order.totalAmount}`;
 
-        window.open(`https://wa.me/?text=${text}`, '_blank');
+        window.open(`https://wa.me/?text=${encodeURIComponent(textToEncode)}`, '_blank');
     };
 
     // Computed live

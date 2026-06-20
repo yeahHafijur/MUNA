@@ -146,6 +146,13 @@ const placeOrder = async (req, res) => {
             return res.status(404).json({ message: "Shop not found!" });
         }
 
+        // Rule 4: Shop open hai ya closed?
+        if (!shop.isOpen) {
+            return res.status(400).json({ 
+                message: "This shop is currently closed. You cannot place an order right now." 
+            });
+        }
+
         // Agar dukan ke paas location nahi hai, toh default Delhi ki location maan lo (testing ke liye)
         const shopLat = shop.location?.coordinates?.[1] || 28.6139;
         const shopLng = shop.location?.coordinates?.[0] || 77.2090;

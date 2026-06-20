@@ -29,6 +29,7 @@ const Cart = () => {
     const { user, token, login } = useAuth();
 
     const [customerPhone, setCustomerPhone] = useState('');
+    const [instructions, setInstructions] = useState('');
     const [gpsLocation, setGpsLocation] = useState(null);
     const [deliveryFee, setDeliveryFee] = useState(null);
     const [distance, setDistance] = useState(null);
@@ -178,7 +179,8 @@ const Cart = () => {
                     lat: gpsLocation.lat,
                     lng: gpsLocation.lng
                 },
-                customerPhone: isPhoneMissing ? customerPhone : user.phone
+                customerPhone: isPhoneMissing ? customerPhone : user.phone,
+                instructions: instructions.trim()
             };
 
             const res = await fetch('/api/orders', {
@@ -348,6 +350,21 @@ const Cart = () => {
                             </div>
                         </div>
                     )}
+                </div>
+
+                {/* INSTRUCTIONS SECTION */}
+                <div className="crt-section">
+                    <div className="crt-section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        Add Instructions
+                    </div>
+                    <textarea 
+                        className="v-input" 
+                        style={{ minHeight: '60px', marginTop: '8px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} 
+                        placeholder="e.g. Make it spicy, leave at door..." 
+                        value={instructions} 
+                        onChange={e => setInstructions(e.target.value)}
+                    ></textarea>
                 </div>
 
                 {/* BILL RECEIPT SECTION */}

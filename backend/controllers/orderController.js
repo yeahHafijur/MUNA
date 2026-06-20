@@ -107,7 +107,7 @@ function deg2rad(deg) {
 // 1. Place Order (Customer karega)
 const placeOrder = async (req, res) => {
     try {
-        const { shopId, items, totalAmount, deliveryLocation, customerPhone } = req.body;
+        const { shopId, items, totalAmount, deliveryLocation, customerPhone, instructions } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({ message: "Your cart is empty!" });
@@ -204,7 +204,8 @@ const placeOrder = async (req, res) => {
             items: verifiedItems,
             totalAmount: finalTotalAmount,
             deliveryFee: fee,
-            deliveryLocation
+            deliveryLocation,
+            instructions: instructions || ''
         });
 
         // 🔔 PUSH NOTIFICATION ALERT TO VENDOR

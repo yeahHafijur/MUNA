@@ -125,14 +125,19 @@ const VendorOrders = () => {
             mapsLink = `https://www.google.com/maps/search/?api=1&query=${order.deliveryLocation.lat},${order.deliveryLocation.lng}`;
         }
 
-        const textToEncode = `*🚨 NEW DELIVERY ORDER 🚨*\n\n` +
+        let textToEncode = `*🚨 NEW DELIVERY ORDER 🚨*\n\n` +
                      `*Order ID:* #${order._id.slice(-5).toUpperCase()}\n` +
                      `*Customer:* ${order.customerId?.name || 'Guest'}\n` +
                      `*Phone:* ${order.customerId?.phone || 'N/A'}\n\n` +
                      `*Address:* ${order.deliveryLocation?.address || 'N/A'}\n` +
                      `*📍 GPS Location:* ${mapsLink}\n\n` +
-                     `*📦 Items:*\n${itemsList}\n\n` +
-                     `*Subtotal:* ₹${subtotal}\n` +
+                     `*📦 Items:*\n${itemsList}\n\n`;
+
+        if (order.instructions && order.instructions.trim() !== '') {
+            textToEncode += `*📝 Instructions:*\n${order.instructions.trim()}\n\n`;
+        }
+
+        textToEncode += `*Subtotal:* ₹${subtotal}\n` +
                      `*Delivery Fee:* ₹${order.deliveryFee}\n` +
                      `*✅ TOTAL:* ₹${order.totalAmount}`;
 
@@ -156,6 +161,12 @@ const VendorOrders = () => {
             <div className="v-order-card-items">
                 {order.items.map(i => `${i.quantity}× ${i.name}`).join(', ')}
             </div>
+            {order.instructions && order.instructions.trim() !== '' && (
+                <div style={{ fontSize: '12px', color: '#b45309', background: '#fef3c7', padding: '6px 8px', borderRadius: '4px', marginTop: '6px', marginBottom: '6px', fontWeight: 600, display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
+                    <span style={{ fontSize: '14px' }}>📝</span>
+                    <span style={{ lineHeight: 1.4 }}>{order.instructions}</span>
+                </div>
+            )}
             {order.deliveryLocation?.address && (
                 <div 
                     className="v-order-card-addr"

@@ -26,7 +26,7 @@ const AdminDashboard = () => {
 
     const [editingShop, setEditingShop] = useState(null);
     const [editFormData, setEditFormData] = useState({
-        name: '', address: '', category: '', udyamNumber: '', lat: '', lng: ''
+        name: '', address: '', category: '', udyamNumber: '', lat: '', lng: '', image: null, imagePreview: ''
     });
 
     // Godown state
@@ -102,19 +102,46 @@ const AdminDashboard = () => {
         setEditFormData({
             name: shop.name || '', address: shop.address || '', category: shop.category || '',
             udyamNumber: shop.udyamNumber || '',
-            lat: shop.location?.coordinates[1] || '', lng: shop.location?.coordinates[0] || ''
+            lat: shop.location?.coordinates[1] || '', lng: shop.location?.coordinates[0] || '',
+            image: null, imagePreview: shop.image || ''
         });
     };
-    const handleEditChange = (e) => setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+    const handleEditChange = (e) => {
+        if (e.target.name === 'image') {
+            const file = e.target.files[0];
+            setEditFormData({ ...editFormData, image: file, imagePreview: file ? URL.createObjectURL(file) : '' });
+        } else {
+            setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+        }
+    };
+
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
             const res = await fetch(`/api/shops/${editingShop._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(editFormData)
+                body: JSON.stringify({
+                    name: editFormData.name, address: editFormData.address, category: editFormData.category,
+                    udyamNumber: editFormData.udyamNumber, lat: editFormData.lat, lng: editFormData.lng
+                })
             });
-            if (res.ok) { setEditingShop(null); fetchShops(); }
+            if (res.ok) { 
+                if (editFormData.image) {
+                    const fd = new FormData();
+                    fd.append('image', editFormData.image);
+                    const imgRes = await fetch(`/api/shops/${editingShop._id}/image`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: fd
+                    });
+                    if (!imgRes.ok) {
+                        alert("Text updated but image upload failed.");
+                    }
+                }
+                setEditingShop(null); 
+                fetchShops(); 
+            }
             else { const d = await res.json(); alert(d.message || 'Failed'); }
         } catch (err) { console.error(err); }
     };
@@ -528,6 +555,14 @@ const AdminDashboard = () => {
                             <button onClick={() => setEditingShop(null)} className="adm-modal-x">✕</button>
                         </div>
                         <form onSubmit={handleEditSubmit} className="adm-modal-body">
+                            <div className="adm-upload-zone" style={{ marginBottom: '16px' }}>
+                                <label style={{ cursor: 'pointer', display: 'block' }}>
+                                    <div className="adm-upload-box" style={{ height: '120px' }}>
+                                        {editFormData.imagePreview ? <img src={editFormData.imagePreview} alt="Shop Banner" /> : <span className="adm-upload-hint">Change Banner Photo</span>}
+                                    </div>
+                                    <input type="file" name="image" accept="image/*" onChange={handleEditChange} style={{ display: 'none' }} />
+                                </label>
+                            </div>
                             <div className="adm-modal-field">
                                 <label>Shop Name</label>
                                 <input type="text" name="name" required className="adm-input" value={editFormData.name} onChange={handleEditChange} />

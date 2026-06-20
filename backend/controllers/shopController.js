@@ -121,8 +121,11 @@ const updateShop = async (req, res) => {
         if (shop.vendorId.toString() !== req.user._id.toString() && req.user.role !== 'super_admin') {
             return res.status(403).json({ message: "Not authorized to update this shop" });
         }
-        // Jo data naya aya hai usse update karo, warna purana hi rehne do
-        shop.name = req.body.name || shop.name;
+        // Super admin can change name, vendor cannot
+        if (req.user.role === 'super_admin' && req.body.name) {
+            shop.name = req.body.name;
+        }
+        
         shop.address = req.body.address || shop.address;
         
         let newImage = req.body.image || shop.image;

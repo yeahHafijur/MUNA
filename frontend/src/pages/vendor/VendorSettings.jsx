@@ -32,7 +32,6 @@ const VendorSettings = () => {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({
-                    name,
                     udyamNumber: udyam,
                     deliverySettings: {
                         minOrderAmount: Number(minOrder),
@@ -72,7 +71,7 @@ const VendorSettings = () => {
                         <div className="v-card-body">
                             <div className="v-field" style={{ marginBottom: '16px' }}>
                                 <label className="v-label">Store Name</label>
-                                <input className="v-input" required value={name} onChange={e => setName(e.target.value)} />
+                                <input className="v-input" required value={name} disabled style={{ backgroundColor: 'var(--v-bg-body)', cursor: 'not-allowed', color: 'var(--v-text-muted)' }} title="Please contact Admin to change store name" />
                             </div>
                             <div className="v-field" style={{ marginBottom: '16px' }}>
                                 <label className="v-label">Udyam Number (Optional)</label>

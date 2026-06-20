@@ -13,6 +13,7 @@ const IcoBell = () => (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor
 const IcoLogout = () => (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>);
 const IcoBack = () => (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>);
 const IcoMore = () => (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>);
+const IcoUser = () => (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>);
 
 const VendorLayout = () => {
     const { user, token, logout } = useAuth();
@@ -146,6 +147,9 @@ const VendorLayout = () => {
                     <button className="v-btn-icon" style={{ position: 'relative' }} onClick={() => navigate('/notifications')}>
                         <IcoBell />
                         {unreadCount > 0 && <span className="v-notif-dot">{unreadCount}</span>}
+                    </button>
+                    <button className="v-btn-icon" onClick={() => navigate('/profile')} title="My Customer Profile">
+                        <IcoUser />
                     </button>
                 </div>
             </header>

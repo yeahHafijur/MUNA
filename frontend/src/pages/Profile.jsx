@@ -77,6 +77,12 @@ const Profile = () => {
     const [expandedOrderId, setExpandedOrderId] = useState(null);
     const navigate = useNavigate();
 
+    // Edit Profile State
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [editName, setEditName] = useState('');
+    const [editPhone, setEditPhone] = useState('');
+    const [isUpdating, setIsUpdating] = useState(false);
+
     useEffect(() => {
         if (!token) { navigate('/login'); return; }
 
@@ -118,6 +124,44 @@ const Profile = () => {
             if (res.ok) { login({ ...user, savedLocations: data.savedLocations }, token); }
             else { alert(data.message || "Failed to delete location"); }
         } catch (error) { console.error("Error deleting location:", error); }
+    };
+
+    const handleOpenEditProfile = () => {
+        setEditName(user.name || '');
+        setEditPhone(user.phone || '');
+        setIsEditingProfile(true);
+    };
+
+    const handleUpdateProfile = async (e) => {
+        e.preventDefault();
+        if (!editName.trim()) { alert("Name cannot be blank"); return; }
+        if (!editPhone.trim() || editPhone.trim().length < 10) { alert("Please enter a valid phone number"); return; }
+
+        setIsUpdating(true);
+        try {
+            const res = await fetch('/api/auth/update-profile', {
+                method: 'PUT',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: editName, phone: editPhone })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                // Update auth context state with the new user info
+                login({ ...user, name: data.user.name, phone: data.user.phone }, token);
+                alert("Profile updated successfully");
+                setIsEditingProfile(false);
+            } else {
+                alert(data.message || "Failed to update profile");
+            }
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            alert("Server error while updating profile");
+        } finally {
+            setIsUpdating(false);
+        }
     };
 
     if (!user) return null;
@@ -285,7 +329,7 @@ const Profile = () => {
                         <div className="prf-settings-section">
                             <div className="prf-settings-label">Account</div>
                             <div className="prf-settings-group">
-                                <div className="prf-setting-row">
+                                <div className="prf-setting-row" onClick={handleOpenEditProfile}>
                                     <div className="prf-setting-icon prf-setting-icon--amber">
                                         <IcoUser />
                                     </div>
@@ -379,6 +423,50 @@ const Profile = () => {
                     </div>
                 )}
             </div>
+
+            {/* ─── EDIT PROFILE MODAL ─── */}
+            {isEditingProfile && (
+                <div className="prf-modal-overlay">
+                    <div className="prf-modal-content">
+                        <div className="prf-modal-header">
+                            <h3>Edit Profile</h3>
+                            <button className="prf-modal-close" onClick={() => setIsEditingProfile(false)}>✕</button>
+                        </div>
+                        <form onSubmit={handleUpdateProfile} className="prf-modal-body">
+                            <div className="prf-form-group">
+                                <label>Name <span style={{color: '#dc2626'}}>*</span></label>
+                                <input 
+                                    type="text" 
+                                    value={editName} 
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    placeholder="Enter your name"
+                                    required
+                                    className="prf-input"
+                                />
+                            </div>
+                            <div className="prf-form-group">
+                                <label>Phone Number <span style={{color: '#dc2626'}}>*</span></label>
+                                <input 
+                                    type="tel" 
+                                    value={editPhone} 
+                                    onChange={(e) => setEditPhone(e.target.value)}
+                                    placeholder="Enter 10-digit phone number"
+                                    required
+                                    minLength={10}
+                                    maxLength={15}
+                                    className="prf-input"
+                                />
+                            </div>
+                            <div className="prf-modal-footer">
+                                <button type="button" className="prf-btn-secondary" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+                                <button type="submit" className="prf-btn-primary" disabled={isUpdating}>
+                                    {isUpdating ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

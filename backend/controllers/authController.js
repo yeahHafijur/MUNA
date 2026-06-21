@@ -252,11 +252,51 @@ const saveFcmToken = async (req, res) => {
     }
 };
 
+// Update user profile (Name & Phone)
+const updateProfile = async (req, res) => {
+    try {
+        const { name, phone } = req.body;
+        
+        if (!name || !name.trim()) {
+            return res.status(400).json({ message: "Name is required" });
+        }
+        
+        if (!phone || !phone.trim() || phone.length < 10) {
+            return res.status(400).json({ message: "Valid phone number is required" });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        user.name = name.trim();
+        user.phone = phone.trim();
+        
+        await user.save();
+
+        res.status(200).json({ 
+            message: "Profile updated successfully", 
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                profilePic: user.profilePic,
+                savedLocations: user.savedLocations
+            }
+        });
+    } catch (error) {
+        console.error("[UpdateProfile] Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 module.exports = {
     sendOTP,
     verifyOTP,
     googleLogin,
     saveLocation,
     deleteLocation,
-    saveFcmToken
+    saveFcmToken,
+    updateProfile
 };

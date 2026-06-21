@@ -6,13 +6,13 @@ import { optimizeImage } from '../utils/imageUtils';
 import './Search.css';
 
 const IcoSearch = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
 );
 
 const IcoBack = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
     </svg>
 );
@@ -54,9 +54,27 @@ const IcoDrinks = () => (
 );
 
 const IcoTime = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{width: '12px', height: '12px', marginRight: '2px'}}>
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{width: '12px', height: '12px', marginRight: '3px'}}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
+);
+
+/* ─── Skeleton Loaders ─── */
+const SearchSkeleton = () => (
+    <div className="search-skel-section">
+        <div className="search-skel-title" />
+        <div className="search-skel-grid">
+            {[1, 2, 3, 4].map(i => (
+                <div key={i} className="search-skel-card">
+                    <div className="search-skel-img" />
+                    <div className="search-skel-body">
+                        <div className="search-skel-line" />
+                        <div className="search-skel-line search-skel-line--short" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
 );
 
 const Search = () => {
@@ -118,7 +136,7 @@ const Search = () => {
 
         const success = addToCart(product, product.shopId);
         if (success) {
-            // Optional: Show a subtle toast here instead of alert
+            // Optional: toast success
         }
     };
 
@@ -150,19 +168,12 @@ const Search = () => {
             {/* ── Scrollable Results Area ── */}
             <div className="search-results-area">
                 
-                {isLoading && (
-                    <div className="search-loader">
-                        <div className="spinner"></div>
-                        <p>Finding the best items...</p>
-                    </div>
-                )}
+                {isLoading && <SearchSkeleton />}
 
                 {!isLoading && hasSearched && results.shops.length === 0 && results.products.length === 0 && (
                     <div className="search-empty-state">
                         <div className="search-empty-icon-wrap">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                            <IcoSearch />
                         </div>
                         <h3>Item not found</h3>
                         <p>We couldn't find anything for "{query}". Try searching for something else.</p>
@@ -181,7 +192,6 @@ const Search = () => {
                                 <Link to={`/shop/${shop._id}`} key={`shop-${shop._id}`} className="search-shop-card">
                                     <div className="search-shop-banner">
                                         {shop.image ? <img src={optimizeImage(shop.image)} alt={shop.name} /> : <div className="search-shop-placeholder"><IcoShop /></div>}
-                                        <div className="search-shop-overlay"></div>
                                         <div className={`search-shop-status ${shop.isOpen ? 'status-open' : 'status-closed'}`}>
                                             {shop.isOpen ? 'Open' : 'Closed'}
                                         </div>

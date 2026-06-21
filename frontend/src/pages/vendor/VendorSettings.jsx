@@ -9,8 +9,8 @@ const VendorSettings = () => {
     const [name, setName] = useState('');
     const [udyam, setUdyam] = useState('');
     const [minOrder, setMinOrder] = useState('');
-    const [freeDeliveryKms, setFreeDeliveryKms] = useState('');
-    const [deliveryFeePerKm, setDeliveryFeePerKm] = useState('');
+    const [minimumCharge, setMinimumCharge] = useState('');
+    const [chargePerKm, setChargePerKm] = useState('');
     const [maxDeliveryRange, setMaxDeliveryRange] = useState('');
 
     useEffect(() => {
@@ -18,9 +18,9 @@ const VendorSettings = () => {
             setName(shop.name || '');
             setUdyam(shop.udyamNumber || '');
             setMinOrder(shop.deliverySettings?.minOrderAmount || 0);
-            setFreeDeliveryKms(shop.deliverySettings?.freeDeliveryKms || 0);
-            setDeliveryFeePerKm(shop.deliverySettings?.deliveryFeePerKm || 0);
-            setMaxDeliveryRange(shop.deliverySettings?.maxDeliveryRange || 5);
+            setMinimumCharge(shop.deliverySettings?.minimumCharge || 0);
+            setChargePerKm(shop.deliverySettings?.chargePerKm || 0);
+            setMaxDeliveryRange(shop.deliverySettings?.maxRange || 5);
         }
     }, [shop]);
 
@@ -35,9 +35,9 @@ const VendorSettings = () => {
                     udyamNumber: udyam,
                     deliverySettings: {
                         minOrderAmount: Number(minOrder),
-                        freeDeliveryKms: Number(freeDeliveryKms),
-                        deliveryFeePerKm: Number(deliveryFeePerKm),
-                        maxDeliveryRange: Number(maxDeliveryRange)
+                        minimumCharge: Number(minimumCharge),
+                        chargePerKm: Number(chargePerKm),
+                        maxRange: Number(maxDeliveryRange)
                     }
                 })
             });
@@ -92,25 +92,21 @@ const VendorSettings = () => {
                             <div className="v-card-title">Delivery Rules</div>
                         </div>
                         <div className="v-card-body">
-                            <div className="v-grid-2" style={{ marginBottom: '16px' }}>
-                                <div className="v-field">
-                                    <label className="v-label">Min Order (₹)</label>
-                                    <input type="number" className="v-input" value={minOrder} onChange={e => setMinOrder(e.target.value)} />
-                                </div>
-                                <div className="v-field">
-                                    <label className="v-label">Max Range (km)</label>
-                                    <input type="number" className="v-input" value={maxDeliveryRange} onChange={e => setMaxDeliveryRange(e.target.value)} />
-                                </div>
+                            <div className="v-field" style={{ marginBottom: '16px' }}>
+                                <label className="v-label">minimum amount for place order</label>
+                                <input type="number" className="v-input" value={minOrder} onChange={e => setMinOrder(e.target.value)} />
                             </div>
-                            <div className="v-grid-2">
-                                <div className="v-field">
-                                    <label className="v-label">Free up to (km)</label>
-                                    <input type="number" className="v-input" value={freeDeliveryKms} onChange={e => setFreeDeliveryKms(e.target.value)} />
-                                </div>
-                                <div className="v-field">
-                                    <label className="v-label">Fee / Extra km (₹)</label>
-                                    <input type="number" className="v-input" value={deliveryFeePerKm} onChange={e => setDeliveryFeePerKm(e.target.value)} />
-                                </div>
+                            <div className="v-field" style={{ marginBottom: '16px' }}>
+                                <label className="v-label">delivery range</label>
+                                <input type="number" className="v-input" value={maxDeliveryRange} onChange={e => setMaxDeliveryRange(e.target.value)} />
+                            </div>
+                            <div className="v-field" style={{ marginBottom: '16px' }}>
+                                <label className="v-label">1st 1km delivery charges</label>
+                                <input type="number" className="v-input" value={minimumCharge} onChange={e => setMinimumCharge(e.target.value)} />
+                            </div>
+                            <div className="v-field">
+                                <label className="v-label">after 1 km</label>
+                                <input type="number" className="v-input" value={chargePerKm} onChange={e => setChargePerKm(e.target.value)} />
                             </div>
                         </div>
                     </div>

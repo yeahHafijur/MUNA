@@ -52,9 +52,10 @@ const shopSchema = new mongoose.Schema({
         timezone: { type: String, default: 'Asia/Kolkata' }
     },
     deliverySettings: {
-        minimumCharge: { type: Number, default: 10 },
-        minimumDistance: { type: Number, default: 2 }, // distance in km
-        chargePerKm: { type: Number, default: 5 }, // charge for extra km
+        minOrderAmount: { type: Number, default: 0 }, // Minimum amount for place order
+        minimumCharge: { type: Number, default: 0 }, // 1st 1km delivery charges
+        minimumDistance: { type: Number, default: 1 }, // distance in km
+        chargePerKm: { type: Number, default: 0 }, // charge for extra km
         maxRange: { type: Number, default: 5 } // Max delivery radius in km
     },
     location: {

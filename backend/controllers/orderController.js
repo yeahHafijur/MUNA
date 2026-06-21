@@ -170,7 +170,7 @@ const placeOrder = async (req, res) => {
         // ---------------------------------------------------------
 
         // Recalculate delivery fee securely on backend
-        const settings = shop.deliverySettings || { minimumCharge: 10, minimumDistance: 2, chargePerKm: 5 };
+        const settings = shop.deliverySettings || { minOrderAmount: 0, minimumCharge: 10, minimumDistance: 1, chargePerKm: 5 };
         let fee = settings.minimumCharge;
         if (distance > settings.minimumDistance) {
             const extraKm = Math.ceil(distance - settings.minimumDistance);
@@ -191,6 +191,13 @@ const placeOrder = async (req, res) => {
                 name: dbProduct.name,
                 price: dbProduct.price,
                 quantity: item.quantity
+            });
+        }
+
+        // Rule 5: Minimum Order Amount Check
+        if (settings.minOrderAmount > 0 && itemsTotal < settings.minOrderAmount) {
+            return res.status(400).json({
+                message: `Minimum order amount for this shop is ₹${settings.minOrderAmount}. Please add more items to your cart.`
             });
         }
 
@@ -241,6 +248,35 @@ const placeOrder = async (req, res) => {
 };
 
 // 2. Get Customer's Orders (Customer apni Order History dekhega)
+// Naya controller: Customer apni "pending" order ko cancel kar sake
+const cancelOrder = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        // Check if the order belongs to this customer
+        if (order.customerId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "You are not authorized to cancel this order" });
+        }
+
+        // Only allow cancellation if status is "pending"
+        if (order.status !== "pending") {
+            return res.status(400).json({ message: "You can only cancel pending orders. If it is already accepted, please contact the vendor." });
+        }
+
+        order.status = "cancelled";
+        await order.save();
+
+        res.status(200).json({ message: "Order cancelled successfully", order });
+    } catch (error) {
+        console.error("Cancel order error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 const getCustomerOrders = async (req, res) => {
     try {
         const orders = await Order.find({ customerId: req.user._id })
@@ -380,5 +416,6 @@ module.exports = {
     placeOrder,
     getCustomerOrders,
     getVendorOrders,
-    updateOrderStatus
+    updateOrderStatus,
+    cancelOrder
 };

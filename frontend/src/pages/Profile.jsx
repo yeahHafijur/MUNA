@@ -60,6 +60,28 @@ const Profile = () => {
             });
     }, [token, navigate]);
 
+    const handleCancelOrder = async (orderId) => {
+        if (!window.confirm("Are you sure you want to cancel this order?")) return;
+        
+        try {
+            const res = await fetch(`/api/orders/${orderId}/cancel`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                alert("Order cancelled successfully");
+                setOrders(orders.map(o => o._id === orderId ? { ...o, status: 'cancelled' } : o));
+            } else {
+                alert(data.message || "Failed to cancel order");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error cancelling order");
+        }
+    };
+
     const handleLogout = () => {
         logout();
         navigate('/');
@@ -178,12 +200,23 @@ const Profile = () => {
                                                     <div className="prf-order-id">#{order._id.slice(-6).toUpperCase()}</div>
                                                     <div className="prf-order-date">
                                                         {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                                                            day: 'numeric', month: 'short',
+                                                            day: 'numeric', month: 'short', year: 'numeric'
+                                                        })} at {new Date(order.createdAt).toLocaleTimeString('en-IN', {
                                                             hour: '2-digit', minute: '2-digit'
                                                         })}
                                                     </div>
                                                 </div>
-                                                <StatusPill status={order.status} />
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                                                    <StatusPill status={order.status} />
+                                                    {order.status === 'pending' && expandedOrderId === order._id && (
+                                                        <button 
+                                                            onClick={(e) => { e.stopPropagation(); handleCancelOrder(order._id); }}
+                                                            style={{ padding: '4px 10px', fontSize: '11px', background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                                                        >
+                                                            Cancel Order
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
 

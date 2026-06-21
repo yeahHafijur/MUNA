@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
-import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
 import SplashScreen from './components/SplashScreen';
 import ScrollToTop from './components/ScrollToTop';
 import { onMessageListener } from './firebase';
@@ -49,7 +49,7 @@ const AppContent = () => {
       .catch((err) => console.log('failed: ', err));
   }, []);
 
-  // Determine if we should show the global customer layout (Navbar + max-w container)
+  // Determine if we should show the global customer layout
   const isDashboardRoute = location.pathname.startsWith('/vendor') || location.pathname.startsWith('/admin');
 
   return (
@@ -60,7 +60,6 @@ const AppContent = () => {
       {!isDashboardRoute ? (
         // CUSTOMER FACING LAYOUT
         <div className="min-h-screen bg-gray-50 font-sans">
-          <Navbar />
           <div className="max-w-4xl mx-auto p-4 pb-20">
             <Suspense fallback={
               <div className="fixed inset-0 z-[9999] bg-[#fdfaf3] flex flex-col items-center justify-center h-screen w-screen">
@@ -84,6 +83,7 @@ const AppContent = () => {
               </Routes>
             </Suspense>
           </div>
+          <BottomNav />
         </div>
       ) : (
         // DASHBOARD LAYOUT (Full width, no global Navbar)

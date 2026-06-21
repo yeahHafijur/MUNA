@@ -1,0 +1,88 @@
+/* ---- GLOBAL BOTTOM NAV BAR ---- */
+.bn-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(240, 228, 192, 0.5);
+    display: flex;
+    align-items: stretch;
+    z-index: 9000;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.05);
+    padding: 0 8px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bn-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: #8C7A55;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: color 0.15s;
+    border: none;
+    background: none;
+    font-family: inherit;
+    position: relative;
+    padding: 0;
+}
+
+.bn-nav-item:hover {
+    color: #5C4A28;
+}
+
+.bn-nav-item--active {
+    color: #C8850A;
+}
+
+.bn-nav-item--active::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 25%;
+    right: 25%;
+    height: 3px;
+    background: linear-gradient(90deg, #F8CB46, #E5A817);
+    border-radius: 0 0 4px 4px;
+}
+
+.bn-nav-icon {
+    width: 22px;
+    height: 22px;
+    position: relative;
+}
+
+.bn-nav-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #dc2626;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    border: 2px solid #fff;
+    line-height: 1;
+    animation: bnBadgeBounce 0.4s ease-out;
+}
+
+@keyframes bnBadgeBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}

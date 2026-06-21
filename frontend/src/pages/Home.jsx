@@ -380,46 +380,6 @@ const Home = () => {
                 )}
             </div>
 
-            {/* ════════ BOTTOM NAV ════════ */}
-            <nav className="mu-nav">
-                <button className="mu-nav-item mu-nav-item--active" onClick={() => window.scrollTo(0, 0)}>
-                    <span className="mu-nav-icon"><IcoHome /></span>
-                    Home
-                </button>
-
-                <button className="mu-nav-item" onClick={() => navigate('/search')}>
-                    <span className="mu-nav-icon"><IcoSearch /></span>
-                    Search
-                </button>
-
-                <button className="mu-nav-item" onClick={() => navigate('/notifications')}>
-                    <span className="mu-nav-icon" style={{ position: 'relative' }}>
-                        <IcoBell />
-                        {unreadCount > 0 && (
-                            <span className="mu-nav-badge">{unreadCount}</span>
-                        )}
-                    </span>
-                    Alerts
-                </button>
-
-                <Link to="/cart" className="mu-nav-item">
-                    <span className="mu-nav-icon">
-                        <IcoCart />
-                        {totalCartItems > 0 && (
-                            <span key={totalCartItems} className="mu-nav-badge">{totalCartItems}</span>
-                        )}
-                    </span>
-                    Cart
-                </Link>
-
-                <Link
-                    to={profileLink}
-                    className="mu-nav-item"
-                >
-                    <span className="mu-nav-icon"><IcoUser /></span>
-                    {user ? 'Profile' : 'Login'}
-                </Link>
-            </nav>
         </div>
     );
 };

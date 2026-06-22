@@ -25,9 +25,11 @@ export const AuthProvider = ({ children }) => {
     // Auto-sync FCM token on app load for already logged in users
     useEffect(() => {
         const syncFCMToken = async () => {
-            if (user && token) {
-                try {
-                    const fcmToken = await requestFirebaseNotificationPermission();
+            if (user && token && 'Notification' in window) {
+                // Only auto-sync if permission is already granted. Do not prompt on every reload!
+                if (Notification.permission === 'granted') {
+                    try {
+                        const fcmToken = await requestFirebaseNotificationPermission();
                     if (fcmToken) {
                         await fetch('/api/auth/fcm-token', {
                             method: 'POST',
@@ -43,7 +45,8 @@ export const AuthProvider = ({ children }) => {
                     console.error("[MUNA Auth] Auto-sync FCM failed", err);
                 }
             }
-        };
+        }
+    };
         syncFCMToken();
     }, [user, token]);
 

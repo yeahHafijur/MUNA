@@ -197,7 +197,7 @@ const placeOrder = async (req, res) => {
         // Rule 5: Minimum Order Amount Check
         if (settings.minOrderAmount > 0 && itemsTotal < settings.minOrderAmount) {
             return res.status(400).json({
-                message: `Minimum order amount for this shop is ₹${settings.minOrderAmount}. Please add more items to your cart.`
+                message: `Minimum order amount (excluding delivery) for this shop is ₹${settings.minOrderAmount}. Your current item total is ₹${itemsTotal}. Please add more items.`
             });
         }
 

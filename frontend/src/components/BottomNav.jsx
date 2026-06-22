@@ -55,7 +55,7 @@ const BottomNav = () => {
         : '/login';
 
     // Hide bottom nav on these pages
-    const hiddenPaths = ['/profile', '/login', '/vendor', '/admin', '/privacy-policy'];
+    const hiddenPaths = ['/profile', '/login', '/vendor', '/admin', '/privacy-policy', '/cart'];
     const shouldHide = hiddenPaths.some(p => location.pathname.startsWith(p));
     if (shouldHide) return null;
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-toastify';
 import { optimizeImage } from '../utils/imageUtils';
@@ -81,47 +82,41 @@ const Search = () => {
     const { addToCart, overrideAndReplaceCart } = useCart();
 
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState({ shops: [], products: [] });
-    const [isLoading, setIsLoading] = useState(false);
-    const [hasSearched, setHasSearched] = useState(false);
+    const [debouncedQuery, setDebouncedQuery] = useState('');
     const [replacePrompt, setReplacePrompt] = useState(null);
 
     const inputRef = useRef(null);
 
+    // Auto-focus input on mount
     useEffect(() => {
         if (inputRef.current) {
             inputRef.current.focus();
         }
     }, []);
 
+    // 🚀 400ms Debounce Hook Logic
     useEffect(() => {
-        const fetchResults = async () => {
-            if (!query.trim()) {
-                setResults({ shops: [], products: [] });
-                setHasSearched(false);
-                setIsLoading(false);
-                return;
-            }
+        const timer = setTimeout(() => {
+            setDebouncedQuery(query.trim());
+        }, 400);
 
-            setIsLoading(true);
-            try {
-                const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-                const data = await res.json();
-                setResults(data);
-                setHasSearched(true);
-            } catch (err) {
-                console.error("Search error:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        const timeoutId = setTimeout(() => {
-            fetchResults();
-        }, 300);
-
-        return () => clearTimeout(timeoutId);
+        return () => clearTimeout(timer);
     }, [query]);
+
+    // 🚀 TanStack React Query for Caching & Fetching
+    const { data: results = { shops: [], products: [] }, isFetching } = useQuery({
+        queryKey: ['search', debouncedQuery],
+        queryFn: async () => {
+            const res = await fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}`);
+            if (!res.ok) throw new Error("Search failed");
+            return res.json();
+        },
+        enabled: debouncedQuery.length > 0, // Sirf tab call hoga jab query mein kuch hoga
+        staleTime: 1000 * 60 * 5, // 5 minutes tak result cache rahega (Instant loading!)
+    });
+
+    const hasSearched = debouncedQuery.length > 0;
+    const isLoading = isFetching;
 
     const handleAddToCart = (e, product) => {
         e.preventDefault();
@@ -188,12 +183,12 @@ const Search = () => {
                             <div className="w-5 h-5"><IcoSearch /></div>
                         </div>
                         <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-tight">No results found</h3>
-                        <p className="text-xs font-medium text-slate-400 px-8 leading-relaxed">We couldn't find anything matching "{query}". Check spelling or try another term.</p>
+                        <p className="text-xs font-medium text-slate-400 px-8 leading-relaxed">We couldn't find anything matching "{debouncedQuery}". Check spelling or try another term.</p>
                     </div>
                 )}
 
                 {/* ── STORES RESULTS ── */}
-                {!isLoading && results.shops.length > 0 && (
+                {!isLoading && results.shops?.length > 0 && (
                     <div className="mb-6">
                         <div className="flex items-center gap-2 mb-3 px-1">
                             <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Stores Near You</h2>
@@ -223,7 +218,7 @@ const Search = () => {
                 )}
 
                 {/* ── PRODUCTS RESULTS ── */}
-                {!isLoading && results.products.length > 0 && (
+                {!isLoading && results.products?.length > 0 && (
                     <div className="mb-6">
                         <div className="flex items-center gap-2 mb-3 px-1">
                             <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Products</h2>
@@ -327,13 +322,13 @@ const Search = () => {
                             Your cart contains dishes from another shop. Do you want to discard the selection and add dishes from <span className="text-amber-600 font-bold">{replacePrompt?.shopName || 'this shop'}</span>?
                         </p>
                         <div className="flex gap-3">
-                            <button 
+                            <button
                                 onClick={() => setReplacePrompt(null)}
                                 className="flex-1 py-3.5 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
                             >
                                 No, thanks
                             </button>
-                            <button 
+                            <button
                                 onClick={() => {
                                     overrideAndReplaceCart(replacePrompt, replacePrompt.shopId);
                                     setReplacePrompt(null);

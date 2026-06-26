@@ -68,7 +68,7 @@ const AdminApprovals = () => {
                 )}
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-4xl mx-auto w-full">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-7xl mx-auto w-full">
                 {isLoading ? (
                     <div className="p-12 text-center text-sm font-bold text-gray-400">Loading approvals...</div>
                 ) : pendingGodown.length === 0 ? (

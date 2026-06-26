@@ -112,7 +112,7 @@ const AdminShops = () => {
                 <span className="ml-auto bg-white border border-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">{shops.length}</span>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-4xl mx-auto w-full">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-7xl mx-auto w-full">
                 {isLoading ? (
                     <div className="p-12 text-center text-sm font-bold text-gray-400">Loading shops...</div>
                 ) : shops.length === 0 ? (

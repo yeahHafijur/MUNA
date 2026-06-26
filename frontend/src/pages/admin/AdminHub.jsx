@@ -94,7 +94,7 @@ const AdminHub = () => {
                 </div>
             </div>
 
-            <div className="flex-1 px-4 pt-6 max-w-3xl mx-auto w-full space-y-6">
+            <div className="flex-1 px-4 pt-6 max-w-7xl mx-auto w-full space-y-6">
 
                 {/* ─── KEY METRICS ─── */}
                 <div className="grid grid-cols-2 gap-3">

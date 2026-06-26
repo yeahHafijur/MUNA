@@ -117,7 +117,7 @@ const AdminCategories = () => {
                 <span className="text-base font-extrabold text-slate-900 tracking-tight">Categories</span>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-4xl mx-auto w-full space-y-8">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-7xl mx-auto w-full space-y-8">
 
                 {/* ─── Shop Categories ─── */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">

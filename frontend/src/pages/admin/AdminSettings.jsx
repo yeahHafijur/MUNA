@@ -69,7 +69,7 @@ const AdminSettings = () => {
                 <span className="text-base font-extrabold text-slate-900 tracking-tight">App Settings</span>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-xl mx-auto w-full">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-7xl mx-auto w-full">
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                         <h2 className="text-base font-black text-gray-900 tracking-tight">App Settings</h2>

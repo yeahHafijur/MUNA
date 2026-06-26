@@ -35,10 +35,11 @@ const IcoArrow = () => (
 const ShopDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart, cartItems, getTotal } = useCart();
+    const { addToCart, overrideAndReplaceCart, cartItems, getTotal } = useCart();
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [replacePrompt, setReplacePrompt] = useState(null); // stores the product if replace cart modal should be shown
 
     const totalCartItems = cartItems.reduce((s, i) => s + i.quantity, 0);
     const cartTotal = getTotal();
@@ -110,6 +111,12 @@ const ShopDetail = () => {
 
     /* ── Handle Add to Cart with Animation ── */
     const handleAddClick = (e, product) => {
+        const res = addToCart(product, id);
+        if (res && res.success === false && res.error === 'DIFFERENT_SHOP_ERROR') {
+            setReplacePrompt(product);
+            return;
+        }
+
         const rect = e.currentTarget.getBoundingClientRect();
         const flyEl = document.createElement('div');
         flyEl.className = 'sd-fly-plus';
@@ -119,8 +126,6 @@ const ShopDetail = () => {
         document.body.appendChild(flyEl);
         
         setTimeout(() => flyEl.remove(), 800);
-        
-        addToCart(product, id);
         
         // Vibrate on supported devices
         if (navigator.vibrate) {
@@ -422,6 +427,39 @@ const ShopDetail = () => {
                         View Cart <IcoArrow />
                     </div>
                 </Link>
+            )}
+
+            {/* ════════ REPLACE CART MODAL ════════ */}
+            {replacePrompt && (
+                <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
+                        <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-3xl">🛒</span>
+                        </div>
+                        <h3 className="text-xl font-black text-center text-gray-900 mb-2">Replace cart item?</h3>
+                        <p className="text-sm text-center text-gray-500 font-medium mb-6 leading-relaxed">
+                            Your cart contains dishes from another shop. Do you want to discard the selection and add dishes from <span className="text-amber-600 font-bold">{shop?.name || 'this shop'}</span>?
+                        </p>
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={() => setReplacePrompt(null)}
+                                className="flex-1 py-3.5 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                            >
+                                No, thanks
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    overrideAndReplaceCart(replacePrompt, id);
+                                    setReplacePrompt(null);
+                                    if (navigator.vibrate) navigator.vibrate(50);
+                                }}
+                                className="flex-1 py-3.5 rounded-xl font-bold text-white bg-amber-500 hover:bg-amber-600 shadow-md hover:shadow-lg transition-all"
+                            >
+                                Replace
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { optimizeImage } from '../utils/imageUtils';
+// Naye hooks jo humne pichle step mein banaye the
+import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
 
 /* ─── Icon Components ─── */
 const IcoPin = ({ className = "w-6 h-6" }) => (
@@ -12,16 +14,6 @@ const IcoPin = ({ className = "w-6 h-6" }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
 );
-
-/* ─── Time-based greeting ─── */
-const getGreeting = () => {
-    const h = new Date().getHours();
-    if (h < 5) return { text: 'Late Night', emoji: '🌙' };
-    if (h < 12) return { text: 'Good Morning', emoji: '☀️' };
-    if (h < 17) return { text: 'Good Afternoon', emoji: '🌤️' };
-    if (h < 21) return { text: 'Good Evening', emoji: '🌇' };
-    return { text: 'Good Night', emoji: '🌙' };
-};
 
 /* ─── Distance formatter ─── */
 const fmtDist = (d) => d < 1 ? `${(d * 1000).toFixed(0)} m` : `${d.toFixed(1)} km`;
@@ -46,10 +38,6 @@ const Home = () => {
     const { user } = useAuth();
     const { cartItems } = useCart();
     const navigate = useNavigate();
-    const greeting = getGreeting();
-
-    // Total items unused in this view directly, but kept from original logic
-    const totalCartItems = cartItems.reduce((s, i) => s + i.quantity, 0);
 
     const [userLocation, setUserLocation] = useState(null);
     const [locationError, setLocationError] = useState(null);
@@ -67,16 +55,8 @@ const Home = () => {
         queryFn: () => fetch('/api/settings/navbar-message').then(r => r.json()),
     });
 
-    const token = localStorage.getItem('token');
-    const { data: unreadData } = useQuery({
-        queryKey: ['unread-count', user?._id],
-        queryFn: () => fetch('/api/notifications/unread-count', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        }).then(r => r.json()),
-        enabled: !!user && !!token,
-        refetchInterval: 15000 // Handled cleanly by TanStack
-    });
-    const unreadCount = unreadData?.count || 0;
+    /* Global unread count hook jo humne banaya tha */
+    const { data: unreadCount = 0 } = useUnreadNotifications();
 
     /* ── Geolocation ── */
     const handleLocate = () => {
@@ -148,29 +128,30 @@ const Home = () => {
        RENDER
     ═══════════════════════════════════════════════════════ */
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 overflow-hidden font-sans text-gray-900 antialiased">
+        /* RESTORED THEME: The main wrapper has your custom amber gradient */
+        <div className="fixed inset-0 z-[100] flex flex-col bg-gradient-to-b from-[#FFC107] via-[#F59E0B] to-[#D97706] overflow-hidden font-sans antialiased">
 
-            {/* ════════ HEADER ════════ */}
-            <header className="shrink-0 bg-white/70 backdrop-blur-md border-b border-gray-100 px-5 py-3 z-10">
+            {/* ════════ HEADER (Transparent so it blends with theme) ════════ */}
+            <header className="shrink-0 px-5 py-4 z-10">
                 <div className="flex items-center justify-between gap-3">
                     {/* Brand */}
                     <Link to="/" className="flex items-center gap-2 shrink-0">
-                        <img src="/muna-logo-new.png" alt="MUNA" className="w-9 h-9 rounded-xl object-contain shadow-sm" />
+                        <img src="/muna-logo-new.png" alt="MUNA" className="w-10 h-10 rounded-xl object-contain shadow-sm" />
                         <div className="flex flex-col leading-none">
-                            <span className="text-[15px] font-black tracking-tight text-gray-900">MUNA</span>
-                            <span className="text-[9px] font-extrabold text-amber-500 tracking-widest uppercase mt-[2px]">
+                            <span className="text-[16px] font-black tracking-tight text-white drop-shadow-sm">MUNA</span>
+                            <span className="text-[9px] font-extrabold text-amber-100 tracking-widest uppercase mt-[2px]">
                                 In Minutes
                             </span>
                         </div>
                     </Link>
 
-                    {/* Profile Action */}
+                    {/* Profile Action - Glassmorphism */}
                     <Link
                         to={profileLink}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 text-[#1F1300]"
                     >
                         <span className="text-lg">{profileEmoji || '👤'}</span>
-                        <span className="text-[11px] font-bold max-w-[70px] truncate">
+                        <span className="text-[11px] font-bold max-w-[70px] truncate text-white drop-shadow-sm">
                             {user ? user.name : 'Login'}
                         </span>
                     </Link>
@@ -178,196 +159,203 @@ const Home = () => {
             </header>
 
             {/* ════════ SCROLLABLE BODY ════════ */}
-            <div className="flex-1 overflow-y-auto pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-                {/* Slogan */}
-                <div className="px-5 pt-5 pb-3">
-                    <div className="text-[26px] md:text-[32px] font-black text-slate-800 leading-tight tracking-tight">
-                        {homeMsg.line1}
-                    </div>
-                    <div className="text-[28px] md:text-[36px] font-black text-amber-500 leading-tight tracking-tight drop-shadow-sm">
-                        {homeMsg.line2}
-                    </div>
-                </div>
-
-                {/* Stats */}
-                <div className="flex gap-3 px-5 pb-5 mt-2">
-                    <div className="flex-1 bg-white rounded-2xl p-4 text-center border border-gray-100 shadow-sm transition-transform hover:-translate-y-0.5">
-                        <div className="text-2xl font-black text-amber-600 leading-none mb-1">{shops.length}</div>
-                        <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Total Shops</div>
-                    </div>
-
-                    <div className="flex-1 bg-white rounded-2xl p-4 text-center border border-gray-100 shadow-sm transition-transform hover:-translate-y-0.5">
-                        <div className="text-2xl font-black text-green-600 leading-none mb-1">{openCount}</div>
-                        <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Open Now</div>
-                    </div>
-
-                    <button
-                        onClick={handleLocate}
-                        className="flex-1 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 text-center border border-amber-200 shadow-sm hover:scale-[0.98] transition-transform active:scale-95"
-                    >
-                        <div className="flex justify-center text-amber-600 mb-1">
-                            <IcoPin className="w-[22px] h-[22px]" />
+                {/* --- YELLOW TOP SECTION --- */}
+                <div className="pb-6">
+                    {/* Slogan */}
+                    <div className="px-5 pt-2 pb-5">
+                        <div className="text-[28px] md:text-[32px] font-black text-[#1F1300] leading-tight tracking-tight">
+                            {homeMsg.line1}
                         </div>
-                        <div className="text-[9px] font-bold text-amber-700 uppercase tracking-wider">
-                            {userLocation ? '✓ Located' : 'Locate Me'}
+                        <div className="text-[32px] md:text-[36px] font-black text-white leading-tight tracking-tight drop-shadow-md mt-1">
+                            {homeMsg.line2}
                         </div>
-                    </button>
-                </div>
-                {locationError && <p className="text-center text-[11px] font-medium text-red-600 px-5 pb-3">{locationError}</p>}
-
-                {/* Category Chips */}
-                <div className="px-5 pb-4 pt-1">
-                    <div className="flex gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
-                        {categories.map(cat => {
-                            const isActive = activeCategory === cat;
-                            return (
-                                <button
-                                    key={cat}
-                                    onClick={() => setActiveCategory(cat)}
-                                    className={`shrink-0 px-4 py-2 rounded-full text-[12px] font-bold border transition-all whitespace-nowrap ${isActive
-                                            ? 'bg-gradient-to-br from-amber-400 to-amber-500 text-gray-900 border-transparent shadow-md shadow-amber-500/20'
-                                            : 'bg-white text-amber-800 border-amber-200 hover:bg-amber-50'
-                                        }`}
-                                >
-                                    {cat === 'All' ? '🏠 All Shops' : cat}
-                                </button>
-                            );
-                        })}
                     </div>
-                </div>
 
-                {/* Section Head */}
-                <div className="flex items-center justify-between px-5 pb-3 pt-1">
-                    <h2 className="text-[16px] font-extrabold text-gray-900 tracking-tight">
-                        {searchQuery
-                            ? `"${searchQuery}"`
-                            : activeCategory !== 'All'
-                                ? activeCategory
-                                : 'Shops near you'}
-                    </h2>
-                    <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-200">
-                        {sortedShops.length} {sortedShops.length === 1 ? 'shop' : 'shops'}
-                    </span>
-                </div>
+                    {/* Stats */}
+                    <div className="flex gap-3 px-5">
+                        <div className="flex-1 bg-white/95 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5">
+                            <div className="text-2xl font-black text-amber-600 leading-none mb-1">{shops.length}</div>
+                            <div className="text-[9px] font-bold text-amber-900/60 uppercase tracking-wider">Total Shops</div>
+                        </div>
 
-                {/* ── Content ── */}
-                {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-6">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="bg-white rounded-[20px] overflow-hidden border border-gray-100 shadow-sm animate-pulse">
-                                <div className="w-full h-48 bg-gray-200" />
-                                <div className="p-4">
-                                    <div className="h-4 bg-gray-200 rounded-md w-3/4 mb-3" />
-                                    <div className="h-3 bg-gray-200 rounded-md w-1/2" />
-                                </div>
+                        <div className="flex-1 bg-white/95 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5">
+                            <div className="text-2xl font-black text-green-600 leading-none mb-1">{openCount}</div>
+                            <div className="text-[9px] font-bold text-amber-900/60 uppercase tracking-wider">Open Now</div>
+                        </div>
+
+                        <button
+                            onClick={handleLocate}
+                            className="flex-1 bg-gradient-to-br from-[#FFF9EC] to-[#FFF4DA] rounded-2xl p-4 text-center shadow-lg shadow-black/10 border-b-2 border-amber-200 hover:scale-[0.98] transition-transform active:scale-95"
+                        >
+                            <div className="flex justify-center text-[#C8850A] mb-1">
+                                <IcoPin className="w-[22px] h-[22px]" />
                             </div>
-                        ))}
+                            <div className="text-[9px] font-bold text-[#8C7A55] uppercase tracking-wider">
+                                {userLocation ? '✓ Located' : 'Locate'}
+                            </div>
+                        </button>
                     </div>
-                ) : sortedShops.length === 0 ? (
-                    <div className="mx-5 my-2 p-8 bg-white text-center rounded-[20px] border border-gray-100 shadow-sm">
-                        <span className="block text-5xl mb-3 opacity-60">🔍</span>
-                        <div className="text-[16px] font-extrabold text-gray-900 mb-1">
-                            {searchQuery ? `No shops found for "${searchQuery}"` : 'No shops available'}
+                    {locationError && <p className="text-center text-[11px] font-bold text-red-700 bg-red-100/80 rounded-lg mx-5 mt-3 py-1.5 backdrop-blur-sm">{locationError}</p>}
+                </div>
+
+                {/* --- WHITE BOTTOM SECTION (With Premium Curve) --- */}
+                <div className="bg-slate-50 rounded-t-[32px] min-h-screen pt-6 pb-28 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
+
+                    {/* Category Chips */}
+                    <div className="px-5 pb-4">
+                        <div className="flex gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
+                            {categories.map(cat => {
+                                const isActive = activeCategory === cat;
+                                return (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setActiveCategory(cat)}
+                                        className={`shrink-0 px-4 py-2 rounded-full text-[12px] font-bold border transition-all whitespace-nowrap ${isActive
+                                                ? 'bg-gradient-to-br from-[#F8CB46] to-[#E5A817] text-[#1a0e00] border-transparent shadow-lg shadow-amber-500/30'
+                                                : 'bg-white text-[#6B5020] border-[#E8D5A0] hover:bg-[#FFF4DA]'
+                                            }`}
+                                    >
+                                        {cat === 'All' ? '🏠 All Shops' : cat}
+                                    </button>
+                                );
+                            })}
                         </div>
-                        <div className="text-[13px] font-medium text-gray-500 mb-4">
-                            {searchQuery ? 'Try a different search term' : 'Check back soon!'}
-                        </div>
-                        {(searchQuery || activeCategory !== 'All') && (
-                            <button
-                                className="px-5 py-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-gray-900 text-[13px] font-bold shadow-md shadow-amber-500/20 hover:scale-[1.02] transition-transform"
-                                onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
-                            >
-                                Show All Shops
-                            </button>
-                        )}
                     </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-6">
-                        {sortedShops.map((shop, idx) => (
-                            <Link
-                                to={`/shop/${shop._id}`}
-                                key={shop._id}
-                                className="group block"
-                                style={{ animationFillMode: 'both', animation: `fadeInUp 0.4s ease-out ${idx * 0.05}s` }}
-                            >
-                                <div className={`bg-white rounded-[20px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${!shop.isOpen ? 'opacity-75 grayscale-[0.2]' : ''}`}>
 
-                                    {/* Banner */}
-                                    <div className="relative w-full h-48 bg-gray-50 overflow-hidden">
-                                        {shop.image ? (
-                                            <img
-                                                src={optimizeImage(shop.image)}
-                                                alt={shop.name}
-                                                loading="lazy"
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-gray-50 to-gray-200">
-                                                🏪
-                                            </div>
-                                        )}
+                    {/* Section Head */}
+                    <div className="flex items-center justify-between px-5 pb-4">
+                        <h2 className="text-[16px] font-extrabold text-[#1F1300] tracking-tight">
+                            {searchQuery
+                                ? `"${searchQuery}"`
+                                : activeCategory !== 'All'
+                                    ? activeCategory
+                                    : 'Shops near you'}
+                        </h2>
+                        <span className="px-2.5 py-1 rounded-full bg-[#FDF3D7] text-[#8C7A55] text-[10px] font-bold border border-[#F0E0A0]">
+                            {sortedShops.length} {sortedShops.length === 1 ? 'shop' : 'shops'}
+                        </span>
+                    </div>
 
-                                        {/* Top overlay: Status + Rating */}
-                                        <div className="absolute top-0 inset-x-0 p-3 flex justify-between items-start bg-gradient-to-b from-black/40 to-transparent">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide text-white backdrop-blur-md ${shop.isOpen ? 'bg-green-600/90 shadow-lg shadow-green-900/20' : 'bg-red-600/90'}`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full bg-white ${shop.isOpen ? 'animate-pulse' : ''}`} />
-                                                {shop.isOpen ? 'Open' : 'Closed'}
-                                            </span>
-                                            <span className="px-2 py-1 rounded-lg bg-black/50 backdrop-blur-md text-white text-[11px] font-extrabold">
-                                                ⭐ {shop.rating || '4.5'}
-                                            </span>
-                                        </div>
-
-                                        {/* Bottom overlay: Distance */}
-                                        {shop.distance !== Infinity && (
-                                            <div className="absolute bottom-0 inset-x-0 p-3 flex justify-end bg-gradient-to-t from-black/60 to-transparent">
-                                                <span className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] font-bold tracking-wide">
-                                                    📍 {fmtDist(shop.distance)} away
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Body */}
+                    {/* Grid Content */}
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-6">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="bg-white rounded-[20px] overflow-hidden border border-[#F0E4C0] shadow-sm animate-pulse">
+                                    <div className="w-full h-48 bg-gradient-to-r from-[#F5ECD4] to-[#FDF3D7]" />
                                     <div className="p-4">
-                                        <h3 className="text-[17px] font-extrabold text-gray-900 truncate tracking-tight mb-1">
-                                            {shop.name}
-                                        </h3>
-                                        <p className="text-xs font-medium text-gray-500 truncate mb-3">
-                                            📍 {shop.address}
-                                        </p>
-
-                                        <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                                            <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border ${shop.isOpen ? 'text-amber-800 bg-amber-50 border-amber-200' : 'text-gray-500 bg-gray-50 border-gray-200'}`}>
-                                                {shop.category || 'Kirana'}
-                                            </span>
-                                            {shop.udyamNumber && (
-                                                <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border ${shop.isOpen ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-gray-500 bg-gray-50 border-gray-200'}`}>
-                                                    🛡️ Verified
-                                                </span>
-                                            )}
-                                            {shop.location?.coordinates && (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        window.open(
-                                                            `https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`,
-                                                            '_blank'
-                                                        );
-                                                    }}
-                                                    className={`ml-auto shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-colors ${shop.isOpen ? 'text-amber-700 bg-amber-50 border-amber-200 hover:bg-amber-100' : 'text-gray-500 bg-gray-50 border-gray-200'}`}
-                                                >
-                                                    🗺️ Directions
-                                                </button>
-                                            )}
-                                        </div>
+                                        <div className="h-4 bg-[#F0E8D0] rounded-md w-3/4 mb-3" />
+                                        <div className="h-3 bg-[#F0E8D0] rounded-md w-1/2" />
                                     </div>
                                 </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
+                            ))}
+                        </div>
+                    ) : sortedShops.length === 0 ? (
+                        <div className="mx-5 my-2 p-8 bg-white text-center rounded-[20px] border border-[#F0E4C0] shadow-sm">
+                            <span className="block text-5xl mb-3 opacity-60">🔍</span>
+                            <div className="text-[16px] font-extrabold text-[#1F1300] mb-1">
+                                {searchQuery ? `No shops found for "${searchQuery}"` : 'No shops available'}
+                            </div>
+                            <div className="text-[13px] font-medium text-[#8C7A55] mb-4">
+                                {searchQuery ? 'Try a different search term' : 'Check back soon!'}
+                            </div>
+                            {(searchQuery || activeCategory !== 'All') && (
+                                <button
+                                    className="px-5 py-2.5 rounded-xl bg-gradient-to-br from-[#F8CB46] to-[#E5A817] text-[#1a0e00] text-[13px] font-bold shadow-md shadow-amber-500/20 hover:scale-[1.02] transition-transform"
+                                    onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
+                                >
+                                    Show All Shops
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-6">
+                            {sortedShops.map((shop, idx) => (
+                                <Link
+                                    to={`/shop/${shop._id}`}
+                                    key={shop._id}
+                                    className="group block"
+                                    style={{ animationFillMode: 'both', animation: `fadeInUp 0.4s ease-out ${idx * 0.05}s` }}
+                                >
+                                    <div className={`bg-white rounded-[20px] overflow-hidden border border-[#F0E4C0] shadow-sm hover:shadow-[0_12px_32px_rgba(200,170,100,0.18)] hover:-translate-y-1 hover:border-[#F8CB46] transition-all duration-300 ${!shop.isOpen ? 'opacity-75 border-[#E8E0D0]' : ''}`}>
+
+                                        {/* Banner */}
+                                        <div className="relative w-full h-48 bg-gradient-to-br from-[#FEF9EB] to-[#FDF3D7] overflow-hidden">
+                                            {shop.image ? (
+                                                <img
+                                                    src={optimizeImage(shop.image)}
+                                                    alt={shop.name}
+                                                    loading="lazy"
+                                                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out ${!shop.isOpen ? 'grayscale-[0.6] brightness-[0.85]' : ''}`}
+                                                />
+                                            ) : (
+                                                <div className={`w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-[#FEF9EB] to-[#FDF0D0] ${!shop.isOpen ? 'grayscale-[0.8]' : ''}`}>
+                                                    🏪
+                                                </div>
+                                            )}
+
+                                            {/* Top overlay: Status + Rating */}
+                                            <div className="absolute top-0 inset-x-0 p-3 flex justify-between items-start bg-gradient-to-b from-black/40 to-transparent">
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide text-white backdrop-blur-md ${shop.isOpen ? 'bg-green-600/90 shadow-lg shadow-green-900/20' : 'bg-red-700/85'}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full bg-white ${shop.isOpen ? 'animate-pulse' : ''}`} />
+                                                    {shop.isOpen ? 'Open' : 'Closed'}
+                                                </span>
+                                                <span className="px-2 py-1 rounded-lg bg-black/50 backdrop-blur-md text-white text-[11px] font-extrabold">
+                                                    ⭐ {shop.rating || '4.5'}
+                                                </span>
+                                            </div>
+
+                                            {/* Bottom overlay: Distance */}
+                                            {shop.distance !== Infinity && (
+                                                <div className="absolute bottom-0 inset-x-0 p-3 flex justify-end bg-gradient-to-t from-black/60 to-transparent">
+                                                    <span className="px-2.5 py-1 rounded-full bg-black/55 backdrop-blur-md text-white text-[10px] font-bold tracking-wide">
+                                                        📍 {fmtDist(shop.distance)} away
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Body */}
+                                        <div className="p-4">
+                                            <h3 className={`text-[16px] font-extrabold truncate tracking-tight mb-1 ${shop.isOpen ? 'text-[#1F1300]' : 'text-[#8C8070]'}`}>
+                                                {shop.name}
+                                            </h3>
+                                            <p className={`text-[12px] font-medium truncate mb-3 ${shop.isOpen ? 'text-[#8C7A55]' : 'text-[#aaa]'}`}>
+                                                📍 {shop.address}
+                                            </p>
+
+                                            <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                                <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border ${shop.isOpen ? 'text-[#8B6914] bg-[#FEF9EB] border-[#F0E0A0]' : 'text-[#999] bg-[#f5f5f5] border-[#e8e8e8]'}`}>
+                                                    {shop.category || 'Kirana'}
+                                                </span>
+                                                {shop.udyamNumber && (
+                                                    <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border ${shop.isOpen ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-[#999] bg-[#f5f5f5] border-[#e8e8e8]'}`}>
+                                                        🛡️ Verified
+                                                    </span>
+                                                )}
+                                                {shop.location?.coordinates && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            window.open(
+                                                                `https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`,
+                                                                '_blank'
+                                                            );
+                                                        }}
+                                                        className={`ml-auto shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-colors ${shop.isOpen ? 'text-[#8B6914] bg-[#FEF9EB] border-[#F0E0A0] hover:bg-[#F8E8B8] hover:border-[#D4B060]' : 'text-[#999] bg-[#f5f5f5] border-[#e5e5e5]'}`}
+                                                    >
+                                                        🗺️ Directions
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <style>{`

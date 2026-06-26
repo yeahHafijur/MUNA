@@ -184,9 +184,12 @@ const VendorMenu = () => {
                     {categories.map(cat => (
                         <button key={cat._id} className={`v-cat-item ${selectedCat === cat._id ? 'active' : ''}`} onClick={() => setSelectedCat(cat._id)}>
                             {cat.image ? <img src={cat.image} alt="" className="v-cat-item-img" /> : <span style={{ fontSize: '16px' }}>🏷</span>}
-                            <span style={{ flex: 1, textAlign: 'left' }}>{cat.name}</span>
+                            <span style={{ flex: 1, textAlign: 'left' }}>
+                                {cat.name}
+                                {cat.isGlobal && <span style={{ fontSize: '9px', marginLeft: '4px', color: '#22c55e' }}>🌐</span>}
+                            </span>
                             <span className="v-cat-item-count">{getCatCount(cat._id)}</span>
-                            <button className="v-cat-item-edit" onClick={(e) => { e.stopPropagation(); openEditCat(cat); }} title="Edit">✏️</button>
+                            {!cat.isGlobal && <button className="v-cat-item-edit" onClick={(e) => { e.stopPropagation(); openEditCat(cat); }} title="Edit">✏️</button>}
                         </button>
                     ))}
                     <button className="v-cat-item" style={{ color: 'var(--v-primary)', fontWeight: 600 }} onClick={openAddCat}>

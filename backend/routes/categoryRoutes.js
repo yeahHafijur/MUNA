@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const {
     getCategoriesByShop,
+    getGlobalCategories,
     createCategory,
+    createGlobalCategory,
     updateCategory,
     deleteCategory,
     reorderCategories
@@ -10,17 +12,23 @@ const {
 const { protect, authorize } = require("../middleware/authMiddleware");
 const upload = require('../middleware/uploadMiddleware');
 
-// Public: Get categories for a shop
+// Public: Get global item categories only
+router.get("/global", getGlobalCategories);
+
+// Public: Get categories for a shop (global + custom)
 router.get("/:shopId", getCategoriesByShop);
 
-// Vendor: Create category
+// Vendor: Create custom item category
 router.post("/", protect, authorize("vendor"), upload.single('image'), createCategory);
 
-// Vendor: Update category
-router.put("/:id", protect, authorize("vendor"), upload.single('image'), updateCategory);
+// Super Admin: Create global item category
+router.post("/global", protect, authorize("super_admin"), upload.single('image'), createGlobalCategory);
 
-// Vendor: Delete category
-router.delete("/:id", protect, authorize("vendor"), deleteCategory);
+// Vendor or Super Admin: Update category
+router.put("/:id", protect, authorize("vendor", "super_admin"), upload.single('image'), updateCategory);
+
+// Vendor or Super Admin: Delete category
+router.delete("/:id", protect, authorize("vendor", "super_admin"), deleteCategory);
 
 // Vendor: Reorder categories
 router.put("/reorder/bulk", protect, authorize("vendor"), reorderCategories);

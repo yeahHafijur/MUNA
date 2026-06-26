@@ -1,18 +1,35 @@
-const Category = require('../models/Category');
+const ItemCategory = require('../models/ItemCategory');
 const Shop = require('../models/Shop');
 const Product = require('../models/Product');
 
-// Get all categories for a shop (Public)
+// Get all item categories for a shop (Public)
+// Returns: global categories + this shop's custom categories
 const getCategoriesByShop = async (req, res) => {
     try {
-        const categories = await Category.find({ shopId: req.params.shopId }).sort({ sortOrder: 1, name: 1 });
+        const categories = await ItemCategory.find({
+            $or: [
+                { isGlobal: true },
+                { shopId: req.params.shopId }
+            ]
+        }).sort({ isGlobal: -1, sortOrder: 1, name: 1 });
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
 };
 
-// Create a new category (Vendor only)
+// Get only global item categories (Public)
+const getGlobalCategories = async (req, res) => {
+    try {
+        const categories = await ItemCategory.find({ isGlobal: true }).sort({ sortOrder: 1, name: 1 });
+        res.status(200).json(categories);
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// Create a custom item category (Vendor only)
+// SECURITY: Always force isGlobal to false for vendors
 const createCategory = async (req, res) => {
     try {
         const { name } = req.body;
@@ -36,14 +53,16 @@ const createCategory = async (req, res) => {
             image = result.secure_url;
         }
 
-        // Get next sort order
-        const maxSort = await Category.findOne({ shopId: shop._id }).sort({ sortOrder: -1 });
+        // Get next sort order for this shop's custom categories
+        const maxSort = await ItemCategory.findOne({ shopId: shop._id }).sort({ sortOrder: -1 });
         const sortOrder = maxSort ? maxSort.sortOrder + 1 : 0;
 
-        const category = await Category.create({
+        const category = await ItemCategory.create({
             name: name.trim(),
             image,
+            isGlobal: false,        // SECURITY: Always false for vendor
             shopId: shop._id,
+            vendorId: req.user._id,
             sortOrder
         });
 
@@ -56,17 +75,66 @@ const createCategory = async (req, res) => {
     }
 };
 
-// Update a category (Vendor only)
+// Create a global item category (Super Admin only)
+const createGlobalCategory = async (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name || !name.trim()) {
+            return res.status(400).json({ message: "Category name is required" });
+        }
+
+        let image = '';
+        if (req.file) {
+            const { uploadStream } = require('../utils/cloudinary');
+            const result = await uploadStream(req.file.buffer, 'muna/categories');
+            image = result.secure_url;
+        } else if (req.body.image && req.body.image.startsWith('data:image')) {
+            const { uploadBase64 } = require('../utils/cloudinary');
+            const result = await uploadBase64(req.body.image, 'muna/categories');
+            image = result.secure_url;
+        }
+
+        const maxSort = await ItemCategory.findOne({ isGlobal: true }).sort({ sortOrder: -1 });
+        const sortOrder = maxSort ? maxSort.sortOrder + 1 : 0;
+
+        const category = await ItemCategory.create({
+            name: name.trim(),
+            image,
+            isGlobal: true,
+            shopId: null,
+            vendorId: null,
+            sortOrder
+        });
+
+        res.status(201).json(category);
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ message: "A global category with this name already exists" });
+        }
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// Update a category (Vendor can edit own custom, Super Admin can edit any)
 const updateCategory = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id);
+        const category = await ItemCategory.findById(req.params.id);
         if (!category) {
             return res.status(404).json({ message: "Category not found" });
         }
 
-        const shop = await Shop.findOne({ vendorId: req.user._id });
-        if (!shop || category.shopId.toString() !== shop._id.toString()) {
-            return res.status(403).json({ message: "Not authorized" });
+        const isSuperAdmin = req.user.role === 'super_admin';
+
+        // If it's a global category, only super admin can edit
+        if (category.isGlobal && !isSuperAdmin) {
+            return res.status(403).json({ message: "Only admin can edit global categories" });
+        }
+
+        // If it's a vendor category, verify ownership
+        if (!category.isGlobal && !isSuperAdmin) {
+            if (!category.vendorId || category.vendorId.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: "Not authorized" });
+            }
         }
 
         if (req.body.name) category.name = req.body.name.trim();
@@ -95,17 +163,24 @@ const updateCategory = async (req, res) => {
     }
 };
 
-// Delete a category (Vendor only — block if products exist)
+// Delete a category (Vendor can delete own custom, Super Admin can delete any)
 const deleteCategory = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id);
+        const category = await ItemCategory.findById(req.params.id);
         if (!category) {
             return res.status(404).json({ message: "Category not found" });
         }
 
-        const shop = await Shop.findOne({ vendorId: req.user._id });
-        if (!shop || category.shopId.toString() !== shop._id.toString()) {
-            return res.status(403).json({ message: "Not authorized" });
+        const isSuperAdmin = req.user.role === 'super_admin';
+
+        if (category.isGlobal && !isSuperAdmin) {
+            return res.status(403).json({ message: "Only admin can delete global categories" });
+        }
+
+        if (!category.isGlobal && !isSuperAdmin) {
+            if (!category.vendorId || category.vendorId.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: "Not authorized" });
+            }
         }
 
         // Check if any products use this category
@@ -123,10 +198,10 @@ const deleteCategory = async (req, res) => {
     }
 };
 
-// Bulk reorder categories (Vendor only)
+// Bulk reorder categories (Vendor only — their custom cats)
 const reorderCategories = async (req, res) => {
     try {
-        const { orderedIds } = req.body; // Array of category IDs in desired order
+        const { orderedIds } = req.body;
         if (!Array.isArray(orderedIds)) {
             return res.status(400).json({ message: "orderedIds must be an array" });
         }
@@ -143,8 +218,10 @@ const reorderCategories = async (req, res) => {
             }
         }));
 
-        await Category.bulkWrite(bulkOps);
-        const categories = await Category.find({ shopId: shop._id }).sort({ sortOrder: 1 });
+        await ItemCategory.bulkWrite(bulkOps);
+        const categories = await ItemCategory.find({
+            $or: [{ isGlobal: true }, { shopId: shop._id }]
+        }).sort({ isGlobal: -1, sortOrder: 1 });
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
@@ -153,7 +230,9 @@ const reorderCategories = async (req, res) => {
 
 module.exports = {
     getCategoriesByShop,
+    getGlobalCategories,
     createCategory,
+    createGlobalCategory,
     updateCategory,
     deleteCategory,
     reorderCategories

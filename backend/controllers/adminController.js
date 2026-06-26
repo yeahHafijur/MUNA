@@ -4,7 +4,7 @@ const Shop = require("../models/Shop");
 // 1. Onboard Vendor & Shop (Super Admin only)
 const onboardVendorAndShop = async (req, res) => {
     try {
-        const { vendorName, vendorEmail, vendorPhone, shopName, shopAddress, shopCategory, shopLat, shopLng, udyamNumber, openTime, closeTime } = req.body;
+        const { vendorName, vendorEmail, vendorPhone, shopName, shopAddress, shopCategory, shopCategoryId, shopLat, shopLng, udyamNumber, openTime, closeTime } = req.body;
 
         // Security Check: Sirf super_admin yeh kar sakta hai
         if (req.user.role !== 'super_admin') {
@@ -53,11 +53,23 @@ const onboardVendorAndShop = async (req, res) => {
             coordinates: [parseFloat(shopLng), parseFloat(shopLat)] // [Lng, Lat] format for GeoJSON
         };
 
-        // 3. Create the Shop
+        // 3. Validate ShopCategory if provided
+        let resolvedCategoryId = null;
+        if (shopCategoryId) {
+            const ShopCategory = require('../models/ShopCategory');
+            const catExists = await ShopCategory.findById(shopCategoryId);
+            if (!catExists) {
+                return res.status(400).json({ message: "Invalid shop category selected." });
+            }
+            resolvedCategoryId = catExists._id;
+        }
+
+        // 4. Create the Shop
         const shop = await Shop.create({
             name: shopName,
             address: shopAddress,
             category: shopCategory || "General",
+            shopCategoryId: resolvedCategoryId,
             udyamNumber: udyamNumber || "",
             location: locationData,
             vendorId: vendor._id,

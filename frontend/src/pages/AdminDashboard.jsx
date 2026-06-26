@@ -19,7 +19,7 @@ const AdminDashboard = () => {
 
     const [formData, setFormData] = useState({
         vendorName: '', vendorEmail: '', vendorPhone: '',
-        shopName: '', shopAddress: '', shopCategory: '', udyamNumber: '', shopLat: '', shopLng: '',
+        shopName: '', shopAddress: '', shopCategory: '', shopCategoryId: '', udyamNumber: '', shopLat: '', shopLng: '',
         openTime: '09:00', closeTime: '21:00'
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,6 +41,18 @@ const AdminDashboard = () => {
     // Settings state
     const [navbarMsg, setNavbarMsg] = useState({ line1: '', line2: '' });
     const [savingSettings, setSavingSettings] = useState(false);
+
+    // Shop Categories state
+    const [shopCategories, setShopCategories] = useState([]);
+    const [shopCatForm, setShopCatForm] = useState({ name: '', image: null, imagePreview: '' });
+    const [editingShopCat, setEditingShopCat] = useState(null);
+    const [savingShopCat, setSavingShopCat] = useState(false);
+
+    // Global Item Categories state
+    const [globalItemCats, setGlobalItemCats] = useState([]);
+    const [itemCatForm, setItemCatForm] = useState({ name: '', image: null, imagePreview: '' });
+    const [editingItemCat, setEditingItemCat] = useState(null);
+    const [savingItemCat, setSavingItemCat] = useState(false);
 
     // ---- DATA FETCHING ----
     const fetchShops = async () => {
@@ -69,11 +81,29 @@ const AdminDashboard = () => {
         } catch (e) { console.error("Error fetching settings", e); }
     };
 
+    const fetchShopCategories = async () => {
+        try {
+            const res = await fetch('/api/shop-categories');
+            const data = await res.json();
+            setShopCategories(Array.isArray(data) ? data : []);
+        } catch { setShopCategories([]); }
+    };
+
+    const fetchGlobalItemCats = async () => {
+        try {
+            const res = await fetch('/api/categories/global');
+            const data = await res.json();
+            setGlobalItemCats(Array.isArray(data) ? data : []);
+        } catch { setGlobalItemCats([]); }
+    };
+
     useEffect(() => {
         if (!token || user?.role !== 'super_admin') { navigate('/'); return; }
         fetchShops();
         fetchGodownItems();
         fetchSettings();
+        fetchShopCategories();
+        fetchGlobalItemCats();
     }, [token, user, navigate]);
 
     // ---- HANDLERS ----
@@ -91,7 +121,7 @@ const AdminDashboard = () => {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Error onboarding vendor');
             alert(data.message);
-            setFormData({ vendorName: '', vendorEmail: '', vendorPhone: '', shopName: '', shopAddress: '', shopCategory: '', udyamNumber: '', shopLat: '', shopLng: '', openTime: '09:00', closeTime: '21:00' });
+            setFormData({ vendorName: '', vendorEmail: '', vendorPhone: '', shopName: '', shopAddress: '', shopCategory: '', shopCategoryId: '', udyamNumber: '', shopLat: '', shopLng: '', openTime: '09:00', closeTime: '21:00' });
             fetchShops();
         } catch (error) { alert(error.message); }
         finally { setIsSubmitting(false); }
@@ -210,6 +240,56 @@ const AdminDashboard = () => {
         } catch (err) { console.error(err); }
     };
 
+    // ── Shop Category CRUD ──
+    const handleShopCatSubmit = async (e) => {
+        e.preventDefault();
+        setSavingShopCat(true);
+        const fd = new FormData();
+        fd.append('name', shopCatForm.name);
+        if (shopCatForm.image) fd.append('image', shopCatForm.image);
+        try {
+            const url = editingShopCat ? `/api/shop-categories/${editingShopCat._id}` : '/api/shop-categories';
+            const res = await fetch(url, { method: editingShopCat ? 'PUT' : 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
+            if (res.ok) {
+                setShopCatForm({ name: '', image: null, imagePreview: '' }); setEditingShopCat(null); fetchShopCategories();
+            } else { const d = await res.json(); alert(d.message || 'Failed'); }
+        } catch (err) { console.error(err); }
+        setSavingShopCat(false);
+    };
+    const handleDeleteShopCat = async (id) => {
+        if (!window.confirm('Delete this shop category?')) return;
+        try {
+            const res = await fetch(`/api/shop-categories/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            if (res.ok) fetchShopCategories();
+            else { const d = await res.json(); alert(d.message || 'Failed'); }
+        } catch (err) { console.error(err); }
+    };
+
+    // ── Global Item Category CRUD ──
+    const handleItemCatSubmit = async (e) => {
+        e.preventDefault();
+        setSavingItemCat(true);
+        const fd = new FormData();
+        fd.append('name', itemCatForm.name);
+        if (itemCatForm.image) fd.append('image', itemCatForm.image);
+        try {
+            const url = editingItemCat ? `/api/categories/${editingItemCat._id}` : '/api/categories/global';
+            const res = await fetch(url, { method: editingItemCat ? 'PUT' : 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
+            if (res.ok) {
+                setItemCatForm({ name: '', image: null, imagePreview: '' }); setEditingItemCat(null); fetchGlobalItemCats();
+            } else { const d = await res.json(); alert(d.message || 'Failed'); }
+        } catch (err) { console.error(err); }
+        setSavingItemCat(false);
+    };
+    const handleDeleteItemCat = async (id) => {
+        if (!window.confirm('Delete this global item category?')) return;
+        try {
+            const res = await fetch(`/api/categories/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            if (res.ok) fetchGlobalItemCats();
+            else { const d = await res.json(); alert(d.message || 'Failed'); }
+        } catch (err) { console.error(err); }
+    };
+
     if (!user) return null;
 
     const handleSettingsSubmit = async (e) => {
@@ -255,10 +335,10 @@ const AdminDashboard = () => {
 
             {/* ---- TABS ---- */}
             <div className="adm-tabbar">
-                {['onboard', 'shops', 'godown', 'approvals', 'settings'].map(tab => (
+                {['onboard', 'shops', 'categories', 'godown', 'approvals', 'settings'].map(tab => (
                     <button key={tab} onClick={() => setActiveTab(tab)}
                         className={`adm-tabbar-item ${activeTab === tab ? 'adm-tabbar-item--active' : ''}`}>
-                        {tab === 'onboard' ? 'Onboard' : tab === 'shops' ? 'Shops' : tab === 'godown' ? 'Godown' : tab === 'settings' ? 'Settings' : `Approvals (${pendingGodown.length})`}
+                        {tab === 'onboard' ? 'Onboard' : tab === 'shops' ? 'Shops' : tab === 'categories' ? 'Categories' : tab === 'godown' ? 'Godown' : tab === 'settings' ? 'Settings' : `Approvals (${pendingGodown.length})`}
                     </button>
                 ))}
             </div>
@@ -303,7 +383,13 @@ const AdminDashboard = () => {
                                     <div className="adm-fields">
                                         <input type="text" name="shopName" required placeholder="Shop name" className="adm-input" value={formData.shopName} onChange={handleChange} />
                                         <input type="text" name="shopAddress" required placeholder="Full address" className="adm-input" value={formData.shopAddress} onChange={handleChange} />
-                                        <input type="text" name="shopCategory" placeholder="Category — Kirana, Pharmacy..." className="adm-input" value={formData.shopCategory} onChange={handleChange} />
+                                        <select name="shopCategoryId" className="adm-input" value={formData.shopCategoryId} onChange={(e) => {
+                                            const selected = shopCategories.find(c => c._id === e.target.value);
+                                            setFormData({ ...formData, shopCategoryId: e.target.value, shopCategory: selected?.name || 'General' });
+                                        }}>
+                                            <option value="">Select Shop Category</option>
+                                            {shopCategories.map(sc => <option key={sc._id} value={sc._id}>{sc.name}</option>)}
+                                        </select>
                                         <input type="text" name="udyamNumber" placeholder="Udyam number (optional)" className="adm-input adm-input--mono" value={formData.udyamNumber} onChange={handleChange} />
                                         <div className="adm-input-row">
                                             <input type="number" step="any" name="shopLat" required placeholder="Latitude" className="adm-input" value={formData.shopLat} onChange={handleChange} />
@@ -389,6 +475,93 @@ const AdminDashboard = () => {
                                 </table>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* == CATEGORIES == */}
+                {activeTab === 'categories' && (
+                    <div className="adm-section" key="categories">
+                        {/* Shop Categories */}
+                        <div className="adm-section-head">
+                            <span className="adm-section-title">Shop Categories (Strict)</span>
+                            <span className="adm-section-count">{shopCategories.length}</span>
+                        </div>
+                        <div className="adm-form-wrap" style={{ marginBottom: '24px' }}>
+                            <form onSubmit={handleShopCatSubmit} style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                                <div style={{ flex: '1 1 200px' }}>
+                                    <label style={{ fontSize: '10px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Name</label>
+                                    <input type="text" required className="adm-input" placeholder="e.g. Kirana" value={shopCatForm.name} onChange={(e) => setShopCatForm({ ...shopCatForm, name: e.target.value })} />
+                                </div>
+                                <div style={{ flex: '0 0 auto' }}>
+                                    <label style={{ fontSize: '10px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Icon</label>
+                                    <input type="file" accept="image/*" style={{ fontSize: '12px' }} onChange={(e) => setShopCatForm({ ...shopCatForm, image: e.target.files[0] })} />
+                                </div>
+                                <button type="submit" disabled={savingShopCat} className="adm-submit" style={{ height: '38px', padding: '0 16px' }}>
+                                    {editingShopCat ? 'Update' : 'Add'}
+                                </button>
+                                {editingShopCat && <button type="button" onClick={() => { setEditingShopCat(null); setShopCatForm({ name: '', image: null, imagePreview: '' }); }} className="adm-tbl-btn" style={{ height: '38px' }}>Cancel</button>}
+                            </form>
+                        </div>
+                        <div className="adm-table-wrap" style={{ marginBottom: '32px' }}>
+                            <table className="adm-table">
+                                <thead><tr><th>Name</th><th>Icon</th><th></th></tr></thead>
+                                <tbody>
+                                    {shopCategories.map(sc => (
+                                        <tr key={sc._id}>
+                                            <td><div className="adm-table-name">{sc.name}</div></td>
+                                            <td>{sc.image ? <img src={sc.image} alt="" style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover' }} /> : '—'}</td>
+                                            <td>
+                                                <div className="adm-table-actions">
+                                                    <button onClick={() => { setEditingShopCat(sc); setShopCatForm({ name: sc.name, image: null, imagePreview: sc.image || '' }); }} className="adm-tbl-btn adm-tbl-btn--edit">Edit</button>
+                                                    <button onClick={() => handleDeleteShopCat(sc._id)} className="adm-tbl-btn adm-tbl-btn--off">Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Global Item Categories */}
+                        <div className="adm-section-head">
+                            <span className="adm-section-title">Global Item Categories 🌐</span>
+                            <span className="adm-section-count">{globalItemCats.length}</span>
+                        </div>
+                        <div className="adm-form-wrap" style={{ marginBottom: '24px' }}>
+                            <form onSubmit={handleItemCatSubmit} style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                                <div style={{ flex: '1 1 200px' }}>
+                                    <label style={{ fontSize: '10px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Name</label>
+                                    <input type="text" required className="adm-input" placeholder="e.g. Beverages" value={itemCatForm.name} onChange={(e) => setItemCatForm({ ...itemCatForm, name: e.target.value })} />
+                                </div>
+                                <div style={{ flex: '0 0 auto' }}>
+                                    <label style={{ fontSize: '10px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Image</label>
+                                    <input type="file" accept="image/*" style={{ fontSize: '12px' }} onChange={(e) => setItemCatForm({ ...itemCatForm, image: e.target.files[0] })} />
+                                </div>
+                                <button type="submit" disabled={savingItemCat} className="adm-submit" style={{ height: '38px', padding: '0 16px' }}>
+                                    {editingItemCat ? 'Update' : 'Add'}
+                                </button>
+                                {editingItemCat && <button type="button" onClick={() => { setEditingItemCat(null); setItemCatForm({ name: '', image: null, imagePreview: '' }); }} className="adm-tbl-btn" style={{ height: '38px' }}>Cancel</button>}
+                            </form>
+                        </div>
+                        <div className="adm-table-wrap">
+                            <table className="adm-table">
+                                <thead><tr><th>Name</th><th>Image</th><th></th></tr></thead>
+                                <tbody>
+                                    {globalItemCats.map(ic => (
+                                        <tr key={ic._id}>
+                                            <td><div className="adm-table-name">{ic.name} <span style={{ fontSize: '10px', color: '#22c55e' }}>🌐 Global</span></div></td>
+                                            <td>{ic.image ? <img src={ic.image} alt="" style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover' }} /> : '—'}</td>
+                                            <td>
+                                                <div className="adm-table-actions">
+                                                    <button onClick={() => { setEditingItemCat(ic); setItemCatForm({ name: ic.name, image: null, imagePreview: ic.image || '' }); }} className="adm-tbl-btn adm-tbl-btn--edit">Edit</button>
+                                                    <button onClick={() => handleDeleteItemCat(ic._id)} className="adm-tbl-btn adm-tbl-btn--off">Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 

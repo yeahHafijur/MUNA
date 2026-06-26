@@ -21,18 +21,15 @@ const shopSchema = new mongoose.Schema({
         type: String,
         default: "General"
     },
+    shopCategoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ShopCategory',
+        default: null
+    },
     udyamNumber: {
         type: String,
         default: ""
     },
-    customCategories: {
-        type: [String],
-        default: []
-    },
-    categoriesConfig: [{
-        name: { type: String, required: true },
-        image: { type: String, required: true }
-    }],
     rating: {
         type: Number,
         default: 0

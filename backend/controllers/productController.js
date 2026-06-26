@@ -14,7 +14,7 @@ const getProductsByShop = async (req, res) => {
 
         // Manually populate category since the field is Mixed
         const mongoose = require('mongoose');
-        const Category = require('../models/Category');
+        const Category = require('../models/ItemCategory');
         const populatedProducts = await Promise.all(products.map(async p => {
             const prodObj = p.toObject();
             if (prodObj.category && mongoose.Types.ObjectId.isValid(prodObj.category)) {

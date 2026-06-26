@@ -1,46 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { optimizeImage } from '../utils/imageUtils';
-import './Home.css';
 
 /* ─── Icon Components ─── */
-const IcoSearch = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-);
-const IcoPin = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+const IcoPin = ({ className = "w-6 h-6" }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-);
-const IcoHome = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
-    </svg>
-);
-const IcoCart = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-    </svg>
-);
-const IcoBell = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-    </svg>
-);
-const IcoUser = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-    </svg>
-);
-const IcoShop = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
     </svg>
 );
 
@@ -78,6 +47,8 @@ const Home = () => {
     const { cartItems } = useCart();
     const navigate = useNavigate();
     const greeting = getGreeting();
+
+    // Total items unused in this view directly, but kept from original logic
     const totalCartItems = cartItems.reduce((s, i) => s + i.quantity, 0);
 
     const [userLocation, setUserLocation] = useState(null);
@@ -103,6 +74,7 @@ const Home = () => {
             headers: { 'Authorization': `Bearer ${token}` }
         }).then(r => r.json()),
         enabled: !!user && !!token,
+        refetchInterval: 15000 // Handled cleanly by TanStack
     });
     const unreadCount = unreadData?.count || 0;
 
@@ -112,16 +84,13 @@ const Home = () => {
             setLocationError('Geolocation not supported.');
             return;
         }
-        setLoading(true);
         navigator.geolocation.getCurrentPosition(
             pos => {
                 setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
                 setLocationError(null);
-                setLoading(false);
             },
             () => {
                 setLocationError('Location denied. Showing all shops.');
-                setLoading(false);
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
@@ -148,7 +117,6 @@ const Home = () => {
             return { ...shop, distance };
         });
 
-        // Search filter
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
             list = list.filter(s =>
@@ -158,12 +126,10 @@ const Home = () => {
             );
         }
 
-        // Category filter
         if (activeCategory !== 'All') {
             list = list.filter(s => (s.category || 'Kirana') === activeCategory);
         }
 
-        // Sort: open first, then by distance
         return list.sort((a, b) => {
             if (a.isOpen !== b.isOpen) return a.isOpen ? -1 : 1;
             return a.distance - b.distance;
@@ -182,119 +148,134 @@ const Home = () => {
        RENDER
     ═══════════════════════════════════════════════════════ */
     return (
-        <div className="mu">
+        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 overflow-hidden font-sans text-gray-900 antialiased">
 
             {/* ════════ HEADER ════════ */}
-            <header className="mu-header">
-                <div className="mu-header-top">
+            <header className="shrink-0 bg-white/70 backdrop-blur-md border-b border-gray-100 px-5 py-3 z-10">
+                <div className="flex items-center justify-between gap-3">
                     {/* Brand */}
-                    <Link to="/" className="mu-brand">
-                        <img src="/muna-logo-new.png" alt="MUNA" className="mu-brand-logo" />
-                        <div className="mu-brand-text">
-                            <span className="mu-brand-name">GROCERY</span>
-                            <span className="mu-brand-sub">In Minutes</span>
+                    <Link to="/" className="flex items-center gap-2 shrink-0">
+                        <img src="/muna-logo-new.png" alt="MUNA" className="w-9 h-9 rounded-xl object-contain shadow-sm" />
+                        <div className="flex flex-col leading-none">
+                            <span className="text-[15px] font-black tracking-tight text-gray-900">MUNA</span>
+                            <span className="text-[9px] font-extrabold text-amber-500 tracking-widest uppercase mt-[2px]">
+                                In Minutes
+                            </span>
                         </div>
                     </Link>
 
-
+                    {/* Profile Action */}
+                    <Link
+                        to={profileLink}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                    >
+                        <span className="text-lg">{profileEmoji || '👤'}</span>
+                        <span className="text-[11px] font-bold max-w-[70px] truncate">
+                            {user ? user.name : 'Login'}
+                        </span>
+                    </Link>
                 </div>
-
             </header>
 
             {/* ════════ SCROLLABLE BODY ════════ */}
-            <div className="mu-body">
+            <div className="flex-1 overflow-y-auto pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
                 {/* Slogan */}
-                <div className="mu-slogan" style={{ padding: '20px 20px 10px 20px' }}>
-                    <div style={{ fontSize: '28px', fontWeight: '900', color: '#1e293b', lineHeight: '1.1', letterSpacing: '-0.5px' }}>
+                <div className="px-5 pt-5 pb-3">
+                    <div className="text-[26px] md:text-[32px] font-black text-slate-800 leading-tight tracking-tight">
                         {homeMsg.line1}
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: '900', color: '#ffffff', lineHeight: '1.2', letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+                    <div className="text-[28px] md:text-[36px] font-black text-amber-500 leading-tight tracking-tight drop-shadow-sm">
                         {homeMsg.line2}
                     </div>
                 </div>
 
                 {/* Stats */}
-                <div className="mu-stats">
-                    <div className="mu-stat">
-                        <div className="mu-stat-value mu-stat-value--amber">{shops.length}</div>
-                        <div className="mu-stat-label">Total Shops</div>
+                <div className="flex gap-3 px-5 pb-5 mt-2">
+                    <div className="flex-1 bg-white rounded-2xl p-4 text-center border border-gray-100 shadow-sm transition-transform hover:-translate-y-0.5">
+                        <div className="text-2xl font-black text-amber-600 leading-none mb-1">{shops.length}</div>
+                        <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Total Shops</div>
                     </div>
-                    <div className="mu-stat">
-                        <div className="mu-stat-value mu-stat-value--green">{openCount}</div>
-                        <div className="mu-stat-label">Open Now</div>
+
+                    <div className="flex-1 bg-white rounded-2xl p-4 text-center border border-gray-100 shadow-sm transition-transform hover:-translate-y-0.5">
+                        <div className="text-2xl font-black text-green-600 leading-none mb-1">{openCount}</div>
+                        <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Open Now</div>
                     </div>
-                    <div
-                        className="mu-stat mu-stat--action"
+
+                    <button
                         onClick={handleLocate}
-                        role="button"
-                        tabIndex={0}
-                        title="Find shops near me"
+                        className="flex-1 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 text-center border border-amber-200 shadow-sm hover:scale-[0.98] transition-transform active:scale-95"
                     >
-                        <div className="mu-stat-icon-val">
-                            <IcoPin />
+                        <div className="flex justify-center text-amber-600 mb-1">
+                            <IcoPin className="w-[22px] h-[22px]" />
                         </div>
-                        <div className="mu-stat-label">
+                        <div className="text-[9px] font-bold text-amber-700 uppercase tracking-wider">
                             {userLocation ? '✓ Located' : 'Locate Me'}
                         </div>
-                    </div>
+                    </button>
                 </div>
-                {locationError && <p className="mu-loc-err">{locationError}</p>}
+                {locationError && <p className="text-center text-[11px] font-medium text-red-600 px-5 pb-3">{locationError}</p>}
 
                 {/* Category Chips */}
-                <div className="mu-cats">
-                    <div className="mu-cats-scroll">
-                        {categories.map(cat => (
-                            <button
-                                key={cat}
-                                className={`mu-chip ${activeCategory === cat ? 'mu-chip--active' : ''}`}
-                                onClick={() => setActiveCategory(cat)}
-                            >
-                                {cat === 'All' ? '🏠 All Shops' : cat}
-                            </button>
-                        ))}
+                <div className="px-5 pb-4 pt-1">
+                    <div className="flex gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
+                        {categories.map(cat => {
+                            const isActive = activeCategory === cat;
+                            return (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={`shrink-0 px-4 py-2 rounded-full text-[12px] font-bold border transition-all whitespace-nowrap ${isActive
+                                            ? 'bg-gradient-to-br from-amber-400 to-amber-500 text-gray-900 border-transparent shadow-md shadow-amber-500/20'
+                                            : 'bg-white text-amber-800 border-amber-200 hover:bg-amber-50'
+                                        }`}
+                                >
+                                    {cat === 'All' ? '🏠 All Shops' : cat}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
                 {/* Section Head */}
-                <div className="mu-sec-head">
-                    <h2 className="mu-sec-title">
+                <div className="flex items-center justify-between px-5 pb-3 pt-1">
+                    <h2 className="text-[16px] font-extrabold text-gray-900 tracking-tight">
                         {searchQuery
                             ? `"${searchQuery}"`
                             : activeCategory !== 'All'
                                 ? activeCategory
                                 : 'Shops near you'}
                     </h2>
-                    <span className="mu-sec-count">
+                    <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-200">
                         {sortedShops.length} {sortedShops.length === 1 ? 'shop' : 'shops'}
                     </span>
                 </div>
 
                 {/* ── Content ── */}
                 {loading ? (
-                    <div className="mu-skel-grid">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-6">
                         {[1, 2, 3].map(i => (
-                            <div key={i} className="mu-skel">
-                                <div className="mu-skel-img" />
-                                <div className="mu-skel-body">
-                                    <div className="mu-skel-line" />
-                                    <div className="mu-skel-line mu-skel-line--sm" />
+                            <div key={i} className="bg-white rounded-[20px] overflow-hidden border border-gray-100 shadow-sm animate-pulse">
+                                <div className="w-full h-48 bg-gray-200" />
+                                <div className="p-4">
+                                    <div className="h-4 bg-gray-200 rounded-md w-3/4 mb-3" />
+                                    <div className="h-3 bg-gray-200 rounded-md w-1/2" />
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : sortedShops.length === 0 ? (
-                    <div className="mu-empty">
-                        <span className="mu-empty-emoji">🔍</span>
-                        <div className="mu-empty-title">
+                    <div className="mx-5 my-2 p-8 bg-white text-center rounded-[20px] border border-gray-100 shadow-sm">
+                        <span className="block text-5xl mb-3 opacity-60">🔍</span>
+                        <div className="text-[16px] font-extrabold text-gray-900 mb-1">
                             {searchQuery ? `No shops found for "${searchQuery}"` : 'No shops available'}
                         </div>
-                        <div className="mu-empty-sub">
+                        <div className="text-[13px] font-medium text-gray-500 mb-4">
                             {searchQuery ? 'Try a different search term' : 'Check back soon!'}
                         </div>
                         {(searchQuery || activeCategory !== 'All') && (
                             <button
-                                className="mu-empty-btn"
+                                className="px-5 py-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-gray-900 text-[13px] font-bold shadow-md shadow-amber-500/20 hover:scale-[1.02] transition-transform"
                                 onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
                             >
                                 Show All Shops
@@ -302,41 +283,46 @@ const Home = () => {
                         )}
                     </div>
                 ) : (
-                    <div className="mu-grid">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-6">
                         {sortedShops.map((shop, idx) => (
                             <Link
                                 to={`/shop/${shop._id}`}
                                 key={shop._id}
-                                className="mu-card-link"
-                                style={{ animationDelay: `${idx * 50}ms` }}
+                                className="group block"
+                                style={{ animationFillMode: 'both', animation: `fadeInUp 0.4s ease-out ${idx * 0.05}s` }}
                             >
-                                <div className={`mu-card ${!shop.isOpen ? 'mu-card--closed' : ''}`}>
+                                <div className={`bg-white rounded-[20px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${!shop.isOpen ? 'opacity-75 grayscale-[0.2]' : ''}`}>
 
                                     {/* Banner */}
-                                    <div className="mu-card-banner">
-                                        <div className="mu-shop-img-box">
-                                            {shop.image ? (
-                                                <img src={optimizeImage(shop.image)} alt={shop.name} loading="lazy" />
-                                            ) : (
-                                                <div className="mu-card-banner-ph">🏪</div>
-                                            )}
-                                        </div>
+                                    <div className="relative w-full h-48 bg-gray-50 overflow-hidden">
+                                        {shop.image ? (
+                                            <img
+                                                src={optimizeImage(shop.image)}
+                                                alt={shop.name}
+                                                loading="lazy"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-gray-50 to-gray-200">
+                                                🏪
+                                            </div>
+                                        )}
 
                                         {/* Top overlay: Status + Rating */}
-                                        <div className="mu-card-overlay-top">
-                                            <span className={`mu-badge ${shop.isOpen ? 'mu-badge--open' : 'mu-badge--closed'}`}>
-                                                <span className="mu-badge-dot" />
+                                        <div className="absolute top-0 inset-x-0 p-3 flex justify-between items-start bg-gradient-to-b from-black/40 to-transparent">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide text-white backdrop-blur-md ${shop.isOpen ? 'bg-green-600/90 shadow-lg shadow-green-900/20' : 'bg-red-600/90'}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full bg-white ${shop.isOpen ? 'animate-pulse' : ''}`} />
                                                 {shop.isOpen ? 'Open' : 'Closed'}
                                             </span>
-                                            <span className="mu-card-rating">
+                                            <span className="px-2 py-1 rounded-lg bg-black/50 backdrop-blur-md text-white text-[11px] font-extrabold">
                                                 ⭐ {shop.rating || '4.5'}
                                             </span>
                                         </div>
 
                                         {/* Bottom overlay: Distance */}
                                         {shop.distance !== Infinity && (
-                                            <div className="mu-card-overlay-bottom">
-                                                <span className="mu-dist">
+                                            <div className="absolute bottom-0 inset-x-0 p-3 flex justify-end bg-gradient-to-t from-black/60 to-transparent">
+                                                <span className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] font-bold tracking-wide">
                                                     📍 {fmtDist(shop.distance)} away
                                                 </span>
                                             </div>
@@ -344,16 +330,20 @@ const Home = () => {
                                     </div>
 
                                     {/* Body */}
-                                    <div className="mu-card-body">
-                                        <h3 className="mu-card-name">{shop.name}</h3>
-                                        <p className="mu-card-addr">📍 {shop.address}</p>
+                                    <div className="p-4">
+                                        <h3 className="text-[17px] font-extrabold text-gray-900 truncate tracking-tight mb-1">
+                                            {shop.name}
+                                        </h3>
+                                        <p className="text-xs font-medium text-gray-500 truncate mb-3">
+                                            📍 {shop.address}
+                                        </p>
 
-                                        <div className="mu-card-tags">
-                                            <span className={`mu-tag ${shop.isOpen ? 'mu-tag--cat' : 'mu-tag--closed'}`}>
+                                        <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                            <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border ${shop.isOpen ? 'text-amber-800 bg-amber-50 border-amber-200' : 'text-gray-500 bg-gray-50 border-gray-200'}`}>
                                                 {shop.category || 'Kirana'}
                                             </span>
                                             {shop.udyamNumber && (
-                                                <span className={`mu-tag ${shop.isOpen ? 'mu-tag--verified' : 'mu-tag--closed'}`}>
+                                                <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border ${shop.isOpen ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-gray-500 bg-gray-50 border-gray-200'}`}>
                                                     🛡️ Verified
                                                 </span>
                                             )}
@@ -366,7 +356,7 @@ const Home = () => {
                                                             '_blank'
                                                         );
                                                     }}
-                                                    className={`mu-dir-btn ${!shop.isOpen ? 'mu-dir-btn--closed' : ''}`}
+                                                    className={`ml-auto shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-colors ${shop.isOpen ? 'text-amber-700 bg-amber-50 border-amber-200 hover:bg-amber-100' : 'text-gray-500 bg-gray-50 border-gray-200'}`}
                                                 >
                                                     🗺️ Directions
                                                 </button>
@@ -380,6 +370,12 @@ const Home = () => {
                 )}
             </div>
 
+            <style>{`
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(16px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
         </div>
     );
 };

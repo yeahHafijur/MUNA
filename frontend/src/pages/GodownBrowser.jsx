@@ -4,6 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
+/* ─── Premium Crisp Icons ─── */
+const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
+
 const GodownBrowser = () => {
     const { token, user } = useAuth();
     const navigate = useNavigate();
@@ -124,22 +127,22 @@ const GodownBrowser = () => {
 
     /* ─── Render Main UI ─── */
     return (
-        <div className="min-h-screen bg-slate-50 pb-20 font-sans">
-            <div className="max-w-6xl mx-auto p-4 md:p-6">
+        <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col font-sans">
+            
+            {/* ─── NATIVE HEADER ─── */}
+            <div className="bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3 sticky top-0 z-50 shadow-sm">
+                <button
+                    onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }}
+                    className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
+                >
+                    <IconBack />
+                </button>
+                <span className="text-base font-extrabold text-slate-900 tracking-tight">Master Godown</span>
+            </div>
 
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pt-2">
-                    <div>
-                        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Master Godown</h1>
-                        <p className="text-[13px] font-medium text-gray-500 mt-1">Import pre-approved items to your catalog instantly.</p>
-                    </div>
-                    <button
-                        className="self-start md:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-bold text-sm shadow-sm hover:bg-gray-50 hover:shadow transition-all"
-                        onClick={() => navigate('/vendor/menu')}
-                    >
-                        <span>←</span> Back to Catalog
-                    </button>
-                </div>
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-6xl mx-auto w-full">
+                
+                <p className="text-[13px] font-medium text-slate-500 mb-6 px-1">Import pre-approved items to your catalog instantly.</p>
 
                 {/* Category Chips */}
                 <div className="flex gap-2.5 overflow-x-auto py-2 mb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

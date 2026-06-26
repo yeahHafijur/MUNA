@@ -8,7 +8,7 @@ const VendorHome = () => {
 
     useEffect(() => {
         if (!token) return;
-        // Fetch orders
+
         fetch('/api/orders/vendor?limit=100', { headers: { Authorization: `Bearer ${token}` } })
             .then(r => r.json())
             .then(data => {
@@ -17,7 +17,7 @@ const VendorHome = () => {
 
                 const today = new Date().toDateString();
                 const todayOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);
-                const liveOrders = orders.filter(o => !['delivered','cancelled'].includes(o.status));
+                const liveOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.status));
                 const todayRevenue = todayOrders
                     .filter(o => o.status === 'delivered')
                     .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
@@ -30,7 +30,6 @@ const VendorHome = () => {
                 }));
             });
 
-        // Fetch products
         if (shop?._id) {
             fetch(`/api/products/${shop._id}`)
                 .then(r => r.json())
@@ -51,7 +50,7 @@ const VendorHome = () => {
         out_for_delivery: 'In Transit', delivered: 'Delivered', cancelled: 'Cancelled'
     };
 
-    const greeting = () => {
+    const getGreeting = () => {
         const h = new Date().getHours();
         if (h < 12) return 'Good Morning';
         if (h < 17) return 'Good Afternoon';
@@ -59,80 +58,111 @@ const VendorHome = () => {
     };
 
     return (
-        <div>
-            <div style={{ marginBottom: '24px' }}>
-                <h1 style={{ fontSize: '22px', fontWeight: 800, marginBottom: '4px' }}>{greeting()}, {(shop?.name || '').split(' ')[0]}!</h1>
-                <p style={{ fontSize: '13px', color: 'var(--v-text-muted)' }}>Here's your store at a glance.</p>
+        <div className="space-y-8 animate-in fade-in duration-300">
+            {/* ── Greeting ── */}
+            <div>
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                    {getGreeting()}, <span className="text-amber-500">{(shop?.name || '').split(' ')[0]}!</span>
+                </h1>
+                <p className="text-sm font-medium text-slate-500 mt-1">Here's what's happening in your store today.</p>
             </div>
 
-            {/* ── Stat Cards ── */}
-            <div className="v-stats">
-                <div className="v-stat" onClick={() => navigate('/vendor/orders')} style={{ cursor: 'pointer' }}>
-                    <div className="v-stat-value" style={{ color: 'var(--v-warning)' }}>{stats.liveOrders}</div>
-                    <div className="v-stat-label">Active Orders</div>
-                    <div className="v-stat-icon" style={{ background: 'var(--v-warning-soft)' }}>📋</div>
-                </div>
-                <div className="v-stat">
-                    <div className="v-stat-value" style={{ color: 'var(--v-success)' }}>₹{stats.todayRevenue}</div>
-                    <div className="v-stat-label">Today's Revenue</div>
-                    <div className="v-stat-icon" style={{ background: 'var(--v-success-soft)' }}>₹</div>
-                </div>
-                <div className="v-stat" onClick={() => navigate('/vendor/menu')} style={{ cursor: 'pointer' }}>
-                    <div className="v-stat-value">{stats.totalProducts}</div>
-                    <div className="v-stat-label">Total Products</div>
-                    <div className="v-stat-icon" style={{ background: 'var(--v-primary-soft)' }}>📦</div>
-                </div>
-                {stats.outOfStock > 0 && (
-                    <div className="v-stat" onClick={() => navigate('/vendor/menu')} style={{ cursor: 'pointer' }}>
-                        <div className="v-stat-value" style={{ color: 'var(--v-danger)' }}>{stats.outOfStock}</div>
-                        <div className="v-stat-label">Out of Stock</div>
-                        <div className="v-stat-icon" style={{ background: 'var(--v-danger-soft)' }}>⚠</div>
+            {/* ── Stat Cards Grid ── */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div onClick={() => navigate('/vendor/orders')} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-amber-400 transition-colors group">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📋</div>
                     </div>
-                )}
+                    <div className="text-3xl font-black text-slate-900 mb-1">{stats.liveOrders}</div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Orders</div>
+                </div>
+
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl">₹</div>
+                    </div>
+                    <div className="text-3xl font-black text-slate-900 mb-1">₹{stats.todayRevenue}</div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Today's Revenue</div>
+                </div>
+
+                <div onClick={() => navigate('/vendor/menu')} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors group">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📦</div>
+                    </div>
+                    <div className="text-3xl font-black text-slate-900 mb-1">{stats.totalProducts}</div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Products</div>
+                </div>
+
+                <div onClick={() => navigate('/vendor/menu')} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-red-400 transition-colors group">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">⚠</div>
+                    </div>
+                    <div className="text-3xl font-black text-red-500 mb-1">{stats.outOfStock}</div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Out of Stock</div>
+                </div>
             </div>
 
             {/* ── Quick Actions ── */}
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', flexWrap: 'wrap' }}>
-                <button className="v-btn v-btn-primary" onClick={() => navigate('/vendor/menu')}>+ Add New Item</button>
-                <button className="v-btn v-btn-ghost" onClick={() => navigate('/vendor/godown')}>📦 Import from Godown</button>
+            <div className="flex flex-wrap gap-3">
+                <button onClick={() => navigate('/vendor/menu')} className="px-6 py-3 bg-amber-400 text-amber-950 font-bold rounded-xl shadow-sm hover:bg-amber-500 active:scale-95 transition-all text-sm">
+                    + Add New Item
+                </button>
+                <button onClick={() => navigate('/vendor/godown')} className="px-6 py-3 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 active:scale-95 transition-all text-sm flex items-center gap-2">
+                    <span>📦</span> Import from Godown
+                </button>
             </div>
 
-            {/* ── Recent Orders ── */}
-            <div className="v-card">
-                <div className="v-card-header">
-                    <div className="v-card-title">Recent Orders</div>
-                    <button className="v-btn v-btn-ghost v-btn-sm" onClick={() => navigate('/vendor/orders')}>View All</button>
+            {/* ── Recent Orders Table ── */}
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">Recent Orders</h2>
+                    <button onClick={() => navigate('/vendor/orders')} className="text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg transition-colors">
+                        View All
+                    </button>
                 </div>
-                <div className="v-card-body" style={{ padding: 0 }}>
+
+                <div className="p-0">
                     {stats.recentOrders.length === 0 ? (
-                        <div className="v-empty">
-                            <div className="v-empty-icon">📦</div>
-                            <div className="v-empty-title">No orders yet</div>
-                            <div className="v-empty-text">When customers place orders, they'll appear here.</div>
+                        <div className="p-12 text-center">
+                            <div className="text-4xl mb-3 opacity-50">📋</div>
+                            <h3 className="text-sm font-bold text-slate-900 mb-1">No orders yet</h3>
+                            <p className="text-xs font-medium text-slate-500">When customers place orders, they'll appear here.</p>
                         </div>
                     ) : (
-                        <div className="v-table-wrap">
-                            <table className="v-table">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr>
-                                        <th>Order ID</th>
-                                        <th>Customer</th>
-                                        <th className="v-table-mobile-hide">Time</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
+                                    <tr className="border-b border-slate-100 bg-white">
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Order ID</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Customer</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap hidden sm:table-cell">Time</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Amount</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-slate-50">
                                     {stats.recentOrders.map(order => (
-                                        <tr key={order._id} onClick={() => navigate('/vendor/orders')} style={{ cursor: 'pointer' }}>
-                                            <td><span className="v-table-id">#{order._id.slice(-5).toUpperCase()}</span></td>
-                                            <td>{order.customerId?.name || 'Guest'}</td>
-                                            <td className="v-table-mobile-hide">
-                                                {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        <tr key={order._id} onClick={() => navigate('/vendor/orders')} className="hover:bg-slate-50 cursor-pointer transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-black text-amber-600">#{order._id.slice(-5).toUpperCase()}</span>
                                             </td>
-                                            <td style={{ fontWeight: 700 }}>₹{order.totalAmount}</td>
-                                            <td>
-                                                <span className={`v-pill v-pill--${order.status}`}>
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">{order.customerId?.name || 'Guest'}</span>
+                                            </td>
+                                            <td className="px-6 py-4 hidden sm:table-cell">
+                                                <span className="text-xs font-medium text-slate-500">
+                                                    {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-black text-slate-900">₹{order.totalAmount}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`inline-flex px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md
+                                                    ${order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
+                                                        order.status === 'pending' ? 'bg-orange-50 text-orange-600 border border-orange-100' :
+                                                            order.status === 'cancelled' ? 'bg-red-50 text-red-600 border border-red-100' :
+                                                                'bg-blue-50 text-blue-600 border border-blue-100'}`}>
                                                     {statusLabels[order.status] || order.status}
                                                 </span>
                                             </td>

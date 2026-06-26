@@ -65,7 +65,7 @@ const Profile = () => {
     const { user, token, logout, login } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('account');
+    const [activeTab, setActiveTab] = useState('orders');
     const [expandedOrderId, setExpandedOrderId] = useState(null);
     const navigate = useNavigate();
 
@@ -253,17 +253,17 @@ const Profile = () => {
                 <div className="px-4 mb-4">
                     <div className="flex bg-gray-200/60 p-1 rounded-xl">
                         <button
-                            className={`flex-1 py-2 text-sm font-bold text-center rounded-lg transition-all duration-200 ${activeTab === 'account' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
-                            onClick={() => setActiveTab('account')}
-                        >
-                            Settings
-                        </button>
-                        <button
                             className={`flex-1 py-2 text-sm font-bold text-center rounded-lg transition-all duration-200 relative ${activeTab === 'orders' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
                             onClick={() => setActiveTab('orders')}
                         >
                             My Orders
                             {activeOrders.length > 0 && <span className="absolute top-2 right-4 px-1.5 py-0.5 rounded-full bg-amber-400 text-white text-[9px] leading-none">{activeOrders.length}</span>}
+                        </button>
+                        <button
+                            className={`flex-1 py-2 text-sm font-bold text-center rounded-lg transition-all duration-200 ${activeTab === 'account' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
+                            onClick={() => setActiveTab('account')}
+                        >
+                            Settings
                         </button>
                     </div>
                 </div>

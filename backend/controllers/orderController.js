@@ -372,7 +372,7 @@ const updateOrderStatus = async (req, res) => {
         }
 
         // 🚀 NEW LOGIC: VERIFY OTP IF VENDOR MARKS AS DELIVERED
-        if (status === 'delivered') {
+        if (status === 'delivered' && order.deliveryOtp) {
             if (!deliveryOtp) {
                 return res.status(400).json({ message: "Delivery PIN is required to complete this order." });
             }

@@ -320,5 +320,6 @@ module.exports = {
     saveLocation,
     deleteLocation,
     saveFcmToken,
-    updateProfile
+    updateProfile,
+    deleteAccount
 };

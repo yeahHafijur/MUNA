@@ -228,6 +228,82 @@ const VendorMenu = () => {
                     </div>
                 </div>
             </div>
+            {/* ═══ CATEGORY MODAL ═══ */}
+            {catModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in" onClick={() => setCatModal(null)}>
+                    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                            <h2 className="text-lg font-black text-slate-900">{catModal === 'add' ? 'New Category' : 'Edit Category'}</h2>
+                            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors" onClick={() => setCatModal(null)}>✕</button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Category Name</label>
+                                <input className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:border-amber-400 focus:outline-none transition-colors" placeholder="e.g. Electronics, Groceries..." value={catName} onChange={e => setCatName(e.target.value)} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Logo / Icon (optional)</label>
+                                <input type="file" accept="image/*" className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 transition-colors" onChange={e => setCatImage(e.target.files[0])} />
+                                {catModal._id && catModal.image && !catImage && (
+                                    <img src={catModal.image} className="w-12 h-12 rounded-xl mt-3 object-cover shadow-sm border border-slate-200" />
+                                )}
+                            </div>
+                        </div>
+                        <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
+                            {catModal._id && (
+                                <button className="px-4 py-3 bg-white border border-red-200 text-red-600 rounded-xl text-sm font-bold hover:bg-red-50 transition-colors mr-auto" onClick={() => { deleteCat(catModal); setCatModal(null); }}>Delete</button>
+                            )}
+                            <button className="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors" onClick={() => setCatModal(null)}>Cancel</button>
+                            <button className="px-6 py-3 bg-amber-400 text-amber-950 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-500 transition-colors disabled:opacity-50" disabled={!catName.trim() || catSaving} onClick={saveCat}>
+                                {catSaving ? 'Saving...' : 'Save'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ═══ PRODUCT MODAL ═══ */}
+            {prodModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in" onClick={() => setProdModal(null)}>
+                    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                            <h2 className="text-lg font-black text-slate-900">{prodModal === 'add' ? 'Add New Item' : 'Edit Item'}</h2>
+                            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors" onClick={() => setProdModal(null)}>✕</button>
+                        </div>
+                        <div className="p-6 space-y-4 overflow-y-auto">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Item Name</label>
+                                    <input className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:border-amber-400 focus:outline-none transition-colors" required placeholder="e.g. Product name" value={prodName} onChange={e => setProdName(e.target.value)} />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Price (₹)</label>
+                                    <input type="number" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:border-amber-400 focus:outline-none transition-colors" required placeholder="0" value={prodPrice} onChange={e => setProdPrice(e.target.value)} />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Category</label>
+                                <select className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:bg-white focus:border-amber-400 focus:outline-none transition-colors appearance-none" value={prodCatId} onChange={e => setProdCatId(e.target.value)}>
+                                    {categories.length === 0 && <option value="">No categories</option>}
+                                    {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Photo {prodModal !== 'add' && <span className="text-slate-400 normal-case tracking-normal font-medium">(optional)</span>}</label>
+                                <input type="file" accept="image/*" className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 transition-colors" onChange={handleProdImage} />
+                                {prodImagePreview && <img src={prodImagePreview} className="h-16 rounded-xl mt-3 object-cover shadow-sm border border-slate-200" />}
+                                {!prodImagePreview && prodModal?.image && <img src={prodModal.image} className="h-16 rounded-xl mt-3 object-cover shadow-sm border border-slate-200 opacity-60" />}
+                            </div>
+                        </div>
+                        <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3 shrink-0">
+                            <button type="button" className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors" onClick={() => setProdModal(null)}>Cancel</button>
+                            <button type="button" className="flex-1 py-3 bg-amber-400 text-amber-950 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-500 transition-colors disabled:opacity-50" disabled={prodSaving} onClick={saveProd}>
+                                {prodSaving ? 'Saving...' : prodModal === 'add' ? 'Create Item' : 'Save Changes'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

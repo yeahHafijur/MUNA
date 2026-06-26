@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { requestFirebaseNotificationPermission } from '../firebase';
 import './Profile.css'; // Keep existing CSS for orders/legacy parts if any
 
 /* ─── Heroicons SVG ─── */
@@ -103,10 +104,58 @@ const Profile = () => {
     
     const handleDeleteAccount = async () => {
         if (!window.confirm("WARNING: This will permanently delete your account, orders, and all data. Are you absolutely sure?")) return;
-        // Placeholder for real backend logic
-        alert("Account deletion request submitted. (Placeholder)");
-        // logout();
-        // navigate('/');
+        
+        try {
+            const res = await fetch('/api/auth/delete-account', {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert("Account deleted successfully.");
+                logout();
+                navigate('/');
+            } else {
+                alert(data.message || "Failed to delete account");
+            }
+        } catch (error) {
+            console.error("Delete account error:", error);
+            alert("An error occurred while deleting account");
+        }
+    };
+
+    const [isAddressesModalOpen, setIsAddressesModalOpen] = useState(false);
+
+    const handleDeleteLocation = async (id) => {
+        if (!window.confirm("Delete this saved location?")) return;
+        try {
+            const res = await fetch(`/api/auth/delete-location/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) { login({ ...user, savedLocations: data.savedLocations }, token); }
+            else { alert(data.message || "Failed to delete location"); }
+        } catch (error) { console.error("Error deleting location:", error); }
+    };
+
+    const handleEnableNotifications = async () => {
+        try {
+            const fcmToken = await requestFirebaseNotificationPermission();
+            if (fcmToken) {
+                await fetch('/api/auth/fcm-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ fcmToken })
+                });
+                alert("Notifications enabled successfully!");
+            } else {
+                alert("Please allow notifications in your browser settings.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Failed to enable notifications.");
+        }
     };
 
     const handleOpenEditProfile = () => {
@@ -239,13 +288,13 @@ const Profile = () => {
                                     title="Saved Addresses" 
                                     subtitle="Home, Office, Other"
                                     rightText={user.savedLocations?.length ? `${user.savedLocations.length} Saved` : 'None'}
-                                    onClick={() => alert("Navigate to addresses")} 
+                                    onClick={() => setIsAddressesModalOpen(true)} 
                                 />
                                 <SettingRow 
                                     icon={<IconHeart />} 
                                     title="Favorites" 
                                     subtitle="Your liked items & shops"
-                                    onClick={() => alert("Navigate to favorites")} 
+                                    onClick={() => alert("Favorites feature is coming soon!")} 
                                 />
                             </div>
                         </div>
@@ -258,8 +307,8 @@ const Profile = () => {
                                     icon={<IconBell />} 
                                     title="Notifications" 
                                     subtitle="Order updates, offers"
-                                    badge="On"
-                                    onClick={() => alert("Notification settings")} 
+                                    badge={Notification.permission === 'granted' ? 'On' : 'Off'}
+                                    onClick={handleEnableNotifications} 
                                 />
                             </div>
                         </div>
@@ -272,7 +321,7 @@ const Profile = () => {
                                     icon={<IconHelp />} 
                                     title="Help & Support" 
                                     subtitle="FAQs, contact us"
-                                    onClick={() => alert("Help Center")} 
+                                    onClick={() => window.location.href = "mailto:support@munastore.in"} 
                                 />
                                 <SettingRow 
                                     icon={<IconShield />} 
@@ -443,6 +492,50 @@ const Profile = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* ─── ADDRESSES MODAL ─── */}
+            {isAddressesModalOpen && (
+                <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-end justify-center sm:items-center">
+                    <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[80vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold text-gray-900">Saved Addresses</h3>
+                            <button onClick={() => setIsAddressesModalOpen(false)} className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-95 transition-transform">
+                                ✕
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {user?.savedLocations && user.savedLocations.length > 0 ? (
+                                user.savedLocations.map(loc => (
+                                    <div key={loc._id} className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                                                <IconMapPin />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-gray-900">{loc.name}</span>
+                                                <span className="text-xs text-gray-500 mt-0.5 line-clamp-1">{loc.address || 'Saved Location'}</span>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleDeleteLocation(loc._id)}
+                                            className="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold active:scale-95 transition-transform"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-8">
+                                    <div className="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <IconMapPin />
+                                    </div>
+                                    <h4 className="text-sm font-bold text-gray-900">No saved addresses</h4>
+                                    <p className="text-xs text-gray-500 mt-1">You can save addresses during checkout.</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

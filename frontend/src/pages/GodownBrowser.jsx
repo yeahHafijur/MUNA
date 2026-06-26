@@ -1,56 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import './vendor/VendorLayout.css'; // Use the new unified CSS
 
 const GodownBrowser = () => {
     const { token, user } = useAuth();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
-    const [masterItems, setMasterItems] = useState([]);
-    const [shop, setShop] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState('All');
-    const [loadingMap, setLoadingMap] = useState({});
+    const [importingId, setImportingId] = useState(null); // Tracks which item is currently being imported
 
-    // Fetch master products
-    useEffect(() => {
-        fetch('/api/master-products')
-            .then(r => r.json())
-            .then(data => setMasterItems(data))
-            .catch(() => toast.error('Failed to load Godown items'));
-    }, []);
-
-    // Fetch shop details to verify vendor
-    useEffect(() => {
-        if (!token || !user) { navigate('/login'); return; }
-        fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => { if (data._id) setShop(data); else { toast.error("Create a shop first"); navigate('/'); } })
-            .catch(() => toast.error('Failed to load shop details'));
-    }, [token, user, navigate]);
-
-    // Derived unique categories from master items
-    const categories = ['All', ...new Set(masterItems.map(item => item.category || 'General'))];
-
-    const filteredItems = masterItems.filter(item => {
-        const matchCat = activeCategory === 'All' || item.category === activeCategory;
-        const matchQuery = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchCat && matchQuery;
+    // 1. React Query: Fetch Shop Details
+    const { data: shop, isLoading: isShopLoading } = useQuery({
+        queryKey: ['my-shop', user?._id],
+        queryFn: async () => {
+            if (!token) throw new Error("No token");
+            const res = await fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } });
+            if (!res.ok) throw new Error("Shop not found");
+            const data = await res.json();
+            if (!data._id) throw new Error("Create a shop first");
+            return data;
+        },
+        onError: () => {
+            toast.error("Please create a shop first");
+            navigate('/');
+        },
+        enabled: !!token && !!user
     });
 
-    const handleImport = async (item) => {
-        if (!shop) return;
-        setLoadingMap(prev => ({ ...prev, [item._id]: true }));
+    // 2. React Query: Fetch Godown Master Items
+    const { data: masterItems = [], isLoading: isItemsLoading } = useQuery({
+        queryKey: ['master-products'],
+        queryFn: async () => {
+            const res = await fetch('/api/master-products');
+            if (!res.ok) throw new Error('Failed to load');
+            return res.json();
+        }
+    });
 
-        try {
-            // First, ensure the category exists in the shop's Category collection
+    // 3. React Query Mutation: Import Product to Vendor's Catalog
+    const importMutation = useMutation({
+        mutationFn: async (item) => {
+            setImportingId(item._id);
+
+            // Step A: Ensure the category exists in the shop's Category collection
             const catRes = await fetch('/api/categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ name: item.category || 'General' })
             });
+
             let catId = '';
             if (catRes.ok) {
                 const cat = await catRes.json();
@@ -63,7 +65,7 @@ const GodownBrowser = () => {
                 if (existing) catId = existing._id;
             }
 
-            // Now create the product with the proper categoryId
+            // Step B: Create the product
             const prodRes = await fetch('/api/products', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -71,85 +73,166 @@ const GodownBrowser = () => {
                     name: item.name,
                     price: 0, // Default to 0, vendor will edit later
                     categoryId: catId,
-                    category: item.category || 'General', // Fallback string
+                    category: item.category || 'General',
                     image: item.image,
                     stock: 0
                 })
             });
 
-            if (prodRes.ok) {
-                toast.success(`${item.name} imported! Don't forget to set its price in your catalog.`);
-            } else {
-                toast.error('Failed to import item');
-            }
-        } catch (error) {
-            toast.error('Error importing item');
+            if (!prodRes.ok) throw new Error('Failed to import item');
+            return item;
+        },
+        onSuccess: (item) => {
+            toast.success(`✅ ${item.name} imported! Set its price in your catalog.`);
+            queryClient.invalidateQueries(['vendor-products', shop?._id]); // Refresh vendor catalog
+        },
+        onError: () => {
+            toast.error('❌ Error importing item');
+        },
+        onSettled: () => {
+            setImportingId(null);
         }
+    });
 
-        setLoadingMap(prev => ({ ...prev, [item._id]: false }));
-    };
+    // Derived states
+    const categories = useMemo(() => {
+        return ['All', ...new Set(masterItems.map(item => item.category || 'General'))];
+    }, [masterItems]);
 
-    if (!shop) return <div className="v-loading"><div className="v-loading-spinner" /><div className="v-loading-text">Loading...</div></div>;
+    const filteredItems = useMemo(() => {
+        return masterItems.filter(item => {
+            const matchCat = activeCategory === 'All' || item.category === activeCategory;
+            const matchQuery = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+            return matchCat && matchQuery;
+        });
+    }, [masterItems, activeCategory, searchQuery]);
 
+
+    /* ─── Render Loading State ─── */
+    if (isShopLoading || isItemsLoading) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+                <div className="relative flex items-center justify-center mb-4">
+                    <div className="absolute w-16 h-16 rounded-full bg-amber-400 opacity-30 animate-ping"></div>
+                    <div className="absolute w-12 h-12 rounded-full bg-amber-500 opacity-40 animate-pulse"></div>
+                    <div className="z-10 text-4xl animate-bounce">📦</div>
+                </div>
+                <div className="text-amber-600 font-black tracking-[0.2em] text-xs animate-pulse">LOADING GODOWN</div>
+            </div>
+        );
+    }
+
+    /* ─── Render Main UI ─── */
     return (
-        <div style={{ padding: '0 0 20px 0', maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-                <div>
-                    <h1 style={{ fontSize: '20px', fontWeight: 800 }}>Master Godown</h1>
-                    <p style={{ fontSize: '13px', color: 'var(--v-text-muted)' }}>Import pre-approved items to your catalog instantly.</p>
-                </div>
-                <button className="v-btn v-btn-ghost" onClick={() => navigate('/vendor/menu')}>← Back to Catalog</button>
-            </div>
+        <div className="min-h-screen bg-slate-50 pb-20 font-sans">
+            <div className="max-w-6xl mx-auto p-4 md:p-6">
 
-            {/* Category Chips */}
-            <div className="v-chipbar" style={{ marginBottom: '16px' }}>
-                {categories.map(cat => (
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pt-2">
+                    <div>
+                        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Master Godown</h1>
+                        <p className="text-[13px] font-medium text-gray-500 mt-1">Import pre-approved items to your catalog instantly.</p>
+                    </div>
                     <button
-                        key={cat}
-                        className={`v-chip ${activeCategory === cat ? 'active' : ''}`}
-                        onClick={() => setActiveCategory(cat)}
+                        className="self-start md:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-bold text-sm shadow-sm hover:bg-gray-50 hover:shadow transition-all"
+                        onClick={() => navigate('/vendor/menu')}
                     >
-                        {cat}
+                        <span>←</span> Back to Catalog
                     </button>
-                ))}
-            </div>
-
-            {/* Search */}
-            <div className="v-searchbar" style={{ marginBottom: '24px' }}>
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                <input placeholder="Search Godown items..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-            </div>
-
-            {filteredItems.length === 0 ? (
-                <div className="v-empty">
-                    <div className="v-empty-icon">📦</div>
-                    <div className="v-empty-title">No items found</div>
-                    <div className="v-empty-text">We couldn't find anything matching your search.</div>
                 </div>
-            ) : (
-                <div className="v-product-grid">
-                    {filteredItems.map(item => (
-                        <div key={item._id} className="v-product-card">
-                            <div className="v-product-card-img">
-                                {item.image ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📷'}
-                            </div>
-                            <div className="v-product-card-body">
-                                <div className="v-product-card-name">{item.name}</div>
-                                <div className="v-product-card-cat">{item.category}</div>
-                                <div className="v-product-card-footer" style={{ marginTop: '12px' }}>
-                                    <button 
-                                        className="v-btn v-btn-primary v-btn-full" 
-                                        onClick={() => handleImport(item)}
-                                        disabled={loadingMap[item._id]}
-                                    >
-                                        {loadingMap[item._id] ? 'Importing...' : 'Import to Catalog'}
-                                    </button>
+
+                {/* Category Chips */}
+                <div className="flex gap-2.5 overflow-x-auto py-2 mb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {categories.map(cat => {
+                        const isActive = activeCategory === cat;
+                        return (
+                            <button
+                                key={cat}
+                                onClick={() => setActiveCategory(cat)}
+                                className={`shrink-0 px-4 py-2 rounded-full text-[12px] font-bold border transition-all whitespace-nowrap ${isActive
+                                        ? 'bg-gradient-to-br from-amber-400 to-amber-500 text-gray-900 border-transparent shadow-md shadow-amber-500/20'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative mb-6">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search Godown items..."
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        className="w-full bg-white border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold text-gray-800 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+                    />
+                </div>
+
+                {/* Grid / Empty State */}
+                {filteredItems.length === 0 ? (
+                    <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-sm mt-8">
+                        <div className="text-6xl mb-4 opacity-50">📦</div>
+                        <h3 className="text-lg font-extrabold text-gray-900 mb-2">No items found</h3>
+                        <p className="text-sm font-medium text-gray-500">We couldn't find anything matching "{searchQuery}"</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
+                        {filteredItems.map(item => {
+                            const isImporting = importingId === item._id;
+                            return (
+                                <div key={item._id} className="bg-white rounded-[20px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+
+                                    {/* Product Image */}
+                                    <div className="relative w-full aspect-square bg-gray-50 flex items-center justify-center p-2 border-b border-gray-50 overflow-hidden">
+                                        {item.image ? (
+                                            <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                                                loading="lazy"
+                                            />
+                                        ) : (
+                                            <span className="text-4xl opacity-50">📷</span>
+                                        )}
+                                        <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 backdrop-blur-sm border border-gray-100 rounded-md text-[9px] font-extrabold text-gray-500 uppercase tracking-wide shadow-sm">
+                                            {item.category}
+                                        </div>
+                                    </div>
+
+                                    {/* Product Info */}
+                                    <div className="p-3.5 flex flex-col flex-1">
+                                        <h3 className="text-[13px] md:text-sm font-extrabold text-gray-900 leading-tight mb-3 line-clamp-2">
+                                            {item.name}
+                                        </h3>
+
+                                        <button
+                                            onClick={() => importMutation.mutate(item)}
+                                            disabled={importingId !== null}
+                                            className={`mt-auto w-full py-2.5 rounded-xl text-[11px] md:text-xs font-black uppercase tracking-wide transition-all ${isImporting
+                                                    ? 'bg-amber-100 text-amber-600 cursor-not-allowed'
+                                                    : importingId !== null
+                                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                        : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-400 hover:text-amber-950 hover:border-amber-400 shadow-sm'
+                                                }`}
+                                        >
+                                            {isImporting ? 'Importing...' : 'Import'}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                            );
+                        })}
+                    </div>
+                )}
+
+            </div>
         </div>
     );
 };

@@ -146,7 +146,7 @@ const CustomerSettings = () => {
             {/* ════════ HEADER NAV ════════ */}
             <div className="bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3 sticky top-0 z-50 shadow-sm">
                 <button
-                    onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/profile'); }}
+                    onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate(-1); }}
                     className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
                 >
                     <IconBack />

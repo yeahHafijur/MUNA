@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { requestFirebaseNotificationPermission } from '../../firebase';
 
 /* ─── Crisp Native Icons ─── */
 const IcoOrders = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>;
 const IcoMenu = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>;
 const IcoSettings = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+const IcoBell = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>;
 const IcoChevron = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-300"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>;
 const IcoGodown = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>;
 const IcoUser = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>;
@@ -41,6 +43,14 @@ const VendorHub = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    // Delivery Rules State
+    const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [minOrder, setMinOrder] = useState('');
+    const [minimumCharge, setMinimumCharge] = useState('');
+    const [chargePerKm, setChargePerKm] = useState('');
+    const [maxDeliveryRange, setMaxDeliveryRange] = useState('');
+
     const { data: shop } = useQuery({
         queryKey: ['my-shop'],
         queryFn: async () => {
@@ -54,6 +64,67 @@ const VendorHub = () => {
     useEffect(() => {
         if (!token || user?.role !== 'vendor') navigate('/');
     }, [token, user, navigate]);
+
+    useEffect(() => {
+        if (shop) {
+            setMinOrder(shop.deliverySettings?.minOrderAmount || 0);
+            setMinimumCharge(shop.deliverySettings?.minimumCharge || 0);
+            setChargePerKm(shop.deliverySettings?.chargePerKm || 0);
+            setMaxDeliveryRange(shop.deliverySettings?.maxRange || 5);
+        }
+    }, [shop]);
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        const loadingToast = toast.loading("Saving delivery rules...");
+        try {
+            const body = {
+                deliverySettings: {
+                    minOrderAmount: Number(minOrder),
+                    minimumCharge: Number(minimumCharge),
+                    chargePerKm: Number(chargePerKm),
+                    maxRange: Number(maxDeliveryRange)
+                }
+            };
+            const res = await fetch(`/api/shops/${shop._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify(body)
+            });
+            if (res.ok) {
+                const updatedShop = await res.json();
+                queryClient.setQueryData(['my-shop'], updatedShop);
+                toast.success("Delivery rules updated!");
+                setIsDeliveryModalOpen(false);
+            } else {
+                toast.error("Failed to update rules.");
+            }
+        } catch (error) {
+            toast.error("Error updating rules.");
+        } finally {
+            toast.dismiss(loadingToast);
+            setIsSaving(false);
+        }
+    };
+
+    const handleEnableNotifications = async () => {
+        try {
+            const fcmToken = await requestFirebaseNotificationPermission();
+            if (fcmToken) {
+                await fetch('/api/auth/fcm-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ fcmToken })
+                });
+                toast.success("Notifications enabled!");
+            } else {
+                toast.warning("Please allow notifications in browser settings.");
+            }
+        } catch (err) {
+            toast.error("Failed to enable notifications.");
+        }
+    };
 
     // Fetch Stats via React Query for zero-latency
     const { data: stats = { liveOrders: 0, todayRevenue: 0, totalProducts: 0 } } = useQuery({
@@ -166,9 +237,15 @@ const VendorHub = () => {
                     />
                     <NavigationRow
                         icon={<IcoSettings />}
-                        title="Store Settings"
-                        subtitle="Delivery rules & profile"
-                        onClick={() => navigate('/vendor/settings')}
+                        title="Delivery Rules"
+                        subtitle={`Max ${shop.deliverySettings?.maxRange || 5}km • Min ₹${shop.deliverySettings?.minOrderAmount || 0}`}
+                        onClick={() => setIsDeliveryModalOpen(true)}
+                    />
+                    <NavigationRow
+                        icon={<IcoBell />}
+                        title="Notifications"
+                        subtitle="New order alerts"
+                        onClick={handleEnableNotifications}
                         isLast={true}
                     />
                 </div>
@@ -195,6 +272,42 @@ const VendorHub = () => {
                     <p className="text-xs text-slate-400 font-bold tracking-wide">MUNA Merchant App v2.0</p>
                 </div>
             </div>
+
+            {/* ─── FLOATING BOTTOM SHEET: DELIVERY RULES ─── */}
+            {isDeliveryModalOpen && (
+                <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-full duration-300 ease-out" onClick={e => e.stopPropagation()}>
+                        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 shrink-0"></div>
+                        <div className="flex items-center justify-between mb-8 shrink-0">
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Delivery Rules</h3>
+                            <button onClick={() => setIsDeliveryModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:scale-95 transition-transform">✕</button>
+                        </div>
+                        <form onSubmit={handleSave} className="space-y-5">
+                            <div className="relative">
+                                <input type="number" required value={minOrder} onChange={(e) => setMinOrder(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Min Order" />
+                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Minimum Order Amount (₹)</label>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="relative">
+                                    <input type="number" required value={minimumCharge} onChange={(e) => setMinimumCharge(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Base Charge" />
+                                    <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Base Charge (₹)</label>
+                                </div>
+                                <div className="relative">
+                                    <input type="number" required value={chargePerKm} onChange={(e) => setChargePerKm(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Per KM" />
+                                    <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Charge Per KM (₹)</label>
+                                </div>
+                            </div>
+                            <div className="relative">
+                                <input type="number" required value={maxDeliveryRange} onChange={(e) => setMaxDeliveryRange(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Max Range" />
+                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Max Delivery Range (KM)</label>
+                            </div>
+                            <button type="submit" disabled={isSaving} className="w-full mt-2 p-4 bg-amber-400 text-slate-900 rounded-2xl font-black text-[15px] active:scale-[0.98] transition-transform shadow-[0_4px_14px_rgba(251,191,36,0.3)] disabled:opacity-70">
+                                {isSaving ? 'Saving...' : 'Save Rules'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

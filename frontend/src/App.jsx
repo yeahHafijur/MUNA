@@ -24,7 +24,6 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const VendorHub = lazy(() => import('./pages/vendor/VendorHub'));
 const VendorOrders = lazy(() => import('./pages/vendor/VendorOrders'));
 const VendorMenu = lazy(() => import('./pages/vendor/VendorMenu'));
-const VendorSettings = lazy(() => import('./pages/vendor/VendorSettings'));
 
 // Admin & Others
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
@@ -121,7 +120,6 @@ const AppContent = () => {
             <Route path="/vendor/orders" element={<VendorOrders />} />
             <Route path="/vendor/menu" element={<VendorMenu />} />
             <Route path="/vendor/godown" element={<GodownBrowser />} />
-            <Route path="/vendor/settings" element={<VendorSettings />} />
 
             {/* KEEP OLD ROUTES AS REDIRECTS TEMPORARILY */}
             <Route path="/vendor-dashboard" element={<Navigate to="/vendor" replace />} />

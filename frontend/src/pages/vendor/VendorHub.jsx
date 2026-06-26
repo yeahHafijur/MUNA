@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
 /* ─── Crisp Native Icons ─── */
@@ -39,14 +39,20 @@ const NavigationRow = ({ icon, title, subtitle, onClick, badge, isLast }) => (
 const VendorHub = () => {
     const { token, user, logout } = useAuth();
     const navigate = useNavigate();
-    const [shop, setShop] = useState(null);
+    const queryClient = useQueryClient();
 
-    // Fetch Shop Details
+    const { data: shop } = useQuery({
+        queryKey: ['my-shop'],
+        queryFn: async () => {
+            const res = await fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } });
+            const data = await res.json();
+            return data._id ? data : null;
+        },
+        enabled: !!token && user?.role === 'vendor'
+    });
+
     useEffect(() => {
-        if (!token || user?.role !== 'vendor') { navigate('/'); return; }
-        fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => { if (data._id) setShop(data); });
+        if (!token || user?.role !== 'vendor') navigate('/');
     }, [token, user, navigate]);
 
     // Fetch Stats via React Query for zero-latency
@@ -85,7 +91,10 @@ const VendorHub = () => {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ isOpen: !shop.isOpen }),
         });
-        if (res.ok) setShop(await res.json());
+        if (res.ok) {
+            const updatedShop = await res.json();
+            queryClient.setQueryData(['my-shop'], updatedShop);
+        }
     };
 
     if (!shop) return (

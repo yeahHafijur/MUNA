@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { requestFirebaseNotificationPermission } from '../../firebase';
+import { useQuery } from '@tanstack/react-query';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -41,7 +42,15 @@ const VendorSettings = () => {
     // 🔥 Changed: Fetching Shop & Token Directly via useAuth
     const { token, user } = useAuth();
     const navigate = useNavigate();
-    const [shop, setShop] = useState(null);
+    const { data: shop } = useQuery({
+        queryKey: ['my-shop'],
+        queryFn: async () => {
+            const res = await fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } });
+            const data = await res.json();
+            return data._id ? data : null;
+        },
+        enabled: !!token && user?.role === 'vendor'
+    });
 
     // Bottom Sheets State
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -56,10 +65,7 @@ const VendorSettings = () => {
     const [maxDeliveryRange, setMaxDeliveryRange] = useState('');
 
     useEffect(() => {
-        if (!token || user?.role !== 'vendor') { navigate('/'); return; }
-        fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => { if (data._id) setShop(data); });
+        if (!token || user?.role !== 'vendor') navigate('/');
     }, [token, user, navigate]);
 
     useEffect(() => {

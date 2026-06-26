@@ -25,8 +25,14 @@ const VendorHub = lazy(() => import('./pages/vendor/VendorHub'));
 const VendorOrders = lazy(() => import('./pages/vendor/VendorOrders'));
 const VendorMenu = lazy(() => import('./pages/vendor/VendorMenu'));
 
-// Admin & Others
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+// Admin Hub & Spoke Pages
+const AdminHub = lazy(() => import('./pages/admin/AdminHub'));
+const AdminOnboard = lazy(() => import('./pages/admin/AdminOnboard'));
+const AdminShops = lazy(() => import('./pages/admin/AdminShops'));
+const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'));
+const AdminGodown = lazy(() => import('./pages/admin/AdminGodown'));
+const AdminApprovals = lazy(() => import('./pages/admin/AdminApprovals'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const GodownBrowser = lazy(() => import('./pages/GodownBrowser'));
 
 const AppContent = () => {
@@ -126,7 +132,13 @@ const AppContent = () => {
             <Route path="/vendor-godown" element={<Navigate to="/vendor/godown" replace />} />
 
             <Route path="/admin-dashboard" element={<Navigate to="/admin" replace />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin" element={<AdminHub />} />
+            <Route path="/admin/onboard" element={<AdminOnboard />} />
+            <Route path="/admin/shops" element={<AdminShops />} />
+            <Route path="/admin/categories" element={<AdminCategories />} />
+            <Route path="/admin/godown" element={<AdminGodown />} />
+            <Route path="/admin/approvals" element={<AdminApprovals />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
           </Routes>
         </Suspense>
       )}

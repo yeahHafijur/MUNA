@@ -21,8 +21,7 @@ const Notifications = lazy(() => import('./pages/Notifications'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 
 // Vendor Pages
-const VendorLayout = lazy(() => import('./pages/vendor/VendorLayout'));
-const VendorHome = lazy(() => import('./pages/vendor/VendorHome'));
+const VendorHub = lazy(() => import('./pages/vendor/VendorHub'));
 const VendorOrders = lazy(() => import('./pages/vendor/VendorOrders'));
 const VendorMenu = lazy(() => import('./pages/vendor/VendorMenu'));
 const VendorSettings = lazy(() => import('./pages/vendor/VendorSettings'));
@@ -50,13 +49,13 @@ const AppContent = () => {
     const unsubscribe = onMessageListener((payload) => {
       console.log('[App.jsx] Received foreground message ', payload);
       toast.info(`${payload.notification?.title}: ${payload.notification?.body}`);
-      
+
       // Zero-API real-time UI update for notifications
       queryClient.setQueryData(['unreadCount'], (old) => (old ? old + 1 : 1));
 
       // Automatic invalidation for order updates
       if (payload.notification?.title?.toLowerCase().includes('order')) {
-          queryClient.invalidateQueries({ queryKey: ['liveOrderCount'] });
+        queryClient.invalidateQueries({ queryKey: ['liveOrderCount'] });
       }
     });
 
@@ -117,15 +116,12 @@ const AppContent = () => {
           </div>
         }>
           <Routes>
-            <Route path="/vendor" element={<VendorLayout />}>
-              <Route index element={<VendorHome />} />
-              <Route path="orders" element={<VendorOrders />} />
-              <Route path="menu" element={<VendorMenu />} />
-              <Route path="settings" element={<VendorSettings />} />
-            </Route>
-            
-            {/* Godown standalone full page route */}
+            {/* Vendor Full Screen Pages */}
+            <Route path="/vendor" element={<VendorHub />} />
+            <Route path="/vendor/orders" element={<VendorOrders />} />
+            <Route path="/vendor/menu" element={<VendorMenu />} />
             <Route path="/vendor/godown" element={<GodownBrowser />} />
+            <Route path="/vendor/settings" element={<VendorSettings />} />
 
             {/* KEEP OLD ROUTES AS REDIRECTS TEMPORARILY */}
             <Route path="/vendor-dashboard" element={<Navigate to="/vendor" replace />} />

@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
+
+/* ─── Premium Crisp Icons ─── */
+const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
 
 const STATUS_LABELS = {
     pending: 'Pending', accepted: 'Accepted', preparing: 'Preparing',
@@ -8,7 +12,10 @@ const STATUS_LABELS = {
 };
 
 const VendorOrders = () => {
-    const { token } = useOutletContext();
+    // 🔥 Changed: Replaced useOutletContext with useAuth
+    const { token } = useAuth();
+    const navigate = useNavigate();
+
     const [orders, setOrders] = useState([]);
     const [activeView, setActiveView] = useState('live');
     const [expandedId, setExpandedId] = useState(null);
@@ -209,117 +216,129 @@ const VendorOrders = () => {
     );
 
     return (
-        <div className="animate-in fade-in duration-300 max-w-7xl mx-auto">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-6">Orders</h1>
+        <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col font-sans">
 
-            {/* ── Native Segmented Control ── */}
-            <div className="flex bg-slate-200/50 p-1.5 rounded-[16px] w-full sm:max-w-md mb-8 shadow-inner">
+            {/* ─── NATIVE HEADER ─── */}
+            <div className="bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3 sticky top-0 z-50 shadow-sm">
                 <button
-                    className={`flex-1 py-2.5 text-[13px] font-black text-center rounded-[12px] transition-all flex items-center justify-center gap-2 ${activeView === 'live' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
-                    onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setActiveView('live'); }}
+                    onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }}
+                    className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
                 >
-                    Live {liveOrders.length > 0 && <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-md leading-none">{liveOrders.length}</span>}
+                    <IconBack />
                 </button>
-                <button
-                    className={`flex-1 py-2.5 text-[13px] font-black text-center rounded-[12px] transition-all ${activeView === 'history' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
-                    onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setActiveView('history'); }}
-                >
-                    History
-                </button>
+                <span className="text-base font-extrabold text-slate-900 tracking-tight">Manage Orders</span>
             </div>
 
-            {/* ── LIVE KANBAN BOARD ── */}
-            {activeView === 'live' && (
-                <>
-                    {liveOrders.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[32px] border border-slate-100 shadow-sm">
-                            <span className="text-6xl opacity-30 mb-5">📋</span>
-                            <h3 className="text-[16px] font-black text-slate-900 mb-1">No active orders</h3>
-                            <p className="text-[13px] font-semibold text-slate-500">Wait for customers to place orders.</p>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="flex flex-col h-full bg-orange-50/30 rounded-[32px] border border-orange-100 p-4">
-                                <div className="flex justify-between items-center mb-4 px-2">
-                                    <h3 className="text-[11px] font-black text-orange-600 uppercase tracking-widest flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div> New
-                                    </h3>
-                                    <span className="bg-orange-100 text-orange-800 text-[10px] font-black px-2 py-1 rounded-md">{pendingOrders.length}</span>
-                                </div>
-                                <div className="flex-1 space-y-4">{pendingOrders.map(renderOrderCard)}</div>
-                            </div>
-                            <div className="flex flex-col h-full bg-blue-50/30 rounded-[32px] border border-blue-100 p-4">
-                                <div className="flex justify-between items-center mb-4 px-2">
-                                    <h3 className="text-[11px] font-black text-blue-600 uppercase tracking-widest">Preparing</h3>
-                                    <span className="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-1 rounded-md">{acceptedOrders.length}</span>
-                                </div>
-                                <div className="flex-1 space-y-4">{acceptedOrders.map(renderOrderCard)}</div>
-                            </div>
-                            <div className="flex flex-col h-full bg-emerald-50/30 rounded-[32px] border border-emerald-100 p-4">
-                                <div className="flex justify-between items-center mb-4 px-2">
-                                    <h3 className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">In Transit</h3>
-                                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-1 rounded-md">{transitOrders.length}</span>
-                                </div>
-                                <div className="flex-1 space-y-4">{transitOrders.map(renderOrderCard)}</div>
-                            </div>
-                        </div>
-                    )}
-                </>
-            )}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-7xl mx-auto w-full">
+                {/* ── Native Segmented Control ── */}
+                <div className="flex bg-slate-200/50 p-1.5 rounded-[16px] w-full sm:max-w-md mb-8 shadow-inner">
+                    <button
+                        className={`flex-1 py-2.5 text-[13px] font-black text-center rounded-[12px] transition-all flex items-center justify-center gap-2 ${activeView === 'live' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
+                        onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setActiveView('live'); }}
+                    >
+                        Live {liveOrders.length > 0 && <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-md leading-none">{liveOrders.length}</span>}
+                    </button>
+                    <button
+                        className={`flex-1 py-2.5 text-[13px] font-black text-center rounded-[12px] transition-all ${activeView === 'history' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
+                        onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setActiveView('history'); }}
+                    >
+                        History
+                    </button>
+                </div>
 
-            {/* ── ORDER HISTORY (Native List UI) ── */}
-            {activeView === 'history' && (
-                <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-slate-50 flex flex-col sm:flex-row gap-3 bg-slate-50/50">
-                        <input
-                            className="flex-1 py-3 px-4 bg-white border border-slate-200 rounded-[16px] text-[13px] font-bold focus:outline-none focus:border-amber-400 transition-colors placeholder:text-slate-400"
-                            placeholder="🔍 Search by ID or Name..."
-                            value={historySearch}
-                            onChange={e => { setHistorySearch(e.target.value); setHistoryPage(1); }}
-                        />
-                        <select
-                            className="sm:w-48 py-3 px-4 bg-white border border-slate-200 rounded-[16px] text-[13px] font-black text-slate-700 focus:outline-none transition-colors appearance-none"
-                            value={historyStatus}
-                            onChange={e => { setHistoryStatus(e.target.value); setHistoryPage(1); }}
-                        >
-                            <option value="all">All Status</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                    </div>
-
-                    <div className="flex-1 p-2">
-                        {historyOrders.length === 0 ? (
-                            <div className="p-16 text-center">
-                                <span className="text-5xl opacity-30 mb-3 block">🔍</span>
-                                <h3 className="text-[15px] font-black text-slate-900 mb-1">No orders found</h3>
+                {/* ── LIVE KANBAN BOARD ── */}
+                {activeView === 'live' && (
+                    <>
+                        {liveOrders.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[32px] border border-slate-100 shadow-sm">
+                                <span className="text-6xl opacity-30 mb-5">📋</span>
+                                <h3 className="text-[16px] font-black text-slate-900 mb-1">No active orders</h3>
+                                <p className="text-[13px] font-semibold text-slate-500">Wait for customers to place orders.</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-slate-50">
-                                {historyOrders.map(order => (
-                                    <div key={order._id} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors cursor-pointer rounded-2xl">
-                                        <div className="flex flex-col">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-[14px] font-black text-slate-900">{order.customerId?.name || 'Guest'}</span>
-                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">#{order._id.slice(-5).toUpperCase()}</span>
-                                            </div>
-                                            <span className={`w-max px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-md ${order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                                                {STATUS_LABELS[order.status] || order.status}
-                                            </span>
-                                        </div>
-                                        <div className="flex flex-col items-end">
-                                            <span className="text-[15px] font-black text-slate-900 tracking-tight">₹{order.totalAmount}</span>
-                                            <span className="text-[10px] font-semibold text-slate-400 mt-0.5">
-                                                {new Date(order.createdAt).toLocaleDateString([], { day: 'numeric', month: 'short' })}
-                                            </span>
-                                        </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div className="flex flex-col h-full bg-orange-50/30 rounded-[32px] border border-orange-100 p-4">
+                                    <div className="flex justify-between items-center mb-4 px-2">
+                                        <h3 className="text-[11px] font-black text-orange-600 uppercase tracking-widest flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div> New
+                                        </h3>
+                                        <span className="bg-orange-100 text-orange-800 text-[10px] font-black px-2 py-1 rounded-md">{pendingOrders.length}</span>
                                     </div>
-                                ))}
+                                    <div className="flex-1 space-y-4">{pendingOrders.map(renderOrderCard)}</div>
+                                </div>
+                                <div className="flex flex-col h-full bg-blue-50/30 rounded-[32px] border border-blue-100 p-4">
+                                    <div className="flex justify-between items-center mb-4 px-2">
+                                        <h3 className="text-[11px] font-black text-blue-600 uppercase tracking-widest">Preparing</h3>
+                                        <span className="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-1 rounded-md">{acceptedOrders.length}</span>
+                                    </div>
+                                    <div className="flex-1 space-y-4">{acceptedOrders.map(renderOrderCard)}</div>
+                                </div>
+                                <div className="flex flex-col h-full bg-emerald-50/30 rounded-[32px] border border-emerald-100 p-4">
+                                    <div className="flex justify-between items-center mb-4 px-2">
+                                        <h3 className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">In Transit</h3>
+                                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-1 rounded-md">{transitOrders.length}</span>
+                                    </div>
+                                    <div className="flex-1 space-y-4">{transitOrders.map(renderOrderCard)}</div>
+                                </div>
                             </div>
                         )}
+                    </>
+                )}
+
+                {/* ── ORDER HISTORY (Native List UI) ── */}
+                {activeView === 'history' && (
+                    <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                        <div className="p-4 border-b border-slate-50 flex flex-col sm:flex-row gap-3 bg-slate-50/50">
+                            <input
+                                className="flex-1 py-3 px-4 bg-white border border-slate-200 rounded-[16px] text-[13px] font-bold focus:outline-none focus:border-amber-400 transition-colors placeholder:text-slate-400"
+                                placeholder="🔍 Search by ID or Name..."
+                                value={historySearch}
+                                onChange={e => { setHistorySearch(e.target.value); setHistoryPage(1); }}
+                            />
+                            <select
+                                className="sm:w-48 py-3 px-4 bg-white border border-slate-200 rounded-[16px] text-[13px] font-black text-slate-700 focus:outline-none transition-colors appearance-none"
+                                value={historyStatus}
+                                onChange={e => { setHistoryStatus(e.target.value); setHistoryPage(1); }}
+                            >
+                                <option value="all">All Status</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div className="flex-1 p-2">
+                            {historyOrders.length === 0 ? (
+                                <div className="p-16 text-center">
+                                    <span className="text-5xl opacity-30 mb-3 block">🔍</span>
+                                    <h3 className="text-[15px] font-black text-slate-900 mb-1">No orders found</h3>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-slate-50">
+                                    {historyOrders.map(order => (
+                                        <div key={order._id} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors cursor-pointer rounded-2xl">
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="text-[14px] font-black text-slate-900">{order.customerId?.name || 'Guest'}</span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">#{order._id.slice(-5).toUpperCase()}</span>
+                                                </div>
+                                                <span className={`w-max px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-md ${order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                                    {STATUS_LABELS[order.status] || order.status}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-end">
+                                                <span className="text-[15px] font-black text-slate-900 tracking-tight">₹{order.totalAmount}</span>
+                                                <span className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                                                    {new Date(order.createdAt).toLocaleDateString([], { day: 'numeric', month: 'short' })}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             {/* ═══ FLOATING BOTTOM SHEET: CONFIRMATION & OTP ═══ */}
             {confirmAction && (() => {

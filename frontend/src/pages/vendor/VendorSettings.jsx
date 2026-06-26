@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { requestFirebaseNotificationPermission } from '../../firebase';
 
 /* ─── Premium Crisp Icons ─── */
+const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
 const IconChevron = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 text-slate-300"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>;
 const IconStore = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg>;
 const IconDelivery = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V11.625c0-.621-.504-1.125-1.125-1.125h-9.75a1.125 1.125 0 00-1.125 1.125v4.5m11.25 0v-4.5m0 0H21m-2.25-4.5h.008v.008h-.008V6.75z" /></svg>;
@@ -36,8 +38,11 @@ const SettingRow = ({ icon, title, subtitle, onClick, rightText, isDanger, badge
 );
 
 const VendorSettings = () => {
-    const { shop, setShop, token } = useOutletContext();
-    
+    // 🔥 Changed: Fetching Shop & Token Directly via useAuth
+    const { token, user } = useAuth();
+    const navigate = useNavigate();
+    const [shop, setShop] = useState(null);
+
     // Bottom Sheets State
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
@@ -49,6 +54,13 @@ const VendorSettings = () => {
     const [minimumCharge, setMinimumCharge] = useState('');
     const [chargePerKm, setChargePerKm] = useState('');
     const [maxDeliveryRange, setMaxDeliveryRange] = useState('');
+
+    useEffect(() => {
+        if (!token || user?.role !== 'vendor') { navigate('/'); return; }
+        fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(data => { if (data._id) setShop(data); });
+    }, [token, user, navigate]);
 
     useEffect(() => {
         if (shop) {
@@ -118,64 +130,73 @@ const VendorSettings = () => {
     if (!shop) return null;
 
     return (
-        <div className="flex flex-col font-sans px-4 pt-4 pb-24 space-y-6 max-w-2xl mx-auto">
-            
-            <div className="mb-2">
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight">Store Settings</h1>
-                <p className="text-[13px] font-semibold text-slate-500 mt-1">Manage your profile and delivery rules.</p>
+        <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col font-sans">
+
+            {/* ─── NATIVE HEADER ─── */}
+            <div className="bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3 sticky top-0 z-50 shadow-sm">
+                <button
+                    onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }}
+                    className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
+                >
+                    <IconBack />
+                </button>
+                <span className="text-base font-extrabold text-slate-900 tracking-tight">Store Settings</span>
             </div>
 
-            <div>
-                <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Store Details</h3>
-                <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
-                    <SettingRow 
-                        icon={<IconStore />} 
-                        title="Edit Store Profile" 
-                        subtitle="Udyam Number" 
-                        onClick={() => setIsProfileModalOpen(true)} 
-                    />
-                    <SettingRow 
-                        icon={<IconImage />} 
-                        title="Banner Image" 
-                        subtitle="Managed via admin panel" 
-                        rightText="Contact Admin"
-                        onClick={() => toast.info("Contact admin to change your store banner.")} 
-                        isLast={true} 
-                    />
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 pb-24 space-y-6 max-w-3xl mx-auto w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+
+                <div>
+                    <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Store Details</h3>
+                    <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                        <SettingRow
+                            icon={<IconStore />}
+                            title="Edit Store Profile"
+                            subtitle="Udyam Number"
+                            onClick={() => setIsProfileModalOpen(true)}
+                        />
+                        <SettingRow
+                            icon={<IconImage />}
+                            title="Banner Image"
+                            subtitle="Managed via admin panel"
+                            rightText="Contact Admin"
+                            onClick={() => toast.info("Contact admin to change your store banner.")}
+                            isLast={true}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            <div>
-                <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Delivery Configuration</h3>
-                <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
-                    <SettingRow 
-                        icon={<IconDelivery />} 
-                        title="Delivery Rules" 
-                        subtitle={`Max ${shop.deliverySettings?.maxRange || 5}km • Min ₹${shop.deliverySettings?.minOrderAmount || 0}`} 
-                        onClick={() => setIsDeliveryModalOpen(true)} 
-                        isLast={true} 
-                    />
+                <div>
+                    <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Delivery Configuration</h3>
+                    <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                        <SettingRow
+                            icon={<IconDelivery />}
+                            title="Delivery Rules"
+                            subtitle={`Max ${shop.deliverySettings?.maxRange || 5}km • Min ₹${shop.deliverySettings?.minOrderAmount || 0}`}
+                            onClick={() => setIsDeliveryModalOpen(true)}
+                            isLast={true}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            <div>
-                <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">App Settings</h3>
-                <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
-                    <SettingRow 
-                        icon={<IconBell />} 
-                        title="Notifications" 
-                        subtitle="New order alerts" 
-                        badge={Notification.permission === 'granted' ? 'Enabled' : 'Off'} 
-                        onClick={handleEnableNotifications} 
-                        isLast={true} 
-                    />
+                <div>
+                    <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">App Settings</h3>
+                    <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                        <SettingRow
+                            icon={<IconBell />}
+                            title="Notifications"
+                            subtitle="New order alerts"
+                            badge={Notification.permission === 'granted' ? 'Enabled' : 'Off'}
+                            onClick={handleEnableNotifications}
+                            isLast={true}
+                        />
+                    </div>
                 </div>
             </div>
 
             {/* ─── FLOATING BOTTOM SHEET: STORE PROFILE ─── */}
             {isProfileModalOpen && (
                 <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl animate-in slide-in-from-bottom-full duration-300 ease-out">
+                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl animate-in slide-in-from-bottom-full duration-300 ease-out" onClick={e => e.stopPropagation()}>
                         <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
                         <div className="flex items-center justify-between mb-8">
                             <h3 className="text-xl font-black text-slate-900 tracking-tight">Store Profile</h3>
@@ -201,14 +222,14 @@ const VendorSettings = () => {
             {/* ─── FLOATING BOTTOM SHEET: DELIVERY RULES ─── */}
             {isDeliveryModalOpen && (
                 <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-full duration-300 ease-out">
+                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-full duration-300 ease-out" onClick={e => e.stopPropagation()}>
                         <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 shrink-0"></div>
                         <div className="flex items-center justify-between mb-8 shrink-0">
                             <h3 className="text-xl font-black text-slate-900 tracking-tight">Delivery Rules</h3>
                             <button onClick={() => setIsDeliveryModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:scale-95 transition-transform">✕</button>
                         </div>
                         <form onSubmit={(e) => handleSave(e, 'delivery')} className="space-y-5">
-                            
+
                             <div className="relative">
                                 <input type="number" required value={minOrder} onChange={(e) => setMinOrder(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Min Order" />
                                 <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Minimum Order Amount (₹)</label>

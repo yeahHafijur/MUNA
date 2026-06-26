@@ -10,8 +10,158 @@ const VendorMenu = () => {
     const [selectedCat, setSelectedCat] = useState(null);
     const [search, setSearch] = useState('');
 
-    // ... (Keep all your existing state handlers for modals and API calls exactly as they are) ...
+    // Category modals
+    const [catModal, setCatModal] = useState(null); // null | 'add' | category obj (edit)
+    const [catName, setCatName] = useState('');
+    const [catImage, setCatImage] = useState(null);
+    const [catSaving, setCatSaving] = useState(false);
 
+    // Product modals
+    const [prodModal, setProdModal] = useState(null); // null | 'add' | product obj (edit)
+    const [prodName, setProdName] = useState('');
+    const [prodPrice, setProdPrice] = useState('');
+    const [prodCatId, setProdCatId] = useState('');
+    const [prodImage, setProdImage] = useState(null);
+    const [prodImagePreview, setProdImagePreview] = useState('');
+    const [prodSaving, setProdSaving] = useState(false);
+
+    const fetchCategories = useCallback(() => {
+        if (!shop?._id) return;
+        fetch(`/api/categories/${shop._id}`).then(r => r.json()).then(data => {
+            if (Array.isArray(data)) setCategories(data);
+        });
+    }, [shop]);
+
+    const fetchProducts = useCallback(() => {
+        if (!shop?._id) return;
+        fetch(`/api/products/${shop._id}`).then(r => r.json()).then(data => {
+            if (Array.isArray(data)) setProducts(data);
+        });
+    }, [shop]);
+
+    useEffect(() => { fetchCategories(); fetchProducts(); }, [fetchCategories, fetchProducts]);
+
+    // ── Category handlers ──
+    const openAddCat = () => { setCatModal('add'); setCatName(''); setCatImage(null); };
+    const openEditCat = (cat) => { setCatModal(cat); setCatName(cat.name); setCatImage(null); };
+
+    const saveCat = async () => {
+        setCatSaving(true);
+        const isEdit = catModal && catModal._id;
+        const fd = new FormData();
+        fd.append('name', catName);
+        if (catImage) fd.append('image', catImage);
+
+        try {
+            const res = await fetch(isEdit ? `/api/categories/${catModal._id}` : '/api/categories', {
+                method: isEdit ? 'PUT' : 'POST',
+                headers: { Authorization: `Bearer ${token}` },
+                body: fd,
+            });
+            if (res.ok) {
+                fetchCategories();
+                setCatModal(null);
+            } else {
+                const d = await res.json();
+                alert(d.message || 'Failed');
+            }
+        } catch { alert('Error saving category'); }
+        setCatSaving(false);
+    };
+
+    const deleteCat = async (cat) => {
+        if (!window.confirm(`Delete category "${cat.name}"?`)) return;
+        const res = await fetch(`/api/categories/${cat._id}`, {
+            method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) { fetchCategories(); if (selectedCat === cat._id) setSelectedCat(null); }
+        else { const d = await res.json(); alert(d.message || 'Failed'); }
+    };
+
+    // ── Product handlers ──
+    const openAddProd = () => {
+        setProdModal('add'); setProdName(''); setProdPrice(''); setProdImage(null); setProdImagePreview('');
+        setProdCatId(categories.length > 0 ? categories[0]._id : '');
+    };
+    const openEditProd = (p) => {
+        setProdModal(p); setProdName(p.name); setProdPrice(p.price);
+        setProdCatId(typeof p.category === 'object' ? p.category._id || p.category : p.category);
+        setProdImage(null); setProdImagePreview('');
+    };
+
+    const handleProdImage = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setProdImage(file);
+        setProdImagePreview(URL.createObjectURL(file));
+    };
+
+    const saveProd = async (e) => {
+        e.preventDefault();
+        setProdSaving(true);
+        const isEdit = prodModal && prodModal._id;
+        const fd = new FormData();
+        fd.append('name', prodName);
+        fd.append('price', Number(prodPrice));
+        fd.append('categoryId', prodCatId);
+        if (prodImage) fd.append('image', prodImage);
+
+        try {
+            const res = await fetch(isEdit ? `/api/products/${prodModal._id}` : '/api/products', {
+                method: isEdit ? 'PUT' : 'POST',
+                headers: { Authorization: `Bearer ${token}` },
+                body: fd,
+            });
+            if (res.ok) {
+                fetchProducts();
+                setProdModal(null);
+            } else {
+                const d = await res.json();
+                alert(d.message || 'Failed');
+            }
+        } catch { alert('Error saving product'); }
+        setProdSaving(false);
+    };
+
+    const toggleStock = async (p) => {
+        await fetch(`/api/products/${p._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ inStock: !p.inStock }),
+        });
+        fetchProducts();
+    };
+
+    const deleteProd = async (p) => {
+        if (!window.confirm(`Delete "${p.name}"?`)) return;
+        await fetch(`/api/products/${p._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        fetchProducts();
+    };
+
+    // ── Helpers ──
+    const getCatName = (catId) => {
+        if (!catId) return 'Uncategorized';
+        if (typeof catId === 'string') {
+            const cat = categories.find(c => c._id === catId);
+            return cat ? cat.name : catId; // Fallback to string for legacy
+        }
+        return catId.name || 'Uncategorized';
+    };
+
+    const getProductCatId = (p) => typeof p.category === 'object' ? (p.category?._id || p.category) : p.category;
+
+    const filteredProducts = products
+        .filter(p => {
+            if (selectedCat && getProductCatId(p) !== selectedCat) return false;
+            if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
+            return true;
+        })
+        .sort((a, b) => {
+            if (a.inStock === b.inStock) return 0;
+            return a.inStock ? 1 : -1; // OOS first
+        });
+
+    const getCatCount = (catId) => products.filter(p => getProductCatId(p) === catId).length;
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header */}

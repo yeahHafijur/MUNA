@@ -69,7 +69,6 @@ const Profile = () => {
     const [expandedOrderId, setExpandedOrderId] = useState(null);
     const navigate = useNavigate();
 
-    // Edit Profile State
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [editName, setEditName] = useState('');
     const [editPhone, setEditPhone] = useState('');
@@ -218,7 +217,6 @@ const Profile = () => {
 
             <div className="flex-1 overflow-y-auto pb-24">
 
-                {/* ════════ USER CARD ════════ */}
                 <div className="px-4 pt-2 pb-4">
                     <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
                         <div className="relative flex-shrink-0">
@@ -237,7 +235,6 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* ════════ STATS ROW ════════ */}
                 <div className="px-4 pb-5 flex gap-3">
                     <div className="flex-1 bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 flex flex-col items-center justify-center">
                         <span className="text-xl font-black text-gray-900 leading-none mb-1">{activeOrders.length}</span>
@@ -253,7 +250,6 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* ════════ SEGMENTED TABS ════════ */}
                 <div className="px-4 mb-4">
                     <div className="flex bg-gray-200/60 p-1 rounded-xl">
                         <button
@@ -275,7 +271,6 @@ const Profile = () => {
                 {/* ─── ACCOUNT TAB ─── */}
                 {activeTab === 'account' && (
                     <div className="px-4 space-y-5 animate-in fade-in duration-300">
-
                         <div>
                             <h3 className="px-3 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-2">General</h3>
                             <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
@@ -349,6 +344,16 @@ const Profile = () => {
 
                                     {expandedOrderId === order._id && (
                                         <div className="px-4 pb-4 border-t border-gray-50 border-dashed animate-in slide-in-from-top-2 duration-200">
+
+                                            {/* 🚀 NEW: DISPLAY OTP TO CUSTOMER */}
+                                            {order.status === 'out_for_delivery' && (
+                                                <div className="bg-amber-100/50 border-2 border-amber-400 rounded-xl p-4 mt-1 mb-4 text-center shadow-inner">
+                                                    <span className="block text-[10px] font-black uppercase text-amber-800 tracking-widest mb-1.5">Your Delivery PIN</span>
+                                                    <span className="block text-4xl font-black text-amber-600 tracking-[0.25em]">{order.deliveryOtp || '----'}</span>
+                                                    <span className="block text-[10px] font-bold text-amber-700/80 mt-2 leading-tight">Share this PIN with the delivery partner to receive your order.</span>
+                                                </div>
+                                            )}
+
                                             <div className="py-3 space-y-2">
                                                 {order.items.map((item, idx) => (
                                                     <div key={idx} className="flex justify-between text-[13px] font-medium text-gray-600">
@@ -455,4 +460,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

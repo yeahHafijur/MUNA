@@ -60,10 +60,12 @@ const orderSchema = new mongoose.Schema({
     instructions: {
         type: String,
         default: ''
+    },
+    //  Delivery Security PIN (OTP)
+    deliveryOtp: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
-
-orderSchema.index({ customerId: 1, createdAt: -1 });
-orderSchema.index({ shopId: 1, status: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Order', orderSchema);

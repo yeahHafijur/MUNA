@@ -8,68 +8,65 @@ const Notification = require('../models/Notification');
 const adminApp = require('../firebaseAdmin');
 const { getMessaging } = require('firebase-admin/messaging');
 
-// Function to send Firebase Cloud Messaging push notification
-const sendFCMNotification = async (userIds, heading, message) => {
-    // If the firebase admin app isn't initialized yet (e.g. credentials missing), skip.
-    if (!adminApp) {
-        console.log("[FCM] ❌ SKIPPED: Firebase Admin not initialized (missing credentials).");
-        return;
-    }
-
-    if (!userIds || userIds.length === 0 || !userIds[0]) {
-        console.log("[FCM] ❌ SKIPPED: No valid User IDs provided!");
-        return;
-    }
+// Function to send Firebase Cloud Messaging push notification (Premium with Cleanup)
+const sendFCMNotification = async (userIds, heading, message, route = "/") => {
+    if (!adminApp) return console.log("[FCM] ❌ SKIPPED: Firebase Admin not initialized.");
+    if (!userIds || userIds.length === 0) return console.log("[FCM] ❌ SKIPPED: No valid User IDs!");
 
     try {
-        // Fetch users from DB to get their FCM tokens
         const users = await User.find({ _id: { $in: userIds } });
         let tokens = [];
-        
+
         users.forEach(user => {
             if (user.fcmTokens && user.fcmTokens.length > 0) {
                 tokens = tokens.concat(user.fcmTokens);
             }
         });
 
-        // Deduplicate tokens just in case
-        tokens = [...new Set(tokens)];
+        tokens = [...new Set(tokens)]; // Remove duplicates
+        if (tokens.length === 0) return console.log(`[FCM] ❌ No FCM tokens found for users: ${userIds}`);
 
-        if (tokens.length === 0) {
-            console.log("[FCM] ❌ SKIPPED: No FCM tokens found for the given users.");
-            return;
-        }
-
-        const payload = {
-            notification: {
-                title: heading,
-                body: message
-            },
-            tokens: tokens
+        const messagePayload = {
+            notification: { title: heading, body: message },
+            data: { route: route }, // Frontend ko click karne par kis page par bhejna hai
+            tokens: tokens,
         };
 
-        const response = await getMessaging(adminApp).sendEachForMulticast(payload);
-        console.log(`[FCM] ✅ Notifications Delivered: ${response.successCount}, Failed: ${response.failureCount}`);
-        
+        const response = await getMessaging(adminApp).sendEachForMulticast(messagePayload);
+        console.log(`[FCM] ✅ Push sent! Success: ${response.successCount}, Failed: ${response.failureCount}`);
+
+        // 🧹 GHOST TOKEN CLEANUP LOGIC (Premium Architecture)
         if (response.failureCount > 0) {
             const failedTokens = [];
             response.responses.forEach((resp, idx) => {
                 if (!resp.success) {
-                    failedTokens.push(tokens[idx]);
+                    const errCode = resp.error?.code;
+                    // Agar token expire ho gaya hai ya invalid hai, list mein daalo
+                    if (errCode === 'messaging/invalid-registration-token' ||
+                        errCode === 'messaging/registration-token-not-registered') {
+                        failedTokens.push(tokens[idx]);
+                    }
                 }
             });
-            console.error("[FCM] ❌ Failed tokens:", failedTokens);
-            // Optionally, remove failed tokens from DB here to keep it clean
+
+            if (failedTokens.length > 0) {
+                // Database se dead tokens hamesha ke liye remove kar do
+                await User.updateMany(
+                    { _id: { $in: userIds } },
+                    { $pull: { fcmTokens: { $in: failedTokens } } }
+                );
+                console.log(`[FCM] 🧹 Cleaned up ${failedTokens.length} dead tokens from DB.`);
+            }
         }
     } catch (error) {
-        console.error("[FCM] ❌ Firebase Error:", error);
+        console.error("[FCM] ❌ Error sending push:", error);
     }
 };
 
 // Helper to send push and save to DB
 const sendAndSaveNotification = async (userIds, heading, message, actionUrl = "") => {
     await sendFCMNotification(userIds, heading, message);
-    
+
     try {
         const notificationsToInsert = userIds.map(id => ({
             userId: id,
@@ -132,7 +129,7 @@ const placeOrder = async (req, res) => {
                 });
             }
 
-            // Rule 2: Kya ye product In Stock hai? (Aapne jo naya feature add kiya)
+            // Rule 2: Kya ye product In Stock hai? 
             if (product.inStock === false) {
                 return res.status(400).json({
                     message: `Sorry, ${product.name} is currently out of stock.`
@@ -148,8 +145,8 @@ const placeOrder = async (req, res) => {
 
         // Rule 4: Shop open hai ya closed?
         if (!shop.isOpen) {
-            return res.status(400).json({ 
-                message: "This shop is currently closed. You cannot place an order right now." 
+            return res.status(400).json({
+                message: "This shop is currently closed. You cannot place an order right now."
             });
         }
 
@@ -163,11 +160,10 @@ const placeOrder = async (req, res) => {
         const distance = getDistanceFromLatLonInKm(shopLat, shopLng, custLat, custLng);
 
         if (distance > 100) {
-            return res.status(400).json({ 
-                message: `Sorry, this shop is ${distance.toFixed(1)} KM away. We only deliver within 100 KM.` 
+            return res.status(400).json({
+                message: `Sorry, this shop is ${distance.toFixed(1)} KM away. We only deliver within 100 KM.`
             });
         }
-        // ---------------------------------------------------------
 
         // Recalculate delivery fee securely on backend
         const settings = shop.deliverySettings || { minOrderAmount: 0, minimumCharge: 10, minimumDistance: 1, chargePerKm: 5 };
@@ -204,6 +200,9 @@ const placeOrder = async (req, res) => {
         // Final total amount
         const finalTotalAmount = itemsTotal + fee;
 
+        // 🚀 NEW LOGIC: GENERATE 4-DIGIT DELIVERY OTP
+        const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
         // Sab theek hai, toh ab Order banate hain!
         const order = await Order.create({
             customerId: req.user._id,
@@ -212,7 +211,8 @@ const placeOrder = async (req, res) => {
             totalAmount: finalTotalAmount,
             deliveryFee: fee,
             deliveryLocation,
-            instructions: instructions || ''
+            instructions: instructions || '',
+            deliveryOtp: generatedOtp
         });
 
         // 🔔 PUSH NOTIFICATION ALERT TO VENDOR
@@ -220,8 +220,8 @@ const placeOrder = async (req, res) => {
             const vendor = await User.findById(shop.vendorId);
             if (vendor) {
                 await sendAndSaveNotification(
-                    [vendor._id], 
-                    "📦 New Order Received!", 
+                    [vendor._id],
+                    "📦 New Order Received!",
                     `Amount: ₹${finalTotalAmount} (${items.length} items). Please review and accept.`,
                     "/vendor-dashboard"
                 );
@@ -247,8 +247,7 @@ const placeOrder = async (req, res) => {
     }
 };
 
-// 2. Get Customer's Orders (Customer apni Order History dekhega)
-// Naya controller: Customer apni "pending" order ko cancel kar sake
+// 2. Cancel Order
 const cancelOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
@@ -277,18 +276,19 @@ const cancelOrder = async (req, res) => {
     }
 };
 
+// 3. Get Customer's Orders
 const getCustomerOrders = async (req, res) => {
     try {
         const orders = await Order.find({ customerId: req.user._id })
-            .populate('shopId', 'name address image') // Shop ka naam aur address
-            .sort('-createdAt'); // Naye orders upar dikhein
+            .populate('shopId', 'name address image')
+            .sort('-createdAt');
         res.status(200).json(orders);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
 };
 
-// 3. Get Vendor's Orders (with pagination, search, filters)
+// 4. Get Vendor's Orders (with pagination, search, filters)
 const getVendorOrders = async (req, res) => {
     try {
         const shop = await Shop.findOne({ vendorId: req.user._id });
@@ -316,24 +316,15 @@ const getVendorOrders = async (req, res) => {
             .populate('customerId', 'name email phone')
             .sort('-createdAt');
 
-        // Search by order ID suffix or customer name
-        if (search) {
-            const searchRegex = new RegExp(search, 'i');
-            // We need to first populate, then filter — or use aggregation
-            // For simplicity: fetch with populate, then filter in memory for small datasets
-            // For production scale, use aggregation pipeline
-        }
-
         const total = await Order.countDocuments(filter);
         const skip = (Number(page) - 1) * Number(limit);
-        
+
         const orders = await query.skip(skip).limit(Number(limit));
 
-        // If search is provided, do client-side filtering on populated fields
         let filteredOrders = orders;
         if (search) {
             const searchLower = search.toLowerCase();
-            filteredOrders = orders.filter(o => 
+            filteredOrders = orders.filter(o =>
                 o._id.toString().toLowerCase().includes(searchLower) ||
                 (o.customerId?.name || '').toLowerCase().includes(searchLower) ||
                 (o.customerId?.phone || '').includes(search)
@@ -354,10 +345,9 @@ const getVendorOrders = async (req, res) => {
     }
 };
 
-// 4. Update Order Status (Vendor order accept/deliver karega)
 const updateOrderStatus = async (req, res) => {
     try {
-        const { status } = req.body;
+        const { status, deliveryOtp } = req.body;
 
         // Validate status value
         const validStatuses = ['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'];
@@ -380,6 +370,16 @@ const updateOrderStatus = async (req, res) => {
             return res.status(403).json({ message: "You cannot update orders of another shop" });
         }
 
+        // 🚀 NEW LOGIC: VERIFY OTP IF VENDOR MARKS AS DELIVERED
+        if (status === 'delivered') {
+            if (!deliveryOtp) {
+                return res.status(400).json({ message: "Delivery PIN is required to complete this order." });
+            }
+            if (order.deliveryOtp !== deliveryOtp.toString()) {
+                return res.status(400).json({ message: "Incorrect PIN! Please ask the customer for the correct 4-digit PIN." });
+            }
+        }
+
         order.status = status;
         const updatedOrder = await order.save();
 
@@ -390,13 +390,13 @@ const updateOrderStatus = async (req, res) => {
                 let statusMessage = "Your order status has been updated.";
                 if (status === 'accepted') statusMessage = "Your order has been accepted by the store!";
                 else if (status === 'preparing') statusMessage = "Your order is being prepared!";
-                else if (status === 'out_for_delivery') statusMessage = "Your order is out for delivery!";
+                else if (status === 'out_for_delivery') statusMessage = "Your order is out for delivery! Please keep your Delivery PIN ready.";
                 else if (status === 'delivered') statusMessage = "Your order has been delivered. Thank you!";
                 else if (status === 'cancelled') statusMessage = "Your order was cancelled.";
 
                 await sendAndSaveNotification(
-                    [customer._id], 
-                    "Order Update 📦", 
+                    [customer._id],
+                    "Order Update 📦",
                     statusMessage,
                     "/profile"
                 );

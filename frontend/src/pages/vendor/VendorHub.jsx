@@ -13,7 +13,7 @@ const IcoBell = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} strok
 const IcoChevron = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-300"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>;
 const IcoGodown = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>;
 const IcoUser = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>;
-const IcoHome = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>;
+const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
 
 const NavigationRow = ({ icon, title, subtitle, onClick, badge, isLast }) => (
     <div
@@ -180,14 +180,20 @@ const VendorHub = () => {
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans pb-10">
 
             {/* ─── NATIVE HEADER ─── */}
-            <div className="bg-white px-5 pt-6 pb-4 flex items-center justify-between shadow-sm sticky top-0 z-50">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-2xl shadow-inner overflow-hidden">
+            <div className="bg-white px-4 pt-6 pb-4 flex items-center justify-between shadow-sm sticky top-0 z-50">
+                <div className="flex items-center gap-2.5">
+                    <button
+                        onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/'); }}
+                        className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform shrink-0"
+                    >
+                        <IconBack />
+                    </button>
+                    <div className="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xl shadow-inner overflow-hidden shrink-0">
                         {shop.image ? <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" /> : '🏪'}
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[17px] font-black text-slate-900 tracking-tight leading-none mb-1">{shop.name}</span>
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Merchant Hub</span>
+                        <span className="text-[16px] font-black text-slate-900 tracking-tight leading-none mb-1">{shop.name}</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Merchant Hub</span>
                     </div>
                 </div>
 
@@ -253,12 +259,6 @@ const VendorHub = () => {
 
                 {/* ─── ACCOUNT ACTIONS ─── */}
                 <div className="bg-white rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
-                    <NavigationRow
-                        icon={<IcoHome />}
-                        title="App Homepage"
-                        subtitle="Go to customer view"
-                        onClick={() => navigate('/')}
-                    />
                     <NavigationRow
                         icon={<IcoUser />}
                         title="My Profile"

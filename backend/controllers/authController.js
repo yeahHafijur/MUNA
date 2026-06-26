@@ -291,6 +291,28 @@ const updateProfile = async (req, res) => {
     }
 };
 
+// Delete User Account
+const deleteAccount = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // If user is a vendor or admin, block deletion for safety (require manual intervention)
+        if (user.role === 'super_admin') {
+            return res.status(403).json({ message: "Super admin cannot be deleted" });
+        }
+        if (user.role === 'vendor') {
+            return res.status(403).json({ message: "Vendors must contact support to delete their account and shop." });
+        }
+
+        await user.deleteOne();
+        res.status(200).json({ message: "Account deleted successfully" });
+    } catch (error) {
+        console.error("[DeleteAccount] Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 module.exports = {
     sendOTP,
     verifyOTP,

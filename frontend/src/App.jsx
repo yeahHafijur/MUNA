@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import BottomNav from './components/BottomNav';
 import SplashScreen from './components/SplashScreen';
 import ScrollToTop from './components/ScrollToTop';
@@ -40,14 +41,24 @@ const AppContent = () => {
     setShowSplash(false);
   };
 
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     onMessageListener()
       .then((payload) => {
         console.log('[App.jsx] Received foreground message ', payload);
         toast.info(`${payload.notification.title}: ${payload.notification.body}`);
+        
+        // Zero-API real-time UI update for notifications
+        queryClient.setQueryData(['unreadCount'], (old) => (old ? old + 1 : 1));
+
+        // If it's an order related notification, trigger a refetch of live orders just to be safe
+        if (payload.notification.title?.toLowerCase().includes('order')) {
+            queryClient.invalidateQueries(['liveOrderCount']);
+        }
       })
       .catch((err) => console.log('failed: ', err));
-  }, []);
+  }, [queryClient]);
 
   // Determine if we should show the global customer layout
   const isDashboardRoute = location.pathname.startsWith('/vendor') || location.pathname.startsWith('/admin');

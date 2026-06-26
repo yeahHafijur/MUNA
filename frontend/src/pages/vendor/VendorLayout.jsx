@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
+import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
+import { useLiveOrders } from '../../hooks/useLiveOrders';
 /* ─── Premium Crisp Icons ─── */
 const IcoHome = () => (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>);
 const IcoOrders = () => (<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>);
@@ -19,9 +20,10 @@ const VendorLayout = () => {
     const location = useLocation();
 
     const [shop, setShop] = useState(null);
-    const [unreadCount, setUnreadCount] = useState(0);
-    const [liveOrderCount, setLiveOrderCount] = useState(0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const { data: unreadCount = 0 } = useUnreadNotifications();
+    const { data: liveOrderCount = 0 } = useLiveOrders();
 
     useEffect(() => {
         if (!token || user?.role !== 'vendor') { navigate('/'); return; }
@@ -31,22 +33,6 @@ const VendorLayout = () => {
             .then(r => r.json())
             .then(data => { if (data._id) setShop(data); });
     }, [token, user, navigate]);
-
-    useEffect(() => {
-        if (!token || !shop) return;
-        const poll = () => {
-            fetch('/api/notifications/unread-count', { headers: { Authorization: `Bearer ${token}` } })
-                .then(r => r.json()).then(d => { if (d.count !== undefined) setUnreadCount(d.count); }).catch(() => { });
-            fetch('/api/orders/vendor?status=pending&limit=100', { headers: { Authorization: `Bearer ${token}` } })
-                .then(r => r.json()).then(d => {
-                    const orders = d.orders || d;
-                    if (Array.isArray(orders)) setLiveOrderCount(orders.filter(o => !['delivered', 'cancelled'].includes(o.status)).length);
-                }).catch(() => { });
-        };
-        poll();
-        const id = setInterval(poll, 15000);
-        return () => clearInterval(id);
-    }, [token, shop]);
 
     const handleToggleShopStatus = async () => {
         if (!shop) return;

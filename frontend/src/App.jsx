@@ -14,6 +14,8 @@ const ShopDetail = lazy(() => import('./pages/ShopDetail'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Login = lazy(() => import('./pages/Login'));
 const Profile = lazy(() => import('./pages/Profile'));
+const CustomerOrders = lazy(() => import('./pages/CustomerOrders'));
+const CustomerSettings = lazy(() => import('./pages/CustomerSettings'));
 const Search = lazy(() => import('./pages/Search'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -92,6 +94,8 @@ const AppContent = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/orders" element={<CustomerOrders />} />
+                <Route path="/profile/settings" element={<CustomerSettings />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />

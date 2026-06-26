@@ -44,20 +44,24 @@ const AppContent = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    onMessageListener()
-      .then((payload) => {
-        console.log('[App.jsx] Received foreground message ', payload);
-        toast.info(`${payload.notification.title}: ${payload.notification.body}`);
-        
-        // Zero-API real-time UI update for notifications
-        queryClient.setQueryData(['unreadCount'], (old) => (old ? old + 1 : 1));
+    // onMessageListener ab ek unsubscribe function return karta hai
+    const unsubscribe = onMessageListener((payload) => {
+      console.log('[App.jsx] Received foreground message ', payload);
+      toast.info(`${payload.notification?.title}: ${payload.notification?.body}`);
+      
+      // Zero-API real-time UI update for notifications
+      queryClient.setQueryData(['unreadCount'], (old) => (old ? old + 1 : 1));
 
-        // If it's an order related notification, trigger a refetch of live orders just to be safe
-        if (payload.notification.title?.toLowerCase().includes('order')) {
-            queryClient.invalidateQueries(['liveOrderCount']);
-        }
-      })
-      .catch((err) => console.log('failed: ', err));
+      // Automatic invalidation for order updates
+      if (payload.notification?.title?.toLowerCase().includes('order')) {
+          queryClient.invalidateQueries({ queryKey: ['liveOrderCount'] });
+      }
+    });
+
+    // Cleanup listener when App unmounts
+    return () => {
+      unsubscribe();
+    };
   }, [queryClient]);
 
   // Determine if we should show the global customer layout

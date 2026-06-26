@@ -313,6 +313,7 @@ const getVendorOrders = async (req, res) => {
         }
 
         let query = Order.find(filter)
+            .select('-deliveryOtp') // Security: Don't send OTP to vendor, otherwise they can cheat via DevTools!
             .populate('customerId', 'name email phone')
             .sort('-createdAt');
 

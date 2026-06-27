@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,11 @@ const IcoPin = ({ className = "w-6 h-6" }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+);
+const IcoBell = ({ className = "w-5 h-5" }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
     </svg>
 );
 
@@ -58,6 +63,24 @@ const Home = () => {
     /* Global unread count hook jo humne banaya tha */
     const { data: unreadCount = 0 } = useUnreadNotifications();
 
+    /* ── Godown items for carousel ── */
+    const { data: godownItems = [] } = useQuery({
+        queryKey: ['godown-carousel'],
+        queryFn: () => fetch('/api/master-products').then(r => r.json()),
+        select: (data) => (Array.isArray(data) ? data : []).filter(item => item.image),
+    });
+
+    const [carouselIdx, setCarouselIdx] = useState(0);
+    const nextSlide = useCallback(() => {
+        setCarouselIdx(prev => (godownItems.length > 0 ? (prev + 1) % godownItems.length : 0));
+    }, [godownItems.length]);
+
+    useEffect(() => {
+        if (godownItems.length <= 1) return;
+        const timer = setInterval(nextSlide, 3500);
+        return () => clearInterval(timer);
+    }, [godownItems.length, nextSlide]);
+
     /* ── Geolocation ── */
     const handleLocate = () => {
         if (!('geolocation' in navigator)) {
@@ -82,7 +105,6 @@ const Home = () => {
         return ['All', ...Array.from(cats).sort()];
     }, [shops]);
 
-    const openCount = shops.filter(s => s.isOpen).length;
 
     const sortedShops = useMemo(() => {
         let list = shops.map(shop => {
@@ -116,14 +138,6 @@ const Home = () => {
         });
     }, [shops, userLocation, searchQuery, activeCategory]);
 
-    /* ── Profile link target ── */
-    const profileLink = user
-        ? (user.role === 'super_admin' ? '/admin-dashboard' : user.role === 'vendor' ? '/vendor-dashboard' : '/profile')
-        : '/login';
-    const profileEmoji = user
-        ? (user.role === 'super_admin' ? '👑' : user.role === 'vendor' ? '🏪' : '👤')
-        : null;
-
     /* ═══════════════════════════════════════════════════════
        RENDER
     ═══════════════════════════════════════════════════════ */
@@ -145,16 +159,31 @@ const Home = () => {
                         </div>
                     </Link>
 
-                    {/* Profile Action - Glassmorphism */}
-                    <Link
-                        to={profileLink}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 text-[#1F1300]"
-                    >
-                        <span className="text-lg">{profileEmoji || '👤'}</span>
-                        <span className="text-[11px] font-bold max-w-[70px] truncate text-white drop-shadow-sm">
-                            {user ? user.name : 'Login'}
-                        </span>
-                    </Link>
+                    {/* Right Actions: Locate Me + Alert Bell */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleLocate}
+                            className="w-10 h-10 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 flex items-center justify-center text-white active:scale-95"
+                            title={userLocation ? 'Located ✓' : 'Locate Me'}
+                        >
+                            {userLocation ? (
+                                <span className="text-[14px]">✓</span>
+                            ) : (
+                                <IcoPin className="w-5 h-5" />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => navigate('/notifications')}
+                            className="relative w-10 h-10 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 flex items-center justify-center text-white active:scale-95"
+                        >
+                            <IcoBell className="w-5 h-5" />
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center shadow-lg shadow-red-500/40 animate-pulse">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -173,30 +202,61 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* Stats */}
-                    <div className="flex gap-3 px-5">
-                        <div className="flex-1 bg-white/95 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5">
-                            <div className="text-2xl font-black text-amber-600 leading-none mb-1">{shops.length}</div>
-                            <div className="text-[9px] font-bold text-amber-900/60 uppercase tracking-wider">Total Shops</div>
-                        </div>
-
-                        <div className="flex-1 bg-white/95 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5">
-                            <div className="text-2xl font-black text-green-600 leading-none mb-1">{openCount}</div>
-                            <div className="text-[9px] font-bold text-amber-900/60 uppercase tracking-wider">Open Now</div>
-                        </div>
-
-                        <button
-                            onClick={handleLocate}
-                            className="flex-1 bg-gradient-to-br from-[#FFF9EC] to-[#FFF4DA] rounded-2xl p-4 text-center shadow-lg shadow-black/10 border-b-2 border-amber-200 hover:scale-[0.98] transition-transform active:scale-95"
-                        >
-                            <div className="flex justify-center text-[#C8850A] mb-1">
-                                <IcoPin className="w-[22px] h-[22px]" />
+                    {/* ── Godown Items Carousel ── */}
+                    {godownItems.length > 0 && (
+                        <div className="px-5">
+                            <div className="relative w-full h-[160px] rounded-2xl overflow-hidden shadow-lg shadow-black/15">
+                                {godownItems.map((item, idx) => (
+                                    <div
+                                        key={item._id}
+                                        className="absolute inset-0 transition-all duration-700 ease-in-out"
+                                        style={{
+                                            opacity: idx === carouselIdx ? 1 : 0,
+                                            transform: idx === carouselIdx ? 'translateX(0) scale(1)' : 'translateX(40px) scale(0.97)',
+                                            pointerEvents: idx === carouselIdx ? 'auto' : 'none',
+                                        }}
+                                    >
+                                        <img
+                                            src={optimizeImage(item.image)}
+                                            alt={item.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        {/* Dark gradient overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                        {/* Item info */}
+                                        <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
+                                            <div>
+                                                <div className="text-[15px] font-black text-white leading-tight drop-shadow-md">{item.name}</div>
+                                                {item.category && (
+                                                    <div className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-0.5">{item.category}</div>
+                                                )}
+                                            </div>
+                                            {item.price > 0 && (
+                                                <div className="px-3 py-1.5 rounded-xl bg-white/20 backdrop-blur-md border border-white/30">
+                                                    <span className="text-[14px] font-black text-white">₹{item.price}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                                {/* Dots indicator */}
+                                {godownItems.length > 1 && (
+                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                                        {godownItems.map((_, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setCarouselIdx(idx)}
+                                                className={`rounded-full transition-all duration-300 ${idx === carouselIdx
+                                                    ? 'w-5 h-1.5 bg-white shadow-md'
+                                                    : 'w-1.5 h-1.5 bg-white/40'
+                                                }`}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                            <div className="text-[9px] font-bold text-[#8C7A55] uppercase tracking-wider">
-                                {userLocation ? '✓ Located' : 'Locate'}
-                            </div>
-                        </button>
-                    </div>
+                        </div>
+                    )}
                     {locationError && <p className="text-center text-[11px] font-bold text-red-700 bg-red-100/80 rounded-lg mx-5 mt-3 py-1.5 backdrop-blur-sm">{locationError}</p>}
                 </div>
 

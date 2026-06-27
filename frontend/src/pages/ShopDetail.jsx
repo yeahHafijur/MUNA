@@ -299,7 +299,7 @@ const ShopDetail = () => {
                                         onClick={() => setSelectedCategory('All')}
                                     >
                                         <span className="sd-cat-emoji">🍔</span>
-                                        <div>
+                                        <div className="sd-cat-content">
                                             <div className="sd-cat-name">All Items</div>
                                             <div className="sd-cat-count">{products.length} items</div>
                                         </div>
@@ -314,15 +314,18 @@ const ShopDetail = () => {
                                         return (
                                             <div
                                                 key={cat}
-                                                className="sd-cat-card"
+                                                className={`sd-cat-card ${customImg ? 'sd-cat-card--has-img' : ''}`}
                                                 onClick={() => setSelectedCategory(cat)}
                                             >
                                                 {customImg ? (
-                                                    <img src={optimizeImage(customImg)} alt={cat} className="sd-cat-emoji" style={{ width: '40px', height: '40px', padding: 0, objectFit: 'cover' }} />
+                                                    <>
+                                                        <img src={optimizeImage(customImg)} alt={cat} className="sd-cat-bg-img" />
+                                                        <div className="sd-cat-overlay"></div>
+                                                    </>
                                                 ) : (
                                                     <span className="sd-cat-emoji" style={{ fontSize: '28px' }}>🏷</span>
                                                 )}
-                                                <div>
+                                                <div className="sd-cat-content">
                                                     <div className="sd-cat-name">{cat}</div>
                                                     <div className="sd-cat-count">{count} items</div>
                                                 </div>

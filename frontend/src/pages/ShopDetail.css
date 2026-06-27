@@ -434,6 +434,51 @@
     color: rgba(26,14,0,0.6);
 }
 
+.sd-cat-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+.sd-cat-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 85%;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+    z-index: 1;
+}
+.sd-cat-content {
+    position: relative;
+    z-index: 2;
+}
+.sd-cat-card--has-img {
+    padding: 0 !important;
+    border: none !important;
+}
+.sd-cat-card--has-img::after {
+    display: none;
+}
+.sd-cat-card--has-img .sd-cat-content {
+    padding: 14px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.sd-cat-card--has-img .sd-cat-name {
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+.sd-cat-card--has-img .sd-cat-count {
+    color: rgba(255,255,255,0.85);
+}
+
+
 /* ---- SECTION HEADING ---- */
 .sd-sec-head {
     display: flex;

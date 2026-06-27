@@ -63,10 +63,10 @@ const Home = () => {
     /* Global unread count hook jo humne banaya tha */
     const { data: unreadCount = 0 } = useUnreadNotifications();
 
-    /* ── Godown items for carousel ── */
+    /* ── Featured godown items for carousel (selected by super admin) ── */
     const { data: godownItems = [] } = useQuery({
-        queryKey: ['godown-carousel'],
-        queryFn: () => fetch('/api/master-products').then(r => r.json()),
+        queryKey: ['featured-carousel'],
+        queryFn: () => fetch('/api/settings/featured-items').then(r => r.json()),
         select: (data) => (Array.isArray(data) ? data : []).filter(item => item.image),
     });
 

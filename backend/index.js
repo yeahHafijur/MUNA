@@ -30,6 +30,8 @@ const allowedOrigins = [
     'http://127.0.0.1:5173',
     'https://munastore.in',
     'https://www.munastore.in',
+    'https://munahut.in',
+    'https://www.munahut.in',
     process.env.FRONTEND_URL   // Set this in .env for production
 ].filter(Boolean);
 

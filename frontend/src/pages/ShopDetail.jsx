@@ -73,7 +73,7 @@ const ShopDetail = () => {
             if (!p.category) return 'General';
             return typeof p.category === 'object' ? (p.category.name || 'General') : p.category;
         }));
-        
+
         // Merge API categories with any legacy ones found in products
         categoriesList.forEach(c => prodCatNames.add(c.name));
         return Array.from(prodCatNames).sort();
@@ -90,7 +90,7 @@ const ShopDetail = () => {
             // Category filter
             const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
             if (selectedCategory && selectedCategory !== 'All' && pCatName !== selectedCategory) return false;
-            
+
             // Search filter
             if (searchQuery) {
                 const query = searchQuery.toLowerCase();
@@ -98,7 +98,7 @@ const ShopDetail = () => {
                 const catMatch = pCatName.toLowerCase().includes(query);
                 if (!nameMatch && !catMatch) return false;
             }
-            
+
             return true;
         }).sort((a, b) => {
             if (a.inStock === b.inStock) return 0;
@@ -124,9 +124,9 @@ const ShopDetail = () => {
         flyEl.style.left = `${rect.left + rect.width / 2}px`;
         flyEl.style.top = `${rect.top}px`;
         document.body.appendChild(flyEl);
-        
+
         setTimeout(() => flyEl.remove(), 800);
-        
+
         // Vibrate on supported devices
         if (navigator.vibrate) {
             navigator.vibrate(50);
@@ -168,11 +168,11 @@ const ShopDetail = () => {
                         <div className="sd-skel-hero" />
                         <div className="sd-skel">
                             <div className="sd-skel-row">
-                                {[1,2,3,4].map(i => <div key={i} className="sd-skel-chip" />)}
+                                {[1, 2, 3, 4].map(i => <div key={i} className="sd-skel-chip" />)}
                             </div>
                         </div>
                         <div className="sd-skel-grid">
-                            {[1,2,3,4].map(i => (
+                            {[1, 2, 3, 4].map(i => (
                                 <div key={i} className="sd-skel-card">
                                     <div className="sd-skel-card-img" />
                                     <div className="sd-skel-card-body">
@@ -444,13 +444,13 @@ const ShopDetail = () => {
                             Your cart contains dishes from another shop. Do you want to discard the selection and add dishes from <span className="text-amber-600 font-bold">{shop?.name || 'this shop'}</span>?
                         </p>
                         <div className="flex gap-3">
-                            <button 
+                            <button
                                 onClick={() => setReplacePrompt(null)}
                                 className="flex-1 py-3.5 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
                             >
                                 No, thanks
                             </button>
-                            <button 
+                            <button
                                 onClick={() => {
                                     overrideAndReplaceCart(replacePrompt, id);
                                     setReplacePrompt(null);
@@ -467,5 +467,4 @@ const ShopDetail = () => {
         </div>
     );
 };
-
 export default ShopDetail;

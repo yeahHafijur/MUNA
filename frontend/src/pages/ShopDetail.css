@@ -117,6 +117,7 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: rgba(200,170,100,0.2) transparent;
+    padding-bottom: 120px;
 }
 .sd-body::-webkit-scrollbar { width: 3px; }
 .sd-body::-webkit-scrollbar-thumb { background: rgba(200,170,100,0.2); border-radius: 4px; }

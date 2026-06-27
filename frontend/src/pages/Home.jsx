@@ -70,8 +70,6 @@ const Home = () => {
         select: (data) => (Array.isArray(data) ? data : []).filter(item => item.image),
     });
 
-    console.log("HOMEPAGE CAROUSEL ITEMS:", godownItems);
-
     // Group items into pairs of 2
     const carouselPairs = useMemo(() => {
         const pairs = [];

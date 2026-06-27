@@ -70,16 +70,25 @@ const Home = () => {
         select: (data) => (Array.isArray(data) ? data : []).filter(item => item.image),
     });
 
+    // Group items into pairs of 2
+    const carouselPairs = useMemo(() => {
+        const pairs = [];
+        for (let i = 0; i < godownItems.length; i += 2) {
+            pairs.push(godownItems.slice(i, i + 2));
+        }
+        return pairs;
+    }, [godownItems]);
+
     const [carouselIdx, setCarouselIdx] = useState(0);
     const nextSlide = useCallback(() => {
-        setCarouselIdx(prev => (godownItems.length > 0 ? (prev + 1) % godownItems.length : 0));
-    }, [godownItems.length]);
+        setCarouselIdx(prev => (carouselPairs.length > 0 ? (prev + 1) % carouselPairs.length : 0));
+    }, [carouselPairs.length]);
 
     useEffect(() => {
-        if (godownItems.length <= 1) return;
+        if (carouselPairs.length <= 1) return;
         const timer = setInterval(nextSlide, 3500);
         return () => clearInterval(timer);
-    }, [godownItems.length, nextSlide]);
+    }, [carouselPairs.length, nextSlide]);
 
     /* ── Geolocation ── */
     const handleLocate = () => {
@@ -202,59 +211,59 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* ── Godown Items Carousel ── */}
-                    {godownItems.length > 0 && (
+                    {/* ── Godown Items Carousel (2 boxes side by side) ── */}
+                    {carouselPairs.length > 0 && (
                         <div className="px-5">
-                            <div className="relative w-full h-[160px] rounded-2xl overflow-hidden shadow-lg shadow-black/15">
-                                {godownItems.map((item, idx) => (
+                            <div className="relative h-[140px] overflow-hidden">
+                                {carouselPairs.map((pair, pairIdx) => (
                                     <div
-                                        key={item._id}
-                                        className="absolute inset-0 transition-all duration-700 ease-in-out"
+                                        key={pairIdx}
+                                        className="absolute inset-0 flex gap-3 transition-all duration-700 ease-in-out"
                                         style={{
-                                            opacity: idx === carouselIdx ? 1 : 0,
-                                            transform: idx === carouselIdx ? 'translateX(0) scale(1)' : 'translateX(40px) scale(0.97)',
-                                            pointerEvents: idx === carouselIdx ? 'auto' : 'none',
+                                            opacity: pairIdx === carouselIdx ? 1 : 0,
+                                            transform: pairIdx === carouselIdx ? 'translateY(0)' : 'translateY(20px)',
+                                            pointerEvents: pairIdx === carouselIdx ? 'auto' : 'none',
                                         }}
                                     >
-                                        <img
-                                            src={optimizeImage(item.image)}
-                                            alt={item.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                        {/* Dark gradient overlay */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                        {/* Item info */}
-                                        <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
-                                            <div>
-                                                <div className="text-[15px] font-black text-white leading-tight drop-shadow-md">{item.name}</div>
-                                                {item.category && (
-                                                    <div className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-0.5">{item.category}</div>
-                                                )}
-                                            </div>
-                                            {item.price > 0 && (
-                                                <div className="px-3 py-1.5 rounded-xl bg-white/20 backdrop-blur-md border border-white/30">
-                                                    <span className="text-[14px] font-black text-white">₹{item.price}</span>
+                                        {pair.map(item => (
+                                            <div key={item._id} className="flex-1 rounded-2xl overflow-hidden shadow-lg shadow-black/10 relative">
+                                                <img
+                                                    src={optimizeImage(item.image)}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                                                <div className="absolute bottom-0 left-0 right-0 p-3">
+                                                    <div className="text-[13px] font-black text-white leading-tight drop-shadow-md truncate">{item.name}</div>
+                                                    {item.price > 0 && (
+                                                        <div className="text-[12px] font-extrabold text-amber-300 mt-0.5">₹{item.price}</div>
+                                                    )}
+                                                    {item.category && (
+                                                        <div className="text-[9px] font-bold text-white/60 uppercase tracking-wider mt-0.5">{item.category}</div>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
+                                            </div>
+                                        ))}
+                                        {/* If pair has only 1 item, add an empty spacer */}
+                                        {pair.length === 1 && <div className="flex-1" />}
                                     </div>
                                 ))}
-                                {/* Dots indicator */}
-                                {godownItems.length > 1 && (
-                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                                        {godownItems.map((_, idx) => (
-                                            <button
-                                                key={idx}
-                                                onClick={() => setCarouselIdx(idx)}
-                                                className={`rounded-full transition-all duration-300 ${idx === carouselIdx
-                                                    ? 'w-5 h-1.5 bg-white shadow-md'
-                                                    : 'w-1.5 h-1.5 bg-white/40'
-                                                }`}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
                             </div>
+                            {/* Dots indicator */}
+                            {carouselPairs.length > 1 && (
+                                <div className="flex justify-center gap-1.5 mt-3">
+                                    {carouselPairs.map((_, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setCarouselIdx(idx)}
+                                            className={`rounded-full transition-all duration-300 ${idx === carouselIdx
+                                                ? 'w-5 h-1.5 bg-[#1F1300] shadow-sm'
+                                                : 'w-1.5 h-1.5 bg-[#1F1300]/30'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                     {locationError && <p className="text-center text-[11px] font-bold text-red-700 bg-red-100/80 rounded-lg mx-5 mt-3 py-1.5 backdrop-blur-sm">{locationError}</p>}

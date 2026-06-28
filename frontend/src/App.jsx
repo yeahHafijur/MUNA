@@ -20,6 +20,7 @@ const CustomerSettings = lazy(() => import('./pages/CustomerSettings'));
 const Search = lazy(() => import('./pages/Search'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
 
 // Vendor Pages
 const VendorHub = lazy(() => import('./pages/vendor/VendorHub'));
@@ -102,6 +103,7 @@ const AppContent = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/orders" element={<CustomerOrders />} />
                 <Route path="/profile/settings" element={<CustomerSettings />} />
+                <Route path="/profile/wishlist" element={<Wishlist />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />

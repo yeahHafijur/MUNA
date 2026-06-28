@@ -345,6 +345,25 @@ const removeFromWishlist = async (req, res) => {
     }
 };
 
+const getWishlist = async (req, res) => {
+    try {
+        const userId = req.user.id || req.user._id;
+        const user = await User.findById(userId).populate({
+            path: 'wishlist',
+            populate: { path: 'category' } // Just in case we need category details
+        });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json(user.wishlist);
+    } catch (error) {
+        console.error("Error fetching wishlist:", error);
+        res.status(500).json({ message: 'Server error fetching wishlist' });
+    }
+};
+
 module.exports = {
     sendOTP,
     verifyOTP,
@@ -355,5 +374,6 @@ module.exports = {
     updateProfile,
     deleteAccount,
     addToWishlist,
-    removeFromWishlist
+    removeFromWishlist,
+    getWishlist
 };

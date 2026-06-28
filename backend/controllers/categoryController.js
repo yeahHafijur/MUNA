@@ -3,15 +3,12 @@ const Shop = require('../models/Shop');
 const Product = require('../models/Product');
 
 // Get all item categories for a shop (Public)
-// Returns: global categories + this shop's custom categories
+// Returns: only this shop's custom categories
 const getCategoriesByShop = async (req, res) => {
     try {
         const categories = await ItemCategory.find({
-            $or: [
-                { isGlobal: true },
-                { shopId: req.params.shopId }
-            ]
-        }).sort({ isGlobal: -1, sortOrder: 1, name: 1 });
+            shopId: req.params.shopId
+        }).sort({ sortOrder: 1, name: 1 });
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
@@ -28,8 +25,8 @@ const getGlobalCategories = async (req, res) => {
     }
 };
 
-// Create a custom item category (Vendor only)
-// SECURITY: Always force isGlobal to false for vendors
+// Create a custom item category (Vendor or Super Admin)
+// SECURITY: Always force isGlobal to false for shop-specific categories
 const createCategory = async (req, res) => {
     try {
         const { name } = req.body;
@@ -37,9 +34,18 @@ const createCategory = async (req, res) => {
             return res.status(400).json({ message: "Category name is required" });
         }
 
-        const shop = await Shop.findOne({ vendorId: req.user._id });
+        let shop;
+        if (req.user.role === 'super_admin') {
+            if (!req.body.shopId) {
+                return res.status(400).json({ message: "shopId is required for super_admin" });
+            }
+            shop = await Shop.findById(req.body.shopId);
+        } else {
+            shop = await Shop.findOne({ vendorId: req.user._id });
+        }
+
         if (!shop) {
-            return res.status(404).json({ message: "You don't have a shop" });
+            return res.status(404).json({ message: req.user.role === 'super_admin' ? "Shop not found" : "You don't have a shop" });
         }
 
         let image = '';
@@ -60,9 +66,9 @@ const createCategory = async (req, res) => {
         const category = await ItemCategory.create({
             name: name.trim(),
             image,
-            isGlobal: false,        // SECURITY: Always false for vendor
+            isGlobal: false,        // SECURITY: Always false for shop-specific
             shopId: shop._id,
-            vendorId: req.user._id,
+            vendorId: shop.vendorId, // bind to shop's vendor
             sortOrder
         });
 

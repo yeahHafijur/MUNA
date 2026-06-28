@@ -18,8 +18,8 @@ router.get("/global", getGlobalCategories);
 // Public: Get categories for a shop (global + custom)
 router.get("/:shopId", getCategoriesByShop);
 
-// Vendor: Create custom item category
-router.post("/", protect, authorize("vendor"), upload.single('image'), createCategory);
+// Vendor or Super Admin: Create custom item category
+router.post("/", protect, authorize("vendor", "super_admin"), upload.single('image'), createCategory);
 
 // Super Admin: Create global item category
 router.post("/global", protect, authorize("super_admin"), upload.single('image'), createGlobalCategory);

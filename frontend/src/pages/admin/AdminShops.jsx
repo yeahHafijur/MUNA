@@ -22,6 +22,9 @@ const AdminShops = () => {
         name: '', address: '', category: '', udyamNumber: '', lat: '', lng: '', image: null, imagePreview: ''
     });
 
+    const [newCatForm, setNewCatForm] = useState({ name: '', image: null, imagePreview: '' });
+    const [savingCat, setSavingCat] = useState(false);
+
     useEffect(() => {
         if (!token || user?.role !== 'super_admin') navigate('/');
     }, [token, user, navigate]);
@@ -34,6 +37,17 @@ const AdminShops = () => {
             return Array.isArray(data) ? data : [];
         },
         enabled: !!token && user?.role === 'super_admin'
+    });
+
+    const { data: shopCategories = [], refetch: refetchCategories } = useQuery({
+        queryKey: ['admin-shop-categories', editingShop?._id],
+        queryFn: async () => {
+            if (!editingShop) return [];
+            const res = await fetch(`/api/categories/${editingShop._id}`);
+            const data = await res.json();
+            return Array.isArray(data) ? data : [];
+        },
+        enabled: !!editingShop
     });
 
     const handleEditClick = (shop) => {
@@ -95,6 +109,64 @@ const AdminShops = () => {
             if (res.ok) queryClient.invalidateQueries({ queryKey: ['admin-shops'] });
             else { const d = await res.json(); toast.error(d.message || 'Failed'); }
         } catch (err) { toast.error("Error toggling status."); }
+    };
+
+    const handleCatChange = (e) => {
+        if (e.target.name === 'image') {
+            const file = e.target.files[0];
+            setNewCatForm({ ...newCatForm, image: file, imagePreview: file ? URL.createObjectURL(file) : '' });
+        } else {
+            setNewCatForm({ ...newCatForm, [e.target.name]: e.target.value });
+        }
+    };
+
+    const handleAddCategory = async (e) => {
+        e.preventDefault();
+        if (!newCatForm.name.trim()) return toast.error("Category name required");
+        setSavingCat(true);
+        const fd = new FormData();
+        fd.append('name', newCatForm.name);
+        fd.append('shopId', editingShop._id);
+        if (newCatForm.image) fd.append('image', newCatForm.image);
+
+        try {
+            const res = await fetch('/api/categories', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: fd
+            });
+            if (res.ok) {
+                setNewCatForm({ name: '', image: null, imagePreview: '' });
+                refetchCategories();
+                toast.success("Category added!");
+            } else {
+                const d = await res.json();
+                toast.error(d.message || "Failed to add category");
+            }
+        } catch(err) {
+            toast.error("Error adding category");
+        } finally {
+            setSavingCat(false);
+        }
+    };
+
+    const handleDeleteCategory = async (catId) => {
+        if (!window.confirm("Delete this category?")) return;
+        try {
+            const res = await fetch(`/api/categories/${catId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                refetchCategories();
+                toast.success("Category deleted");
+            } else {
+                const d = await res.json();
+                toast.error(d.message || "Failed to delete");
+            }
+        } catch(err) {
+            toast.error("Error deleting");
+        }
     };
 
     return (
@@ -181,6 +253,51 @@ const AdminShops = () => {
                                 <button type="submit" className={`${btnPrimaryClasses} w-full py-3`}>Save Changes</button>
                             </div>
                         </form>
+
+                        {/* ─── CATEGORY MANAGEMENT SECTION ─── */}
+                        <div className="mt-8 pt-8 border-t border-slate-200">
+                            <h4 className="text-lg font-black text-slate-900 tracking-tight mb-4">Item Categories</h4>
+                            
+                            {/* List Existing Categories */}
+                            <div className="space-y-3 mb-6">
+                                {shopCategories.length === 0 ? (
+                                    <div className="text-sm font-medium text-slate-500 bg-slate-50 p-4 rounded-xl border border-slate-100">No categories found for this shop.</div>
+                                ) : (
+                                    shopCategories.map(cat => (
+                                        <div key={cat._id} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
+                                            {cat.image ? (
+                                                <img src={cat.image} alt={cat.name} className="w-10 h-10 rounded-lg object-cover bg-slate-100 shrink-0" />
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 text-xs shrink-0">No Img</div>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-sm font-bold text-slate-900 truncate">{cat.name}</div>
+                                            </div>
+                                            <button type="button" onClick={() => handleDeleteCategory(cat._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0">
+                                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* Add New Category */}
+                            <form onSubmit={handleAddCategory} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                                <h5 className="text-sm font-bold text-slate-900">Add New Category</h5>
+                                <label className="cursor-pointer block group">
+                                    <div className="w-full h-24 rounded-xl border-2 border-dashed border-gray-300 bg-white flex items-center justify-center overflow-hidden group-hover:border-amber-400 transition-colors">
+                                        {newCatForm.imagePreview ? <img src={newCatForm.imagePreview} alt="Category" className="w-full h-full object-cover" /> : <span className="text-xs font-bold text-gray-400 group-hover:text-amber-500">Upload Banner Photo (Optional)</span>}
+                                    </div>
+                                    <input type="file" name="image" accept="image/*" onChange={handleCatChange} className="hidden" />
+                                </label>
+                                <div className="flex gap-2">
+                                    <input type="text" name="name" required placeholder="Category Name" className={`${inputClasses} flex-1`} value={newCatForm.name} onChange={handleCatChange} />
+                                    <button type="submit" disabled={savingCat} className={`${btnPrimaryClasses} shrink-0`}>
+                                        {savingCat ? 'Adding...' : 'Add'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

@@ -114,6 +114,7 @@ app.use('/api/search', require('./routes/searchRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/shop-categories', require('./routes/shopCategoryRoutes'));
 app.use('/api/categories', require('./routes/categoryRoutes'));
+app.use('/api/vendor-requests', require('./routes/vendorRequestRoutes'));
 
 app.get("/", (req, res) => {
     res.send("MUNA is running")

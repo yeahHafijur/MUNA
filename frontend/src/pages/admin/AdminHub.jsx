@@ -125,6 +125,12 @@ const AdminHub = () => {
                         onClick={() => navigate('/admin/onboard')}
                     />
                     <NavigationRow
+                        icon={<span className="text-xl">🏪</span>}
+                        title="Vendor Requests"
+                        subtitle="Review user applications"
+                        onClick={() => navigate('/admin/vendor-requests')}
+                    />
+                    <NavigationRow
                         icon={<IcoShops />}
                         title="Manage Shops"
                         subtitle={`${stats.totalShops} registered shops`}

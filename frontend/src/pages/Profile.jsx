@@ -126,6 +126,16 @@ const Profile = () => {
                         />
                     </div>
 
+                    <div className="bg-white rounded-[28px] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-amber-100 overflow-hidden mb-6">
+                        <MenuRow
+                            icon={<span className="text-xl">🏪</span>}
+                            title="Request to be a Vendor"
+                            subtitle="Open your own shop on MUNA"
+                            onClick={() => navigate('/profile/vendor-request')}
+                            isLast={true}
+                        />
+                    </div>
+
                     <div className="bg-white rounded-[28px] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-red-50 overflow-hidden mb-6">
                         <MenuRow
                             icon={<IconLogout />}

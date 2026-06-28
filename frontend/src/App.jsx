@@ -21,6 +21,7 @@ const Search = lazy(() => import('./pages/Search'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
+const VendorRequestForm = lazy(() => import('./pages/VendorRequestForm'));
 
 // Vendor Pages
 const VendorHub = lazy(() => import('./pages/vendor/VendorHub'));
@@ -35,6 +36,7 @@ const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'));
 const AdminGodown = lazy(() => import('./pages/admin/AdminGodown'));
 const AdminApprovals = lazy(() => import('./pages/admin/AdminApprovals'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminVendorRequests = lazy(() => import('./pages/admin/AdminVendorRequests'));
 const GodownBrowser = lazy(() => import('./pages/GodownBrowser'));
 
 const AppContent = () => {
@@ -104,6 +106,7 @@ const AppContent = () => {
                 <Route path="/profile/orders" element={<CustomerOrders />} />
                 <Route path="/profile/settings" element={<CustomerSettings />} />
                 <Route path="/profile/wishlist" element={<Wishlist />} />
+                <Route path="/profile/vendor-request" element={<VendorRequestForm />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -142,6 +145,7 @@ const AppContent = () => {
             <Route path="/admin/categories" element={<AdminCategories />} />
             <Route path="/admin/godown" element={<AdminGodown />} />
             <Route path="/admin/approvals" element={<AdminApprovals />} />
+            <Route path="/admin/vendor-requests" element={<AdminVendorRequests />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
           </Routes>
         </Suspense>

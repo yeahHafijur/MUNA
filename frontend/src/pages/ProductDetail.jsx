@@ -6,47 +6,13 @@ import { useAuth } from '../context/AuthContext';
 import { optimizeImage } from '../utils/imageUtils';
 import { toast } from 'react-toastify';
 
-/* ─── Premium Icons ─── */
-const IcoBack = () => (
-    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-    </svg>
-);
-const IcoHeart = ({ filled }) => (
-    <svg fill={filled ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={filled ? 0 : 2} stroke="currentColor" className="w-6 h-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-    </svg>
-);
-const IcoShare = () => (
-    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8.25V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V8.25m-18 0V6a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 6v2.25m-18 0h18M5.25 6h.008v.008H5.25V6zM7.5 6h.008v.008H7.5V6zm2.25 0h.008v.008H9.75V6z" />
-    </svg>
-);
-const IcoMinus = () => (
-    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
-    </svg>
-);
-const IcoPlus = () => (
-    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-    </svg>
-);
-const IcoStore = () => (
-    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-6h-3v6m-6 0H3m18 0h-1.5M3 21h18M3 10.5h18M3 7.5h18M5.25 3.75h13.5M5.25 3.75L3 7.5l2.25 3.75M5.25 3.75v13.5M18.75 3.75v13.5M18.75 3.75L21 7.5l-2.25 3.75" />
-    </svg>
-);
-const IcoClock = () => (
-    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-);
-const IcoShield = () => (
-    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-    </svg>
-);
+/* ─── Standard Native Icons ─── */
+const IcoBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>;
+const IcoHeart = ({ filled }) => <svg fill={filled ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={filled ? 0 : 1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>;
+const IcoShare = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" /></svg>;
+const IcoMinus = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" /></svg>;
+const IcoPlus = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>;
+const IcoPlaceholder = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-16 h-16 text-gray-300"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>;
 
 const triggerHaptic = (duration = 30) => {
     if (navigator.vibrate) navigator.vibrate(duration);
@@ -59,17 +25,8 @@ const ProductDetail = () => {
     const { token } = useAuth();
 
     const [liked, setLiked] = useState(false);
-    const [headerOpaque, setHeaderOpaque] = useState(false);
     const cartItem = cartItems.find(i => i.productId === productId);
 
-    // ── Scroll listener for header transparency ──
-    useEffect(() => {
-        const handleScroll = () => setHeaderOpaque(window.scrollY > 60);
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    // ── Wishlist local persistence ──
     useEffect(() => {
         const savedLikes = JSON.parse(localStorage.getItem('muna_likes') || '{}');
         if (savedLikes[productId]) setLiked(true);
@@ -111,7 +68,6 @@ const ProductDetail = () => {
         }
     };
 
-    // ── Data fetching ──
     const { data: shop, isLoading: shopLoading } = useQuery({
         queryKey: ['shop', shopId],
         queryFn: async () => {
@@ -132,25 +88,23 @@ const ProductDetail = () => {
 
     const isLoading = shopLoading || productLoading;
 
-    // ── Loading state ──
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center">
-                <div className="w-10 h-10 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+                <div className="w-8 h-8 border-4 border-gray-200 border-t-gray-800 rounded-full animate-spin" />
             </div>
         );
     }
 
-    // ── Error state ──
     if (!product || !shop) {
         return (
-            <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 text-center">
-                <div className="w-20 h-20 bg-slate-200 text-slate-400 rounded-full flex items-center justify-center text-3xl mb-4">🔍</div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">Item Unavailable</h2>
-                <p className="text-sm font-medium text-slate-500 mb-8">This item might have been removed from the catalog.</p>
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+                <div className="text-gray-400 mb-4"><IcoPlaceholder /></div>
+                <h2 className="text-lg font-bold text-gray-900 mb-1">Product Not Found</h2>
+                <p className="text-sm text-gray-500 mb-6">This item is currently unavailable.</p>
                 <button
                     onClick={() => navigate(-1)}
-                    className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl active:scale-[0.98] transition-transform shadow-lg"
+                    className="px-6 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg"
                 >
                     Go Back
                 </button>
@@ -158,7 +112,6 @@ const ProductDetail = () => {
         );
     }
 
-    // ── Cart handler ──
     const handleAdd = () => {
         if (!product.inStock) return;
         triggerHaptic(50);
@@ -179,195 +132,113 @@ const ProductDetail = () => {
         }
     };
 
-    const productImage = product.image ? optimizeImage(product.image, 1200) : null;
+    const productImage = product.image ? optimizeImage(product.image, 800) : null;
 
     return (
-        <div className="min-h-screen bg-white font-sans pb-32">
+        <div className="min-h-screen bg-gray-100 font-sans pb-24">
 
-            {/* ─── 1. HERO SECTION (full‑width image with overlay) ─── */}
-            <section className="relative h-[75vh] min-h-[500px] w-full overflow-hidden">
+            {/* ─── STANDARD STICKY HEADER ─── */}
+            <header className="sticky top-0 inset-x-0 z-50 bg-white border-b border-gray-200 flex items-center justify-between px-2 py-2">
+                <button
+                    className="p-2 text-gray-800"
+                    onClick={() => navigate(-1)}
+                >
+                    <IcoBack />
+                </button>
+                <div className="flex items-center">
+                    <button
+                        className={`p-2 ${liked ? 'text-red-500' : 'text-gray-800'}`}
+                        onClick={toggleLike}
+                    >
+                        <IcoHeart filled={liked} />
+                    </button>
+                    <button
+                        className="p-2 text-gray-800"
+                        onClick={handleShare}
+                    >
+                        <IcoShare />
+                    </button>
+                </div>
+            </header>
+
+            {/* ─── PRODUCT IMAGE ─── */}
+            <section className="w-full bg-white flex items-center justify-center p-8 aspect-square max-h-[400px]">
                 {productImage ? (
-                    <div
-                        className="absolute inset-0 bg-cover bg-center scale-105"
-                        style={{ backgroundImage: `url(${productImage})` }}
+                    <img
+                        src={productImage}
+                        alt={product.name}
+                        className="w-full h-full object-contain mix-blend-multiply"
                     />
                 ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-8xl text-slate-300">
-                        🛍️
-                    </div>
+                    <IcoPlaceholder />
                 )}
-                {/* Dark gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-                {/* Hero text – overlaid on image */}
-                <div className="absolute bottom-10 left-6 right-6 text-white z-10">
-                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/80 mb-2">
-                        <IcoStore />
-                        <span>{shop.name}</span>
-                    </div>
-                    <h1 className="text-4xl sm:text-5xl font-bold leading-[1.1] tracking-tight drop-shadow-lg">
-                        {product.name}
-                    </h1>
-                    <div className="flex items-end gap-2 mt-3">
-                        <span className="text-2xl font-light text-white/70">₹</span>
-                        <span className="text-5xl font-black">{product.price}</span>
-                        {product.inStock && (
-                            <span className="ml-3 px-3 py-1 bg-emerald-400/20 backdrop-blur-sm text-emerald-100 text-[10px] font-bold uppercase tracking-widest rounded-full border border-emerald-400/30">
-                                In Stock
-                            </span>
-                        )}
-                    </div>
-                </div>
-
-                {/* ── Floating Header (transparent → opaque on scroll) ── */}
-                <header
-                    className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-5 py-4 transition-all duration-300 ${headerOpaque
-                            ? 'bg-white/80 backdrop-blur-md border-b border-slate-100/60'
-                            : 'bg-transparent'
-                        }`}
-                >
-                    <button
-                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${headerOpaque
-                                ? 'text-slate-800 hover:bg-slate-100'
-                                : 'text-white hover:bg-white/10'
-                            }`}
-                        onClick={() => navigate(-1)}
-                    >
-                        <IcoBack />
-                    </button>
-                    <div className="flex items-center gap-1">
-                        <button
-                            className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${headerOpaque
-                                    ? 'text-slate-800 hover:bg-slate-100'
-                                    : 'text-white hover:bg-white/10'
-                                } ${liked ? 'text-rose-500' : ''}`}
-                            onClick={toggleLike}
-                        >
-                            <IcoHeart filled={liked} />
-                        </button>
-                        <button
-                            className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${headerOpaque
-                                    ? 'text-slate-800 hover:bg-slate-100'
-                                    : 'text-white hover:bg-white/10'
-                                }`}
-                            onClick={handleShare}
-                        >
-                            <IcoShare />
-                        </button>
-                    </div>
-                </header>
             </section>
 
-            {/* ─── 2. BOTTOM SHEET (rounded card with details) ─── */}
-            <section className="relative -mt-8 z-20 px-6 pt-8 pb-6 bg-white rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.08)]">
-                {/* Category chip */}
-                <div className="flex items-center gap-2 mb-6">
-                    <span className="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-full">
-                        {typeof product.category === 'object' ? product.category?.name || 'General' : product.category || 'General'}
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">•</span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        by {shop.name}
-                    </span>
-                </div>
+            {/* ─── MAIN INFO SECTION ─── */}
+            <section className="bg-white px-4 py-5 mb-2 border-b border-gray-200">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    {typeof product.category === 'object' ? product.category?.name || 'Category' : product.category || 'Category'}
+                </p>
+                <h1 className="text-xl font-semibold text-gray-900 leading-snug mb-3">
+                    {product.name}
+                </h1>
 
-                {/* Description */}
-                <div className="mb-8">
-                    <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-3">
-                        Description
-                    </h2>
-                    <p className="text-sm text-slate-600 leading-relaxed font-medium whitespace-pre-line">
-                        {product.description ||
-                            `Freshly sourced and securely packaged by ${shop.name}. We ensure strict quality standards so you only get the best products delivered right to your door.`}
-                    </p>
+                <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
                 </div>
-
-                {/* Trust features – horizontal scroll / grid */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="flex items-center gap-3 p-3 bg-slate-50/80 rounded-2xl border border-slate-100/70">
-                        <div className="w-9 h-9 rounded-full bg-white text-slate-700 flex items-center justify-center shadow-sm shrink-0">
-                            <IcoClock />
-                        </div>
-                        <div>
-                            <span className="block text-sm font-bold text-slate-900">Instant</span>
-                            <span className="text-[10px] text-slate-500 font-medium">15‑30 min</span>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-slate-50/80 rounded-2xl border border-slate-100/70">
-                        <div className="w-9 h-9 rounded-full bg-white text-slate-700 flex items-center justify-center shadow-sm shrink-0">
-                            <IcoShield />
-                        </div>
-                        <div>
-                            <span className="block text-sm font-bold text-slate-900">Genuine</span>
-                            <span className="text-[10px] text-slate-500 font-medium">Verified</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Shop card */}
-                <div className="flex items-center justify-between p-4 bg-slate-50/80 rounded-2xl border border-slate-100/70">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-sm">
-                            {shop.name.charAt(0)}
-                        </div>
-                        <div>
-                            <span className="block text-sm font-bold text-slate-900">{shop.name}</span>
-                            <span className="text-[10px] text-slate-500 font-medium">Verified shop</span>
-                        </div>
-                    </div>
-                    <button className="text-xs font-bold text-slate-900 underline-offset-2 hover:underline">
-                        Visit
-                    </button>
+                <div className="text-sm text-gray-500">
+                    Sold by <span className="font-medium text-gray-900">{shop.name}</span>
                 </div>
             </section>
 
-            {/* ─── 3. FLOATING ACTION DOCK (pill‑shaped, bottom) ─── */}
-            <div className="fixed bottom-6 left-0 right-0 flex justify-center z-50 pointer-events-none px-4">
-                <div className="max-w-sm w-full bg-white/90 backdrop-blur-xl rounded-full shadow-2xl border border-white/40 p-1.5 pointer-events-auto flex items-center gap-1.5">
+            {/* ─── DETAILS SECTION ─── */}
+            <section className="bg-white px-4 py-5 border-y border-gray-200 mb-2">
+                <h2 className="text-base font-semibold text-gray-900 mb-3">Product Details</h2>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                    {product.description || `High-quality product sourced directly from ${shop.name}. We ensure standard packaging and swift delivery directly to your location.`}
+                </p>
+            </section>
+
+            {/* ─── STANDARD BOTTOM BAR ─── */}
+            <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 p-3 pb-safe z-50">
+                <div className="max-w-xl mx-auto w-full flex gap-3">
                     {!product.inStock ? (
-                        <button className="w-full py-3.5 bg-slate-100 text-slate-400 rounded-full font-bold text-sm cursor-not-allowed px-6">
-                            Currently Unavailable
+                        <button className="w-full py-3.5 bg-gray-100 text-gray-400 rounded-lg font-semibold text-sm cursor-not-allowed">
+                            Out of Stock
                         </button>
                     ) : cartItem ? (
                         <>
-                            {/* Quantity controls */}
-                            <div className="flex items-center gap-1 pl-1">
+                            {/* Native Quantity Controller */}
+                            <div className="flex items-center justify-between bg-white border border-gray-300 rounded-lg px-2 w-[120px] shrink-0">
                                 <button
-                                    className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 active:bg-slate-200 transition-colors hover:bg-slate-100"
-                                    onClick={() => {
-                                        triggerHaptic(30);
-                                        updateQuantity(product._id, cartItem.quantity - 1);
-                                    }}
+                                    className="p-2 text-gray-600 active:bg-gray-100 rounded"
+                                    onClick={() => { triggerHaptic(30); updateQuantity(product._id, cartItem.quantity - 1); }}
                                 >
                                     <IcoMinus />
                                 </button>
-                                <span className="font-black text-base text-slate-900 min-w-[24px] text-center">
+                                <span className="font-semibold text-base text-gray-900">
                                     {cartItem.quantity}
                                 </span>
                                 <button
-                                    className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 active:bg-slate-200 transition-colors hover:bg-slate-100"
-                                    onClick={() => {
-                                        triggerHaptic(30);
-                                        updateQuantity(product._id, cartItem.quantity + 1);
-                                    }}
+                                    className="p-2 text-gray-600 active:bg-gray-100 rounded"
+                                    onClick={() => { triggerHaptic(30); updateQuantity(product._id, cartItem.quantity + 1); }}
                                 >
                                     <IcoPlus />
                                 </button>
                             </div>
-                            {/* View Cart button */}
                             <button
-                                className="flex-1 py-3.5 bg-slate-900 text-white rounded-full font-bold text-sm shadow-sm active:scale-[0.97] transition-transform flex items-center justify-center px-4 hover:bg-slate-800"
+                                className="flex-1 py-3.5 bg-gray-900 text-white rounded-lg font-semibold text-sm active:bg-gray-800 transition-colors"
                                 onClick={() => navigate('/cart')}
                             >
-                                View Cart
+                                Go to Cart
                             </button>
                         </>
                     ) : (
                         <button
-                            className="w-full py-3.5 bg-amber-400 text-amber-950 rounded-full font-bold text-sm shadow-md active:scale-[0.97] transition-transform flex items-center justify-center gap-2 px-6 hover:bg-amber-300"
+                            className="w-full py-3.5 bg-amber-400 text-amber-950 rounded-lg font-semibold text-sm active:bg-amber-500 transition-colors"
                             onClick={handleAdd}
                         >
-                            Add to Cart <span className="opacity-60">•</span> ₹{product.price}
+                            Add to Cart
                         </button>
                     )}
                 </div>

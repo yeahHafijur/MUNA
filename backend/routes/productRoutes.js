@@ -4,10 +4,14 @@ const {
     getProductsByShop,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProductDetail
 } = require('../controllers/productController');
 const { protect, authorize } = require("../middleware/authMiddleware");
 const upload = require('../middleware/uploadMiddleware');
+
+// Get single product detail
+router.get("/detail/:id", getProductDetail);
 
 // 1. Public Route: Get products by shop (Yeh wala gayab ho gaya tha)
 router.get("/:shopId", getProductsByShop);

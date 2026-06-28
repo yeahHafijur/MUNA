@@ -313,6 +313,38 @@ const deleteAccount = async (req, res) => {
     }
 };
 
+const addToWishlist = async (req, res) => {
+    try {
+        const userId = req.user.id || req.user._id; 
+        const productId = req.params.id;
+
+        await User.findByIdAndUpdate(userId, {
+            $addToSet: { wishlist: productId }
+        });
+
+        res.status(200).json({ message: 'Added to wishlist' });
+    } catch (error) {
+        console.error("Error adding to wishlist:", error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const removeFromWishlist = async (req, res) => {
+    try {
+        const userId = req.user.id || req.user._id;
+        const productId = req.params.id;
+
+        await User.findByIdAndUpdate(userId, {
+            $pull: { wishlist: productId }
+        });
+
+        res.status(200).json({ message: 'Removed from wishlist' });
+    } catch (error) {
+        console.error("Error removing from wishlist:", error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     sendOTP,
     verifyOTP,
@@ -321,5 +353,7 @@ module.exports = {
     deleteLocation,
     saveFcmToken,
     updateProfile,
-    deleteAccount
+    deleteAccount,
+    addToWishlist,
+    removeFromWishlist
 };

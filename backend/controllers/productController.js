@@ -145,9 +145,41 @@ const deleteProduct = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+const getProductDetail = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Use .lean() for faster execution since we only need to read the data
+        const product = await Product.findById(id).lean();
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Populate category manually if needed since we use mixed schema types for legacy
+        if (product.category) {
+            const mongoose = require('mongoose');
+            if (mongoose.Types.ObjectId.isValid(product.category)) {
+                const Category = require('../models/ItemCategory');
+                try {
+                    const catInfo = await Category.findById(product.category).lean();
+                    if (catInfo) product.category = catInfo;
+                } catch (err) {}
+            }
+        }
+
+        res.status(200).json(product);
+    } catch (error) {
+        console.error("Error fetching product detail:", error);
+        res.status(500).json({ message: 'Server error fetching product details' });
+    }
+};
+
 module.exports = {
     getProductsByShop,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProductDetail
 };

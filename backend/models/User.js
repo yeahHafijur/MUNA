@@ -38,8 +38,11 @@ const userSchema = new mongoose.Schema({
     },
     fcmTokens: [{
         type: String
+    }],
+    wishlist: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
     }]
-
 });
 
 module.exports = mongoose.model("User", userSchema);

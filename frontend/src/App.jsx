@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // Lazy loaded pages
 const Home = lazy(() => import('./pages/Home'));
 const ShopDetail = lazy(() => import('./pages/ShopDetail'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Login = lazy(() => import('./pages/Login'));
 const Profile = lazy(() => import('./pages/Profile'));
@@ -95,6 +96,7 @@ const AppContent = () => {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/shop/:id" element={<ShopDetail />} />
+                <Route path="/shop/:shopId/product/:productId" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/profile" element={<Profile />} />

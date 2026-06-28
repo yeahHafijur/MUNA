@@ -364,7 +364,8 @@ const ShopDetail = () => {
                                                 <div
                                                     key={product._id}
                                                     className={`sd-prod ${!product.inStock ? 'sd-prod--oos' : ''}`}
-                                                    style={{ animationDelay: `${idx * 40}ms` }}
+                                                    style={{ animationDelay: `${idx * 40}ms`, cursor: 'pointer' }}
+                                                    onClick={() => navigate(`/shop/${id}/product/${product._id}`)}
                                                 >
                                                     {/* Image */}
                                                     <div className="sd-prod-img">
@@ -392,7 +393,10 @@ const ShopDetail = () => {
                                                             {product.inStock ? (
                                                                 <button
                                                                     className={`sd-add-btn ${inCart ? 'sd-add-btn--added' : 'sd-add-btn--add'}`}
-                                                                    onClick={(e) => handleAddClick(e, product)}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleAddClick(e, product);
+                                                                    }}
                                                                 >
                                                                     {inCart ? `${inCart.quantity} Added` : 'ADD'}
                                                                 </button>

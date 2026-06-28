@@ -438,7 +438,7 @@ const ShopDetail = () => {
 
             {/* ════════ REPLACE CART MODAL ════════ */}
             {replacePrompt && (
-                <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 animate-in fade-in duration-200">
+                <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center px-4 pt-4 pb-[80px] animate-in fade-in duration-200">
                     <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
                         <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <span className="text-3xl">🛒</span>

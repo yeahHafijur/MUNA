@@ -39,14 +39,23 @@ const createProduct = async (req, res) => {
         const { name, price, category, categoryId, stock } = req.body;
         
         let image = req.body.image;
-        if (req.file) {
+        if (req.files && req.files['image']) {
             const { uploadStream } = require('../utils/cloudinary');
-            const result = await uploadStream(req.file.buffer, 'muna/products');
+            const result = await uploadStream(req.files['image'][0].buffer, 'muna/products');
             image = result.secure_url;
         } else if (image && image.startsWith('data:image')) {
             const { uploadBase64 } = require('../utils/cloudinary');
             const result = await uploadBase64(image, 'muna/products');
             image = result.secure_url;
+        }
+
+        let galleryUrls = [];
+        if (req.files && req.files['gallery']) {
+            const { uploadStream } = require('../utils/cloudinary');
+            for (const file of req.files['gallery']) {
+                const result = await uploadStream(file.buffer, 'muna/products');
+                galleryUrls.push(result.secure_url);
+            }
         }
 
         const shop = await Shop.findOne({
@@ -67,7 +76,8 @@ const createProduct = async (req, res) => {
             await MasterProduct.create({
                 name,
                 category: catName,
-                image
+                image,
+                gallery: galleryUrls
             });
             console.log(`[Godown] New item pushed to approvals: ${name}`);
         } catch (err) {
@@ -80,6 +90,7 @@ const createProduct = async (req, res) => {
             price,
             category: resolvedCategory,
             image,
+            gallery: galleryUrls,
             stock,
             shopId: shop._id
         });
@@ -109,9 +120,9 @@ const updateProduct = async (req, res) => {
         }
         
         // Handle image: multipart file, base64, or URL
-        if (req.file) {
+        if (req.files && req.files['image']) {
             const { uploadStream } = require('../utils/cloudinary');
-            const result = await uploadStream(req.file.buffer, 'muna/products');
+            const result = await uploadStream(req.files['image'][0].buffer, 'muna/products');
             product.image = result.secure_url;
         } else if (req.body.image && req.body.image.startsWith('data:image')) {
             const { uploadBase64 } = require('../utils/cloudinary');
@@ -119,6 +130,20 @@ const updateProduct = async (req, res) => {
             product.image = result.secure_url;
         } else if (req.body.image) {
             product.image = req.body.image;
+        }
+
+        // Handle gallery
+        if (req.files && req.files['gallery']) {
+            const { uploadStream } = require('../utils/cloudinary');
+            let newGallery = [];
+            for (const file of req.files['gallery']) {
+                const result = await uploadStream(file.buffer, 'muna/products');
+                newGallery.push(result.secure_url);
+            }
+            product.gallery = newGallery;
+        } else if (req.body.gallery) {
+            // If gallery is passed as an array of strings/URLs
+            product.gallery = Array.isArray(req.body.gallery) ? req.body.gallery : [req.body.gallery];
         }
 
         product.inStock = req.body.inStock !== undefined ? req.body.inStock : product.inStock;

@@ -19,7 +19,7 @@ const AdminGodown = () => {
 
     const [godownSearchQuery, setGodownSearchQuery] = useState('');
     const [editingGodownItem, setEditingGodownItem] = useState(null);
-    const [godownFormData, setGodownFormData] = useState({ name: '', category: '', image: null, imagePreview: '' });
+    const [godownFormData, setGodownFormData] = useState({ name: '', category: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] });
     const [isGodownModalOpen, setIsGodownModalOpen] = useState(false);
 
     useEffect(() => {
@@ -42,6 +42,13 @@ const AdminGodown = () => {
         if (e.target.name === 'image') {
             const file = e.target.files[0];
             setGodownFormData({ ...godownFormData, image: file, imagePreview: file ? URL.createObjectURL(file) : '' });
+        } else if (e.target.name === 'gallery') {
+            const files = Array.from(e.target.files).slice(0, 4);
+            setGodownFormData({ 
+                ...godownFormData, 
+                gallery: files, 
+                galleryPreviews: files.map(f => URL.createObjectURL(f)) 
+            });
         } else {
             setGodownFormData({ ...godownFormData, [e.target.name]: e.target.value });
         }
@@ -53,11 +60,12 @@ const AdminGodown = () => {
         fd.append('name', godownFormData.name);
         fd.append('category', godownFormData.category);
         if (godownFormData.image) fd.append('image', godownFormData.image);
+        godownFormData.gallery.forEach(file => fd.append('gallery', file));
         try {
             const url = editingGodownItem ? `/api/master-products/${editingGodownItem._id}` : '/api/master-products';
             const res = await fetch(url, { method: editingGodownItem ? 'PUT' : 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
             if (res.ok) {
-                setGodownFormData({ name: '', category: '', image: null, imagePreview: '' });
+                setGodownFormData({ name: '', category: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] });
                 setEditingGodownItem(null);
                 queryClient.invalidateQueries({ queryKey: ['master-products'] });
                 setIsGodownModalOpen(false);
@@ -68,7 +76,7 @@ const AdminGodown = () => {
 
     const handleGodownEditClick = (item) => {
         setEditingGodownItem(item);
-        setGodownFormData({ name: item.name, category: item.category || '', image: null, imagePreview: item.image || '' });
+        setGodownFormData({ name: item.name, category: item.category || '', image: null, imagePreview: item.image || '', gallery: [], galleryPreviews: item.gallery || [] });
         setIsGodownModalOpen(true);
     };
 
@@ -94,7 +102,7 @@ const AdminGodown = () => {
                 </button>
                 <span className="text-base font-extrabold text-slate-900 tracking-tight">Master Godown</span>
                 <button
-                    onClick={() => { setEditingGodownItem(null); setGodownFormData({ name: '', category: '', image: null, imagePreview: '' }); setIsGodownModalOpen(true); }}
+                    onClick={() => { setEditingGodownItem(null); setGodownFormData({ name: '', category: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] }); setIsGodownModalOpen(true); }}
                     className="ml-auto px-4 py-2 bg-amber-400 text-amber-950 rounded-xl text-[12px] font-black shadow-[0_4px_14px_rgba(251,191,36,0.3)] active:scale-95 transition-transform"
                 >
                     + Add Item
@@ -150,6 +158,17 @@ const AdminGodown = () => {
                                     </div>
                                     <input type="file" name="image" accept="image/*" onChange={handleGodownFormChange} className="hidden" />
                                 </label>
+                            </div>
+                            <div>
+                                <label className={labelClasses}>Gallery Photos (Max 4)</label>
+                                <input type="file" name="gallery" accept="image/*" multiple onChange={handleGodownFormChange} className="w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm text-slate-500 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-800" />
+                                {godownFormData.galleryPreviews.length > 0 && (
+                                    <div className="flex gap-2 mt-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+                                        {godownFormData.galleryPreviews.map((src, i) => (
+                                            <img key={i} src={src} className="h-12 w-12 rounded-lg object-cover shadow-sm border border-slate-200 shrink-0" />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <label className={labelClasses}>Item Name</label>

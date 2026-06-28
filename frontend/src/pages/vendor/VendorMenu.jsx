@@ -44,6 +44,8 @@ const VendorMenu = () => {
     const [prodCatId, setProdCatId] = useState('');
     const [prodImage, setProdImage] = useState(null);
     const [prodImagePreview, setProdImagePreview] = useState('');
+    const [prodGallery, setProdGallery] = useState([]);
+    const [prodGalleryPreviews, setProdGalleryPreviews] = useState([]);
     const [prodSaving, setProdSaving] = useState(false);
 
     const fetchCategories = useCallback(() => {
@@ -109,6 +111,7 @@ const VendorMenu = () => {
     const openAddProd = () => {
         if (navigator.vibrate) navigator.vibrate(30);
         setProdModal('add'); setProdName(''); setProdPrice(''); setProdImage(null); setProdImagePreview('');
+        setProdGallery([]); setProdGalleryPreviews([]);
         setProdCatId(categories.length > 0 ? categories[0]._id : '');
     };
     const openEditProd = (p) => {
@@ -116,6 +119,7 @@ const VendorMenu = () => {
         setProdModal(p); setProdName(p.name); setProdPrice(p.price);
         setProdCatId(typeof p.category === 'object' ? p.category._id || p.category : p.category);
         setProdImage(null); setProdImagePreview('');
+        setProdGallery([]); setProdGalleryPreviews([]);
     };
 
     const handleProdImage = (e) => {
@@ -123,6 +127,12 @@ const VendorMenu = () => {
         if (!file) return;
         setProdImage(file);
         setProdImagePreview(URL.createObjectURL(file));
+    };
+
+    const handleProdGallery = (e) => {
+        const files = Array.from(e.target.files).slice(0, 4); // Max 4
+        setProdGallery(files);
+        setProdGalleryPreviews(files.map(f => URL.createObjectURL(f)));
     };
 
     const saveProd = async (e) => {
@@ -134,6 +144,7 @@ const VendorMenu = () => {
         fd.append('price', Number(prodPrice));
         fd.append('categoryId', prodCatId);
         if (prodImage) fd.append('image', prodImage);
+        prodGallery.forEach(file => fd.append('gallery', file));
 
         try {
             const res = await fetch(isEdit ? `/api/products/${prodModal._id}` : '/api/products', {
@@ -344,10 +355,29 @@ const VendorMenu = () => {
                             </div>
 
                             <div>
-                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Photo (Optional)</label>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Main Photo (Optional)</label>
                                 <input type="file" accept="image/*" className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-[11px] file:font-black file:uppercase file:tracking-wider file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 transition-colors" onChange={handleProdImage} />
                                 {prodImagePreview && <img src={prodImagePreview} className="h-20 rounded-2xl mt-3 object-cover shadow-sm border border-slate-200" />}
                                 {!prodImagePreview && prodModal?.image && <img src={prodModal.image} className="h-20 rounded-2xl mt-3 object-cover shadow-sm border border-slate-200 opacity-80" />}
+                            </div>
+
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Gallery Photos (Max 4)</label>
+                                <input type="file" accept="image/*" multiple className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-[11px] file:font-black file:uppercase file:tracking-wider file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200 transition-colors" onChange={handleProdGallery} />
+                                
+                                {prodGalleryPreviews.length > 0 ? (
+                                    <div className="flex gap-2 mt-3 overflow-x-auto pb-2 [scrollbar-width:none]">
+                                        {prodGalleryPreviews.map((src, i) => (
+                                            <img key={i} src={src} className="h-16 w-16 rounded-xl object-cover shadow-sm border border-slate-200 shrink-0" />
+                                        ))}
+                                    </div>
+                                ) : prodModal?.gallery?.length > 0 && (
+                                    <div className="flex gap-2 mt-3 overflow-x-auto pb-2 [scrollbar-width:none]">
+                                        {prodModal.gallery.map((src, i) => (
+                                            <img key={i} src={src} className="h-16 w-16 rounded-xl object-cover shadow-sm border border-slate-200 opacity-80 shrink-0" />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="pt-4 flex gap-3 shrink-0">

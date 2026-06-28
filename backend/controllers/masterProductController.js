@@ -24,12 +24,23 @@ const getAllMasterProducts = async (req, res) => {
 const createMasterProduct = async (req, res) => {
     try {
         const { name, category } = req.body;
-        const image = req.file ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}` : req.body.image;
+        let image = req.body.image || '';
+        if (req.files && req.files['image']) {
+            image = `data:${req.files['image'][0].mimetype};base64,${req.files['image'][0].buffer.toString('base64')}`;
+        }
+
+        let gallery = [];
+        if (req.files && req.files['gallery']) {
+            gallery = req.files['gallery'].map(file => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`);
+        } else if (req.body.gallery) {
+            gallery = Array.isArray(req.body.gallery) ? req.body.gallery : [req.body.gallery];
+        }
 
         const newProduct = await MasterProduct.create({
             name,
             category,
-            image
+            image,
+            gallery
         });
 
         res.status(201).json({ message: "Product added to Godown successfully", product: newProduct });
@@ -52,10 +63,16 @@ const updateMasterProduct = async (req, res) => {
         product.name = name || product.name;
         product.category = category || product.category;
 
-        if (req.file) {
-            product.image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+        if (req.files && req.files['image']) {
+            product.image = `data:${req.files['image'][0].mimetype};base64,${req.files['image'][0].buffer.toString('base64')}`;
         } else if (req.body.image !== undefined) {
              product.image = req.body.image;
+        }
+
+        if (req.files && req.files['gallery']) {
+            product.gallery = req.files['gallery'].map(file => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`);
+        } else if (req.body.gallery) {
+            product.gallery = Array.isArray(req.body.gallery) ? req.body.gallery : [req.body.gallery];
         }
 
         const updatedProduct = await product.save();

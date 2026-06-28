@@ -17,10 +17,12 @@ router.get("/detail/:id", getProductDetail);
 router.get("/:shopId", getProductsByShop);
 
 // 2. Protected Routes: Vendor apne products ko manage kare
-router.post("/", protect, authorize("vendor"), upload.single('image'), createProduct);
+const productUploadFields = upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery', maxCount: 4 }]);
+
+router.post("/", protect, authorize("vendor"), productUploadFields, createProduct);
 
 // Yahan galti se deleteProduct likh diya tha, isey updateProduct karna hai
-router.put("/:id", protect, authorize("vendor"), upload.single('image'), updateProduct);
+router.put("/:id", protect, authorize("vendor"), productUploadFields, updateProduct);
 
 // Aur ye naya route delete ke liye add karna hai
 router.delete("/:id", protect, authorize("vendor"), deleteProduct);

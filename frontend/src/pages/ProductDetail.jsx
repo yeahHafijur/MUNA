@@ -25,6 +25,7 @@ const ProductDetail = () => {
     const { token } = useAuth();
 
     const [liked, setLiked] = useState(false);
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const cartItem = cartItems.find(i => i.productId === productId);
 
     useEffect(() => {
@@ -147,8 +148,8 @@ const ProductDetail = () => {
             toast.error('Something went wrong.');
         }
     };
-
-    const productImage = product.image ? optimizeImage(product.image, 800) : null;
+    const allImages = product ? [product.image, ...(product.gallery || [])].filter(Boolean) : [];
+    const activeImage = allImages.length > 0 ? optimizeImage(allImages[activeImageIndex], 800) : null;
 
     return (
         <div className="min-h-screen bg-gray-100 font-sans pb-40">
@@ -177,16 +178,32 @@ const ProductDetail = () => {
                 </div>
             </header>
 
-            {/* ─── PRODUCT IMAGE ─── */}
-            <section className="w-full bg-white flex items-center justify-center p-8 aspect-square max-h-[400px]">
-                {productImage ? (
-                    <img
-                        src={productImage}
-                        alt={product.name}
-                        className="w-full h-full object-contain mix-blend-multiply"
-                    />
-                ) : (
-                    <IcoPlaceholder />
+            {/* ─── PRODUCT IMAGE GALLERY ─── */}
+            <section className="w-full bg-white flex flex-col p-4 sm:p-8">
+                <div className="aspect-square w-full max-h-[400px] flex items-center justify-center relative bg-white">
+                    {activeImage ? (
+                        <img
+                            src={activeImage}
+                            alt={product.name}
+                            className="w-full h-full object-contain mix-blend-multiply"
+                        />
+                    ) : (
+                        <IcoPlaceholder />
+                    )}
+                </div>
+                
+                {allImages.length > 1 && (
+                    <div className="flex gap-2.5 mt-4 overflow-x-auto pb-2 px-1 [scrollbar-width:none]">
+                        {allImages.map((img, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => { setActiveImageIndex(idx); triggerHaptic(20); }}
+                                className={`w-16 h-16 shrink-0 rounded-xl overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-amber-400 scale-105 shadow-sm' : 'border-gray-100 opacity-70 active:scale-95'}`}
+                            >
+                                <img src={optimizeImage(img, 200)} className="w-full h-full object-contain mix-blend-multiply" alt={`Gallery ${idx+1}`} />
+                            </button>
+                        ))}
+                    </div>
                 )}
             </section>
 

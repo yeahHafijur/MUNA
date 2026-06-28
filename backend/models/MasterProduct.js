@@ -14,6 +14,9 @@ const masterProductSchema = new mongoose.Schema({
         type: String, // Global image link
         default: ''
     },
+    gallery: [{
+        type: String
+    }],
     status: {
         type: String,
         enum: ['pending', 'approved'],

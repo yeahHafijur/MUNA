@@ -14,8 +14,10 @@ const upload = require('../middleware/uploadMiddleware');
 router.get('/', getAllMasterProducts);
 
 // Super Admin Only Routes
-router.post('/', protect, authorize('super_admin'), upload.single('image'), createMasterProduct);
-router.put('/:id', protect, authorize('super_admin'), upload.single('image'), updateMasterProduct);
+const masterUploadFields = upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery', maxCount: 4 }]);
+
+router.post('/', protect, authorize('super_admin'), masterUploadFields, createMasterProduct);
+router.put('/:id', protect, authorize('super_admin'), masterUploadFields, updateMasterProduct);
 router.put('/:id/approve', protect, authorize('super_admin'), approveMasterProduct);
 router.delete('/:id', protect, authorize('super_admin'), deleteMasterProduct);
 

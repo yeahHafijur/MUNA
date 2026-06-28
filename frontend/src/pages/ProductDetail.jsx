@@ -59,14 +59,23 @@ const ProductDetail = () => {
         }
     };
 
-    // Fetch the shop details to find the specific product
-    const { data: shop, isLoading, error } = useQuery({
+    // Fetch the shop details
+    const { data: shop, isLoading: shopLoading, error: shopError } = useQuery({
         queryKey: ['shop', shopId],
         queryFn: () => fetch(`/api/shops/${shopId}`).then(r => {
             if (!r.ok) throw new Error('Shop not found');
             return r.json();
         }),
     });
+
+    // Fetch the products for this shop
+    const { data: productsData = [], isLoading: productsLoading } = useQuery({
+        queryKey: ['products', shopId],
+        queryFn: () => fetch(`/api/products/${shopId}`).then(r => r.json()),
+    });
+    
+    const isLoading = shopLoading || productsLoading;
+    const error = shopError;
 
     if (isLoading) {
         return (
@@ -85,24 +94,17 @@ const ProductDetail = () => {
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-[#fdfdfc]">
                 <div className="text-4xl mb-4">😢</div>
-                <h2 className="text-xl font-bold text-gray-800">Product not found</h2>
+                <h2 className="text-xl font-bold text-gray-800">Shop not found</h2>
                 <button onClick={() => navigate(-1)} className="mt-4 px-6 py-2 bg-amber-500 text-white font-bold rounded-full">Go Back</button>
             </div>
         );
     }
 
-    // Find the product in the shop's menu
-    let product = null;
-    if (shop.menu) {
-        // shop.menu is typically an array of categories, each with an items array
-        for (const cat of shop.menu) {
-            const found = cat.items.find(i => i._id === productId);
-            if (found) {
-                product = found;
-                break;
-            }
-        }
-    }
+    // Ensure products is an array
+    const products = Array.isArray(productsData) ? productsData : [];
+    
+    // Find the product
+    const product = products.find(p => p._id === productId);
 
     if (!product) {
         return (

@@ -298,7 +298,6 @@ const ShopDetail = () => {
                                         className="sd-cat-card sd-cat-card--all"
                                         onClick={() => setSelectedCategory('All')}
                                     >
-                                        <span className="sd-cat-emoji">🍔</span>
                                         <div className="sd-cat-content">
                                             <div className="sd-cat-name">All Items</div>
                                             <div className="sd-cat-count">{products.length} items</div>

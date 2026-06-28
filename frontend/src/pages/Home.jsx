@@ -286,7 +286,7 @@ const Home = () => {
                                                 : 'bg-white text-[#6B5020] border-[#E8D5A0] hover:bg-[#FFF4DA]'
                                             }`}
                                     >
-                                        {cat === 'All' ? '🏠 All Shops' : cat}
+                                        {cat === 'All' ? '🏠 All Stores' : cat}
                                     </button>
                                 );
                             })}
@@ -300,10 +300,10 @@ const Home = () => {
                                 ? `"${searchQuery}"`
                                 : activeCategory !== 'All'
                                     ? activeCategory
-                                    : 'Shops near you'}
+                                    : 'Stores near you'}
                         </h2>
                         <span className="px-2.5 py-1 rounded-full bg-[#FDF3D7] text-[#8C7A55] text-[10px] font-bold border border-[#F0E0A0]">
-                            {sortedShops.length} {sortedShops.length === 1 ? 'shop' : 'shops'}
+                            {sortedShops.length} {sortedShops.length === 1 ? 'store' : 'stores'}
                         </span>
                     </div>
 

@@ -56,7 +56,7 @@ const BottomNav = () => {
 
     // Hide bottom nav on these pages
     const hiddenPaths = ['/profile', '/login', '/vendor', '/admin', '/privacy-policy'];
-    const shouldHide = hiddenPaths.some(p => location.pathname.startsWith(p)) || location.pathname.includes('/product/');
+    const shouldHide = hiddenPaths.some(p => location.pathname.startsWith(p));
     if (shouldHide) return null;
 
     // Determine active tab

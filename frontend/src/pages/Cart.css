@@ -55,7 +55,7 @@
     flex: 1;
     overflow-y: auto;
     padding: 16px;
-    padding-bottom: 120px; /* Space for fixed bottom bar */
+    padding-bottom: 160px; /* Space for fixed bottom bar */
     -webkit-overflow-scrolling: touch;
 }
 
@@ -301,8 +301,8 @@
 
 /* ---- FIXED BOTTOM BAR ---- */
 .crt-bottom-bar {
-    position: absolute;
-    bottom: 0;
+    position: fixed;
+    bottom: 64px;
     left: 0;
     right: 0;
     background: #ffffff;

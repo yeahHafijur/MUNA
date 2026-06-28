@@ -151,7 +151,7 @@ const ProductDetail = () => {
     const productImage = product.image ? optimizeImage(product.image, 800) : null;
 
     return (
-        <div className="min-h-screen bg-gray-100 font-sans pb-28">
+        <div className="min-h-screen bg-gray-100 font-sans pb-40">
 
             {/* ─── STANDARD STICKY HEADER ─── */}
             <header className="sticky top-0 inset-x-0 z-50 bg-white border-b border-gray-200 flex items-center justify-between px-2 py-2">
@@ -261,7 +261,7 @@ const ProductDetail = () => {
             )}
 
             {/* ─── STANDARD BOTTOM BAR ─── */}
-            <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 p-3 pb-safe z-50">
+            <div className="fixed bottom-[64px] inset-x-0 bg-white border-t border-gray-200 p-3 z-50">
                 <div className="max-w-xl mx-auto w-full flex gap-3">
                     {!product.inStock ? (
                         <button className="w-full py-3.5 bg-gray-100 text-gray-400 rounded-lg font-semibold text-sm cursor-not-allowed">

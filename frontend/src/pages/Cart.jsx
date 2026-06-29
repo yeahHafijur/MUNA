@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { Player } from '@lottiefiles/react-lottie-player';
+import Lottie from 'lottie-react';
+import successAnimationData from '../assets/success.json';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -209,7 +210,7 @@ const Cart = () => {
             setTimeout(() => {
                 clearCart();
                 navigate('/profile');
-            }, 3000);
+            }, 3500);
 
         } catch (error) {
             alert(error.message);
@@ -221,11 +222,9 @@ const Cart = () => {
     if (orderSuccess) {
         return (
             <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white">
-                <Player
-                    autoplay
+                <Lottie
+                    animationData={successAnimationData}
                     loop={false}
-                    keepLastFrame
-                    src="https://lottie.host/9bd7b070-ad27-4dd3-ae99-fcc613393962/j7m87K3n5U.json" // High quality generic success animation
                     style={{ height: '300px', width: '300px' }}
                 />
                 <h2 className="mt-4 text-2xl font-bold text-slate-800 tracking-tight">Order Placed!</h2>

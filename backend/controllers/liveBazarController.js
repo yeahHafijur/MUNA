@@ -41,10 +41,10 @@ const postItem = async (req, res) => {
     }
 };
 
-// 2. Get nearby active items (with optional maxDistance in km, default 5km)
+// 2. Get nearby active items (with optional maxDistance in km, default 1000km)
 const getNearbyItems = async (req, res) => {
     try {
-        const { lng, lat, maxDistance = 5 } = req.query;
+        const { lng, lat, maxDistance = 1000 } = req.query;
 
         if (!lng || !lat) {
             return res.status(400).json({ message: "Longitude and Latitude are required." });

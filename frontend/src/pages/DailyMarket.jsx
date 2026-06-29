@@ -47,7 +47,7 @@ const DailyMarket = () => {
         queryKey: ['dailyMarketItems', location?.lat, location?.lng],
         queryFn: async () => {
             if (!location) return [];
-            const res = await fetch(`/api/live-bazar?lat=${location.lat}&lng=${location.lng}&maxDistance=10`);
+            const res = await fetch(`/api/live-bazar?lat=${location.lat}&lng=${location.lng}&maxDistance=1000`);
             if (!res.ok) throw new Error('Failed to fetch items');
             return res.json();
         },

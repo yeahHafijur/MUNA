@@ -58,6 +58,18 @@ const getMessages = async (req, res) => {
         const messages = await ChatMessage.find({ sessionId })
             .sort({ createdAt: 1 });
 
+        // Mark as read for messages not sent by me
+        const unreadMsgIds = messages
+            .filter(m => m.senderId.toString() !== req.user._id.toString() && !m.isRead)
+            .map(m => m._id);
+
+        if (unreadMsgIds.length > 0) {
+            await ChatMessage.updateMany(
+                { _id: { $in: unreadMsgIds } },
+                { $set: { isRead: true } }
+            );
+        }
+
         res.status(200).json(messages);
     } catch (error) {
         console.error("getMessages Error:", error);
@@ -144,9 +156,36 @@ const sendMessage = async (req, res) => {
     }
 };
 
+// 5. Get global unread chat count
+const getUnreadCount = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        // Find all sessions where user is a participant
+        const sessions = await ChatSession.find({
+            $or: [{ buyerId: userId }, { sellerId: userId }]
+        }).select('_id');
+
+        const sessionIds = sessions.map(s => s._id);
+
+        // Count unread messages in these sessions where sender is not the user
+        const unreadCount = await ChatMessage.countDocuments({
+            sessionId: { $in: sessionIds },
+            senderId: { $ne: userId },
+            isRead: false
+        });
+
+        res.status(200).json({ count: unreadCount });
+    } catch (error) {
+        console.error("getUnreadChatCount Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 module.exports = {
     getChatSessions,
     startSession,
     getMessages,
-    sendMessage
+    sendMessage,
+    getUnreadCount
 };

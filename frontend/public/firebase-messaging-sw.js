@@ -18,4 +18,9 @@ const messaging = firebase.messaging();
 // otherwise it will show duplicates!
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  
+  // Set generic badge dot on app icon
+  if (navigator.setAppBadge) {
+    navigator.setAppBadge().catch(console.error);
+  }
 });

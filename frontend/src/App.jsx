@@ -7,6 +7,8 @@ import ScrollToTop from './components/ScrollToTop';
 import { onMessageListener } from './firebase';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUnreadNotifications } from './hooks/useUnreadNotifications';
+import { useUnreadChats } from './hooks/useUnreadChats';
 
 // Lazy loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -43,6 +45,25 @@ const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminVendorRequests = lazy(() => import('./pages/admin/AdminVendorRequests'));
 const GodownBrowser = lazy(() => import('./pages/GodownBrowser'));
 
+// Global Badge Updater Component
+const AppBadgeUpdater = () => {
+  const { data: unreadNotifs = 0 } = useUnreadNotifications();
+  const { data: unreadChats = 0 } = useUnreadChats();
+
+  useEffect(() => {
+    const totalUnread = unreadNotifs + unreadChats;
+    if ('setAppBadge' in navigator) {
+      if (totalUnread > 0) {
+        navigator.setAppBadge(totalUnread).catch(console.error);
+      } else {
+        navigator.clearAppBadge().catch(console.error);
+      }
+    }
+  }, [unreadNotifs, unreadChats]);
+
+  return null;
+};
+
 const AppContent = () => {
   const [showSplash, setShowSplash] = useState(() => {
     const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
@@ -65,6 +86,11 @@ const AppContent = () => {
 
       // Zero-API real-time UI update for notifications
       queryClient.setQueryData(['unreadCount'], (old) => (old ? old + 1 : 1));
+      
+      // Attempt to increment chat unread count if title contains 'Message'
+      if (payload.notification?.title?.toLowerCase().includes('message')) {
+        queryClient.setQueryData(['unreadChatCount'], (old) => (old ? old + 1 : 1));
+      }
 
       // Automatic invalidation for order updates
       if (payload.notification?.title?.toLowerCase().includes('order')) {
@@ -83,6 +109,7 @@ const AppContent = () => {
 
   return (
     <>
+      <AppBadgeUpdater />
       <ScrollToTop />
       {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
 

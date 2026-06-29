@@ -98,15 +98,17 @@ const DailyMarketPost = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans pb-10">
-            <header className="sticky top-0 inset-x-0 z-50 bg-white border-b border-slate-100 flex items-center px-4 py-3">
-                <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-800 rounded-full">
+        /* Fixed Viewport Shell to bypass App.jsx padding */
+        <div className="fixed inset-0 z-[100] flex flex-col bg-white font-sans overflow-hidden">
+            <header className="shrink-0 h-14 bg-white border-b border-slate-100 flex items-center px-4 z-50">
+                <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-800 rounded-full active:bg-slate-100 transition-colors">
                     <IcoBack />
                 </button>
-                <h1 className="text-lg font-black text-slate-900 tracking-tight ml-2">Post to Market</h1>
+                <h1 className="text-lg font-bold text-slate-900 tracking-tight ml-2">Post to Market</h1>
             </header>
 
-            <form onSubmit={handleSubmit} className="p-4 space-y-6">
+            <main className="flex-1 overflow-y-auto p-4 space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6 pb-20">
                 
                 {/* Photo Upload */}
                 <div className="w-full">
@@ -186,7 +188,8 @@ const DailyMarketPost = () => {
                         {postMutation.isPending ? 'Posting...' : !location ? 'Getting Location...' : 'Post Item Now'}
                     </button>
                 </div>
-            </form>
+                </form>
+            </main>
         </div>
     );
 };

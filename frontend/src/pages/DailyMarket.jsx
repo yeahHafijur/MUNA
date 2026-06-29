@@ -86,16 +86,17 @@ const DailyMarket = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-24">
+        /* Fixed Viewport Shell to bypass App.jsx padding */
+        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 font-sans overflow-hidden">
             {/* Header */}
-            <header className="sticky top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-4 py-3 shadow-sm">
+            <header className="shrink-0 h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-50">
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-800 active:bg-slate-100 rounded-full transition-colors">
                         <IcoBack />
                     </button>
                     <div>
-                        <h1 className="text-xl font-black text-slate-900 tracking-tight leading-none">MunaDailyMarket</h1>
-                        <p className="text-[11px] font-bold text-amber-500 uppercase tracking-widest mt-1 flex items-center gap-1">
+                        <h1 className="text-lg font-bold text-slate-900 tracking-tight leading-none">MunaDailyMarket</h1>
+                        <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-1 flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                             Live near you
                         </p>
@@ -103,14 +104,14 @@ const DailyMarket = () => {
                 </div>
                 <button
                     onClick={() => navigate('/chat')}
-                    className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 relative active:scale-95 transition-transform"
+                    className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 relative active:bg-slate-200 transition-colors"
                 >
                     <IcoChat />
                 </button>
             </header>
 
             {/* Content */}
-            <main className="p-4">
+            <main className="flex-1 overflow-y-auto p-4 pb-24 relative">
                 {isLocating ? (
                     <div className="flex flex-col items-center justify-center py-20 text-slate-400">
                         <IcoLocation />
@@ -179,7 +180,7 @@ const DailyMarket = () => {
                     if (!token) { toast.error("Please login to sell"); navigate('/login'); return; }
                     navigate('/daily-market/post');
                 }}
-                className="fixed bottom-24 right-4 z-50 bg-slate-900 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgba(15,23,42,0.4)] active:scale-90 transition-transform"
+                className="absolute bottom-6 right-4 z-50 bg-slate-900 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgba(15,23,42,0.4)] active:scale-90 transition-transform"
             >
                 <IcoAdd />
             </button>

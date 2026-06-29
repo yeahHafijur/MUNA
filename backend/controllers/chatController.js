@@ -1,7 +1,8 @@
 const ChatSession = require('../models/ChatSession');
 const ChatMessage = require('../models/ChatMessage');
 const User = require('../models/User');
-
+const adminApp = require('../firebaseAdmin');
+const { getMessaging } = require('firebase-admin/messaging');
 // 1. Get all chat sessions for the logged-in user
 const getChatSessions = async (req, res) => {
     try {
@@ -82,12 +83,61 @@ const sendMessage = async (req, res) => {
         });
 
         // Update the session's lastMessage and updatedAt
-        await ChatSession.findByIdAndUpdate(sessionId, {
+        const session = await ChatSession.findByIdAndUpdate(sessionId, {
             lastMessage: text,
             updatedAt: new Date()
         });
 
         res.status(201).json(message);
+
+        // --- FIREBASE PUSH NOTIFICATION ---
+        try {
+            if (session && adminApp) {
+                // Determine recipient
+                const recipientId = session.buyerId.toString() === senderId.toString() ? session.sellerId : session.buyerId;
+                
+                // Fetch recipient's FCM tokens
+                const recipient = await User.findById(recipientId).select('fcmTokens');
+                
+                if (recipient && recipient.fcmTokens && recipient.fcmTokens.length > 0) {
+                    const tokens = [...new Set(recipient.fcmTokens)];
+                    
+                    const messagePayload = {
+                        notification: { 
+                            title: `New Message from ${req.user.name || 'someone'}`, 
+                            body: text 
+                        },
+                        data: { route: `/chat/${sessionId}` },
+                        tokens: tokens,
+                    };
+            
+                    const response = await getMessaging(adminApp).sendEachForMulticast(messagePayload);
+                    
+                    // Cleanup dead tokens
+                    if (response.failureCount > 0) {
+                        const failedTokens = [];
+                        response.responses.forEach((resp, idx) => {
+                            if (!resp.success) {
+                                const errCode = resp.error?.code;
+                                if (errCode === 'messaging/invalid-registration-token' ||
+                                    errCode === 'messaging/registration-token-not-registered') {
+                                    failedTokens.push(tokens[idx]);
+                                }
+                            }
+                        });
+            
+                        if (failedTokens.length > 0) {
+                            await User.findByIdAndUpdate(recipientId, {
+                                $pull: { fcmTokens: { $in: failedTokens } }
+                            });
+                        }
+                    }
+                }
+            }
+        } catch (fcmError) {
+            console.error("FCM Chat Error:", fcmError);
+        }
+
     } catch (error) {
         console.error("sendMessage Error:", error);
         res.status(500).json({ message: "Server error" });

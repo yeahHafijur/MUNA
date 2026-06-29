@@ -154,7 +154,12 @@ const Search = () => {
                     </span>
                     <input
                         ref={inputRef}
-                        type="text"
+                        type="search"
+                        name="q"
+                        id="search-input"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck="false"
                         className="w-full py-2.5 pl-11 pr-10 bg-slate-50 border border-slate-200/80 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-slate-800 focus:ring-0 transition-all"
                         placeholder="Search for items, stores or categories..."
                         value={query}

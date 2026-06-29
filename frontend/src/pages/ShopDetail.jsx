@@ -223,7 +223,12 @@ const ShopDetail = () => {
                             <div className="sd-search-wrap">
                                 <IcoSearch />
                                 <input
-                                    type="text"
+                                    type="search"
+                                    name="q"
+                                    id="shop-search-input"
+                                    autoComplete="off"
+                                    autoCorrect="off"
+                                    spellCheck="false"
                                     placeholder="Search items, categories..."
                                     className="sd-search-input"
                                     value={searchQuery}

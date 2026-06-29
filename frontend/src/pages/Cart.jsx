@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
+import { Player } from '@lottiefiles/react-lottie-player';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -34,10 +36,11 @@ const Cart = () => {
     const [deliveryFee, setDeliveryFee] = useState(null);
     const [distance, setDistance] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [locating, setLocating] = useState(false);
+    const [isLocating, setLocating] = useState(false);
     
     // Saved Locations
     const [savingLocation, setSavingLocation] = useState(false);
+    const [orderSuccess, setOrderSuccess] = useState(false);
     const [locationName, setLocationName] = useState('Home');
     const [showSavePrompt, setShowSavePrompt] = useState(false);
     const [selectedSavedLoc, setSelectedSavedLoc] = useState(null);
@@ -202,8 +205,11 @@ const Cart = () => {
                 login({ ...user, phone: customerPhone }, token);
             }
             
-            clearCart();
-            navigate('/profile');
+            setOrderSuccess(true);
+            setTimeout(() => {
+                clearCart();
+                navigate('/profile');
+            }, 3000);
 
         } catch (error) {
             alert(error.message);
@@ -211,6 +217,22 @@ const Cart = () => {
             setLoading(false);
         }
     };
+
+    if (orderSuccess) {
+        return (
+            <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white">
+                <Player
+                    autoplay
+                    loop={false}
+                    keepLastFrame
+                    src="https://lottie.host/9bd7b070-ad27-4dd3-ae99-fcc613393962/j7m87K3n5U.json" // High quality generic success animation
+                    style={{ height: '300px', width: '300px' }}
+                />
+                <h2 className="mt-4 text-2xl font-bold text-slate-800 tracking-tight">Order Placed!</h2>
+                <p className="text-slate-500 mt-2">Redirecting to your orders...</p>
+            </div>
+        );
+    }
 
     if (cartItems.length === 0) {
         return (

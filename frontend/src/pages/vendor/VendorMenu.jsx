@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { useQuery } from '@tanstack/react-query';
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../../utils/cropImage';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -47,6 +49,13 @@ const VendorMenu = () => {
     const [prodGallery, setProdGallery] = useState([]);
     const [prodGalleryPreviews, setProdGalleryPreviews] = useState([]);
     const [prodSaving, setProdSaving] = useState(false);
+
+    // Cropper State for Product Main Image
+    const [cropImageSrc, setCropImageSrc] = useState(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [isCropping, setIsCropping] = useState(false);
 
     const fetchCategories = useCallback(() => {
         if (!shop?._id) return;
@@ -125,8 +134,26 @@ const VendorMenu = () => {
     const handleProdImage = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        setProdImage(file);
-        setProdImagePreview(URL.createObjectURL(file));
+        setCropImageSrc(URL.createObjectURL(file));
+        setIsCropping(true);
+    };
+
+    const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
+
+    const handleCropSave = async () => {
+        try {
+            const croppedImageBlob = await getCroppedImg(cropImageSrc, croppedAreaPixels, 0);
+            const croppedFile = new File([croppedImageBlob], 'cropped.jpg', { type: 'image/jpeg' });
+            setProdImage(croppedFile);
+            setProdImagePreview(URL.createObjectURL(croppedImageBlob));
+            setIsCropping(false);
+            setCropImageSrc(null);
+        } catch (e) {
+            console.error(e);
+            toast.error("Failed to crop image");
+        }
     };
 
     const handleProdGallery = (e) => {
@@ -386,6 +413,46 @@ const VendorMenu = () => {
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Full-Screen Cropper Overlay for Product Image */}
+            {isCropping && (
+                <div className="fixed inset-0 z-[300] bg-black flex flex-col">
+                    <header className="shrink-0 h-14 flex items-center justify-between px-4 z-10 bg-gradient-to-b from-black/50 to-transparent">
+                        <button onClick={() => { setIsCropping(false); setCropImageSrc(null); }} className="p-2 -ml-2 text-white rounded-full">
+                            ✕
+                        </button>
+                        <h1 className="text-white font-bold tracking-tight">Crop Photo</h1>
+                        <button onClick={handleCropSave} className="text-amber-400 font-bold uppercase tracking-wider text-sm active:opacity-70">
+                            Done
+                        </button>
+                    </header>
+                    <div className="flex-1 relative">
+                        {cropImageSrc && (
+                            <Cropper
+                                image={cropImageSrc}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={1} // 1:1 Square
+                                onCropChange={setCrop}
+                                onCropComplete={onCropComplete}
+                                onZoomChange={setZoom}
+                                objectFit="contain"
+                            />
+                        )}
+                    </div>
+                    <div className="h-24 bg-black/90 pb-safe flex items-center justify-center px-8 z-10">
+                        <input
+                            type="range"
+                            value={zoom}
+                            min={1}
+                            max={3}
+                            step={0.1}
+                            onChange={(e) => setZoom(e.target.value)}
+                            className="w-full accent-amber-400"
+                        />
                     </div>
                 </div>
             )}

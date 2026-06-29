@@ -218,21 +218,21 @@ const Home = () => {
                     <div className="px-5 pb-5">
                         <div 
                             onClick={() => navigate('/daily-market')}
-                            className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-[0_8px_30px_rgba(15,23,42,0.3)] cursor-pointer active:scale-[0.98] transition-transform relative overflow-hidden"
+                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 flex items-center justify-between shadow-[0_8px_30px_rgba(37,99,235,0.4)] cursor-pointer active:scale-[0.98] transition-transform relative overflow-hidden"
                         >
                             {/* Subtle shine effect */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
                             
                             <div className="relative z-10">
                                 <h3 className="text-[17px] font-black text-white flex items-center gap-2 tracking-tight">
-                                    MunaDailyMarket <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse mt-0.5"></span>
+                                    MunaDailyMarket <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse mt-0.5"></span>
                                 </h3>
-                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                                <p className="text-[11px] font-bold text-blue-100 uppercase tracking-widest mt-0.5">
                                     Sell & Buy in your neighborhood
                                 </p>
                             </div>
-                            <div className="relative z-10 w-10 h-10 bg-white text-slate-900 rounded-full flex items-center justify-center shrink-0 shadow-sm active:bg-slate-100 transition-colors">
-                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                            <div className="relative z-10 w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center shrink-0 shadow-md active:bg-blue-50 transition-colors">
+                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                             </div>
                         </div>
                     </div>

@@ -302,7 +302,7 @@ const Home = () => {
                             <div className="space-y-4">
                                 {[1, 2, 3].map(i => (
                                     <div key={i} className="bg-white rounded-2xl p-3 border border-slate-100 flex gap-4 animate-pulse">
-                                        <div className="w-20 h-20 bg-slate-100 rounded-xl shrink-0" />
+                                        <div className="w-[120px] h-[84px] bg-slate-100 rounded-xl shrink-0" />
                                         <div className="flex-1 py-1">
                                             <div className="h-4 bg-slate-100 w-2/3 rounded mb-2" />
                                             <div className="h-3 bg-slate-100 w-1/2 rounded" />
@@ -326,9 +326,9 @@ const Home = () => {
                                         className={`bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex gap-4 active:scale-[0.98] transition-all hover:border-amber-400 group ${!shop.isOpen ? 'opacity-60 bg-slate-50' : ''}`}
                                     >
                                         {/* Store Image */}
-                                        <div className="w-[84px] h-[84px] rounded-xl bg-slate-50 shrink-0 relative overflow-hidden border border-slate-100">
+                                        <div className="w-[120px] h-[84px] rounded-xl bg-slate-50 shrink-0 relative overflow-hidden border border-slate-100">
                                             {shop.image ? (
-                                                <img src={optimizeImage(shop.image, 200)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                <img src={optimizeImage(shop.image, 300)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-300"><IcoStore /></div>
                                             )}

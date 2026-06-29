@@ -2,26 +2,20 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
 import { optimizeImage } from '../utils/imageUtils';
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
 import { useUnreadChats } from '../hooks/useUnreadChats';
 
-/* ─── Icon Components ─── */
-const IcoPin = ({ className = "w-6 h-6" }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-);
-const IcoBell = ({ className = "w-5 h-5" }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-    </svg>
-);
+/* ─── Premium Native Icons ─── */
+const IcoSearch = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>;
+const IcoMapPin = () => <svg fill="currentColor" viewBox="0 0 24 24" className="w-5 h-5 text-amber-500"><path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>;
+const IcoBell = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>;
+const IcoUser = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>;
+const IcoStar = () => <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3 text-white"><path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" /></svg>;
+const IcoStore = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg>;
 
 /* ─── Distance formatter ─── */
-const fmtDist = (d) => d < 1 ? `${(d * 1000).toFixed(0)} m` : `${d.toFixed(1)} km`;
+const fmtDist = (d) => d < 1 ? `${(d * 1000).toFixed(0)}m` : `${d.toFixed(1)}km`;
 
 /* ─── Haversine ─── */
 const haversine = (lat1, lon1, lat2, lon2) => {
@@ -29,421 +23,264 @@ const haversine = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) ** 2;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
-/* ═══════════════════════════════════════════════════════════
-   HOME PAGE COMPONENT — Premium App Shell
-═══════════════════════════════════════════════════════════ */
 const Home = () => {
     const { user } = useAuth();
-    const { cartItems } = useCart();
     const navigate = useNavigate();
 
     const [userLocation, setUserLocation] = useState(null);
-    const [locationError, setLocationError] = useState(null);
+    const [locationText, setLocationText] = useState("Fetching location...");
     const [activeCategory, setActiveCategory] = useState('All');
-    const [searchQuery, setSearchQuery] = useState('');
 
-    /* ── Fetch shops & settings with React Query ── */
+    // Hardcoded categories for a visual visual menu
+    const categoryMenu = [
+        { name: 'All', icon: '🏪' },
+        { name: 'Kirana', icon: '🍚' },
+        { name: 'Vegetables', icon: '🥬' },
+        { name: 'Pharmacy', icon: '💊' },
+        { name: 'Meat', icon: '🥩' },
+        { name: 'Dairy', icon: '🥛' },
+        { name: 'Bakery', icon: '🍞' }
+    ];
+
+    /* ── Fetch Data ── */
     const { data: shops = [], isLoading: loading } = useQuery({
         queryKey: ['shops'],
         queryFn: () => fetch('/api/shops').then(r => r.json()),
     });
 
-    const { data: homeMsg = { line1: 'Your local market,', line2: 'delivered in minutes ⚡' } } = useQuery({
+    const { data: homeMsg = { line1: 'Delivery in', line2: '15 Minutes' } } = useQuery({
         queryKey: ['navbar-message'],
         queryFn: () => fetch('/api/settings/navbar-message').then(r => r.json()),
     });
 
-    /* Global unread count hook jo humne banaya tha */
     const { data: unreadCount = 0 } = useUnreadNotifications();
     const { data: unreadChatCount = 0 } = useUnreadChats();
-
     const totalAlerts = unreadCount + unreadChatCount;
 
-    /* ── Featured godown items for carousel (selected by super admin) ── */
+    /* ── Carousel ── */
     const { data: godownItems = [] } = useQuery({
         queryKey: ['featured-carousel'],
         queryFn: () => fetch('/api/settings/featured-items').then(r => r.json()),
         select: (data) => (Array.isArray(data) ? data : []).filter(item => item.image),
     });
 
-    // Group items into pairs of 2
-    const carouselPairs = useMemo(() => {
-        const pairs = [];
-        for (let i = 0; i < godownItems.length; i += 2) {
-            pairs.push(godownItems.slice(i, i + 2));
-        }
-        return pairs;
-    }, [godownItems]);
-
     const [carouselIdx, setCarouselIdx] = useState(0);
-    const nextSlide = useCallback(() => {
-        setCarouselIdx(prev => (carouselPairs.length > 0 ? (prev + 1) % carouselPairs.length : 0));
-    }, [carouselPairs.length]);
-
     useEffect(() => {
-        if (carouselPairs.length <= 1) return;
-        const timer = setInterval(nextSlide, 3500);
+        if (godownItems.length <= 1) return;
+        const timer = setInterval(() => {
+            setCarouselIdx(prev => (prev + 1) % godownItems.length);
+        }, 4000);
         return () => clearInterval(timer);
-    }, [carouselPairs.length, nextSlide]);
+    }, [godownItems.length]);
 
     /* ── Geolocation ── */
-    const handleLocate = () => {
+    useEffect(() => {
         if (!('geolocation' in navigator)) {
-            setLocationError('Geolocation not supported.');
+            setLocationText('Location not supported');
             return;
         }
         navigator.geolocation.getCurrentPosition(
             pos => {
                 setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-                setLocationError(null);
+                setLocationText("Current Location");
             },
-            () => {
-                setLocationError('Location denied. Showing all shops.');
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            () => setLocationText("Select Location"),
+            { enableHighAccuracy: true, timeout: 5000 }
         );
-    };
+    }, []);
 
-    /* ── Derived data ── */
-    const categories = useMemo(() => {
-        const cats = new Set(shops.map(s => s.category || 'Kirana'));
-        return ['All', ...Array.from(cats).sort()];
-    }, [shops]);
-
-
+    /* ── Derived Data ── */
     const sortedShops = useMemo(() => {
         let list = shops.map(shop => {
             let distance = Infinity;
             if (userLocation && shop.location?.coordinates?.length === 2) {
-                distance = haversine(
-                    userLocation.lat, userLocation.lng,
-                    shop.location.coordinates[1],
-                    shop.location.coordinates[0]
-                );
+                distance = haversine(userLocation.lat, userLocation.lng, shop.location.coordinates[1], shop.location.coordinates[0]);
             }
             return { ...shop, distance };
         });
 
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            list = list.filter(s =>
-                s.name.toLowerCase().includes(q) ||
-                s.address.toLowerCase().includes(q) ||
-                (s.category || '').toLowerCase().includes(q)
-            );
-        }
-
         if (activeCategory !== 'All') {
-            list = list.filter(s => (s.category || 'Kirana') === activeCategory);
+            list = list.filter(s => (s.category || 'Kirana').includes(activeCategory));
         }
 
         return list.sort((a, b) => {
             if (a.isOpen !== b.isOpen) return a.isOpen ? -1 : 1;
             return a.distance - b.distance;
         });
-    }, [shops, userLocation, searchQuery, activeCategory]);
+    }, [shops, userLocation, activeCategory]);
 
-    /* ═══════════════════════════════════════════════════════
-       RENDER
-    ═══════════════════════════════════════════════════════ */
     return (
-        /* RESTORED THEME: The main wrapper has your custom amber gradient */
-        <div className="fixed inset-0 z-[100] flex flex-col bg-gradient-to-b from-[#FFC107] via-[#F59E0B] to-[#D97706] overflow-hidden font-sans antialiased">
+        <div className="min-h-screen bg-slate-50 font-sans pb-24">
 
-            {/* ════════ HEADER (Transparent so it blends with theme) ════════ */}
-            <header className="shrink-0 px-5 py-4 z-10">
-                <div className="flex items-center justify-between gap-3">
-                    {/* Brand */}
-                    <Link to="/" className="flex items-center gap-2 shrink-0">
-                        <img src="/muna-logo-new.png" alt="MUNA" className="w-10 h-10 rounded-xl object-contain shadow-sm" />
-                        <div className="flex flex-col leading-none">
-                            <span className="text-[16px] font-black tracking-tight text-white drop-shadow-sm">MUNA</span>
-                            <span className="text-[9px] font-extrabold text-amber-100 tracking-widest uppercase mt-[2px]">
-                                In Minutes
+            {/* ════════ HEADER SECTION ════════ */}
+            <header className="bg-white px-4 pt-3 pb-4 sticky top-0 z-50 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+
+                {/* Top Row: Location & Profile */}
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2 flex-1 min-w-0 pr-4">
+                        <IcoMapPin />
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-[15px] font-black text-slate-900 truncate tracking-tight flex items-center gap-1">
+                                {homeMsg.line2}
+                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-amber-500"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" /></svg>
                             </span>
+                            <span className="text-[11px] font-semibold text-slate-500 truncate">{locationText}</span>
                         </div>
-                    </Link>
+                    </div>
 
-                    {/* Right Actions: Locate Me + Alert Bell */}
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={handleLocate}
-                            className="w-10 h-10 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 flex items-center justify-center text-white active:scale-95"
-                            title={userLocation ? 'Located ✓' : 'Locate Me'}
-                        >
-                            {userLocation ? (
-                                <span className="text-[14px]">✓</span>
-                            ) : (
-                                <IcoPin className="w-5 h-5" />
-                            )}
+                    <div className="flex items-center gap-3 shrink-0">
+                        <button onClick={() => navigate('/notifications')} className="relative text-slate-700 active:scale-95 transition-transform">
+                            <IcoBell />
+                            {totalAlerts > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white">{totalAlerts}</span>}
                         </button>
-                        <button
-                            onClick={() => navigate('/notifications')}
-                            className="relative w-10 h-10 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 flex items-center justify-center text-white active:scale-95"
-                        >
-                            <IcoBell className="w-5 h-5" />
-                            {totalAlerts > 0 && (
-                                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center shadow-lg shadow-red-500/40 animate-pulse">
-                                    {totalAlerts > 9 ? '9+' : totalAlerts}
-                                </span>
-                            )}
+                        <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 active:scale-95 transition-transform">
+                            {user?.name ? <span className="font-bold text-sm">{user.name.charAt(0).toUpperCase()}</span> : <IcoUser />}
                         </button>
+                    </div>
+                </div>
+
+                {/* Search Bar */}
+                <div
+                    onClick={() => navigate('/search')}
+                    className="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-3 cursor-text active:scale-[0.98] transition-transform"
+                >
+                    <span className="text-amber-500"><IcoSearch /></span>
+                    <div className="flex flex-col">
+                        <span className="text-[13px] font-bold text-slate-900 leading-none mb-0.5">Search for "{homeMsg.line1.replace(/[^a-zA-Z ]/g, "").trim() || 'Groceries'}"</span>
+                        <span className="text-[10px] font-medium text-slate-500">Over 5,000 products available</span>
                     </div>
                 </div>
             </header>
 
-            {/* ════════ SCROLLABLE BODY ════════ */}
-            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {/* ════════ MAIN CONTENT ════════ */}
+            <main className="pt-4">
 
-                {/* --- YELLOW TOP SECTION --- */}
-                <div className="pb-6">
-                    {/* Slogan */}
-                    <div className="px-5 pt-2 pb-4">
-                        <div className="text-[28px] md:text-[32px] font-black text-[#1F1300] leading-tight tracking-tight">
-                            {homeMsg.line1}
-                        </div>
-                        <div className="text-[32px] md:text-[36px] font-black text-white leading-tight tracking-tight drop-shadow-md mt-1">
-                            {homeMsg.line2}
-                        </div>
-                    </div>
-
-                    {/* ── Daily Market Banner ── */}
-                    <div className="px-5 pb-5">
-                        <div 
-                            onClick={() => navigate('/daily-market')}
-                            className="w-full bg-gradient-to-r from-sky-400 to-cyan-500 rounded-2xl p-4 flex items-center justify-between shadow-[0_8px_30px_rgba(14,165,233,0.3)] cursor-pointer active:scale-[0.98] transition-transform relative overflow-hidden"
-                        >
-                            {/* Subtle shine effect */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                            
-                            <div className="relative z-10">
-                                <h3 className="text-[17px] font-black text-white flex items-center gap-2 tracking-tight drop-shadow-sm">
-                                    MunaDailyMarket <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse mt-0.5"></span>
-                                </h3>
-                                <p className="text-[11px] font-bold text-cyan-50 uppercase tracking-widest mt-0.5 drop-shadow-sm">
-                                    Sell & Buy in your neighborhood
-                                </p>
-                            </div>
-                            <div className="relative z-10 w-10 h-10 bg-white text-sky-500 rounded-full flex items-center justify-center shrink-0 shadow-md active:bg-sky-50 transition-colors">
-                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ── Godown Items Carousel (2 boxes side by side) ── */}
-                    {carouselPairs.length > 0 && (
-                        <div className="px-5">
-                            <div className="relative h-[140px] overflow-hidden">
-                                {carouselPairs.map((pair, pairIdx) => (
-                                    <div
-                                        key={pairIdx}
-                                        className="absolute inset-0 flex gap-3 transition-all duration-700 ease-in-out"
-                                        style={{
-                                            opacity: pairIdx === carouselIdx ? 1 : 0,
-                                            transform: pairIdx === carouselIdx ? 'translateY(0)' : 'translateY(20px)',
-                                            pointerEvents: pairIdx === carouselIdx ? 'auto' : 'none',
-                                        }}
-                                    >
-                                        {pair.map(item => (
-                                            <div key={item._id} className="flex-1 rounded-2xl overflow-hidden shadow-lg shadow-black/10 relative">
-                                                <img
-                                                    src={optimizeImage(item.image)}
-                                                    alt={item.name}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                                                <div className="absolute bottom-0 left-0 right-0 p-3">
-                                                    <div className="text-[13px] font-black text-white leading-tight drop-shadow-md truncate">{item.name}</div>
-                                                    {item.price > 0 && (
-                                                        <div className="text-[12px] font-extrabold text-amber-300 mt-0.5">₹{item.price}</div>
-                                                    )}
-                                                    {item.category && (
-                                                        <div className="text-[9px] font-bold text-white/60 uppercase tracking-wider mt-0.5">{item.category}</div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {/* If pair has only 1 item, add an empty spacer */}
-                                        {pair.length === 1 && <div className="flex-1" />}
-                                    </div>
-                                ))}
-                            </div>
-                            {/* Dots indicator */}
-                            {carouselPairs.length > 1 && (
-                                <div className="flex justify-center gap-1.5 mt-3">
-                                    {carouselPairs.map((_, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setCarouselIdx(idx)}
-                                            className={`rounded-full transition-all duration-300 ${idx === carouselIdx
-                                                ? 'w-5 h-1.5 bg-[#1F1300] shadow-sm'
-                                                : 'w-1.5 h-1.5 bg-[#1F1300]/30'
-                                            }`}
-                                        />
-                                    ))}
+                {/* ── Visual Category Menu ── */}
+                <div className="px-4 mb-6">
+                    <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 snap-x">
+                        {categoryMenu.map(cat => (
+                            <button
+                                key={cat.name}
+                                onClick={() => setActiveCategory(cat.name)}
+                                className="flex flex-col items-center gap-2 shrink-0 snap-start active:scale-95 transition-transform"
+                            >
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-sm transition-colors border ${activeCategory === cat.name ? 'bg-amber-100 border-amber-300' : 'bg-white border-slate-100'}`}>
+                                    {cat.icon}
                                 </div>
-                            )}
-                        </div>
-                    )}
-                    {locationError && <p className="text-center text-[11px] font-bold text-red-700 bg-red-100/80 rounded-lg mx-5 mt-3 py-1.5 backdrop-blur-sm">{locationError}</p>}
+                                <span className={`text-[11px] font-bold ${activeCategory === cat.name ? 'text-amber-700' : 'text-slate-600'}`}>
+                                    {cat.name}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
-                {/* --- WHITE BOTTOM SECTION (With Premium Curve) --- */}
-                <div className="bg-slate-50 rounded-t-[32px] min-h-screen pt-6 pb-28 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
-
-                    {/* Category Chips */}
-                    <div className="px-5 pb-4">
-                        <div className="flex gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
-                            {categories.map(cat => {
-                                const isActive = activeCategory === cat;
-                                return (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setActiveCategory(cat)}
-                                        className={`shrink-0 px-4 py-2 rounded-full text-[12px] font-bold border transition-all whitespace-nowrap ${isActive
-                                                ? 'bg-gradient-to-br from-[#F8CB46] to-[#E5A817] text-[#1a0e00] border-transparent shadow-lg shadow-amber-500/30'
-                                                : 'bg-white text-[#6B5020] border-[#E8D5A0] hover:bg-[#FFF4DA]'
-                                            }`}
-                                    >
-                                        {cat === 'All' ? '🏠 All Stores' : cat}
-                                    </button>
-                                );
-                            })}
+                {/* ── Promotional Carousel ── */}
+                {godownItems.length > 0 && (
+                    <div className="px-4 mb-8">
+                        <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden bg-slate-200">
+                            {godownItems.map((item, idx) => (
+                                <img
+                                    key={item._id}
+                                    src={optimizeImage(item.image, 800)}
+                                    alt="Promo"
+                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${idx === carouselIdx ? 'opacity-100' : 'opacity-0'}`}
+                                />
+                            ))}
+                            <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1.5 z-10">
+                                {godownItems.map((_, idx) => (
+                                    <div key={idx} className={`h-1.5 rounded-full transition-all ${idx === carouselIdx ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`} />
+                                ))}
+                            </div>
                         </div>
                     </div>
+                )}
 
-                    {/* Section Head */}
-                    <div className="flex items-center justify-between px-5 pb-4">
-                        <h2 className="text-[16px] font-extrabold text-[#1F1300] tracking-tight">
-                            {searchQuery
-                                ? `"${searchQuery}"`
-                                : activeCategory !== 'All'
-                                    ? activeCategory
-                                    : 'Stores near you'}
-                        </h2>
-                        <span className="px-2.5 py-1 rounded-full bg-[#FDF3D7] text-[#8C7A55] text-[10px] font-bold border border-[#F0E0A0]">
-                            {sortedShops.length} {sortedShops.length === 1 ? 'store' : 'stores'}
-                        </span>
+                {/* ── Daily Market CTA ── */}
+                <div className="px-4 mb-8">
+                    <div onClick={() => navigate('/daily-market')} className="bg-slate-900 rounded-2xl p-4 flex items-center justify-between active:scale-[0.98] transition-transform">
+                        <div>
+                            <h3 className="text-white font-black text-sm tracking-wide mb-1">Muna Daily Market</h3>
+                            <p className="text-slate-400 text-[11px] font-semibold">Buy & Sell used items locally</p>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
+                            ➔
+                        </div>
                     </div>
+                </div>
 
-                    {/* Grid Content */}
+                {/* ── Stores List ── */}
+                <div className="px-4">
+                    <h2 className="text-lg font-black text-slate-900 tracking-tight mb-4 flex items-center justify-between">
+                        {activeCategory === 'All' ? 'Stores Near You' : `${activeCategory} Stores`}
+                        <span className="text-xs font-bold text-slate-500">{sortedShops.length} options</span>
+                    </h2>
+
                     {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-6">
+                        <div className="space-y-4">
                             {[1, 2, 3].map(i => (
-                                <div key={i} className="bg-white rounded-[20px] overflow-hidden border border-[#F0E4C0] shadow-sm animate-pulse">
-                                    <div className="w-full h-48 bg-gradient-to-r from-[#F5ECD4] to-[#FDF3D7]" />
-                                    <div className="p-4">
-                                        <div className="h-4 bg-[#F0E8D0] rounded-md w-3/4 mb-3" />
-                                        <div className="h-3 bg-[#F0E8D0] rounded-md w-1/2" />
+                                <div key={i} className="bg-white rounded-2xl p-3 border border-slate-100 flex gap-4 animate-pulse">
+                                    <div className="w-20 h-20 bg-slate-100 rounded-xl shrink-0" />
+                                    <div className="flex-1 py-1">
+                                        <div className="h-4 bg-slate-100 w-2/3 rounded mb-2" />
+                                        <div className="h-3 bg-slate-100 w-1/2 rounded" />
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : sortedShops.length === 0 ? (
-                        <div className="mx-5 my-2 p-8 bg-white text-center rounded-[20px] border border-[#F0E4C0] shadow-sm">
-                            <span className="block text-5xl mb-3 opacity-60">🔍</span>
-                            <div className="text-[16px] font-extrabold text-[#1F1300] mb-1">
-                                {searchQuery ? `No shops found for "${searchQuery}"` : 'No shops available'}
-                            </div>
-                            <div className="text-[13px] font-medium text-[#8C7A55] mb-4">
-                                {searchQuery ? 'Try a different search term' : 'Check back soon!'}
-                            </div>
-                            {(searchQuery || activeCategory !== 'All') && (
-                                <button
-                                    className="px-5 py-2.5 rounded-xl bg-gradient-to-br from-[#F8CB46] to-[#E5A817] text-[#1a0e00] text-[13px] font-bold shadow-md shadow-amber-500/20 hover:scale-[1.02] transition-transform"
-                                    onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
-                                >
-                                    Show All Shops
-                                </button>
-                            )}
+                        <div className="text-center py-10 bg-white rounded-2xl border border-slate-100">
+                            <span className="text-4xl opacity-50 mb-2 block">🏪</span>
+                            <h3 className="text-sm font-bold text-slate-900">No stores found</h3>
+                            <p className="text-xs font-medium text-slate-500 mt-1">Try selecting a different category</p>
+                            <button onClick={() => setActiveCategory('All')} className="mt-4 px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg">View All Stores</button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-6">
-                            {sortedShops.map((shop, idx) => (
+                        <div className="space-y-4">
+                            {sortedShops.map((shop) => (
                                 <Link
                                     to={`/shop/${shop._id}`}
                                     key={shop._id}
-                                    className="group block"
-                                    style={{ animationFillMode: 'both', animation: `fadeInUp 0.4s ease-out ${idx * 0.05}s` }}
+                                    className={`bg-white rounded-2xl p-3 border border-slate-100 shadow-sm flex gap-4 active:scale-[0.98] transition-all ${!shop.isOpen ? 'opacity-60' : ''}`}
                                 >
-                                    <div className={`bg-white rounded-[20px] overflow-hidden border border-[#F0E4C0] shadow-sm hover:shadow-[0_12px_32px_rgba(200,170,100,0.18)] hover:-translate-y-1 hover:border-[#F8CB46] transition-all duration-300 ${!shop.isOpen ? 'opacity-75 border-[#E8E0D0]' : ''}`}>
+                                    {/* Store Image */}
+                                    <div className="w-20 h-20 rounded-xl bg-slate-50 shrink-0 relative overflow-hidden border border-slate-100">
+                                        {shop.image ? (
+                                            <img src={optimizeImage(shop.image, 200)} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-300"><IcoStore /></div>
+                                        )}
+                                        {/* Rating Badge on Image */}
+                                        <div className="absolute bottom-1 left-1 bg-green-600/90 backdrop-blur text-white text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                            <span>{shop.rating || '4.5'}</span> <IcoStar />
+                                        </div>
+                                    </div>
 
-                                        {/* Banner */}
-                                        <div className="relative w-full h-48 bg-gradient-to-br from-[#FEF9EB] to-[#FDF3D7] overflow-hidden">
-                                            {shop.image ? (
-                                                <img
-                                                    src={optimizeImage(shop.image)}
-                                                    alt={shop.name}
-                                                    loading="lazy"
-                                                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out ${!shop.isOpen ? 'grayscale-[0.6] brightness-[0.85]' : ''}`}
-                                                />
-                                            ) : (
-                                                <div className={`w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-[#FEF9EB] to-[#FDF0D0] ${!shop.isOpen ? 'grayscale-[0.8]' : ''}`}>
-                                                    🏪
-                                                </div>
-                                            )}
-
-                                            {/* Top overlay: Status + Rating */}
-                                            <div className="absolute top-0 inset-x-0 p-3 flex justify-between items-start bg-gradient-to-b from-black/40 to-transparent">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide text-white backdrop-blur-md ${shop.isOpen ? 'bg-green-600/90 shadow-lg shadow-green-900/20' : 'bg-red-700/85'}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full bg-white ${shop.isOpen ? 'animate-pulse' : ''}`} />
-                                                    {shop.isOpen ? 'Open' : 'Closed'}
-                                                </span>
-                                                <span className="px-2 py-1 rounded-lg bg-black/50 backdrop-blur-md text-white text-[11px] font-extrabold">
-                                                    ⭐ {shop.rating || '4.5'}
-                                                </span>
-                                            </div>
-
-                                            {/* Bottom overlay: Distance */}
-                                            {shop.distance !== Infinity && (
-                                                <div className="absolute bottom-0 inset-x-0 p-3 flex justify-end bg-gradient-to-t from-black/60 to-transparent">
-                                                    <span className="px-2.5 py-1 rounded-full bg-black/55 backdrop-blur-md text-white text-[10px] font-bold tracking-wide">
-                                                        📍 {fmtDist(shop.distance)} away
-                                                    </span>
-                                                </div>
+                                    {/* Store Details */}
+                                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                        <div className="flex items-center justify-between mb-0.5">
+                                            <h3 className="text-sm font-bold text-slate-900 truncate pr-2">{shop.name}</h3>
+                                            {!shop.isOpen && (
+                                                <span className="text-[9px] font-bold text-red-500 uppercase tracking-widest bg-red-50 px-1.5 py-0.5 rounded shrink-0">Closed</span>
                                             )}
                                         </div>
 
-                                        {/* Body */}
-                                        <div className="p-4">
-                                            <h3 className={`text-[16px] font-extrabold truncate tracking-tight mb-1 ${shop.isOpen ? 'text-[#1F1300]' : 'text-[#8C8070]'}`}>
-                                                {shop.name}
-                                            </h3>
-                                            <p className={`text-[12px] font-medium truncate mb-3 ${shop.isOpen ? 'text-[#8C7A55]' : 'text-[#aaa]'}`}>
-                                                📍 {shop.address}
-                                            </p>
+                                        <p className="text-[11px] font-semibold text-slate-500 truncate mb-1">
+                                            {shop.category || 'Kirana Store'}
+                                        </p>
 
-                                            <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                                                <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border ${shop.isOpen ? 'text-[#8B6914] bg-[#FEF9EB] border-[#F0E0A0]' : 'text-[#999] bg-[#f5f5f5] border-[#e8e8e8]'}`}>
-                                                    {shop.category || 'Kirana'}
-                                                </span>
-                                                {shop.udyamNumber && (
-                                                    <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border ${shop.isOpen ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-[#999] bg-[#f5f5f5] border-[#e8e8e8]'}`}>
-                                                        🛡️ Verified
-                                                    </span>
-                                                )}
-                                                {shop.location?.coordinates && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            window.open(
-                                                                `https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`,
-                                                                '_blank'
-                                                            );
-                                                        }}
-                                                        className={`ml-auto shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-colors ${shop.isOpen ? 'text-[#8B6914] bg-[#FEF9EB] border-[#F0E0A0] hover:bg-[#F8E8B8] hover:border-[#D4B060]' : 'text-[#999] bg-[#f5f5f5] border-[#e5e5e5]'}`}
-                                                    >
-                                                        🗺️ Directions
-                                                    </button>
-                                                )}
-                                            </div>
+                                        <div className="flex items-center gap-3 text-[11px] font-bold text-slate-400 mt-auto">
+                                            <span className="flex items-center gap-1">
+                                                <IcoMapPin />
+                                                {shop.distance !== Infinity ? fmtDist(shop.distance) : 'Nearby'}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                ⏱️ {shop.distance < 2 ? '15 mins' : '30 mins'}
+                                            </span>
                                         </div>
                                     </div>
                                 </Link>
@@ -451,14 +288,7 @@ const Home = () => {
                         </div>
                     )}
                 </div>
-            </div>
-
-            <style>{`
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(16px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-            `}</style>
+            </main>
         </div>
     );
 };

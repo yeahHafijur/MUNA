@@ -26,6 +26,7 @@ const Wishlist = lazy(() => import('./pages/Wishlist'));
 const VendorRequestForm = lazy(() => import('./pages/VendorRequestForm'));
 const DailyMarket = lazy(() => import('./pages/DailyMarket'));
 const DailyMarketPost = lazy(() => import('./pages/DailyMarketPost'));
+const DailyMarketItemDetail = lazy(() => import('./pages/DailyMarketItemDetail'));
 const ChatInbox = lazy(() => import('./pages/ChatInbox'));
 const ChatScreen = lazy(() => import('./pages/ChatScreen'));
 
@@ -143,6 +144,7 @@ const AppContent = () => {
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/daily-market" element={<DailyMarket />} />
                 <Route path="/daily-market/post" element={<DailyMarketPost />} />
+                <Route path="/daily-market/item/:id" element={<DailyMarketItemDetail />} />
                 <Route path="/chat" element={<ChatInbox />} />
                 <Route path="/chat/:sessionId" element={<ChatScreen />} />
               </Routes>

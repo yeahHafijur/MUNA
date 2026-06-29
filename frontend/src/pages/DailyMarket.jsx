@@ -140,7 +140,11 @@ const DailyMarket = () => {
                 ) : (
                     <div className="grid grid-cols-2 gap-4">
                         {items.map(item => (
-                            <div key={item._id} className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group">
+                            <div 
+                                key={item._id} 
+                                onClick={() => navigate(`/daily-market/item/${item._id}`)}
+                                className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group cursor-pointer"
+                            >
                                 <div className="absolute top-3 left-3 z-10 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1.5 text-white shadow-sm">
                                     <IcoClock />
                                     <span className="text-[10px] font-bold tracking-wider">{formatTimeLeft(item.expiresAt)}</span>
@@ -158,7 +162,8 @@ const DailyMarket = () => {
                                         <span className="text-lg font-black text-slate-900 tracking-tight">₹{item.price}</span>
                                     </div>
                                     <button 
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.stopPropagation();
                                             if (!token) { toast.error("Please login first"); navigate('/login'); return; }
                                             startChatMutation.mutate(item);
                                         }}

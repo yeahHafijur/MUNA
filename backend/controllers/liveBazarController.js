@@ -127,10 +127,26 @@ const deleteItem = async (req, res) => {
     }
 };
 
+// 5. Get Single Item By ID
+const getItemById = async (req, res) => {
+    try {
+        const item = await LiveBazarItem.findById(req.params.id)
+            .populate('userId', 'name profilePicture');
+            
+        if (!item) return res.status(404).json({ message: "Item not found" });
+        
+        res.status(200).json(item);
+    } catch (error) {
+        console.error("LiveBazar getItemById Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 module.exports = {
     postItem,
     getNearbyItems,
     getMyItems,
     updateStatus,
-    deleteItem
+    deleteItem,
+    getItemById
 };

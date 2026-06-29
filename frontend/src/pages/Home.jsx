@@ -4,8 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { optimizeImage } from '../utils/imageUtils';
-// Naye hooks jo humne pichle step mein banaye the
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
+import { useUnreadChats } from '../hooks/useUnreadChats';
 
 /* ─── Icon Components ─── */
 const IcoPin = ({ className = "w-6 h-6" }) => (
@@ -62,6 +62,9 @@ const Home = () => {
 
     /* Global unread count hook jo humne banaya tha */
     const { data: unreadCount = 0 } = useUnreadNotifications();
+    const { data: unreadChatCount = 0 } = useUnreadChats();
+
+    const totalAlerts = unreadCount + unreadChatCount;
 
     /* ── Featured godown items for carousel (selected by super admin) ── */
     const { data: godownItems = [] } = useQuery({
@@ -186,9 +189,9 @@ const Home = () => {
                             className="relative w-10 h-10 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 flex items-center justify-center text-white active:scale-95"
                         >
                             <IcoBell className="w-5 h-5" />
-                            {unreadCount > 0 && (
+                            {totalAlerts > 0 && (
                                 <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center shadow-lg shadow-red-500/40 animate-pulse">
-                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                    {totalAlerts > 9 ? '9+' : totalAlerts}
                                 </span>
                             )}
                         </button>

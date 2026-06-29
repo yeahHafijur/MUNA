@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
+import { useUnreadChats } from '../hooks/useUnreadChats';
 import './BottomNav.css';
 
 /* ─── Icon Components ─── */
@@ -48,6 +49,9 @@ const BottomNav = () => {
         enabled: !!user && !!token,
     });
     const unreadCount = unreadData?.count || 0;
+    const { data: unreadChatCount = 0 } = useUnreadChats();
+
+    const totalAlerts = unreadCount + unreadChatCount;
 
     /* Profile link target */
     const profileLink = user
@@ -81,8 +85,8 @@ const BottomNav = () => {
             <button className={`bn-nav-item ${isAlerts ? 'bn-nav-item--active' : ''}`} onClick={() => navigate('/notifications')}>
                 <span className="bn-nav-icon" style={{ position: 'relative' }}>
                     <IcoBell />
-                    {unreadCount > 0 && (
-                        <span className="bn-nav-badge">{unreadCount}</span>
+                    {totalAlerts > 0 && (
+                        <span className="bn-nav-badge">{totalAlerts}</span>
                     )}
                 </span>
                 Alerts

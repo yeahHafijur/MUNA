@@ -134,7 +134,7 @@ const ProductDetail = () => {
         triggerHaptic(50);
 
         try {
-            const res = addToCart(itemToAdd, shop, 1);
+            const res = addToCart(itemToAdd, shopId);
             if (res && res.success === false) {
                 if (res.error === 'DIFFERENT_SHOP_ERROR') {
                     toast.error('Clear your cart to order from a new shop.', { autoClose: 3000 });

@@ -1,33 +1,145 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
+import { socket } from '../utils/socket';
 
 const IcoBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>;
 const IcoSend = () => <svg fill="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" /></svg>;
+const IcoDoubleTick = ({ read }) => (
+    <svg viewBox="0 0 24 24" fill="none" className={`w-4 h-4 inline-block ml-1 -mb-1 ${read ? 'text-blue-400' : 'text-slate-400'}`}>
+        <path d="M4 12l4 4 8-8M10 16l4 4 8-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
 
 const ChatScreen = () => {
     const { sessionId } = useParams();
     const navigate = useNavigate();
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
+    
     const messagesEndRef = useRef(null);
-
+    const observerTarget = useRef(null);
+    
     const [inputText, setInputText] = useState('');
 
-    const { data: messages = [], isLoading } = useQuery({
+    // Infinite Query for pagination
+    const { 
+        data, 
+        fetchNextPage, 
+        hasNextPage, 
+        isFetchingNextPage, 
+        isLoading 
+    } = useInfiniteQuery({
         queryKey: ['chatMessages', sessionId],
-        queryFn: async () => {
-            const res = await fetch(`/api/chat/sessions/${sessionId}/messages`, {
+        queryFn: async ({ pageParam = 1 }) => {
+            const res = await fetch(`/api/chat/sessions/${sessionId}/messages?page=${pageParam}&limit=30`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to fetch messages');
             return res.json();
         },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
         enabled: !!token && !!sessionId,
-        refetchInterval: 2000
     });
 
+    // Flatten pages: page 1 is latest (but reversed), page 2 is older. 
+    // We want older messages at the top, so we reverse the pages array.
+    const messages = data ? [...data.pages].reverse().flatMap(page => page.messages) : [];
+
+    // Intersection Observer for Infinite Scrolling
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+                    // Save current scroll height to maintain position
+                    const container = document.getElementById('chat-scroll-container');
+                    const oldHeight = container ? container.scrollHeight : 0;
+                    
+                    fetchNextPage().then(() => {
+                        // Adjust scroll position after loading older messages
+                        setTimeout(() => {
+                            if (container) {
+                                container.scrollTop = container.scrollHeight - oldHeight;
+                            }
+                        }, 50);
+                    });
+                }
+            },
+            { threshold: 0.1 }
+        );
+        if (observerTarget.current) observer.observe(observerTarget.current);
+        return () => observer.disconnect();
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    // WebSocket Integration
+    useEffect(() => {
+        if (!sessionId) return;
+        socket.connect();
+        socket.emit("join_room", sessionId);
+
+        const handleReceiveMessage = (message) => {
+            queryClient.setQueryData(['chatMessages', sessionId], (oldData) => {
+                if (!oldData) return oldData;
+                const newPages = [...oldData.pages];
+                // page 0 contains the newest messages
+                newPages[0] = {
+                    ...newPages[0],
+                    messages: [...newPages[0].messages, message]
+                };
+                return { ...oldData, pages: newPages };
+            });
+
+            // If I receive a message not sent by me, mark it as read immediately
+            if (message.senderId !== user._id) {
+                socket.emit("mark_as_read", { sessionId, messageIds: [message._id] });
+            }
+
+            setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        };
+
+        const handleMessagesRead = (messageIds) => {
+            queryClient.setQueryData(['chatMessages', sessionId], (oldData) => {
+                if (!oldData) return oldData;
+                const newPages = oldData.pages.map(page => ({
+                    ...page,
+                    messages: page.messages.map(msg => 
+                        messageIds.includes(msg._id) ? { ...msg, isRead: true } : msg
+                    )
+                }));
+                return { ...oldData, pages: newPages };
+            });
+        };
+
+        socket.on("receive_message", handleReceiveMessage);
+        socket.on("messages_read", handleMessagesRead);
+
+        // Bulk mark unread as read on open
+        if (messages.length > 0) {
+            const unreadIds = messages.filter(m => m.senderId !== user._id && !m.isRead).map(m => m._id);
+            if (unreadIds.length > 0) {
+                socket.emit("mark_as_read", { sessionId, messageIds: unreadIds });
+            }
+        }
+
+        return () => {
+            socket.off("receive_message", handleReceiveMessage);
+            socket.off("messages_read", handleMessagesRead);
+            socket.disconnect();
+        };
+    }, [sessionId, queryClient, user._id, messages.length]);
+
+    // Initial scroll to bottom
+    useEffect(() => {
+        if (messages.length > 0 && data?.pages.length === 1) {
+            messagesEndRef.current?.scrollIntoView();
+        }
+    }, [data?.pages.length]);
+
+    // Send Message Mutation
     const sendMutation = useMutation({
         mutationFn: async (text) => {
             const res = await fetch(`/api/chat/sessions/${sessionId}/messages`, {
@@ -43,25 +155,38 @@ const ChatScreen = () => {
         },
         onMutate: async (newText) => {
             await queryClient.cancelQueries(['chatMessages', sessionId]);
-            const previousMessages = queryClient.getQueryData(['chatMessages', sessionId]);
+            const previousData = queryClient.getQueryData(['chatMessages', sessionId]);
 
             const optimisticMsg = {
                 _id: Date.now().toString(),
                 sessionId,
                 senderId: user._id,
                 text: newText,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                isRead: false
             };
 
-            queryClient.setQueryData(['chatMessages', sessionId], old => [...(old || []), optimisticMsg]);
+            queryClient.setQueryData(['chatMessages', sessionId], (oldData) => {
+                if (!oldData) return oldData;
+                const newPages = [...oldData.pages];
+                newPages[0] = {
+                    ...newPages[0],
+                    messages: [...newPages[0].messages, optimisticMsg]
+                };
+                return { ...oldData, pages: newPages };
+            });
 
-            return { previousMessages };
+            setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 50);
+
+            return { previousData };
         },
         onError: (err, newText, context) => {
-            queryClient.setQueryData(['chatMessages', sessionId], context.previousMessages);
+            queryClient.setQueryData(['chatMessages', sessionId], context.previousData);
         },
         onSettled: () => {
-            queryClient.invalidateQueries(['chatMessages', sessionId]);
+            // queryClient.invalidateQueries(['chatMessages', sessionId]); // No longer needed, socket handles sync!
             queryClient.invalidateQueries(['chatSessions']);
         }
     });
@@ -73,18 +198,8 @@ const ChatScreen = () => {
         setInputText('');
     };
 
-    // Auto-scroll to bottom only when new messages arrive
-    useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [messages]);
-
     return (
-        /* Structural Fix: fixed inset-0 prevents layout interference from App.jsx padding */
         <div className="fixed inset-0 z-[100] flex flex-col bg-slate-100 font-sans overflow-hidden">
-
-            {/* ─── 1. FIXED HEADER ─── */}
             <header className="shrink-0 h-14 bg-white border-b border-slate-200 flex items-center px-4 z-50">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-800 active:bg-slate-100 rounded-full transition-colors">
                     <IcoBack />
@@ -94,8 +209,13 @@ const ChatScreen = () => {
                 </div>
             </header>
 
-            {/* ─── 2. SCROLLABLE MESSAGES AREA ─── */}
-            <main className="flex-1 overflow-y-auto p-4 space-y-4">
+            <main id="chat-scroll-container" className="flex-1 overflow-y-auto p-4 space-y-4">
+                
+                {/* Intersection Observer Target for Loading More */}
+                <div ref={observerTarget} className="h-4 flex justify-center items-center">
+                    {isFetchingNextPage && <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>}
+                </div>
+
                 {isLoading ? (
                     <div className="flex justify-center py-10">
                         <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
@@ -110,12 +230,10 @@ const ChatScreen = () => {
                     <div className="space-y-4">
                         {messages.map((msg, idx) => {
                             const isMe = msg.senderId === user?._id;
-                            // Show timestamp if it's the first message, or > 5 mins since last message
                             const showTime = idx === 0 || new Date(msg.createdAt) - new Date(messages[idx - 1].createdAt) > 5 * 60 * 1000;
 
                             return (
                                 <div key={msg._id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-
                                     {showTime && (
                                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest my-3 self-center bg-slate-200/50 px-2 py-0.5 rounded">
                                             {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -123,23 +241,22 @@ const ChatScreen = () => {
                                     )}
 
                                     <div
-                                        className={`px-4 py-2.5 max-w-[75%] rounded-2xl text-[14px] leading-relaxed shadow-sm ${isMe
+                                        className={`px-4 py-2.5 max-w-[75%] rounded-2xl text-[14px] leading-relaxed shadow-sm flex items-end gap-2 ${isMe
                                                 ? 'bg-slate-900 text-white rounded-br-sm'
                                                 : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm'
                                             }`}
                                     >
-                                        {msg.text}
+                                        <span className="whitespace-pre-wrap">{msg.text}</span>
+                                        {isMe && <IcoDoubleTick read={msg.isRead} />}
                                     </div>
                                 </div>
                             );
                         })}
-                        {/* Invisible div to scroll to */}
                         <div ref={messagesEndRef} className="h-1" />
                     </div>
                 )}
             </main>
 
-            {/* ─── 3. FIXED INPUT FOOTER ─── */}
             <footer className="shrink-0 bg-white border-t border-slate-200 p-3 pb-safe">
                 <form onSubmit={handleSend} className="flex gap-2 items-end max-w-3xl mx-auto">
                     <input

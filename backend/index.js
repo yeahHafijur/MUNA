@@ -1,4 +1,6 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
@@ -8,10 +10,52 @@ const cron = require("node-cron");
 const moment = require("moment-timezone");
 const compression = require("compression");
 const helmet = require("helmet");
+const ChatMessage = require("./models/ChatMessage");
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+
+// ---- SOCKET.IO SETUP ----
+const io = new Server(server, {
+    cors: {
+        origin: "*", // Handled by express cors below, but socket needs it too
+        methods: ["GET", "POST"]
+    }
+});
+
+app.set('socketio', io); // Make it accessible in controllers
+
+io.on("connection", (socket) => {
+    console.log(`User Connected: ${socket.id}`);
+
+    socket.on("join_room", (sessionId) => {
+        socket.join(sessionId);
+        console.log(`User with ID: ${socket.id} joined room: ${sessionId}`);
+    });
+
+    socket.on("mark_as_read", async (data) => {
+        // data: { sessionId, messageIds }
+        try {
+            if (data.messageIds && data.messageIds.length > 0) {
+                await ChatMessage.updateMany(
+                    { _id: { $in: data.messageIds } },
+                    { $set: { isRead: true } }
+                );
+            }
+            // Emit back to the room so the sender's UI updates the ticks
+            socket.to(data.sessionId).emit("messages_read", data.messageIds);
+        } catch (err) {
+            console.error("Socket mark_as_read Error:", err);
+        }
+    });
+
+    socket.on("disconnect", () => {
+        console.log("User Disconnected", socket.id);
+    });
+});
+
 app.use(helmet());
 
 // Compress all responses for extreme performance
@@ -194,8 +238,8 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log("MongoDB Connected");
 
-        // Start the server only after DB is connected
-        app.listen(PORT, () => {
+        // Start the server only after DB is connected (Using `server.listen` instead of `app.listen`)
+        server.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
 

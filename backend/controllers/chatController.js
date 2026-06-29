@@ -50,15 +50,21 @@ const startSession = async (req, res) => {
     }
 };
 
-// 3. Get messages for a specific session
+// 3. Get messages for a specific session (With Pagination)
 const getMessages = async (req, res) => {
     try {
         const { sessionId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 30;
+        const skip = (page - 1) * limit;
 
+        // Sort descending to get newest messages first, then reverse them for UI
         const messages = await ChatMessage.find({ sessionId })
-            .sort({ createdAt: 1 });
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
-        // Mark as read for messages not sent by me
+        // Mark as read for messages not sent by me (Only for the fetched page to keep it fast)
         const unreadMsgIds = messages
             .filter(m => m.senderId.toString() !== req.user._id.toString() && !m.isRead)
             .map(m => m._id);
@@ -70,7 +76,12 @@ const getMessages = async (req, res) => {
             );
         }
 
-        res.status(200).json(messages);
+        const hasMore = messages.length === limit;
+        
+        res.status(200).json({
+            messages: messages.reverse(), // UI needs chronological order (oldest at top, newest at bottom)
+            nextCursor: hasMore ? page + 1 : null
+        });
     } catch (error) {
         console.error("getMessages Error:", error);
         res.status(500).json({ message: "Server error" });
@@ -98,7 +109,13 @@ const sendMessage = async (req, res) => {
         const session = await ChatSession.findByIdAndUpdate(sessionId, {
             lastMessage: text,
             updatedAt: new Date()
-        });
+        }, { new: true }).populate('buyerId sellerId itemId');
+
+        // Emit via WebSockets
+        const io = req.app.get('socketio');
+        if (io) {
+            io.to(sessionId).emit('receive_message', message);
+        }
 
         res.status(201).json(message);
 

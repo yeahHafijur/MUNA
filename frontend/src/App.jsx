@@ -22,6 +22,10 @@ const Notifications = lazy(() => import('./pages/Notifications'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const VendorRequestForm = lazy(() => import('./pages/VendorRequestForm'));
+const DailyMarket = lazy(() => import('./pages/DailyMarket'));
+const DailyMarketPost = lazy(() => import('./pages/DailyMarketPost'));
+const ChatInbox = lazy(() => import('./pages/ChatInbox'));
+const ChatScreen = lazy(() => import('./pages/ChatScreen'));
 
 // Vendor Pages
 const VendorHub = lazy(() => import('./pages/vendor/VendorHub'));
@@ -110,6 +114,10 @@ const AppContent = () => {
                 <Route path="/search" element={<Search />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/daily-market" element={<DailyMarket />} />
+                <Route path="/daily-market/post" element={<DailyMarketPost />} />
+                <Route path="/chat" element={<ChatInbox />} />
+                <Route path="/chat/:sessionId" element={<ChatScreen />} />
               </Routes>
             </Suspense>
           </div>

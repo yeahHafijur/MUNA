@@ -202,12 +202,32 @@ const Home = () => {
                 {/* --- YELLOW TOP SECTION --- */}
                 <div className="pb-6">
                     {/* Slogan */}
-                    <div className="px-5 pt-2 pb-5">
+                    <div className="px-5 pt-2 pb-4">
                         <div className="text-[28px] md:text-[32px] font-black text-[#1F1300] leading-tight tracking-tight">
                             {homeMsg.line1}
                         </div>
                         <div className="text-[32px] md:text-[36px] font-black text-white leading-tight tracking-tight drop-shadow-md mt-1">
                             {homeMsg.line2}
+                        </div>
+                    </div>
+
+                    {/* ── Daily Market Banner ── */}
+                    <div className="px-5 pb-5">
+                        <div 
+                            onClick={() => navigate('/daily-market')}
+                            className="w-full bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-4 flex items-center justify-between shadow-lg cursor-pointer active:scale-[0.98] transition-transform"
+                        >
+                            <div>
+                                <h3 className="text-[17px] font-black text-white drop-shadow-sm flex items-center gap-1.5">
+                                    MunaDailyMarket <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse mt-0.5"></span>
+                                </h3>
+                                <p className="text-[11px] font-bold text-white/80 uppercase tracking-widest mt-0.5">
+                                    Sell & Buy in your neighborhood
+                                </p>
+                            </div>
+                            <div className="w-10 h-10 bg-white text-amber-500 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                            </div>
                         </div>
                     </div>
 

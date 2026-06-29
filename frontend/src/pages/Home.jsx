@@ -143,11 +143,11 @@ const Home = () => {
             <header className="shrink-0 px-5 py-4 z-10">
                 <div className="flex items-center justify-between gap-3">
                     <Link to="/" className="flex items-center gap-2 shrink-0">
-                        <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-xl font-black text-amber-500">M</div>
+                        <img src="/muna-logo-new.png" alt="MUNA" className="w-10 h-10 rounded-xl object-contain shadow-sm" />
                         <div className="flex flex-col leading-none">
                             <span className="text-[16px] font-black tracking-tight text-white drop-shadow-sm">MUNA</span>
                             <span className="text-[9px] font-extrabold text-amber-100 tracking-widest uppercase mt-[2px]">
-                                In Minutes
+                                Grocery In Minutes
                             </span>
                         </div>
                     </Link>

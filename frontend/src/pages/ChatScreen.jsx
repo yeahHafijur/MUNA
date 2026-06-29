@@ -81,8 +81,8 @@ const ChatScreen = () => {
     }, [messages]);
 
     return (
-        /* Structural Fix: 100dvh prevents Safari/Chrome mobile browser bar jumping */
-        <div className="flex flex-col h-[100dvh] bg-slate-100 font-sans overflow-hidden">
+        /* Structural Fix: fixed inset-0 prevents layout interference from App.jsx padding */
+        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-100 font-sans overflow-hidden">
 
             {/* ─── 1. FIXED HEADER ─── */}
             <header className="shrink-0 h-14 bg-white border-b border-slate-200 flex items-center px-4 z-50">

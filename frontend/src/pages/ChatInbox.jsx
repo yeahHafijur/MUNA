@@ -25,8 +25,8 @@ const ChatInbox = () => {
     });
 
     return (
-        /* Fixed Viewport Shell */
-        <div className="flex flex-col h-[100dvh] bg-slate-50 font-sans overflow-hidden">
+        /* Fixed Viewport Shell to bypass App.jsx padding */
+        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 font-sans overflow-hidden">
 
             {/* Header - Fixed Height */}
             <header className="shrink-0 h-14 bg-white border-b border-slate-200 flex items-center px-4 z-50">

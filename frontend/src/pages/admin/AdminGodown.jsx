@@ -122,18 +122,18 @@ const AdminGodown = () => {
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-[1px] bg-gray-100 p-[1px]">
                         {filteredGodown.map(item => (
-                            <div key={item._id} className="bg-white p-4 flex flex-col items-center text-center group hover:bg-amber-50/30 transition-colors relative">
+                            <div key={item._id} className="bg-white p-4 pb-10 flex flex-col items-center text-center group hover:bg-amber-50/30 transition-colors relative">
                                 <div className="w-16 h-16 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center p-1 mb-3">
                                     {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-gray-300 font-black text-2xl">M</span>}
                                 </div>
                                 <div className="text-xs font-bold text-gray-900 line-clamp-2 leading-tight mb-1">{item.name}</div>
                                 {item.category && <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{item.category}</div>}
 
-                                {/* Hover Actions */}
-                                <div className="absolute inset-x-0 bottom-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 flex opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => handleGodownEditClick(item)} className="flex-1 py-2 text-[10px] font-bold text-blue-600 hover:bg-blue-50 transition-colors">Edit</button>
-                                    <div className="w-[1px] bg-gray-200"></div>
-                                    <button onClick={() => handleDeleteGodownItem(item._id)} className="flex-1 py-2 text-[10px] font-bold text-red-600 hover:bg-red-50 transition-colors">Delete</button>
+                                {/* Actions (Always visible for mobile) */}
+                                <div className="absolute inset-x-0 bottom-0 bg-slate-50 border-t border-slate-100 flex transition-opacity">
+                                    <button onClick={() => handleGodownEditClick(item)} className="flex-1 py-2 text-[10px] font-bold text-blue-600 hover:bg-blue-100 transition-colors">Edit</button>
+                                    <div className="w-[1px] bg-slate-200"></div>
+                                    <button onClick={() => handleDeleteGodownItem(item._id)} className="flex-1 py-2 text-[10px] font-bold text-red-600 hover:bg-red-100 transition-colors">Delete</button>
                                 </div>
                             </div>
                         ))}

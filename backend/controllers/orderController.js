@@ -413,10 +413,47 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+// @desc    Get all orders (Super Admin Monitor)
+// @route   GET /api/orders/admin/all
+// @access  Protected (Super Admin)
+const getAllOrdersForAdmin = async (req, res) => {
+    try {
+        if (req.user.role !== 'super_admin') {
+            return res.status(403).json({ message: "Access denied. Super Admin only." });
+        }
+        
+        // Date filtering logic (default to today if not provided)
+        let queryDate = req.query.date ? new Date(req.query.date) : new Date();
+        
+        // Start of the day
+        const startOfDay = new Date(queryDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        
+        // End of the day
+        const endOfDay = new Date(queryDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        
+        const filter = {
+            createdAt: { $gte: startOfDay, $lte: endOfDay }
+        };
+        
+        const orders = await Order.find(filter)
+            .populate('shopId', 'name vendorId address isActive')
+            .populate('customerId', 'name phone')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(orders);
+    } catch (error) {
+        console.error("getAllOrdersForAdmin error:", error);
+        res.status(500).json({ message: "Failed to fetch orders." });
+    }
+};
+
 module.exports = {
     placeOrder,
     getCustomerOrders,
     getVendorOrders,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    getAllOrdersForAdmin
 };

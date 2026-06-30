@@ -18,4 +18,8 @@ router.put("/:id/cancel", protect, authorize("customer", "vendor"), cancelOrder)
 router.get("/vendor", protect, authorize("vendor"), getVendorOrders);
 router.put("/:id/status", protect, authorize("vendor"), updateOrderStatus);
 
+// 3. Admin Routes (Super Admin)
+const { getAllOrdersForAdmin } = require("../controllers/orderController");
+router.get("/admin/all", protect, authorize("super_admin"), getAllOrdersForAdmin);
+
 module.exports = router;

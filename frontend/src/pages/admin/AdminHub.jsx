@@ -119,6 +119,12 @@ const AdminHub = () => {
                 {/* ─── MASTER NAVIGATION LIST ─── */}
                 <div className="bg-white rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
                     <NavigationRow
+                        icon={<span className="text-xl">📈</span>}
+                        title="Live Order Monitor"
+                        subtitle="Track all shop orders in real-time"
+                        onClick={() => navigate('/admin/live-orders')}
+                    />
+                    <NavigationRow
                         icon={<IcoOnboard />}
                         title="Onboard Vendor"
                         subtitle="Register new vendors & shops"

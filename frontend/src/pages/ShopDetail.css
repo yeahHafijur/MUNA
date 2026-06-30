@@ -806,7 +806,7 @@
 /* ---- FLOATING CART BAR ---- */
 .sd-cart-bar {
     position: fixed;
-    bottom: 30px;
+    bottom: 85px;
     left: 20px;
     right: 20px;
     z-index: 50;

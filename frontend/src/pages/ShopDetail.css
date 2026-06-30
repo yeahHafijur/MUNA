@@ -661,6 +661,38 @@
     font-size: 11px;
 }
 
+/* Quantity Control (Add/Minus) */
+.sd-qty-ctrl {
+    display: flex;
+    align-items: center;
+    background: #10B981;
+    border-radius: 12px;
+    overflow: hidden;
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    height: 32px;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+}
+.sd-qty-ctrl button {
+    padding: 0 12px;
+    height: 100%;
+    color: white;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: 900;
+    transition: background 0.2s;
+}
+.sd-qty-ctrl button:active {
+    background: rgba(0,0,0,0.1);
+}
+.sd-qty-ctrl span {
+    padding: 0 4px;
+    min-width: 24px;
+    text-align: center;
+}
+
 /* Fly animation */
 .sd-fly-plus {
     position: fixed;

@@ -25,7 +25,7 @@ const IconLocation = () => (
 );
 
 const Cart = () => {
-    const { cartItems, cartShopId, getTotal, removeFromCart, clearCart } = useCart();
+    const { cartItems, cartShopId, getTotal, removeFromCart, clearCart, updateQuantity } = useCart();
     const { user, token, login } = useAuth();
 
     const [customerPhone, setCustomerPhone] = useState('');
@@ -261,9 +261,13 @@ const Cart = () => {
                                 </div>
                                 <div className="crt-item-price-wrap">
                                     <div className="crt-item-total">₹{item.price * item.quantity}</div>
-                                    <button onClick={() => removeFromCart(item.productId)} className="crt-remove-btn">
-                                        <IconTrash /> Remove
-                                    </button>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                                            <button onClick={() => updateQuantity(item.productId, item.quantity - 1)} style={{ padding: '4px 10px', background: '#f8fafc', color: '#475569', fontWeight: 'bold' }}>-</button>
+                                            <span style={{ padding: '4px 10px', fontSize: '13px', fontWeight: 'bold', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', minWidth: '32px', textAlign: 'center' }}>{item.quantity}</span>
+                                            <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} style={{ padding: '4px 10px', background: '#f8fafc', color: '#475569', fontWeight: 'bold' }}>+</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}

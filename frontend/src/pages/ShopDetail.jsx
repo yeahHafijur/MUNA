@@ -35,7 +35,7 @@ const IcoArrow = () => (
 const ShopDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart, overrideAndReplaceCart, cartItems, getTotal } = useCart();
+    const { addToCart, overrideAndReplaceCart, cartItems, getTotal, updateQuantity } = useCart();
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -395,15 +395,23 @@ const ShopDetail = () => {
                                                                 {product.price}
                                                             </span>
                                                             {product.inStock ? (
-                                                                <button
-                                                                    className={`sd-add-btn ${inCart ? 'sd-add-btn--added' : 'sd-add-btn--add'}`}
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleAddClick(e, product);
-                                                                    }}
-                                                                >
-                                                                    {inCart ? `${inCart.quantity} Added` : 'ADD'}
-                                                                </button>
+                                                                inCart ? (
+                                                                    <div className="sd-qty-ctrl" onClick={(e) => e.stopPropagation()}>
+                                                                        <button onClick={() => updateQuantity(product._id, inCart.quantity - 1)}>-</button>
+                                                                        <span>{inCart.quantity}</span>
+                                                                        <button onClick={() => updateQuantity(product._id, inCart.quantity + 1)}>+</button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <button
+                                                                        className={`sd-add-btn sd-add-btn--add`}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleAddClick(e, product);
+                                                                        }}
+                                                                    >
+                                                                        ADD
+                                                                    </button>
+                                                                )
                                                             ) : (
                                                                 <span className="sd-add-btn sd-add-btn--oos">
                                                                     Out of Stock

@@ -297,8 +297,8 @@ const Home = () => {
                 </div>
 
                 {/* ── Store Listing (Blinkit Card Style) ── */}
-                <div className="bg-white min-h-[50vh] px-4 py-5 border-t border-slate-100">
-                    <div className="flex items-center justify-between mb-4">
+                <div className="bg-white min-h-[50vh] px-2.5 py-5 border-t border-slate-100">
+                    <div className="flex items-center justify-between mb-4 px-1.5">
                         <h3 className="text-[15px] font-black text-slate-900">
                             {activeCategory !== 'All' ? `${activeCategory} Stores` : 'Stores Around You'}
                         </h3>
@@ -307,11 +307,11 @@ const Home = () => {
                         )}
                     </div>
 
-                    <div className={sortedShops.length > 0 && !loading ? "grid grid-cols-2 gap-3" : "space-y-4"}>
+                    <div className={sortedShops.length > 0 && !loading ? "grid grid-cols-2 gap-2" : "space-y-4"}>
                         {loading ? (
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-2 gap-2">
                                 {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className="flex flex-col bg-white rounded-[16px] border border-slate-100 p-2.5 animate-pulse">
+                                    <div key={i} className="flex flex-col bg-white rounded-[16px] border border-slate-100 p-1.5 animate-pulse">
                                         <div className="w-full aspect-[4/3] bg-slate-100 rounded-xl mb-3" />
                                         <div className="h-4 bg-slate-100 w-3/4 rounded mb-1.5" />
                                         <div className="h-3 bg-slate-100 w-1/2 rounded" />
@@ -319,7 +319,7 @@ const Home = () => {
                                 ))}
                             </div>
                         ) : sortedShops.length === 0 ? (
-                            <div className="text-center py-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed w-full">
+                            <div className="text-center py-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed w-full mx-1.5">
                                 <span className="text-4xl opacity-30 block mb-2">🏪</span>
                                 <p className="text-sm font-bold text-slate-500">No stores found.</p>
                             </div>
@@ -332,10 +332,10 @@ const Home = () => {
                                     <Link
                                         to={`/shop/${shop._id}`}
                                         key={shop._id}
-                                        className={`flex flex-col bg-white rounded-[16px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 p-2.5 active:scale-95 transition-transform ${!shop.isOpen ? 'opacity-50 grayscale-[0.3]' : ''}`}
+                                        className={`flex flex-col bg-white rounded-[16px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 p-1.5 active:scale-95 transition-transform ${!shop.isOpen ? 'opacity-50 grayscale-[0.3]' : ''}`}
                                     >
                                         {/* Store Image - Rectangular Banner */}
-                                        <div className="w-full aspect-[4/3] rounded-xl bg-slate-50 mb-2.5 overflow-hidden relative border border-slate-100/50">
+                                        <div className="w-full aspect-[4/3] rounded-xl bg-slate-50 mb-2 overflow-hidden relative border border-slate-100/50">
                                             {shop.image ? (
                                                 <img src={optimizeImage(shop.image, 400)} className="w-full h-full object-cover" />
                                             ) : (
@@ -350,13 +350,13 @@ const Home = () => {
                                         </div>
 
                                         {/* Store Details */}
-                                        <div className="flex flex-col flex-1 px-0.5">
+                                        <div className="flex flex-col flex-1 px-1">
                                             <h3 className="text-[13px] font-black text-slate-900 leading-tight mb-0.5 line-clamp-1">{shop.name}</h3>
                                             <p className="text-[10px] font-semibold text-slate-500 mb-2 truncate">
                                                 {shop.category || 'Kirana & Grocery'}
                                             </p>
 
-                                            <div className="mt-auto flex items-center justify-between">
+                                            <div className="mt-auto flex items-center justify-between pb-0.5">
                                                 <div className="flex items-center gap-1 bg-slate-100/80 px-1.5 py-0.5 rounded text-[9px] font-black text-slate-700">
                                                     <IcoStar /> {shop.rating || '4.5'}
                                                 </div>

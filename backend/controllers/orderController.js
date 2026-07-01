@@ -388,6 +388,17 @@ const updateOrderStatus = async (req, res) => {
             if (order.deliveryOtp !== deliveryOtp.toString()) {
                 return res.status(400).json({ message: "Incorrect PIN! Please ask the customer for the correct 4-digit PIN." });
             }
+
+            // Increment salesCount for each product in the order
+            try {
+                const productIds = order.items.map(item => item.productId);
+                await Product.updateMany(
+                    { _id: { $in: productIds } },
+                    { $inc: { salesCount: 1 } }
+                );
+            } catch (err) {
+                console.error("Failed to increment salesCount:", err);
+            }
         }
 
         order.status = status;

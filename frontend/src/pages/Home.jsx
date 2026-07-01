@@ -50,8 +50,14 @@ const Home = () => {
     });
 
     const { data: featuredProducts = [] } = useQuery({
-        queryKey: ['featured-products'],
-        queryFn: () => fetch('/api/master-products').then(r => r.json()),
+        queryKey: ['featured-products', userLocation?.lat, userLocation?.lng],
+        queryFn: () => {
+            let url = '/api/products/bestsellers';
+            if (userLocation?.lat && userLocation?.lng) {
+                url += `?lat=${userLocation.lat}&lng=${userLocation.lng}`;
+            }
+            return fetch(url).then(r => r.json());
+        },
     });
 
     const { data: dbCategories = [] } = useQuery({
@@ -254,29 +260,44 @@ const Home = () => {
                                 <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search?q=popular')}>See All</span>
                             </div>
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-                                {featuredProducts.slice(0, 12).map(prod => (
-                                    <div 
-                                        key={prod._id} 
-                                        onClick={() => navigate(`/search?q=${encodeURIComponent(prod.name)}`)}
-                                        className="bg-white rounded-[14px] p-2 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col cursor-pointer active:scale-95 transition-all"
-                                    >
-                                        <div className="w-full aspect-square rounded-xl bg-slate-50 mb-2 p-2 flex items-center justify-center relative overflow-hidden">
-                                            {prod.image ? <img src={prod.image} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-3xl">📦</span>}
-                                            <div className="absolute top-1 left-1 bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[7.5px] font-black px-1.5 py-0.5 rounded shadow-sm">10% OFF</div>
+                                {featuredProducts.slice(0, 12).map(prod => {
+                                    const shopIdToNavigate = prod.shopId?._id || prod.shopId;
+                                    return (
+                                        <div 
+                                            key={prod._id} 
+                                            onClick={() => shopIdToNavigate ? navigate(`/shop/${shopIdToNavigate}`) : navigate(`/search?q=${encodeURIComponent(prod.name)}`)}
+                                            className="bg-white rounded-[14px] p-2 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col cursor-pointer active:scale-95 transition-all relative group"
+                                        >
+                                            <div className="w-full aspect-square rounded-xl bg-slate-50 mb-2 p-2 flex items-center justify-center relative overflow-hidden">
+                                                {prod.image ? <img src={prod.image} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-3xl">📦</span>}
+                                                <div className="absolute top-1 left-1 bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[7.5px] font-black px-1.5 py-0.5 rounded shadow-sm">Top Seller</div>
+                                            </div>
+                                            <h4 className="text-[10px] font-bold text-slate-800 line-clamp-2 leading-tight mb-0.5">{prod.name}</h4>
+                                            
+                                            {/* Show Shop Name if available */}
+                                            {prod.shopId?.name ? (
+                                                <span className="text-[8.5px] font-semibold text-slate-500 mb-1.5 truncate">
+                                                    By {prod.shopId.name}
+                                                </span>
+                                            ) : (
+                                                <span className="text-[9px] font-semibold text-slate-400 mb-1.5">{prod.category?.name || prod.category || '1 unit'}</span>
+                                            )}
+
+                                            <div className="mt-auto flex items-center justify-between">
+                                                <span className="text-[12px] font-black text-slate-900">₹{prod.price || Math.floor(Math.random() * 200 + 50)}</span>
+                                                <button 
+                                                    onClick={(e) => { 
+                                                        e.stopPropagation(); 
+                                                        shopIdToNavigate ? navigate(`/shop/${shopIdToNavigate}`) : navigate(`/search?q=${encodeURIComponent(prod.name)}`);
+                                                    }}
+                                                    className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-200 transition-colors"
+                                                >
+                                                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <h4 className="text-[10px] font-bold text-slate-800 line-clamp-2 leading-tight mb-0.5">{prod.name}</h4>
-                                        <span className="text-[9px] font-semibold text-slate-400 mb-1.5">{prod.category || '1 unit'}</span>
-                                        <div className="mt-auto flex items-center justify-between">
-                                            <span className="text-[12px] font-black text-slate-900">₹{prod.price || Math.floor(Math.random() * 200 + 50)}</span>
-                                            <button 
-                                                onClick={(e) => { e.stopPropagation(); navigate(`/search?q=${encodeURIComponent(prod.name)}`); }}
-                                                className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-200 transition-colors"
-                                            >
-                                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}

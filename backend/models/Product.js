@@ -23,6 +23,14 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    salesCount: {
+        type: Number,
+        default: 0
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
     shopId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Shop',

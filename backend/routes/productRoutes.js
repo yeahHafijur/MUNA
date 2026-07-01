@@ -13,6 +13,9 @@ const upload = require('../middleware/uploadMiddleware');
 // Get single product detail
 router.get("/detail/:id", getProductDetail);
 
+// Get bestsellers based on location
+router.get("/bestsellers", require('../controllers/productController').getBestsellers);
+
 // 1. Public Route: Get products by shop (Yeh wala gayab ho gaya tha)
 router.get("/:shopId", getProductsByShop);
 

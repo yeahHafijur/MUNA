@@ -2,6 +2,57 @@ const Product = require('../models/Product');
 const Shop = require('../models/Shop');
 const MasterProduct = require('../models/MasterProduct');
 
+const getBestsellers = async (req, res) => {
+    try {
+        const { lat, lng, radius = 5 } = req.query;
+
+        if (!lat || !lng) {
+            // Return top global products if no location provided (Fallback)
+            const globalBest = await Product.find({ inStock: true })
+                .sort({ salesCount: -1, isFeatured: -1 })
+                .limit(12)
+                .populate('shopId', 'name')
+                .lean();
+            return res.status(200).json(globalBest);
+        }
+
+        // 1. Find nearby active shops
+        const nearbyShops = await Shop.find({
+            isActive: true,
+            location: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [parseFloat(lng), parseFloat(lat)]
+                    },
+                    $maxDistance: parseFloat(radius) * 1000 // convert km to meters
+                }
+            }
+        }).select('_id');
+
+        const shopIds = nearbyShops.map(s => s._id);
+
+        if (shopIds.length === 0) {
+            return res.status(200).json([]); // No nearby shops
+        }
+
+        // 2. Fetch products from these shops, sorted by salesCount
+        const bestsellers = await Product.find({
+            shopId: { $in: shopIds },
+            inStock: true
+        })
+        .sort({ salesCount: -1, isFeatured: -1 })
+        .limit(12)
+        .populate('shopId', 'name')
+        .lean();
+
+        res.status(200).json(bestsellers);
+    } catch (error) {
+        console.error("Bestsellers Error:", error);
+        res.status(500).json({ message: "Server error while fetching bestsellers" });
+    }
+};
+
 const getProductsByShop = async (req, res) => {
     try {
         const { shopId } = req.params;
@@ -202,6 +253,7 @@ const getProductDetail = async (req, res) => {
 };
 
 module.exports = {
+    getBestsellers,
     getProductsByShop,
     createProduct,
     updateProduct,

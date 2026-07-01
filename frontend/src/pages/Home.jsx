@@ -111,50 +111,58 @@ const Home = () => {
         /* FRESH SLATE BACKGROUND */
         <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 overflow-hidden font-sans antialiased">
 
-            {/* ════════ HEADER SECTION ════════ */}
-            <div className="shrink-0 pt-10 px-5 pb-3">
-                {/* Logo Row */}
-                <div className="flex items-center gap-2 mb-6">
-                    <img src="/muna-logo-new.png" alt="MUNA" className="w-10 h-10 object-contain drop-shadow-sm rounded-xl" />
-                    <div className="flex flex-col">
-                        <span className="text-[22px] font-black tracking-tight text-slate-900 leading-none">MUNA</span>
-                        <span className="text-[7.5px] font-extrabold text-slate-500 tracking-widest uppercase mt-0.5 whitespace-nowrap">
-                            — Local Delivery & Shopping —
-                        </span>
+            {/* ════════ PREMIUM STICKY HEADER ════════ */}
+            <div className="shrink-0 bg-white shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] pt-10 px-4 pb-4 rounded-b-[24px] z-50 relative">
+                <div className="flex items-center justify-between mb-4">
+                    {/* Left: Location Dropdown */}
+                    <div className="flex items-center gap-3 flex-1 overflow-hidden cursor-pointer active:opacity-70 transition-opacity" onClick={handleLocate}>
+                        <div className="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-[14px] flex items-center justify-center shrink-0">
+                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                        </div>
+                        <div className="flex flex-col truncate pt-0.5">
+                            <span className="text-[10px] font-black tracking-widest text-emerald-600 uppercase mb-0.5">Delivery in 15 mins</span>
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-[16px] font-black text-slate-900 truncate">
+                                    {userLocation ? 'Location updated' : 'Bhalukmari, Assam'}
+                                </span>
+                                <svg className="w-3 h-3 text-slate-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Right: Profile Icon */}
+                    <div 
+                        className="w-11 h-11 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center shrink-0 ml-3 active:scale-95 transition-transform cursor-pointer shadow-sm overflow-hidden" 
+                        onClick={() => navigate('/profile')}
+                    >
+                        {user?.photoURL ? (
+                            <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-slate-500"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                        )}
                     </div>
                 </div>
 
-                {/* Location & Delivery Illustration Row */}
-                <div className="flex items-end justify-between w-full">
-                    <div className="flex flex-col cursor-pointer active:opacity-70 transition-opacity" onClick={handleLocate}>
-                        <span className="text-[12px] font-bold text-slate-400 mb-0.5">Delivering in your area</span>
-                        <div className="flex items-center gap-1.5">
-                            <span className="text-[17px] font-black text-emerald-600 tracking-tight">
-                                {userLocation ? 'Location updated' : 'Bhalukmari, Assam'}
-                            </span>
-                            <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                            </svg>
+                {/* Search Bar inside Header */}
+                <div
+                    onClick={() => navigate('/search')}
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-3.5 flex items-center gap-3 cursor-text active:scale-[0.99] transition-transform"
+                >
+                    <span className="text-emerald-600"><IcoSearch /></span>
+                    <span className="text-[13px] font-bold text-slate-400">Search "Milk"</span>
+                    <div className="ml-auto flex items-center gap-2">
+                        <div className="w-[1px] h-4 bg-slate-200"></div>
+                        <div className="text-slate-400">
+                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" /></svg>
                         </div>
-                    </div>
-                    {/* Placeholder for Delivery Boy Illustration */}
-                    <div className="w-[85px] h-[65px] bg-transparent flex items-end justify-end shrink-0 -mb-2">
-                        <span className="text-5xl drop-shadow-sm">🛵</span>
                     </div>
                 </div>
             </div>
 
             {/* ════════ SCROLLABLE BODY ════════ */}
-            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-5 pb-24">
-
-                {/* Search Bar */}
-                <div
-                    onClick={() => navigate('/search')}
-                    className="w-full bg-white rounded-2xl px-4 py-4 flex items-center gap-3 shadow-sm mb-6 cursor-text active:scale-[0.98] transition-transform border border-slate-200"
-                >
-                    <span className="text-slate-400"><IcoSearch /></span>
-                    <span className="text-[13px] font-semibold text-slate-400">Search for products or stores...</span>
-                </div>
+            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-5 pb-24 pt-6">
 
                 {/* Promo Banners (Carousel) */}
                 <div className="mb-8 flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-5 px-5">

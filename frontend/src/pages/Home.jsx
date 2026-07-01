@@ -307,21 +307,19 @@ const Home = () => {
                         )}
                     </div>
 
-                    <div className="space-y-4">
+                    <div className={sortedShops.length > 0 && !loading ? "grid grid-cols-2 gap-3" : "space-y-4"}>
                         {loading ? (
-                            <div className="space-y-4">
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} className="flex gap-4 animate-pulse">
-                                        <div className="w-[88px] h-[88px] bg-slate-100 rounded-xl" />
-                                        <div className="flex-1 py-1">
-                                            <div className="h-4 bg-slate-100 w-3/4 rounded mb-2" />
-                                            <div className="h-3 bg-slate-100 w-1/2 rounded" />
-                                        </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="flex flex-col bg-white rounded-[16px] border border-slate-100 p-2.5 animate-pulse">
+                                        <div className="w-full aspect-[4/3] bg-slate-100 rounded-xl mb-3" />
+                                        <div className="h-4 bg-slate-100 w-3/4 rounded mb-1.5" />
+                                        <div className="h-3 bg-slate-100 w-1/2 rounded" />
                                     </div>
                                 ))}
                             </div>
                         ) : sortedShops.length === 0 ? (
-                            <div className="text-center py-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed">
+                            <div className="text-center py-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed w-full">
                                 <span className="text-4xl opacity-30 block mb-2">🏪</span>
                                 <p className="text-sm font-bold text-slate-500">No stores found.</p>
                             </div>
@@ -334,42 +332,37 @@ const Home = () => {
                                     <Link
                                         to={`/shop/${shop._id}`}
                                         key={shop._id}
-                                        className={`block bg-white active:bg-slate-50 transition-colors ${!shop.isOpen ? 'opacity-50 grayscale-[0.3]' : ''}`}
+                                        className={`flex flex-col bg-white rounded-[16px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 p-2.5 active:scale-95 transition-transform ${!shop.isOpen ? 'opacity-50 grayscale-[0.3]' : ''}`}
                                     >
-                                        <div className="flex gap-4 py-2 border-b border-slate-100/60 pb-4">
-                                            {/* Store Image - Square, rounded edges */}
-                                            <div className="w-[90px] h-[90px] rounded-[14px] bg-slate-50 shrink-0 overflow-hidden relative border border-slate-100/50">
-                                                {shop.image ? (
-                                                    <img src={optimizeImage(shop.image, 300)} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-3xl">🏪</div>
-                                                )}
+                                        {/* Store Image - Rectangular Banner */}
+                                        <div className="w-full aspect-[4/3] rounded-xl bg-slate-50 mb-2.5 overflow-hidden relative border border-slate-100/50">
+                                            {shop.image ? (
+                                                <img src={optimizeImage(shop.image, 400)} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-3xl bg-slate-100">🏪</div>
+                                            )}
 
-                                                {!shop.isOpen && (
-                                                    <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
-                                                        <span className="bg-slate-800 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">CLOSED</span>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            {!shop.isOpen && (
+                                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                                                    <span className="bg-slate-800 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">CLOSED</span>
+                                                </div>
+                                            )}
+                                        </div>
 
-                                            {/* Store Details - Crisp Typography */}
-                                            <div className="flex-1 py-0.5 flex flex-col justify-start">
-                                                <h3 className="text-[15px] font-black text-slate-900 leading-tight pr-2 mb-1 line-clamp-1">{shop.name}</h3>
+                                        {/* Store Details */}
+                                        <div className="flex flex-col flex-1 px-0.5">
+                                            <h3 className="text-[13px] font-black text-slate-900 leading-tight mb-0.5 line-clamp-1">{shop.name}</h3>
+                                            <p className="text-[10px] font-semibold text-slate-500 mb-2 truncate">
+                                                {shop.category || 'Kirana & Grocery'}
+                                            </p>
 
-                                                <p className="text-[12px] font-semibold text-slate-500 mb-2 truncate">
-                                                    {shop.category || 'Kirana & Grocery'}
-                                                </p>
-
-                                                {/* Blinkit-Style "Time" Badge */}
-                                                <div className="mt-auto flex items-center gap-3">
-                                                    <div className="flex items-center gap-1 bg-slate-100/80 px-2 py-1 rounded text-[10px] font-black text-slate-700">
-                                                        <IcoStar /> {shop.rating || '4.5'}
-                                                    </div>
-
-                                                    <div className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-black tracking-wide uppercase ${isFast ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                                                        <IcoTimer />
-                                                        {isFast ? '15 MINS' : '30 MINS'}
-                                                    </div>
+                                            <div className="mt-auto flex items-center justify-between">
+                                                <div className="flex items-center gap-1 bg-slate-100/80 px-1.5 py-0.5 rounded text-[9px] font-black text-slate-700">
+                                                    <IcoStar /> {shop.rating || '4.5'}
+                                                </div>
+                                                <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wide uppercase ${isFast ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                                                    <IcoTimer />
+                                                    {isFast ? '15m' : '30m'}
                                                 </div>
                                             </div>
                                         </div>

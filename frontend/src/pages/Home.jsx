@@ -232,7 +232,13 @@ const Home = () => {
                             return (
                                 <button
                                     key={catName}
-                                    onClick={() => setActiveCategory(catName)}
+                                    onClick={() => {
+                                        if (catName === 'All') {
+                                            navigate('/search');
+                                        } else {
+                                            navigate(`/search?q=${encodeURIComponent(catName)}`);
+                                        }
+                                    }}
                                     className="flex flex-col items-center gap-2 active:opacity-60 transition-opacity"
                                 >
                                     <div className={`w-[65px] h-[65px] rounded-2xl flex items-center justify-center text-[28px] overflow-hidden ${isActive ? 'ring-2 ring-slate-900 shadow-md bg-slate-50' : bg}`}>

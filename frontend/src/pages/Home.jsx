@@ -260,7 +260,7 @@ const Home = () => {
                                 <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search?q=popular')}>See All</span>
                             </div>
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-                                {featuredProducts.slice(0, 12).map(prod => {
+                                {featuredProducts.slice(0, 6).map(prod => {
                                     const shopIdToNavigate = prod.shopId?._id || prod.shopId;
                                     return (
                                         <div 

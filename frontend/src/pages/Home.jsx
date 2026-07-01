@@ -123,7 +123,7 @@ const Home = () => {
                     🛵
                 </div>
                 
-                <div className="flex items-center justify-between mb-4 relative z-10">
+                <div className="flex items-center justify-between relative z-10">
                     {/* Left: Logo & Location */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 pr-4 cursor-pointer active:opacity-70 transition-opacity">
                         {/* MUNA Logo */}
@@ -157,15 +157,6 @@ const Home = () => {
                             <IcoUser />
                         )}
                     </div>
-                </div>
-
-                {/* Search Bar - Crisp White inside Yellow */}
-                <div
-                    onClick={() => navigate('/search')}
-                    className="w-full bg-white border-0 shadow-[0_2px_15px_rgba(0,0,0,0.06)] rounded-[14px] px-4 py-3.5 flex items-center gap-3 cursor-text active:scale-[0.99] transition-transform relative z-10"
-                >
-                    <span className="text-amber-500"><IcoSearch /></span>
-                    <span className="text-[13px] font-bold text-slate-400">Search for "Atta, Dal, Coke"</span>
                 </div>
             </div>
 
@@ -213,6 +204,17 @@ const Home = () => {
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                {/* ── Global Search Bar ── */}
+                <div className="px-4 pb-4 mt-2">
+                    <div
+                        onClick={() => navigate('/search')}
+                        className="w-full bg-white border border-slate-200 shadow-sm rounded-[14px] px-4 py-3.5 flex items-center gap-3 cursor-text active:scale-[0.99] transition-transform"
+                    >
+                        <span className="text-slate-400"><IcoSearch /></span>
+                        <span className="text-[13px] font-bold text-slate-400">Search for "Atta, Dal, Coke"</span>
                     </div>
                 </div>
 

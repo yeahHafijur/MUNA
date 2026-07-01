@@ -106,18 +106,23 @@ const Home = () => {
             {/* ════════ MINIMALIST HEADER ════════ */}
             <div className="shrink-0 bg-white pt-10 px-4 pb-3 z-50 shadow-[0_4px_10px_rgba(0,0,0,0.03)] border-b border-slate-100">
                 <div className="flex items-center justify-between mb-3">
-                    {/* Left: Bold Location */}
-                    <div className="flex flex-col flex-1 min-w-0 pr-4 cursor-pointer active:opacity-70 transition-opacity">
-                        <span className="text-[12px] font-black tracking-widest text-slate-800 uppercase flex items-center gap-1 mb-0.5">
-                            Blinkit <span className="text-emerald-600">in 15 mins</span>
-                        </span>
-                        <div className="flex items-center gap-1">
-                            <span className="text-[16px] font-bold text-slate-900 truncate">
-                                {userLocation ? 'Location updated' : 'Bhalukmari, Assam'}
+                    {/* Left: Logo & Location */}
+                    <div className="flex items-center gap-3 flex-1 min-w-0 pr-4 cursor-pointer active:opacity-70 transition-opacity" onClick={handleLocate}>
+                        {/* MUNA Logo */}
+                        <img src="/muna-logo-new.png" alt="MUNA" className="w-10 h-10 object-contain drop-shadow-sm rounded-[10px] shrink-0 bg-slate-50 border border-slate-100/50" />
+                        
+                        <div className="flex flex-col flex-1 min-w-0">
+                            <span className="text-[11px] font-black tracking-widest text-emerald-600 uppercase flex items-center gap-1 mb-0.5">
+                                Delivery in 15 mins
                             </span>
-                            <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                            </svg>
+                            <div className="flex items-center gap-1">
+                                <span className="text-[16px] font-bold text-slate-900 truncate">
+                                    {userLocation ? 'Location updated' : 'Bhalukmari, Assam'}
+                                </span>
+                                <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
 

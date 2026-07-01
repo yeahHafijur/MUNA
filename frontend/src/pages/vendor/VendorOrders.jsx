@@ -19,6 +19,7 @@ const VendorOrders = () => {
 
     const [orders, setOrders] = useState([]);
     const [activeView, setActiveView] = useState('live');
+    const [liveTab, setLiveTab] = useState('pending'); // Inner tab state for Live Orders
     const [expandedId, setExpandedId] = useState(null);
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
     const [confirmAction, setConfirmAction] = useState(null);
@@ -273,43 +274,58 @@ const VendorOrders = () => {
                     </button>
                 </div>
 
-                {/* ── LIVE KANBAN BOARD ── */}
+                {/* ── LIVE ORDERS (Inner Tabs UI) ── */}
                 {activeView === 'live' && (
-                    <>
-                        {liveOrders.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[32px] border border-slate-100 shadow-sm">
-                                <span className="text-6xl opacity-30 mb-5">📋</span>
-                                <h3 className="text-[16px] font-black text-slate-900 mb-1">No active orders</h3>
-                                <p className="text-[13px] font-semibold text-slate-500">Wait for customers to place orders.</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <div className="flex flex-col h-full bg-orange-50/30 rounded-[32px] border border-orange-100 p-4">
-                                    <div className="flex justify-between items-center mb-4 px-2">
-                                        <h3 className="text-[11px] font-black text-orange-600 uppercase tracking-widest flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div> New
-                                        </h3>
-                                        <span className="bg-orange-100 text-orange-800 text-[10px] font-black px-2 py-1 rounded-md">{pendingOrders.length}</span>
-                                    </div>
-                                    <div className="flex-1 space-y-4">{pendingOrders.map(renderOrderCard)}</div>
+                    <div className="space-y-4">
+                        {/* Inner Tabs for Live Orders */}
+                        <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                            <button
+                                onClick={() => setLiveTab('pending')}
+                                className={`flex-shrink-0 px-5 py-2.5 rounded-[14px] text-[13px] font-black transition-all flex items-center gap-2 ${liveTab === 'pending' ? 'bg-orange-500 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                            >
+                                New {pendingOrders.length > 0 && <span className={`text-[10px] px-2 py-0.5 rounded-md leading-none ${liveTab === 'pending' ? 'bg-white text-orange-600' : 'bg-orange-100 text-orange-800'}`}>{pendingOrders.length}</span>}
+                            </button>
+                            <button
+                                onClick={() => setLiveTab('preparing')}
+                                className={`flex-shrink-0 px-5 py-2.5 rounded-[14px] text-[13px] font-black transition-all flex items-center gap-2 ${liveTab === 'preparing' ? 'bg-blue-500 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                            >
+                                Preparing {acceptedOrders.length > 0 && <span className={`text-[10px] px-2 py-0.5 rounded-md leading-none ${liveTab === 'preparing' ? 'bg-white text-blue-600' : 'bg-blue-100 text-blue-800'}`}>{acceptedOrders.length}</span>}
+                            </button>
+                            <button
+                                onClick={() => setLiveTab('transit')}
+                                className={`flex-shrink-0 px-5 py-2.5 rounded-[14px] text-[13px] font-black transition-all flex items-center gap-2 ${liveTab === 'transit' ? 'bg-emerald-500 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                            >
+                                In Transit {transitOrders.length > 0 && <span className={`text-[10px] px-2 py-0.5 rounded-md leading-none ${liveTab === 'transit' ? 'bg-white text-emerald-600' : 'bg-emerald-100 text-emerald-800'}`}>{transitOrders.length}</span>}
+                            </button>
+                        </div>
+
+                        {/* Order List for the selected tab */}
+                        <div className="space-y-4 pt-2">
+                            {liveTab === 'pending' && pendingOrders.length === 0 && (
+                                <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                    <span className="text-5xl opacity-40 mb-3 block">🛎️</span>
+                                    <h3 className="text-[15px] font-black text-slate-900 mb-1">No new orders</h3>
                                 </div>
-                                <div className="flex flex-col h-full bg-blue-50/30 rounded-[32px] border border-blue-100 p-4">
-                                    <div className="flex justify-between items-center mb-4 px-2">
-                                        <h3 className="text-[11px] font-black text-blue-600 uppercase tracking-widest">Preparing</h3>
-                                        <span className="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-1 rounded-md">{acceptedOrders.length}</span>
-                                    </div>
-                                    <div className="flex-1 space-y-4">{acceptedOrders.map(renderOrderCard)}</div>
+                            )}
+                            {liveTab === 'pending' && pendingOrders.map(renderOrderCard)}
+
+                            {liveTab === 'preparing' && acceptedOrders.length === 0 && (
+                                <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                    <span className="text-5xl opacity-40 mb-3 block">👨‍🍳</span>
+                                    <h3 className="text-[15px] font-black text-slate-900 mb-1">Nothing is preparing</h3>
                                 </div>
-                                <div className="flex flex-col h-full bg-emerald-50/30 rounded-[32px] border border-emerald-100 p-4">
-                                    <div className="flex justify-between items-center mb-4 px-2">
-                                        <h3 className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">In Transit</h3>
-                                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-1 rounded-md">{transitOrders.length}</span>
-                                    </div>
-                                    <div className="flex-1 space-y-4">{transitOrders.map(renderOrderCard)}</div>
+                            )}
+                            {liveTab === 'preparing' && acceptedOrders.map(renderOrderCard)}
+
+                            {liveTab === 'transit' && transitOrders.length === 0 && (
+                                <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                    <span className="text-5xl opacity-40 mb-3 block">🚚</span>
+                                    <h3 className="text-[15px] font-black text-slate-900 mb-1">No orders in transit</h3>
                                 </div>
-                            </div>
-                        )}
-                    </>
+                            )}
+                            {liveTab === 'transit' && transitOrders.map(renderOrderCard)}
+                        </div>
+                    </div>
                 )}
 
                 {/* ── ORDER HISTORY (Native List UI) ── */}

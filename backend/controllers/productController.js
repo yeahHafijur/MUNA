@@ -4,7 +4,7 @@ const MasterProduct = require('../models/MasterProduct');
 
 const getBestsellers = async (req, res) => {
     try {
-        const { lat, lng, radius = 5 } = req.query;
+        const { lat, lng, radius = 100 } = req.query;
 
         if (!lat || !lng) {
             // Return top global products if no location provided (Fallback)

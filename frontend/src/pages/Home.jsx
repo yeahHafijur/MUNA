@@ -49,6 +49,11 @@ const Home = () => {
         queryFn: () => fetch('/api/shops').then(r => r.json()),
     });
 
+    const { data: featuredProducts = [] } = useQuery({
+        queryKey: ['featured-products'],
+        queryFn: () => fetch('/api/master-products').then(r => r.json()),
+    });
+
     /* ── Geolocation ── */
     useEffect(() => {
         if (!('geolocation' in navigator)) {
@@ -195,6 +200,41 @@ const Home = () => {
                         })}
                     </div>
                 </div>
+
+                {/* ── Top Sellers (Grid) ── */}
+                {featuredProducts && featuredProducts.length > 0 && (
+                    <div className="bg-white px-4 py-6 border-b border-slate-100 mb-2">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-[15px] font-black text-slate-900">Bestsellers</h3>
+                            <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search?q=popular')}>See All</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                            {featuredProducts.slice(0, 6).map(prod => (
+                                <div 
+                                    key={prod._id} 
+                                    onClick={() => navigate(`/search?q=${encodeURIComponent(prod.name)}`)}
+                                    className="bg-white rounded-[14px] p-2 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col cursor-pointer active:scale-95 transition-transform"
+                                >
+                                    <div className="w-full aspect-square rounded-xl bg-slate-50 mb-2 p-2 flex items-center justify-center relative overflow-hidden">
+                                        {prod.image ? <img src={prod.image} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-3xl">📦</span>}
+                                        <div className="absolute top-1 left-1 bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[7.5px] font-black px-1.5 py-0.5 rounded shadow-sm">10% OFF</div>
+                                    </div>
+                                    <h4 className="text-[10px] font-bold text-slate-800 line-clamp-2 leading-tight mb-0.5">{prod.name}</h4>
+                                    <span className="text-[9px] font-semibold text-slate-400 mb-1.5">{prod.category || '1 unit'}</span>
+                                    <div className="mt-auto flex items-center justify-between">
+                                        <span className="text-[12px] font-black text-slate-900">₹{prod.price || Math.floor(Math.random() * 200 + 50)}</span>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); navigate(`/search?q=${encodeURIComponent(prod.name)}`); }}
+                                            className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-100 transition-colors"
+                                        >
+                                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* ── Store Listing (Blinkit Card Style) ── */}
                 <div className="bg-white min-h-[50vh] px-4 py-5 border-t border-slate-100">

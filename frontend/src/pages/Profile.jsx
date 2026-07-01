@@ -53,7 +53,7 @@ const IconHelp = () => (
 );
 
 /* ─── Reusable Menu Row (refined) ─── */
-const MenuRow = ({ icon, title, subtitle, onClick, isDanger, isLast }) => (
+const MenuRow = ({ icon, title, subtitle, onClick, isDanger, isLast, iconBgClass }) => (
     <div
         onClick={() => {
             if (navigator.vibrate) navigator.vibrate(40);
@@ -64,8 +64,8 @@ const MenuRow = ({ icon, title, subtitle, onClick, isDanger, isLast }) => (
     >
         <div className="flex items-center gap-4 min-w-0">
             <div
-                className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0
-          ${isDanger ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-700'}`}
+                className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 border border-white/50 shadow-sm
+          ${isDanger ? 'bg-red-50 text-red-500' : (iconBgClass || 'bg-slate-50 text-slate-700')}`}
             >
                 {icon}
             </div>
@@ -85,7 +85,7 @@ const MenuRow = ({ icon, title, subtitle, onClick, isDanger, isLast }) => (
 );
 
 /* ─── Quick Action Chip (pill style) ─── */
-const QuickActionChip = ({ icon, label, onClick }) => (
+const QuickActionChip = ({ icon, label, onClick, iconColorClass }) => (
     <div
         onClick={() => {
             if (navigator.vibrate) navigator.vibrate(40);
@@ -94,7 +94,7 @@ const QuickActionChip = ({ icon, label, onClick }) => (
         className="flex flex-col items-center justify-center bg-white p-3 rounded-3xl border border-slate-100
       shadow-[0_4px_12px_rgba(0,0,0,0.02)] active:scale-95 transition-transform cursor-pointer"
     >
-        <div className="text-slate-700 mb-1.5">{icon}</div>
+        <div className={`mb-1.5 ${iconColorClass || 'text-slate-700'}`}>{icon}</div>
         <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest">
             {label}
         </span>
@@ -134,18 +134,18 @@ const Profile = () => {
 
             <div className="flex-1 overflow-y-auto pb-24 scrollbar-hide">
                 {/* ─── COVER PHOTO AREA ─── */}
-                <div className="relative h-36 bg-gradient-to-br from-amber-100 via-amber-50 to-orange-50 overflow-hidden">
+                <div className="relative h-44 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 overflow-hidden rounded-b-[40px] shadow-lg">
                     <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
-                    <button className="absolute top-3 right-3 bg-white/80 backdrop-blur-md rounded-full p-2 shadow-sm border border-white/60 active:scale-95 transition-transform">
+                    <button className="absolute top-3 right-3 bg-white/20 backdrop-blur-md rounded-full p-2 shadow-sm border border-white/30 text-white active:scale-95 transition-transform">
                         <IconCamera />
                     </button>
                 </div>
 
                 {/* ─── PROFILE CARD (overlapping cover) ─── */}
-                <div className="px-4 -mt-14 relative z-10">
-                    <div className="bg-white rounded-[32px] p-5 shadow-[0_20px_40px_rgba(0,0,0,0.06)] border border-slate-100 flex items-center gap-5">
+                <div className="px-4 -mt-16 relative z-10">
+                    <div className="bg-white rounded-[32px] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center gap-5">
                         <div className="relative flex-shrink-0">
-                            <div className="w-[88px] h-[88px] rounded-full bg-gradient-to-br from-amber-400 to-amber-500 ring-4 ring-white shadow-md flex items-center justify-center text-white text-4xl font-bold">
+                            <div className="w-[88px] h-[88px] rounded-full bg-gradient-to-br from-amber-400 to-orange-500 ring-4 ring-white shadow-md flex items-center justify-center text-white text-4xl font-bold">
                                 {user.name.charAt(0).toUpperCase()}
                             </div>
                             <button className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-slate-600 border border-slate-100 active:scale-90 transition-transform">
@@ -164,28 +164,31 @@ const Profile = () => {
 
                 {/* ─── QUICK ACTIONS ─── */}
                 <div className="grid grid-cols-3 gap-3 px-4 mt-6 mb-6">
-                    <QuickActionChip icon={<IconPackage />} label="Orders" onClick={() => navigate('/profile/orders')} />
-                    <QuickActionChip icon={<IconMapPin />} label="Addresses" onClick={() => navigate('/profile/settings')} />
-                    <QuickActionChip icon={<IconHeart />} label="Wishlist" onClick={() => navigate('/profile/wishlist')} />
+                    <QuickActionChip icon={<IconPackage />} label="Orders" onClick={() => navigate('/profile/orders')} iconColorClass="text-blue-500" />
+                    <QuickActionChip icon={<IconMapPin />} label="Addresses" onClick={() => navigate('/profile/settings')} iconColorClass="text-emerald-500" />
+                    <QuickActionChip icon={<IconHeart />} label="Wishlist" onClick={() => navigate('/profile/wishlist')} iconColorClass="text-rose-500" />
                 </div>
 
                 {/* ─── MENU SECTIONS ─── */}
                 <div className="px-4 space-y-5">
-                    <div className="bg-white rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-slate-100 overflow-hidden">
+                    <div className="bg-white rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-slate-100/50 overflow-hidden">
                         <MenuRow
                             icon={<IconPackage />}
+                            iconBgClass="bg-blue-50 text-blue-600"
                             title="My Orders"
                             subtitle="View active & past orders"
                             onClick={() => navigate('/profile/orders')}
                         />
                         <MenuRow
                             icon={<IconHeart />}
+                            iconBgClass="bg-rose-50 text-rose-500"
                             title="My Wishlist"
                             subtitle="View your liked items"
                             onClick={() => navigate('/profile/wishlist')}
                         />
                         <MenuRow
                             icon={<IconSettings />}
+                            iconBgClass="bg-slate-100 text-slate-700"
                             title="Profile & Settings"
                             subtitle="Edit details & notifications"
                             onClick={() => navigate('/profile/settings')}
@@ -193,9 +196,10 @@ const Profile = () => {
                         />
                     </div>
 
-                    <div className="bg-white rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-amber-100 overflow-hidden">
+                    <div className="bg-white rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-amber-100/50 overflow-hidden">
                         <MenuRow
                             icon={<span className="text-xl">🏪</span>}
+                            iconBgClass="bg-amber-50 text-amber-600"
                             title="Request to be a Vendor"
                             subtitle="Open your own shop on MUNA"
                             onClick={() => navigate('/profile/vendor-request')}

@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
+const IcoCalendar = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>;
 
 const STATUS_LABELS = {
     pending: 'Pending', accepted: 'Accepted', preparing: 'Preparing',
@@ -52,6 +53,7 @@ const CustomerOrders = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [expandedOrderId, setExpandedOrderId] = useState(null);
+    const [selectedDate, setSelectedDate] = useState('');
 
     // 🚀 ZERO LATENCY FETCHING
     const { data: orders = [], isLoading } = useQuery({
@@ -64,6 +66,10 @@ const CustomerOrders = () => {
         },
         enabled: !!token
     });
+
+    const filteredOrders = selectedDate 
+        ? orders.filter(o => o.createdAt && o.createdAt.startsWith(selectedDate))
+        : orders;
 
     const handleCancelOrder = async (orderId) => {
         // Native feel confirmation
@@ -106,20 +112,50 @@ const CustomerOrders = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto pt-4 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                
+                {/* ── Date Picker Filter ── */}
+                <div className="px-4 mb-4">
+                    <div className="bg-white p-3 rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] border border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-slate-700 font-bold">
+                            <IcoCalendar />
+                            <span className="text-[13px]">{selectedDate ? 'Filtered' : 'All Time'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {selectedDate && (
+                                <button 
+                                    onClick={() => setSelectedDate('')}
+                                    className="text-[10px] font-black text-rose-500 bg-rose-50 px-2 py-1.5 rounded-md uppercase tracking-wider active:scale-95 transition-transform"
+                                >
+                                    Clear
+                                </button>
+                            )}
+                            <input 
+                                type="date" 
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                                max={new Date().toISOString().split('T')[0]}
+                                className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 min-w-[110px]"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 {isLoading ? (
                     <OrderSkeleton />
-                ) : orders.length === 0 ? (
+                ) : filteredOrders.length === 0 ? (
                     <div className="text-center py-16 bg-white rounded-3xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.02)] mx-4 mt-2">
                         <span className="text-6xl block mb-5 opacity-80">📭</span>
-                        <div className="text-lg font-black text-slate-900 mb-1">No Orders Yet</div>
-                        <div className="text-[13px] font-semibold text-slate-500 max-w-[200px] mx-auto mb-8">Looks like you haven't ordered anything from MUNA yet.</div>
+                        <div className="text-lg font-black text-slate-900 mb-1">No Orders Found</div>
+                        <div className="text-[13px] font-semibold text-slate-500 max-w-[200px] mx-auto mb-8">
+                            {selectedDate ? `You didn't order anything on this day.` : "Looks like you haven't ordered anything from MUNA yet."}
+                        </div>
                         <button onClick={() => navigate('/')} className="bg-amber-400 text-slate-900 px-8 py-3.5 rounded-2xl font-black active:scale-95 transition-transform shadow-[0_4px_14px_rgba(251,191,36,0.3)]">
                             Start Shopping
                         </button>
                     </div>
                 ) : (
                     <div className="space-y-4 px-4">
-                        {orders.map(order => (
+                        {filteredOrders.map(order => (
                             <div key={order._id} className="bg-white rounded-[20px] shadow-[0_2px_15px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden transition-all duration-200">
                                 {/* Side Status Bar (from Vendor UI) */}
                                 <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${getStatusColor(order.status).split(' ')[0]}`}></div>

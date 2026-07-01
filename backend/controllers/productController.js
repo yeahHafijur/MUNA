@@ -16,9 +16,8 @@ const getBestsellers = async (req, res) => {
             return res.status(200).json(globalBest);
         }
 
-        // 1. Find nearby active shops
+        // 1. Find nearby shops (ignoring isActive to support legacy data)
         const nearbyShops = await Shop.find({
-            isActive: true,
             location: {
                 $near: {
                     $geometry: {

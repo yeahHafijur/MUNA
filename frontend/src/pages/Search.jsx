@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-toastify';
 import { optimizeImage } from '../utils/imageUtils';
+import ProductCard from '../components/ProductCard';
 
 /* ─── Sharp Premium Outlined Icons ─── */
 const IcoSearch = () => (
@@ -247,38 +248,17 @@ const Search = () => {
                         </div>
                         <div className="grid grid-cols-3 gap-3">
                             {results.products.map(product => (
-                                <div key={`prod-${product._id}`} className={`bg-white rounded-[14px] p-2 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col transition-all ${!product.inStock || !product.shopIsOpen ? 'opacity-60' : ''}`}>
-                                    <Link to={`/shop/${product.shopId}`} className="w-full aspect-square rounded-xl bg-slate-50 mb-2 p-2 flex items-center justify-center relative overflow-hidden">
-                                        {product.image ? (
-                                            <img src={optimizeImage(product.image, 200)} alt={product.name} className="w-full h-full object-contain mix-blend-multiply" />
-                                        ) : (
-                                            <span className="text-3xl">📦</span>
-                                        )}
-                                        {product.inStock && product.shopIsOpen && (
-                                            <div className="absolute top-1 left-1 bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[7.5px] font-black px-1.5 py-0.5 rounded shadow-sm">10% OFF</div>
-                                        )}
-                                        {(!product.inStock || !product.shopIsOpen) && (
-                                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
-                                                <span className="bg-slate-800 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm uppercase">
-                                                    {!product.shopIsOpen ? 'Closed' : 'Out of Stock'}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </Link>
-
-                                    <h4 className="text-[10px] font-bold text-slate-800 line-clamp-2 leading-tight mb-0.5"><Link to={`/shop/${product.shopId}`}>{product.name}</Link></h4>
-                                    <span className="text-[9px] font-semibold text-slate-400 mb-1.5 truncate">By {product.shopName}</span>
-                                    
-                                    <div className="mt-auto flex items-center justify-between">
-                                        <span className="text-[12px] font-black text-slate-900">₹{product.price}</span>
-                                        <button
-                                            className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-100 transition-colors disabled:border-slate-100 disabled:text-slate-300 disabled:bg-slate-50"
-                                            onClick={(e) => handleAddToCart(e, product)}
-                                            disabled={!product.inStock || !product.shopIsOpen}
-                                        >
-                                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                                        </button>
-                                    </div>
+                                <div key={`prod-${product._id}`}>
+                                    <ProductCard 
+                                        product={product}
+                                        onClick={() => navigate(`/shop/${product.shopId}`)}
+                                        onAddClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddToCart(e, product);
+                                        }}
+                                        discount="15%"
+                                        deliveryTime="10 MINS"
+                                    />
                                 </div>
                             ))}
                         </div>

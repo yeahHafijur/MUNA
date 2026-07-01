@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { optimizeImage } from '../utils/imageUtils';
+import ProductCard from '../components/ProductCard';
 import './ShopDetail.css';
 
 /* ─── Icon Components ─── */
@@ -365,60 +366,26 @@ const ShopDetail = () => {
                                         {filteredProducts.map((product, idx) => {
                                             const inCart = cartItems.find(i => i.productId === product._id);
                                             return (
-                                                <div
-                                                    key={product._id}
-                                                    className={`sd-prod ${!product.inStock ? 'sd-prod--oos' : ''}`}
-                                                    style={{ animationDelay: `${idx * 40}ms`, cursor: 'pointer' }}
-                                                    onClick={() => navigate(`/shop/${id}/product/${product._id}`)}
-                                                >
-                                                    {/* Image */}
-                                                    <div className="sd-prod-img">
-                                                        {product.image ? (
-                                                            <img src={optimizeImage(product.image)} alt={product.name} loading="lazy" />
-                                                        ) : (
-                                                            <div className="sd-prod-img-ph">📦</div>
-                                                        )}
-                                                        {!product.inStock && (
-                                                            <span className="sd-prod-oos-tag">Out of Stock</span>
-                                                        )}
-                                                        <span className="sd-prod-cat-tag">
-                                                            {typeof product.category === 'object' ? (product.category?.name || 'General') : (product.category || 'General')}
-                                                        </span>
-                                                    </div>
-
-                                                    {/* Body */}
-                                                    <div className="sd-prod-body">
-                                                        <h3 className="sd-prod-name">{product.name}</h3>
-                                                        <div className="sd-prod-footer">
-                                                            <span className="sd-prod-price">
-                                                                <span className="sd-prod-price-symbol">₹</span>
-                                                                {product.price}
-                                                            </span>
-                                                            {product.inStock ? (
-                                                                inCart ? (
-                                                                    <div className="sd-qty-ctrl" onClick={(e) => e.stopPropagation()}>
-                                                                        <button onClick={() => updateQuantity(product._id, inCart.quantity - 1)}>-</button>
-                                                                        <span>{inCart.quantity}</span>
-                                                                        <button onClick={() => updateQuantity(product._id, inCart.quantity + 1)}>+</button>
-                                                                    </div>
-                                                                ) : (
-                                                                    <button
-                                                                        className={`sd-add-btn sd-add-btn--add`}
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleAddClick(e, product);
-                                                                        }}
-                                                                    >
-                                                                        ADD
-                                                                    </button>
-                                                                )
-                                                            ) : (
-                                                                <span className="sd-add-btn sd-add-btn--oos">
-                                                                    Out of Stock
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
+                                                <div key={product._id} style={{ animationDelay: `${idx * 40}ms` }} className="sd-prod-wrapper">
+                                                    <ProductCard 
+                                                        product={product}
+                                                        onClick={() => navigate(`/shop/${id}/product/${product._id}`)}
+                                                        onAddClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleAddClick(e, product);
+                                                        }}
+                                                        quantity={inCart?.quantity || 0}
+                                                        onIncrement={(e) => {
+                                                            e.stopPropagation();
+                                                            updateQuantity(product._id, inCart.quantity + 1);
+                                                        }}
+                                                        onDecrement={(e) => {
+                                                            e.stopPropagation();
+                                                            updateQuantity(product._id, inCart.quantity - 1);
+                                                        }}
+                                                        discount="15%"
+                                                        deliveryTime="10 MINS"
+                                                    />
                                                 </div>
                                             );
                                         })}

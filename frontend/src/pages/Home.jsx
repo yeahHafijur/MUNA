@@ -145,18 +145,6 @@ const Home = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Right: Profile */}
-                    <div
-                        className="w-11 h-11 bg-white/50 border border-white/60 rounded-full flex items-center justify-center shrink-0 active:scale-95 transition-transform cursor-pointer overflow-hidden text-slate-800 shadow-sm"
-                        onClick={() => navigate('/profile')}
-                    >
-                        {user?.photoURL ? (
-                            <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
-                        ) : (
-                            <IcoUser />
-                        )}
-                    </div>
                 </div>
             </div>
 

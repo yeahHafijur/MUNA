@@ -79,10 +79,14 @@ const SearchSkeleton = () => (
 
 const Search = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { addToCart, overrideAndReplaceCart } = useCart();
 
-    const [query, setQuery] = useState('');
-    const [debouncedQuery, setDebouncedQuery] = useState('');
+    const [query, setQuery] = useState(() => {
+        const searchParams = new URLSearchParams(location.search);
+        return searchParams.get('q') || '';
+    });
+    const [debouncedQuery, setDebouncedQuery] = useState(query);
     const [replacePrompt, setReplacePrompt] = useState(null);
 
     const inputRef = useRef(null);

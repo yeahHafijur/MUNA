@@ -234,7 +234,7 @@ const Home = () => {
                     <div className="mb-8">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-[15px] font-black text-slate-900">Bestsellers in your area</h3>
-                            <span className="text-[13px] font-bold text-emerald-600" onClick={() => navigate('/search')}>See All</span>
+                            <span className="text-[13px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search?q=popular')}>See All</span>
                         </div>
                         <div className="flex gap-4 overflow-x-auto snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-5 px-5 pb-4">
                             {featuredProducts.slice(0, 6).map(prod => (
@@ -271,7 +271,9 @@ const Home = () => {
                         <h3 className="text-[15px] font-black text-slate-900">
                             {activeCategory !== 'All' ? `${activeCategory} Shops` : 'Top Picks from Local Shops'}
                         </h3>
-                        <span className="text-[13px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search')}>View All</span>
+                        {activeCategory !== 'All' && (
+                            <span className="text-[13px] font-bold text-emerald-600 cursor-pointer" onClick={() => setActiveCategory('All')}>View All</span>
+                        )}
                     </div>
 
                     <div className="space-y-4">

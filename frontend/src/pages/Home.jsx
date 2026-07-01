@@ -173,7 +173,7 @@ const Home = () => {
                     </div>
                     {/* Slide 2 */}
                     <div
-                        onClick={() => navigate('/search')}
+                        onClick={() => navigate('/search?q=fruits')}
                         className="snap-center shrink-0 w-[85vw] sm:w-[300px] rounded-2xl bg-gradient-to-r from-rose-100 to-pink-200 p-5 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer border border-rose-100"
                     >
                         <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 text-[100px] opacity-80">🍎</div>
@@ -186,7 +186,7 @@ const Home = () => {
                     </div>
                     {/* Slide 3 */}
                     <div
-                        onClick={() => navigate('/search')}
+                        onClick={() => navigate('/search?q=care')}
                         className="snap-center shrink-0 w-[85vw] sm:w-[300px] rounded-2xl bg-gradient-to-r from-indigo-100 to-blue-200 p-5 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer border border-indigo-100"
                     >
                         <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 text-[100px] opacity-80">🧴</div>
@@ -211,7 +211,10 @@ const Home = () => {
                             return (
                                 <button
                                     key={cat}
-                                    onClick={() => setActiveCategory(cat)}
+                                    onClick={() => {
+                                        setActiveCategory(cat);
+                                        document.getElementById('shops-section')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
                                     className="flex flex-col items-center gap-2 active:opacity-70 transition-opacity"
                                 >
                                     <div className={`w-[60px] h-[60px] rounded-2xl flex items-center justify-center text-[28px] ${activeCategory === cat ? 'bg-emerald-100 ring-2 ring-emerald-500 shadow-sm' : bg}`}>
@@ -235,7 +238,11 @@ const Home = () => {
                         </div>
                         <div className="flex gap-4 overflow-x-auto snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-5 px-5 pb-4">
                             {featuredProducts.slice(0, 6).map(prod => (
-                                <div key={prod._id} className="snap-start shrink-0 w-[120px] bg-white rounded-2xl p-2 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col">
+                                <div 
+                                    key={prod._id} 
+                                    onClick={() => navigate(`/search?q=${encodeURIComponent(prod.name)}`)}
+                                    className="snap-start shrink-0 w-[120px] bg-white rounded-2xl p-2 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col cursor-pointer active:scale-95 transition-transform"
+                                >
                                     <div className="w-full h-[90px] rounded-xl bg-slate-50 mb-2 p-2 flex items-center justify-center relative overflow-hidden">
                                         {prod.image ? <img src={prod.image} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-3xl">📦</span>}
                                         {/* Optional discount badge */}
@@ -245,7 +252,10 @@ const Home = () => {
                                     <span className="text-[10px] font-bold text-slate-400 mb-2">{prod.category || '1 unit'}</span>
                                     <div className="mt-auto flex items-center justify-between">
                                         <span className="text-[13px] font-black text-slate-900">₹{prod.price || Math.floor(Math.random() * 200 + 50)}</span>
-                                        <button className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-100 transition-colors">
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); navigate(`/search?q=${encodeURIComponent(prod.name)}`); }}
+                                            className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-100 transition-colors"
+                                        >
                                             <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                                         </button>
                                     </div>
@@ -256,12 +266,12 @@ const Home = () => {
                 )}
 
                 {/* Top Picks from Local Shops */}
-                <div>
+                <div id="shops-section">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-[15px] font-black text-slate-900">
                             {activeCategory !== 'All' ? `${activeCategory} Shops` : 'Top Picks from Local Shops'}
                         </h3>
-                        <span className="text-[13px] font-bold text-emerald-600">View All</span>
+                        <span className="text-[13px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search')}>View All</span>
                     </div>
 
                     <div className="space-y-4">

@@ -6,17 +6,33 @@ import { toast } from 'react-toastify';
 
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
 
-const StatusPill = ({ status }) => {
-    const labels = {
-        pending: { text: '⏳ Pending', style: 'bg-orange-50 text-orange-600 border-orange-100' },
-        accepted: { text: '👍 Accepted', style: 'bg-blue-50 text-blue-600 border-blue-100' },
-        preparing: { text: '🔥 Preparing', style: 'bg-purple-50 text-purple-600 border-purple-100' },
-        out_for_delivery: { text: '🛵 On the Way', style: 'bg-amber-50 text-amber-700 border-amber-200' },
-        delivered: { text: '✅ Delivered', style: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-        cancelled: { text: '❌ Cancelled', style: 'bg-rose-50 text-rose-600 border-rose-100' },
-    };
-    const current = labels[status] || { text: status, style: 'bg-slate-100 text-slate-600' };
-    return <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border ${current.style}`}>{current.text}</span>;
+const STATUS_LABELS = {
+    pending: 'Pending', accepted: 'Accepted', preparing: 'Preparing',
+    out_for_delivery: 'In Transit', delivered: 'Delivered', cancelled: 'Cancelled'
+};
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        case 'accepted': return 'bg-blue-100 text-blue-800 border-blue-200';
+        case 'preparing': return 'bg-purple-100 text-purple-800 border-purple-200';
+        case 'out_for_delivery': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+        case 'delivered': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        case 'cancelled': return 'bg-rose-100 text-rose-800 border-rose-200';
+        default: return 'bg-slate-100 text-slate-800 border-slate-200';
+    }
+};
+
+const formatTime = (dateString) => {
+    const d = new Date(dateString);
+    let h = d.getHours();
+    let m = d.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    h = h ? h : 12;
+    m = m < 10 ? '0' + m : m;
+    const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    return `${dateStr} • ${h}:${m} ${ampm}`;
 };
 
 const OrderSkeleton = () => (
@@ -104,32 +120,46 @@ const CustomerOrders = () => {
                 ) : (
                     <div className="space-y-4 px-4">
                         {orders.map(order => (
-                            <div key={order._id} className="bg-white rounded-[24px] border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden transition-all duration-200">
+                            <div key={order._id} className="bg-white rounded-[20px] shadow-[0_2px_15px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden transition-all duration-200">
+                                {/* Side Status Bar (from Vendor UI) */}
+                                <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${getStatusColor(order.status).split(' ')[0]}`}></div>
 
                                 <div
-                                    className="p-5 cursor-pointer active:bg-slate-50 transition-colors"
+                                    className="p-4 pl-5 cursor-pointer active:bg-slate-50 transition-colors"
                                     onClick={() => {
                                         if (navigator.vibrate) navigator.vibrate(30);
                                         setExpandedOrderId(expandedOrderId === order._id ? null : order._id);
                                     }}
                                 >
-                                    <div className="flex justify-between items-start mb-4">
+                                    <div className="flex justify-between items-start mb-3">
                                         <div>
-                                            <div className="text-[15px] font-black text-slate-900 tracking-tight mb-0.5">{order.shopId?.name || "Local Shop"}</div>
-                                            <div className="text-[11px] font-bold text-slate-400">
-                                                {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} • {new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                                            <div className="text-xs font-black text-slate-400 mb-0.5">ORDER #{order._id.slice(-6).toUpperCase()}</div>
+                                            <div className="font-bold text-slate-800 text-[15px]">{order.shopId?.name || "Local Shop"}</div>
+                                        </div>
+                                        <div className={`px-2.5 py-1 rounded-md border text-[10px] font-black uppercase tracking-wider ${getStatusColor(order.status)}`}>
+                                            {STATUS_LABELS[order.status] || order.status}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-end">
+                                        <div className="flex flex-col gap-1 text-[13px]">
+                                            <div className="flex items-center gap-2 text-slate-500 font-medium">
+                                                <span>⏱️</span> {formatTime(order.createdAt)}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-slate-400 text-xs font-bold mt-1">
+                                                <span>{order.items.length} Items</span> 
+                                                <span className={`transition-transform duration-300 ml-1 inline-block ${expandedOrderId === order._id ? 'rotate-180' : ''}`}>▼</span>
                                             </div>
                                         </div>
-                                        <StatusPill status={order.status} />
-                                    </div>
-                                    <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100/50">
-                                        <div className="text-[11px] font-black text-slate-500 tracking-widest">ID: {order._id.slice(-6).toUpperCase()}</div>
-                                        <div className={`text-slate-400 transition-transform duration-300 ${expandedOrderId === order._id ? 'rotate-180' : ''}`}>▼</div>
+                                        <div className="text-right">
+                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Amount</div>
+                                            <div className="font-black text-slate-900 text-lg">₹{order.totalAmount}</div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 {expandedOrderId === order._id && (
-                                    <div className="px-5 pb-5 border-t border-slate-50 border-dashed animate-in slide-in-from-top-2 duration-200">
+                                    <div className="px-5 pb-5 pt-2 border-t border-slate-100 border-dashed animate-in slide-in-from-top-2 duration-200 bg-slate-50/30">
 
                                         {/* 🚀 DISPLAY OTP TO CUSTOMER */}
                                         {order.status === 'out_for_delivery' && (
@@ -140,7 +170,7 @@ const CustomerOrders = () => {
                                             </div>
                                         )}
 
-                                        <div className="py-3 space-y-2.5">
+                                        <div className="py-2 space-y-2.5">
                                             {order.items.map((item, idx) => (
                                                 <div key={idx} className="flex justify-between text-[13px] font-semibold text-slate-600">
                                                     <span><span className="font-black text-slate-400 mr-2">{item.quantity}×</span>{item.name}</span>
@@ -150,13 +180,13 @@ const CustomerOrders = () => {
                                         </div>
 
                                         {order.instructions && (
-                                            <div className="bg-amber-50/50 border border-amber-100/50 p-3.5 rounded-xl mt-2 mb-3">
+                                            <div className="bg-amber-50/50 border border-amber-100/50 p-3.5 rounded-xl mt-3 mb-3">
                                                 <strong className="block text-[10px] font-black uppercase text-amber-700/80 tracking-wider mb-1">📝 Instructions</strong>
                                                 <span className="text-xs font-semibold text-amber-900/90">{order.instructions}</span>
                                             </div>
                                         )}
 
-                                        <div className="flex justify-between items-center pt-4 mt-2 border-t border-slate-100">
+                                        <div className="flex justify-between items-center pt-4 mt-3 border-t border-slate-200/60">
                                             <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Total Paid</span>
                                             <span className="text-lg font-black text-slate-900">₹{order.totalAmount}</span>
                                         </div>

@@ -110,7 +110,7 @@ const Home = () => {
             if (a.isOpen !== b.isOpen) return a.isOpen ? -1 : 1;
             return a.distance - b.distance;
            /* PURE WHITE/LIGHT GRAY BACKGROUND (Blinkit Style) */
-        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50/50 overflow-hidden font-sans antialiased">
+        <div className="fixed inset-0 md:inset-y-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] md:w-full z-[100] flex flex-col bg-slate-50/50 overflow-hidden font-sans antialiased md:shadow-[0_0_40px_rgba(0,0,0,0.1)] md:border-x border-slate-200">
 
             {/* ════════ YELLOW THEME HEADER ════════ */}
             <div className="shrink-0 bg-amber-400 pt-10 px-4 pb-4 z-50 shadow-md relative overflow-hidden rounded-b-[20px]">
@@ -119,7 +119,7 @@ const Home = () => {
                     🛵
                 </div>
                 
-                <div className="flex items-center justify-between relative z-10 max-w-7xl mx-auto">
+                <div className="flex items-center justify-between relative z-10">
                     {/* Left: Logo & Location */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 pr-4 cursor-pointer active:opacity-70 transition-opacity">
                         {/* MUNA Logo */}
@@ -147,7 +147,7 @@ const Home = () => {
             {/* ════════ SCROLLABLE BODY ════════ */}
             <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-24">
                 
-                <div className="max-w-7xl mx-auto">
+                <div className="w-full">
                     {/* ── Promo Banners Carousel ── */}
                     <div className="pt-4 pb-2">
                         <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4">
@@ -196,7 +196,7 @@ const Home = () => {
                     <div className="px-4 pb-4 mt-2">
                         <div
                             onClick={() => navigate('/search')}
-                            className="w-full max-w-3xl mx-auto bg-white border border-slate-200 shadow-sm rounded-[14px] px-4 py-3.5 flex items-center gap-3 cursor-text active:scale-[0.99] transition-transform"
+                            className="w-full bg-white border border-slate-200 shadow-sm rounded-[14px] px-4 py-3.5 flex items-center gap-3 cursor-text active:scale-[0.99] transition-transform"
                         >
                             <span className="text-slate-400"><IcoSearch /></span>
                             <span className="text-[13px] font-bold text-slate-400">Search for "Atta, Dal, Coke"</span>
@@ -204,12 +204,12 @@ const Home = () => {
                     </div>
 
                     {/* ── Shop by Category (Clean Grid) ── */}
-                    <div className="bg-white px-4 py-6 border-y border-slate-100 mb-2 rounded-2xl md:mx-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                    <div className="bg-white px-4 py-6 border-y border-slate-100 mb-2 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-[15px] md:text-lg font-black text-slate-900">Shop by Category</h3>
+                            <h3 className="text-[15px] font-black text-slate-900">Shop by Category</h3>
                         </div>
 
-                        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-y-6 gap-x-2">
+                        <div className="grid grid-cols-4 gap-y-6 gap-x-2">
                             {categoryList.map(catObj => {
                                 const catName = catObj.name;
                                 const isActive = activeCategory === catName;
@@ -226,14 +226,14 @@ const Home = () => {
                                         }}
                                         className="flex flex-col items-center gap-2 active:opacity-60 transition-opacity"
                                     >
-                                        <div className={`w-[65px] h-[65px] md:w-[75px] md:h-[75px] rounded-2xl flex items-center justify-center text-[28px] md:text-[32px] overflow-hidden ${isActive ? 'ring-2 ring-slate-900 shadow-md bg-slate-50' : bg}`}>
+                                        <div className={`w-[65px] h-[65px] rounded-2xl flex items-center justify-center text-[28px] overflow-hidden ${isActive ? 'ring-2 ring-slate-900 shadow-md bg-slate-50' : bg}`}>
                                             {catObj.image ? (
                                                 <img src={catObj.image} alt={catName} className="w-full h-full object-cover" />
                                             ) : (
                                                 emoji
                                             )}
                                         </div>
-                                        <span className={`text-[10px] md:text-[11px] text-center leading-tight px-1 ${isActive ? 'font-black text-slate-900' : 'font-bold text-slate-600'}`}>
+                                        <span className={`text-[10px] text-center leading-tight px-1 ${isActive ? 'font-black text-slate-900' : 'font-bold text-slate-600'}`}>
                                             {catName === 'All' ? 'All Stores' : catName}
                                         </span>
                                     </button>
@@ -244,29 +244,29 @@ const Home = () => {
 
                     {/* ── Top Sellers (Grid) ── */}
                     {featuredProducts && featuredProducts.length > 0 && (
-                        <div className="bg-white px-4 py-6 border-b border-slate-100 mb-2 rounded-2xl md:mx-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                        <div className="bg-white px-4 py-6 border-b border-slate-100 mb-2 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-[15px] md:text-lg font-black text-slate-900">Bestsellers</h3>
+                                <h3 className="text-[15px] font-black text-slate-900">Bestsellers</h3>
                                 <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search?q=popular')}>See All</span>
                             </div>
-                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-                                {featuredProducts.slice(0, 8).map(prod => (
+                            <div className="grid grid-cols-3 gap-3">
+                                {featuredProducts.slice(0, 6).map(prod => (
                                     <div 
                                         key={prod._id} 
                                         onClick={() => navigate(`/search?q=${encodeURIComponent(prod.name)}`)}
-                                        className="bg-white rounded-[14px] p-2 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col cursor-pointer hover:shadow-md active:scale-95 transition-all"
+                                        className="bg-white rounded-[14px] p-2 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col cursor-pointer active:scale-95 transition-all"
                                     >
                                         <div className="w-full aspect-square rounded-xl bg-slate-50 mb-2 p-2 flex items-center justify-center relative overflow-hidden">
                                             {prod.image ? <img src={prod.image} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-3xl">📦</span>}
                                             <div className="absolute top-1 left-1 bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[7.5px] font-black px-1.5 py-0.5 rounded shadow-sm">10% OFF</div>
                                         </div>
-                                        <h4 className="text-[10px] md:text-[12px] font-bold text-slate-800 line-clamp-2 leading-tight mb-0.5">{prod.name}</h4>
+                                        <h4 className="text-[10px] font-bold text-slate-800 line-clamp-2 leading-tight mb-0.5">{prod.name}</h4>
                                         <span className="text-[9px] font-semibold text-slate-400 mb-1.5">{prod.category || '1 unit'}</span>
                                         <div className="mt-auto flex items-center justify-between">
-                                            <span className="text-[12px] md:text-[14px] font-black text-slate-900">₹{prod.price || Math.floor(Math.random() * 200 + 50)}</span>
+                                            <span className="text-[12px] font-black text-slate-900">₹{prod.price || Math.floor(Math.random() * 200 + 50)}</span>
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); navigate(`/search?q=${encodeURIComponent(prod.name)}`); }}
-                                                className="w-6 h-6 md:w-7 md:h-7 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 hover:bg-emerald-100 active:bg-emerald-200 transition-colors"
+                                                className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-200 transition-colors"
                                             >
                                                 <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                                             </button>
@@ -278,37 +278,37 @@ const Home = () => {
                     )}
 
                     {/* ── Daily Market ── */}
-                    <div className="px-4 py-3 mb-2 md:mx-4">
+                    <div className="px-4 py-3 mb-2">
                         <div
                             onClick={() => navigate('/daily-market')}
-                            className="w-full bg-slate-900 rounded-[16px] p-4 md:p-6 flex items-center justify-between shadow-lg hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer overflow-hidden relative"
+                            className="w-full bg-slate-900 rounded-[16px] p-4 flex items-center justify-between shadow-lg hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer overflow-hidden relative"
                         >
                             <div className="relative z-10">
-                                <h3 className="text-[16px] md:text-xl font-black text-white tracking-tight mb-0.5">Daily Market</h3>
-                                <p className="text-[11px] md:text-sm font-semibold text-slate-400">Buy & Sell used items locally</p>
+                                <h3 className="text-[16px] font-black text-white tracking-tight mb-0.5">Daily Market</h3>
+                                <p className="text-[11px] font-semibold text-slate-400">Buy & Sell used items locally</p>
                             </div>
-                            <div className="relative z-10 bg-white/10 text-white rounded-full p-2 md:p-3 hover:bg-white/20 transition-colors">
-                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4 md:w-5 md:h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg>
+                            <div className="relative z-10 bg-white/10 text-white rounded-full p-2 hover:bg-white/20 transition-colors">
+                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg>
                             </div>
                         </div>
                     </div>
 
                     {/* ── Store Listing (Blinkit Card Style) ── */}
-                    <div className="bg-white min-h-[50vh] px-2.5 md:px-6 py-5 md:py-8 border-t border-slate-100 md:rounded-t-3xl md:mx-4 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
-                        <div className="flex items-center justify-between mb-4 md:mb-6 px-1.5">
-                            <h3 className="text-[15px] md:text-xl font-black text-slate-900">
+                    <div className="bg-white min-h-[50vh] px-2.5 py-5 border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+                        <div className="flex items-center justify-between mb-4 px-1.5">
+                            <h3 className="text-[15px] font-black text-slate-900">
                                 {activeCategory !== 'All' ? `${activeCategory} Stores` : 'Stores Around You'}
                             </h3>
                             {activeCategory !== 'All' && (
-                                <span className="text-[12px] md:text-sm font-bold text-emerald-600 cursor-pointer hover:text-emerald-700" onClick={() => setActiveCategory('All')}>Clear</span>
+                                <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => setActiveCategory('All')}>Clear</span>
                             )}
                         </div>
 
-                        <div className={sortedShops.length > 0 && !loading ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4 lg:gap-5" : "space-y-4"}>
+                        <div className={sortedShops.length > 0 && !loading ? "grid grid-cols-2 gap-2" : "space-y-4"}>
                             {loading ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
-                                    {[1, 2, 3, 4, 5, 6].map(i => (
-                                        <div key={i} className="flex flex-col bg-white rounded-[16px] border border-slate-100 p-1.5 md:p-2.5 animate-pulse">
+                                <div className="grid grid-cols-2 gap-2">
+                                    {[1, 2, 3, 4].map(i => (
+                                        <div key={i} className="flex flex-col bg-white rounded-[16px] border border-slate-100 p-1.5 animate-pulse">
                                             <div className="w-full aspect-[4/3] bg-slate-100 rounded-xl mb-3" />
                                             <div className="h-4 bg-slate-100 w-3/4 rounded mb-1.5" />
                                             <div className="h-3 bg-slate-100 w-1/2 rounded" />
@@ -316,7 +316,7 @@ const Home = () => {
                                     ))}
                                 </div>
                             ) : sortedShops.length === 0 ? (
-                                <div className="text-center py-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed w-full mx-1.5 md:mx-0 col-span-full">
+                                <div className="text-center py-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed w-full mx-1.5 col-span-full">
                                     <span className="text-4xl opacity-30 block mb-2">🏪</span>
                                     <p className="text-sm font-bold text-slate-500">No stores found.</p>
                                 </div>
@@ -329,35 +329,35 @@ const Home = () => {
                                         <Link
                                             to={`/shop/${shop._id}`}
                                             key={shop._id}
-                                            className={`flex flex-col bg-white rounded-[16px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] border border-slate-100 p-1.5 md:p-2.5 active:scale-95 transition-all ${!shop.isOpen ? 'opacity-50 grayscale-[0.3]' : ''}`}
+                                            className={`flex flex-col bg-white rounded-[16px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 p-1.5 active:scale-95 transition-all ${!shop.isOpen ? 'opacity-50 grayscale-[0.3]' : ''}`}
                                         >
                                             {/* Store Image - Rectangular Banner */}
-                                            <div className="w-full aspect-[4/3] rounded-xl bg-slate-50 mb-2 md:mb-3 overflow-hidden relative border border-slate-100/50">
+                                            <div className="w-full aspect-[4/3] rounded-xl bg-slate-50 mb-2 overflow-hidden relative border border-slate-100/50">
                                                 {shop.image ? (
-                                                    <img src={optimizeImage(shop.image, 400)} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                                                    <img src={optimizeImage(shop.image, 400)} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-3xl bg-slate-100">🏪</div>
                                                 )}
 
                                                 {!shop.isOpen && (
                                                     <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
-                                                        <span className="bg-slate-800 text-white text-[9px] md:text-[11px] font-black px-1.5 py-0.5 md:px-2 md:py-1 rounded shadow-sm">CLOSED</span>
+                                                        <span className="bg-slate-800 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">CLOSED</span>
                                                     </div>
                                                 )}
                                             </div>
 
                                             {/* Store Details */}
                                             <div className="flex flex-col flex-1 px-1">
-                                                <h3 className="text-[13px] md:text-[15px] font-black text-slate-900 leading-tight mb-0.5 md:mb-1 line-clamp-1">{shop.name}</h3>
-                                                <p className="text-[10px] md:text-[12px] font-semibold text-slate-500 mb-2 truncate">
+                                                <h3 className="text-[13px] font-black text-slate-900 leading-tight mb-0.5 line-clamp-1">{shop.name}</h3>
+                                                <p className="text-[10px] font-semibold text-slate-500 mb-2 truncate">
                                                     {shop.category || 'Kirana & Grocery'}
                                                 </p>
 
                                                 <div className="mt-auto flex items-center justify-between pb-0.5">
-                                                    <div className="flex items-center gap-1 bg-slate-100/80 px-1.5 py-0.5 md:px-2 md:py-1 rounded text-[9px] md:text-[11px] font-black text-slate-700">
+                                                    <div className="flex items-center gap-1 bg-slate-100/80 px-1.5 py-0.5 rounded text-[9px] font-black text-slate-700">
                                                         <IcoStar /> {shop.rating || '4.5'}
                                                     </div>
-                                                    <div className={`flex items-center gap-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded text-[9px] md:text-[11px] font-black tracking-wide uppercase ${isFast ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                                                    <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wide uppercase ${isFast ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
                                                         <IcoTimer />
                                                         {isFast ? '15m' : '30m'}
                                                     </div>

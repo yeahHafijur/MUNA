@@ -25,7 +25,7 @@ const getBestsellers = async (req, res) => {
                         type: "Point",
                         coordinates: [parseFloat(lng), parseFloat(lat)]
                     },
-                    $maxDistance: parseFloat(radius) * 1000 // convert km to meters
+                    $maxDistance: parseFloat(50000) * 1000 // 50,000 km covers the whole earth
                 }
             }
         }).select('_id');

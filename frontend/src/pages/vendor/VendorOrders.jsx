@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
+const IcoCalendar = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>;
 
 const STATUS_LABELS = {
     pending: 'Pending', accepted: 'Accepted', preparing: 'Preparing',
@@ -25,10 +26,9 @@ const VendorOrders = () => {
     const prevLiveRef = useRef(0);
 
     const [historyOrders, setHistoryOrders] = useState([]);
-    const [historySearch, setHistorySearch] = useState('');
-    const [historyStatus, setHistoryStatus] = useState('all');
-    const [historyPage, setHistoryPage] = useState(1);
-    const [historyPagination, setHistoryPagination] = useState({ total: 0, pages: 1 });
+    // Changed: Date based state for history
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
     const playSound = useCallback(() => {
         try {
@@ -59,19 +59,17 @@ const VendorOrders = () => {
 
     const fetchHistory = useCallback(() => {
         if (!token) return;
-        const params = new URLSearchParams({ page: historyPage, limit: 15 });
-        if (historyStatus !== 'all') params.set('status', historyStatus);
-        if (historySearch) params.set('search', historySearch);
-
-        fetch(`/api/orders/vendor?${params}`, { headers: { Authorization: `Bearer ${token}` } })
+        setIsHistoryLoading(true);
+        fetch(`/api/orders/vendor?date=${selectedDate}&limit=200`, { headers: { Authorization: `Bearer ${token}` } })
             .then(r => r.json())
             .then(data => {
                 if (data.orders) {
                     setHistoryOrders(data.orders);
-                    setHistoryPagination(data.pagination || { total: 0, pages: 1 });
                 }
-            }).catch(() => { });
-    }, [token, historyPage, historyStatus, historySearch]);
+            })
+            .catch(() => { })
+            .finally(() => setIsHistoryLoading(false));
+    }, [token, selectedDate]);
 
     useEffect(() => { fetchLive(); const id = setInterval(fetchLive, 12000); return () => clearInterval(id); }, [fetchLive]);
     useEffect(() => { if (activeView === 'history') fetchHistory(); }, [activeView, fetchHistory]);
@@ -215,6 +213,35 @@ const VendorOrders = () => {
         </div>
     );
 
+    // ─── STATS & HELPERS FOR HISTORY ───
+    const historyTotal = historyOrders.length;
+    const historyPending = historyOrders.filter(o => o.status === 'pending').length;
+    const historyActive = historyOrders.filter(o => ['accepted', 'preparing', 'out_for_delivery'].includes(o.status)).length;
+    const historyDone = historyOrders.filter(o => o.status === 'delivered').length;
+
+    const formatTime = (dateString) => {
+        const d = new Date(dateString);
+        let h = d.getHours();
+        let m = d.getMinutes();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12;
+        h = h ? h : 12;
+        m = m < 10 ? '0' + m : m;
+        return `${h}:${m} ${ampm}`;
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'accepted': return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'preparing': return 'bg-purple-100 text-purple-800 border-purple-200';
+            case 'out_for_delivery': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+            case 'delivered': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+            case 'cancelled': return 'bg-rose-100 text-rose-800 border-rose-200';
+            default: return 'bg-slate-100 text-slate-800 border-slate-200';
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col font-sans">
 
@@ -287,53 +314,84 @@ const VendorOrders = () => {
 
                 {/* ── ORDER HISTORY (Native List UI) ── */}
                 {activeView === 'history' && (
-                    <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-                        <div className="p-4 border-b border-slate-50 flex flex-col sm:flex-row gap-3 bg-slate-50/50">
-                            <input
-                                className="flex-1 py-3 px-4 bg-white border border-slate-200 rounded-[16px] text-[13px] font-bold focus:outline-none focus:border-amber-400 transition-colors placeholder:text-slate-400"
-                                placeholder="🔍 Search by ID or Name..."
-                                value={historySearch}
-                                onChange={e => { setHistorySearch(e.target.value); setHistoryPage(1); }}
+                    <div className="space-y-5">
+                        
+                        {/* Date Picker & Controls */}
+                        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-slate-700 font-bold">
+                                <IcoCalendar />
+                                <span className="text-sm">Filter by Date:</span>
+                            </div>
+                            <input 
+                                type="date" 
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                                max={new Date().toISOString().split('T')[0]}
+                                className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
                             />
-                            <select
-                                className="sm:w-48 py-3 px-4 bg-white border border-slate-200 rounded-[16px] text-[13px] font-black text-slate-700 focus:outline-none transition-colors appearance-none"
-                                value={historyStatus}
-                                onChange={e => { setHistoryStatus(e.target.value); setHistoryPage(1); }}
-                            >
-                                <option value="all">All Status</option>
-                                <option value="delivered">Delivered</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
                         </div>
 
-                        <div className="flex-1 p-2">
-                            {historyOrders.length === 0 ? (
-                                <div className="p-16 text-center">
-                                    <span className="text-5xl opacity-30 mb-3 block">🔍</span>
-                                    <h3 className="text-[15px] font-black text-slate-900 mb-1">No orders found</h3>
+                        {/* Quick Stats */}
+                        <div className="grid grid-cols-4 gap-2">
+                            <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
+                                <span className="text-xl font-black text-slate-800">{historyTotal}</span>
+                                <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Total</span>
+                            </div>
+                            <div className="bg-yellow-50 p-3 rounded-2xl shadow-sm border border-yellow-100 flex flex-col items-center justify-center text-center">
+                                <span className="text-xl font-black text-yellow-700">{historyPending}</span>
+                                <span className="text-[9px] sm:text-[10px] font-bold text-yellow-600/70 uppercase tracking-wider mt-1">Pending</span>
+                            </div>
+                            <div className="bg-blue-50 p-3 rounded-2xl shadow-sm border border-blue-100 flex flex-col items-center justify-center text-center">
+                                <span className="text-xl font-black text-blue-700">{historyActive}</span>
+                                <span className="text-[9px] sm:text-[10px] font-bold text-blue-600/70 uppercase tracking-wider mt-1">Active</span>
+                            </div>
+                            <div className="bg-emerald-50 p-3 rounded-2xl shadow-sm border border-emerald-100 flex flex-col items-center justify-center text-center">
+                                <span className="text-xl font-black text-emerald-700">{historyDone}</span>
+                                <span className="text-[9px] sm:text-[10px] font-bold text-emerald-600/70 uppercase tracking-wider mt-1">Done</span>
+                            </div>
+                        </div>
+
+                        {/* Orders List */}
+                        <div className="space-y-3">
+                            {isHistoryLoading ? (
+                                <div className="text-center py-10 text-slate-400 font-semibold text-sm">Loading orders...</div>
+                            ) : historyOrders.length === 0 ? (
+                                <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                    <span className="text-4xl mb-2 block">📭</span>
+                                    <span className="text-slate-500 font-bold text-sm">No orders found for this date.</span>
                                 </div>
                             ) : (
-                                <div className="divide-y divide-slate-50">
-                                    {historyOrders.map(order => (
-                                        <div key={order._id} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors cursor-pointer rounded-2xl">
-                                            <div className="flex flex-col">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-[14px] font-black text-slate-900">{order.customerId?.name || 'Guest'}</span>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">#{order._id.slice(-5).toUpperCase()}</span>
-                                                </div>
-                                                <span className={`w-max px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-md ${order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                                                    {STATUS_LABELS[order.status] || order.status}
-                                                </span>
+                                historyOrders.map((order) => (
+                                    <div key={order._id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
+                                        {/* Side Status Bar */}
+                                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${getStatusColor(order.status).split(' ')[0]}`}></div>
+                                        
+                                        <div className="flex justify-between items-start mb-3 pl-2">
+                                            <div>
+                                                <div className="text-xs font-black text-slate-400 mb-0.5">ORDER #{order._id.slice(-6).toUpperCase()}</div>
+                                                <div className="font-bold text-slate-800 text-[15px]">{order.customerId?.name || 'Guest'}</div>
                                             </div>
-                                            <div className="flex flex-col items-end">
-                                                <span className="text-[15px] font-black text-slate-900 tracking-tight">₹{order.totalAmount}</span>
-                                                <span className="text-[10px] font-semibold text-slate-400 mt-0.5">
-                                                    {new Date(order.createdAt).toLocaleDateString([], { day: 'numeric', month: 'short' })}
-                                                </span>
+                                            <div className={`px-2.5 py-1 rounded-md border text-[10px] font-black uppercase tracking-wider ${getStatusColor(order.status)}`}>
+                                                {STATUS_LABELS[order.status] || order.status}
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
+
+                                        <div className="pl-2 flex justify-between items-end">
+                                            <div className="flex flex-col gap-1 text-[13px]">
+                                                <div className="flex items-center gap-2 text-slate-600 font-semibold">
+                                                    <span>📞</span> {order.customerId?.phone || 'No Phone'}
+                                                </div>
+                                                <div className="flex items-center gap-2 text-slate-500 font-medium">
+                                                    <span>⏱️</span> {formatTime(order.createdAt)}
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Amount</div>
+                                                <div className="font-black text-slate-900 text-lg">₹{order.totalAmount}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
                             )}
                         </div>
                     </div>

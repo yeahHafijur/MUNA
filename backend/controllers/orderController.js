@@ -296,7 +296,7 @@ const getVendorOrders = async (req, res) => {
             return res.status(404).json({ message: "You don't have any shop." });
         }
 
-        const { page = 1, limit = 20, status, search, from, to } = req.query;
+        const { page = 1, limit = 20, status, search, from, to, date } = req.query;
 
         let filter = { shopId: shop._id };
 
@@ -306,7 +306,16 @@ const getVendorOrders = async (req, res) => {
         }
 
         // Date range filter
-        if (from || to) {
+        if (date) {
+            const queryDate = new Date(date);
+            const startOfDay = new Date(queryDate);
+            startOfDay.setHours(0, 0, 0, 0);
+            
+            const endOfDay = new Date(queryDate);
+            endOfDay.setHours(23, 59, 59, 999);
+            
+            filter.createdAt = { $gte: startOfDay, $lte: endOfDay };
+        } else if (from || to) {
             filter.createdAt = {};
             if (from) filter.createdAt.$gte = new Date(from);
             if (to) filter.createdAt.$lte = new Date(to + 'T23:59:59.999Z');

@@ -134,9 +134,9 @@ const Profile = () => {
 
             <div className="flex-1 overflow-y-auto pb-24 scrollbar-hide">
                 {/* ─── COVER PHOTO AREA ─── */}
-                <div className="relative h-44 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 overflow-hidden rounded-b-[40px] shadow-lg">
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
-                    <button className="absolute top-3 right-3 bg-white/20 backdrop-blur-md rounded-full p-2 shadow-sm border border-white/30 text-white active:scale-95 transition-transform">
+                <div className="relative h-44 bg-gradient-to-br from-amber-300 via-amber-400 to-amber-500 overflow-hidden rounded-b-[40px] shadow-lg">
+                    <div className="absolute inset-0 bg-white/20 backdrop-blur-[2px]"></div>
+                    <button className="absolute top-3 right-3 bg-white/30 backdrop-blur-md rounded-full p-2 shadow-sm border border-white/40 text-amber-950 active:scale-95 transition-transform">
                         <IconCamera />
                     </button>
                 </div>
@@ -145,7 +145,7 @@ const Profile = () => {
                 <div className="px-4 -mt-16 relative z-10">
                     <div className="bg-white rounded-[32px] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center gap-5">
                         <div className="relative flex-shrink-0">
-                            <div className="w-[88px] h-[88px] rounded-full bg-gradient-to-br from-amber-400 to-orange-500 ring-4 ring-white shadow-md flex items-center justify-center text-white text-4xl font-bold">
+                            <div className="w-[88px] h-[88px] rounded-full bg-gradient-to-br from-amber-300 to-amber-500 ring-4 ring-white shadow-md flex items-center justify-center text-amber-950 text-4xl font-black">
                                 {user.name.charAt(0).toUpperCase()}
                             </div>
                             <button className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-slate-600 border border-slate-100 active:scale-90 transition-transform">

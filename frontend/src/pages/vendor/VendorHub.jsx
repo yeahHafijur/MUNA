@@ -180,28 +180,28 @@ const VendorHub = () => {
         <div className="min-h-screen bg-[#F4F7F9] flex flex-col font-sans pb-10">
             
             {/* ─── IMMERSIVE HEADER (Native Feel) ─── */}
-            <div className="bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 pt-6 pb-20 px-4 rounded-b-[40px] shadow-lg relative z-10">
+            <div className="bg-gradient-to-br from-amber-300 via-amber-400 to-amber-500 pt-6 pb-20 px-4 rounded-b-[40px] shadow-lg relative z-10">
                 <div className="flex items-center justify-between max-w-7xl mx-auto w-full">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/'); }}
-                            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white active:scale-95 transition-transform shrink-0 border border-white/30"
+                            className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-amber-950 active:scale-95 transition-transform shrink-0 border border-white/40"
                         >
                             <IconBack />
                         </button>
                         <div className="w-12 h-12 rounded-full bg-white border-2 border-white/80 flex items-center justify-center text-xl shadow-md overflow-hidden shrink-0">
                             {shop.image ? <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" /> : '🏪'}
                         </div>
-                        <div className="flex flex-col text-white">
+                        <div className="flex flex-col text-amber-950">
                             <span className="text-[17px] font-black tracking-tight leading-none mb-1 drop-shadow-sm">{shop.name}</span>
-                            <span className="text-[11px] font-bold text-white/80 uppercase tracking-widest">Merchant Hub</span>
+                            <span className="text-[11px] font-bold text-amber-900/80 uppercase tracking-widest">Merchant Hub</span>
                         </div>
                     </div>
 
                     {/* Store Status Toggle */}
                     <button
                         onClick={handleToggleShopStatus}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 border ${shop.isOpen ? 'bg-white text-emerald-600 border-white/40' : 'bg-slate-900/40 backdrop-blur-md text-white border-white/20'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 border ${shop.isOpen ? 'bg-white text-emerald-700 border-white/60' : 'bg-slate-900/40 backdrop-blur-md text-white border-slate-900/20'}`}
                     >
                         <span className={`w-2 h-2 rounded-full ${shop.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`}></span>
                         {shop.isOpen ? 'Open' : 'Closed'}

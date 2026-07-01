@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../../utils/cropImage';
 
 /* ─── Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -21,6 +23,13 @@ const AdminGodown = () => {
     const [editingGodownItem, setEditingGodownItem] = useState(null);
     const [godownFormData, setGodownFormData] = useState({ name: '', category: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] });
     const [isGodownModalOpen, setIsGodownModalOpen] = useState(false);
+
+    // Crop Modal States
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+    const [tempImageForCrop, setTempImageForCrop] = useState(null);
 
     useEffect(() => {
         if (!token || user?.role !== 'super_admin') navigate('/');
@@ -41,7 +50,12 @@ const AdminGodown = () => {
     const handleGodownFormChange = (e) => {
         if (e.target.name === 'image') {
             const file = e.target.files[0];
-            setGodownFormData({ ...godownFormData, image: file, imagePreview: file ? URL.createObjectURL(file) : '' });
+            if (file) {
+                setTempImageForCrop(URL.createObjectURL(file));
+                setIsCropModalOpen(true);
+            }
+            e.target.value = ''; // Reset input so same file can be selected again
+
         } else if (e.target.name === 'gallery') {
             const files = Array.from(e.target.files).slice(0, 4);
             setGodownFormData({ 
@@ -54,13 +68,41 @@ const AdminGodown = () => {
         }
     };
 
+    const onCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    };
+
+    const handleCropConfirm = async () => {
+        try {
+            const croppedImageBlob = await getCroppedImg(tempImageForCrop, croppedAreaPixels);
+            const croppedImageUrl = URL.createObjectURL(croppedImageBlob);
+            setGodownFormData({ ...godownFormData, image: croppedImageBlob, imagePreview: croppedImageUrl });
+            setIsCropModalOpen(false);
+            setTempImageForCrop(null);
+        } catch (e) {
+            console.error(e);
+            toast.error("Failed to crop image");
+        }
+    };
+
+    const handleCropCancel = () => {
+        setIsCropModalOpen(false);
+        setTempImageForCrop(null);
+    };
+
     const handleGodownSubmit = async (e) => {
         e.preventDefault();
         const fd = new FormData();
         fd.append('name', godownFormData.name);
         fd.append('category', godownFormData.category);
-        if (godownFormData.image) fd.append('image', godownFormData.image);
-        godownFormData.gallery.forEach(file => fd.append('gallery', file));
+        if (godownFormData.image instanceof Blob || godownFormData.image instanceof File) {
+            fd.append('image', godownFormData.image, 'image.jpg');
+        }
+        godownFormData.gallery.forEach((file, index) => {
+            if (file instanceof Blob || file instanceof File) {
+                fd.append('gallery', file, `gallery-${index}.jpg`);
+            }
+        });
         try {
             const url = editingGodownItem ? `/api/master-products/${editingGodownItem._id}` : '/api/master-products';
             const res = await fetch(url, { method: editingGodownItem ? 'PUT' : 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
@@ -142,7 +184,7 @@ const AdminGodown = () => {
             </div>
 
             {/* ─── ADD/EDIT GODOWN MODAL ─── */}
-            {isGodownModalOpen && (
+            {isGodownModalOpen && !isCropModalOpen && (
                 <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
                     <div className="bg-white w-full max-w-md rounded-t-[32px] p-6 pb-8 shadow-2xl max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-full duration-300 ease-out" onClick={e => e.stopPropagation()}>
                         <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 shrink-0"></div>
@@ -182,6 +224,30 @@ const AdminGodown = () => {
                                 <button type="submit" className={`${btnPrimaryClasses} w-full py-3`}>{editingGodownItem ? 'Update Item' : 'Add to Godown'}</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ─── CROP MODAL ─── */}
+            {isCropModalOpen && (
+                <div className="fixed inset-0 z-[300] bg-slate-900 flex flex-col font-sans">
+                    <div className="bg-slate-900 px-4 py-3 flex items-center justify-between shadow-sm z-10 text-white">
+                        <button onClick={handleCropCancel} className="text-sm font-bold active:scale-95 transition-transform text-slate-300">Cancel</button>
+                        <span className="text-base font-extrabold tracking-tight">Crop Image</span>
+                        <button onClick={handleCropConfirm} className="text-sm font-bold text-amber-400 active:scale-95 transition-transform">Done</button>
+                    </div>
+                    <div className="flex-1 relative bg-black">
+                        {tempImageForCrop && (
+                            <Cropper
+                                image={tempImageForCrop}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={1} /* Square Crop */
+                                onCropChange={setCrop}
+                                onCropComplete={onCropComplete}
+                                onZoomChange={setZoom}
+                            />
+                        )}
                     </div>
                 </div>
             )}

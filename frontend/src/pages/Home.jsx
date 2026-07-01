@@ -7,23 +7,20 @@ import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
 import { useUnreadChats } from '../hooks/useUnreadChats';
 
 /* ─── Premium Native Icons ─── */
-const IcoPin = ({ className = "w-6 h-6" }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-);
-const IcoBell = ({ className = "w-5 h-5" }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-    </svg>
-);
-const IcoSearch = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>;
-const IcoStore = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg>;
-const IcoStar = () => <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3 text-white"><path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" /></svg>;
+const IcoSearch = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>;
+const IcoStar = () => <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3 text-amber-400"><path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" /></svg>;
 
-/* ─── Distance formatter ─── */
-const fmtDist = (d) => d < 1 ? `${(d * 1000).toFixed(0)}m` : `${d.toFixed(1)}km`;
+/* ─── Category Style Mapper ─── */
+const getCategoryIcon = (cat) => {
+    const l = cat.toLowerCase();
+    if (l.includes('grocery') || l.includes('kirana')) return { emoji: '🥬', bg: 'bg-emerald-50' };
+    if (l.includes('fruit') || l.includes('veg')) return { emoji: '🍎', bg: 'bg-rose-50' };
+    if (l.includes('dairy') || l.includes('baker') || l.includes('milk')) return { emoji: '🍞', bg: 'bg-amber-50' };
+    if (l.includes('meat') || l.includes('egg') || l.includes('fish')) return { emoji: '🥩', bg: 'bg-red-50' };
+    if (l.includes('personal') || l.includes('care') || l.includes('pharm')) return { emoji: '🧴', bg: 'bg-cyan-50' };
+    if (l.includes('all')) return { emoji: '🏪', bg: 'bg-slate-100' };
+    return { emoji: '🛍️', bg: 'bg-indigo-50' };
+};
 
 /* ─── Haversine ─── */
 const haversine = (lat1, lon1, lat2, lon2) => {
@@ -50,40 +47,15 @@ const Home = () => {
         queryFn: () => fetch('/api/shops').then(r => r.json()),
     });
 
+    const { data: featuredProducts = [] } = useQuery({
+        queryKey: ['featured-products'],
+        queryFn: () => fetch('/api/master-products').then(r => r.json()),
+    });
+
     const { data: homeMsg = { line1: 'Your local market,', line2: 'delivered in minutes ⚡' } } = useQuery({
         queryKey: ['navbar-message'],
         queryFn: () => fetch('/api/settings/navbar-message').then(r => r.json()),
     });
-
-    const { data: unreadCount = 0 } = useUnreadNotifications();
-    const { data: unreadChatCount = 0 } = useUnreadChats();
-    const totalAlerts = unreadCount + unreadChatCount;
-
-    /* ── Godown Carousel ── */
-    const { data: godownItems = [] } = useQuery({
-        queryKey: ['featured-carousel'],
-        queryFn: () => fetch('/api/settings/featured-items').then(r => r.json()),
-        select: (data) => (Array.isArray(data) ? data : []).filter(item => item.image),
-    });
-
-    const carouselPairs = useMemo(() => {
-        const pairs = [];
-        for (let i = 0; i < godownItems.length; i += 2) {
-            pairs.push(godownItems.slice(i, i + 2));
-        }
-        return pairs;
-    }, [godownItems]);
-
-    const [carouselIdx, setCarouselIdx] = useState(0);
-    const nextSlide = useCallback(() => {
-        setCarouselIdx(prev => (carouselPairs.length > 0 ? (prev + 1) % carouselPairs.length : 0));
-    }, [carouselPairs.length]);
-
-    useEffect(() => {
-        if (carouselPairs.length <= 1) return;
-        const timer = setInterval(nextSlide, 3500);
-        return () => clearInterval(timer);
-    }, [carouselPairs.length, nextSlide]);
 
     /* ── Geolocation ── */
     const handleLocate = () => {
@@ -103,7 +75,7 @@ const Home = () => {
 
     /* ── Derived Data ── */
     const categories = useMemo(() => {
-        const cats = new Set(shops.map(s => s.category || 'Kirana'));
+        const cats = new Set(shops.map(s => s.category || 'Grocery'));
         return ['All', ...Array.from(cats).sort()];
     }, [shops]);
 
@@ -126,7 +98,7 @@ const Home = () => {
         }
 
         if (activeCategory !== 'All') {
-            list = list.filter(s => (s.category || 'Kirana') === activeCategory);
+            list = list.filter(s => (s.category || 'Grocery') === activeCategory);
         }
 
         return list.sort((a, b) => {
@@ -136,173 +108,168 @@ const Home = () => {
     }, [shops, userLocation, searchQuery, activeCategory]);
 
     return (
-        /* VIBRANT AMBER BACKGROUND (Restored) */
-        <div className="fixed inset-0 z-[100] flex flex-col bg-gradient-to-b from-[#FFC107] via-[#F59E0B] to-[#D97706] overflow-hidden font-sans antialiased">
+        /* FRESH SLATE BACKGROUND */
+        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 overflow-hidden font-sans antialiased">
 
-            {/* ════════ HEADER ════════ */}
-            <header className="shrink-0 px-5 py-4 z-10">
-                <div className="flex items-center justify-between gap-3">
-                    <Link to="/" className="flex items-center gap-2 shrink-0">
-                        <img src="/muna-logo-new.png" alt="MUNA" className="w-10 h-10 rounded-xl object-contain shadow-sm" />
-                        <div className="flex flex-col leading-none">
-                            <span className="text-[16px] font-black tracking-tight text-white drop-shadow-sm">MUNA</span>
-                            <span className="text-[9px] font-extrabold text-amber-100 tracking-widest uppercase mt-[2px]">
-                                Grocery In Minutes
-                            </span>
-                        </div>
-                    </Link>
-
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={handleLocate}
-                            className="w-10 h-10 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 flex items-center justify-center text-white active:scale-95"
-                        >
-                            {userLocation ? <span className="text-[14px]">✓</span> : <IcoPin className="w-5 h-5" />}
-                        </button>
-                        <button
-                            onClick={() => navigate('/notifications')}
-                            className="relative w-10 h-10 rounded-full bg-white/25 backdrop-blur-md hover:bg-white/40 transition-colors border border-white/20 flex items-center justify-center text-white active:scale-95"
-                        >
-                            <IcoBell className="w-5 h-5" />
-                            {totalAlerts > 0 && (
-                                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center shadow-lg animate-pulse">
-                                    {totalAlerts > 9 ? '9+' : totalAlerts}
-                                </span>
-                            )}
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            {/* ════════ SCROLLABLE BODY ════════ */}
-            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-
-                {/* --- YELLOW TOP SECTION (Restored) --- */}
-                <div className="pb-6">
-                    {/* Slogan */}
-                    <div className="px-5 pt-2 pb-4">
-                        <div className="text-[28px] md:text-[32px] font-black text-[#1F1300] leading-tight tracking-tight">
-                            {homeMsg.line1}
-                        </div>
-                        <div className="text-[32px] md:text-[36px] font-black text-white leading-tight tracking-tight drop-shadow-md mt-1">
-                            {homeMsg.line2}
-                        </div>
-                    </div>
-
-                    {/* Daily Market Banner */}
-                    <div className="px-5 pb-5">
-                        <div
-                            onClick={() => navigate('/daily-market')}
-                            className="w-full bg-gradient-to-r from-sky-400 to-cyan-500 rounded-2xl p-4 flex items-center justify-between shadow-[0_8px_30px_rgba(14,165,233,0.3)] cursor-pointer active:scale-[0.98] transition-transform relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                            <div className="relative z-10">
-                                <h3 className="text-[17px] font-black text-white flex items-center gap-2 tracking-tight drop-shadow-sm">
-                                    MunaDailyMarket <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse mt-0.5"></span>
-                                </h3>
-                                <p className="text-[11px] font-bold text-cyan-50 uppercase tracking-widest mt-0.5 drop-shadow-sm">
-                                    Sell & Buy in your neighborhood
-                                </p>
-                            </div>
-                            <div className="relative z-10 w-10 h-10 bg-white text-sky-500 rounded-full flex items-center justify-center shrink-0 shadow-md">
-                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Godown Items Carousel */}
-                    {carouselPairs.length > 0 && (
-                        <div className="px-5">
-                            <div className="relative h-[140px] overflow-hidden">
-                                {carouselPairs.map((pair, pairIdx) => (
-                                    <div
-                                        key={pairIdx}
-                                        className="absolute inset-0 flex gap-3 transition-all duration-700 ease-in-out"
-                                        style={{
-                                            opacity: pairIdx === carouselIdx ? 1 : 0,
-                                            transform: pairIdx === carouselIdx ? 'translateY(0)' : 'translateY(20px)',
-                                            pointerEvents: pairIdx === carouselIdx ? 'auto' : 'none',
-                                        }}
-                                    >
-                                        {pair.map(item => (
-                                            <div key={item._id} className="flex-1 rounded-2xl overflow-hidden shadow-lg shadow-black/10 relative bg-white">
-                                                <img src={optimizeImage(item.image)} alt={item.name} className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                                                <div className="absolute bottom-0 left-0 right-0 p-3">
-                                                    <div className="text-[13px] font-black text-white leading-tight drop-shadow-md truncate">{item.name}</div>
-                                                    {item.price > 0 && <div className="text-[12px] font-extrabold text-amber-300 mt-0.5">₹{item.price}</div>}
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {pair.length === 1 && <div className="flex-1" />}
-                                    </div>
-                                ))}
-                            </div>
-                            {carouselPairs.length > 1 && (
-                                <div className="flex justify-center gap-1.5 mt-3">
-                                    {carouselPairs.map((_, idx) => (
-                                        <button key={idx} onClick={() => setCarouselIdx(idx)} className={`rounded-full transition-all duration-300 ${idx === carouselIdx ? 'w-5 h-1.5 bg-[#1F1300]' : 'w-1.5 h-1.5 bg-[#1F1300]/30'}`} />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* --- WHITE BOTTOM SECTION (With New Clean List Layout) --- */}
-                <div className="bg-slate-50 rounded-t-[32px] min-h-screen pt-6 pb-28 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
-
-                    {/* Category Chips */}
-                    <div className="px-5 pb-4">
-                        <div className="flex gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
-                            {categories.map(cat => {
-                                const isActive = activeCategory === cat;
-                                return (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setActiveCategory(cat)}
-                                        className={`shrink-0 px-5 py-2.5 rounded-full text-xs font-bold border transition-all whitespace-nowrap shadow-sm ${isActive
-                                            ? 'bg-gradient-to-br from-[#F8CB46] to-[#E5A817] text-[#1a0e00] border-transparent shadow-amber-500/30'
-                                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                                            }`}
-                                    >
-                                        {cat === 'All' ? '🏠 All Stores' : cat}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Search Bar */}
-                    <div className="px-5 pb-6">
-                        <div
-                            onClick={() => navigate('/search')}
-                            className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-sm cursor-text active:scale-[0.98] transition-transform"
-                        >
-                            <span className="text-amber-500"><IcoSearch /></span>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-bold text-slate-400 leading-none">Search for groceries, shops...</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section Head */}
-                    <div className="flex items-center justify-between px-5 pb-4">
-                        <h2 className="text-lg font-black text-slate-900 tracking-tight">
-                            {activeCategory !== 'All' ? `${activeCategory} Stores` : 'Stores Near You'}
-                        </h2>
-                        <span className="text-xs font-bold text-slate-400">
-                            {sortedShops.length} options
+            {/* ════════ HEADER SECTION ════════ */}
+            <div className="shrink-0 pt-10 px-5 pb-3">
+                {/* Logo Row */}
+                <div className="flex items-center gap-2 mb-6">
+                    <img src="/muna-logo-new.png" alt="MUNA" className="w-10 h-10 object-contain drop-shadow-sm rounded-xl" />
+                    <div className="flex flex-col">
+                        <span className="text-[22px] font-black tracking-tight text-slate-900 leading-none">MUNA</span>
+                        <span className="text-[7.5px] font-extrabold text-slate-500 tracking-widest uppercase mt-0.5 whitespace-nowrap">
+                            — Local Delivery & Shopping —
                         </span>
                     </div>
+                </div>
 
-                    {/* CLEAN LIST VIEW */}
-                    <div className="px-5 pb-6">
+                {/* Location & Delivery Illustration Row */}
+                <div className="flex items-end justify-between w-full">
+                    <div className="flex flex-col cursor-pointer active:opacity-70 transition-opacity" onClick={handleLocate}>
+                        <span className="text-[12px] font-bold text-slate-400 mb-0.5">Delivering in your area</span>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-[17px] font-black text-emerald-600 tracking-tight">
+                                {userLocation ? 'Location updated' : 'Bhalukmari, Assam'}
+                            </span>
+                            <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
+                    </div>
+                    {/* Placeholder for Delivery Boy Illustration */}
+                    <div className="w-[85px] h-[65px] bg-transparent flex items-end justify-end shrink-0 -mb-2">
+                        <span className="text-5xl drop-shadow-sm">🛵</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* ════════ SCROLLABLE BODY ════════ */}
+            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-5 pb-24">
+
+                {/* Search Bar */}
+                <div
+                    onClick={() => navigate('/search')}
+                    className="w-full bg-white rounded-2xl px-4 py-4 flex items-center gap-3 shadow-sm mb-6 cursor-text active:scale-[0.98] transition-transform border border-slate-200"
+                >
+                    <span className="text-slate-400"><IcoSearch /></span>
+                    <span className="text-[13px] font-semibold text-slate-400">Search for products or stores...</span>
+                </div>
+
+                {/* Promo Banners (Carousel) */}
+                <div className="mb-8 flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-5 px-5">
+                    {/* Slide 1 */}
+                    <div
+                        onClick={() => navigate('/daily-market')}
+                        className="snap-center shrink-0 w-[85vw] sm:w-[300px] rounded-2xl bg-gradient-to-r from-emerald-100 to-teal-200 p-5 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer border border-emerald-100"
+                    >
+                        <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 text-[100px] opacity-80">🧺</div>
+                        <div className="relative z-10 w-2/3">
+                            <h2 className="text-2xl font-black text-teal-900 leading-tight mb-1">GROCERIES</h2>
+                            <p className="text-[15px] font-bold text-teal-800 mb-3">Fresh & Daily</p>
+                            <p className="text-[10px] font-bold text-teal-700 tracking-widest uppercase mb-4">Up to 20% Off</p>
+                            <button className="bg-teal-700 text-white text-[11px] font-bold px-4 py-2 rounded-full shadow-md hover:bg-teal-800 transition-colors w-fit">Shop Now</button>
+                        </div>
+                    </div>
+                    {/* Slide 2 */}
+                    <div
+                        onClick={() => navigate('/search')}
+                        className="snap-center shrink-0 w-[85vw] sm:w-[300px] rounded-2xl bg-gradient-to-r from-rose-100 to-pink-200 p-5 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer border border-rose-100"
+                    >
+                        <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 text-[100px] opacity-80">🍎</div>
+                        <div className="relative z-10 w-2/3">
+                            <h2 className="text-2xl font-black text-pink-900 leading-tight mb-1">FRESH FRUITS</h2>
+                            <p className="text-[15px] font-bold text-pink-800 mb-3">Straight from farms</p>
+                            <p className="text-[10px] font-bold text-pink-700 tracking-widest uppercase mb-4">Deal of the Day</p>
+                            <button className="bg-pink-700 text-white text-[11px] font-bold px-4 py-2 rounded-full shadow-md hover:bg-pink-800 transition-colors w-fit">Explore</button>
+                        </div>
+                    </div>
+                    {/* Slide 3 */}
+                    <div
+                        onClick={() => navigate('/search')}
+                        className="snap-center shrink-0 w-[85vw] sm:w-[300px] rounded-2xl bg-gradient-to-r from-indigo-100 to-blue-200 p-5 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer border border-indigo-100"
+                    >
+                        <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 text-[100px] opacity-80">🧴</div>
+                        <div className="relative z-10 w-2/3">
+                            <h2 className="text-2xl font-black text-blue-900 leading-tight mb-1">PERSONAL CARE</h2>
+                            <p className="text-[15px] font-bold text-blue-800 mb-3">Top brands</p>
+                            <p className="text-[10px] font-bold text-blue-700 tracking-widest uppercase mb-4">Buy 1 Get 1</p>
+                            <button className="bg-blue-700 text-white text-[11px] font-bold px-4 py-2 rounded-full shadow-md hover:bg-blue-800 transition-colors w-fit">Grab Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Shop by Category */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-[15px] font-black text-slate-900">Shop by Category</h3>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-y-6 gap-x-2">
+                        {categories.map(cat => {
+                            const { emoji, bg } = getCategoryIcon(cat);
+                            return (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className="flex flex-col items-center gap-2 active:opacity-70 transition-opacity"
+                                >
+                                    <div className={`w-[60px] h-[60px] rounded-2xl flex items-center justify-center text-[28px] ${activeCategory === cat ? 'bg-emerald-100 ring-2 ring-emerald-500 shadow-sm' : bg}`}>
+                                        {emoji}
+                                    </div>
+                                    <span className="text-[10px] font-bold text-center text-slate-700 leading-tight px-1">
+                                        {cat === 'All' ? 'Grocery' : cat}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Featured Products (Bestsellers) */}
+                {featuredProducts && featuredProducts.length > 0 && (
+                    <div className="mb-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-[15px] font-black text-slate-900">Bestsellers in your area</h3>
+                            <span className="text-[13px] font-bold text-emerald-600" onClick={() => navigate('/search')}>See All</span>
+                        </div>
+                        <div className="flex gap-4 overflow-x-auto snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-5 px-5 pb-4">
+                            {featuredProducts.slice(0, 6).map(prod => (
+                                <div key={prod._id} className="snap-start shrink-0 w-[120px] bg-white rounded-2xl p-2 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col">
+                                    <div className="w-full h-[90px] rounded-xl bg-slate-50 mb-2 p-2 flex items-center justify-center relative overflow-hidden">
+                                        {prod.image ? <img src={prod.image} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-3xl">📦</span>}
+                                        {/* Optional discount badge */}
+                                        <div className="absolute top-1 left-1 bg-amber-400 text-amber-950 text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm">10% OFF</div>
+                                    </div>
+                                    <h4 className="text-[11px] font-bold text-slate-800 line-clamp-2 leading-tight mb-1">{prod.name}</h4>
+                                    <span className="text-[10px] font-bold text-slate-400 mb-2">{prod.category || '1 unit'}</span>
+                                    <div className="mt-auto flex items-center justify-between">
+                                        <span className="text-[13px] font-black text-slate-900">₹{prod.price || Math.floor(Math.random() * 200 + 50)}</span>
+                                        <button className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-100 transition-colors">
+                                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Top Picks from Local Shops */}
+                <div>
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-[15px] font-black text-slate-900">
+                            {activeCategory !== 'All' ? `${activeCategory} Shops` : 'Top Picks from Local Shops'}
+                        </h3>
+                        <span className="text-[13px] font-bold text-emerald-600">View All</span>
+                    </div>
+
+                    <div className="space-y-4">
                         {loading ? (
                             <div className="space-y-4">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="bg-white rounded-2xl p-3 border border-slate-100 flex gap-4 animate-pulse">
-                                        <div className="w-[120px] h-[84px] bg-slate-100 rounded-xl shrink-0" />
+                                    <div key={i} className="bg-white rounded-2xl p-4 flex gap-4 animate-pulse">
+                                        <div className="w-20 h-20 bg-slate-100 rounded-xl" />
                                         <div className="flex-1 py-1">
                                             <div className="h-4 bg-slate-100 w-2/3 rounded mb-2" />
                                             <div className="h-3 bg-slate-100 w-1/2 rounded" />
@@ -311,62 +278,56 @@ const Home = () => {
                                 ))}
                             </div>
                         ) : sortedShops.length === 0 ? (
-                            <div className="text-center py-10 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                                <span className="text-4xl opacity-50 mb-2 block">🏪</span>
-                                <h3 className="text-sm font-bold text-slate-900">No stores found</h3>
-                                <p className="text-xs font-medium text-slate-500 mt-1">Try selecting a different category</p>
-                                <button onClick={() => setActiveCategory('All')} className="mt-4 px-5 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl shadow-md">View All Stores</button>
+                            <div className="text-center py-10 bg-white rounded-2xl shadow-sm border border-slate-200">
+                                <span className="text-4xl opacity-50 block mb-2">🏪</span>
+                                <p className="text-sm font-bold text-slate-600">No stores found</p>
                             </div>
                         ) : (
-                            <div className="space-y-3">
-                                {sortedShops.map((shop) => (
-                                    <Link
-                                        to={`/shop/${shop._id}`}
-                                        key={shop._id}
-                                        className={`bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex gap-4 active:scale-[0.98] transition-all hover:border-amber-400 group ${!shop.isOpen ? 'opacity-60 bg-slate-50' : ''}`}
-                                    >
+                            sortedShops.map((shop) => (
+                                <Link
+                                    to={`/shop/${shop._id}`}
+                                    key={shop._id}
+                                    className={`block bg-white rounded-[24px] p-3 shadow-sm border border-slate-100 active:scale-[0.98] transition-transform hover:border-emerald-200 ${!shop.isOpen ? 'opacity-60' : ''}`}
+                                >
+                                    <div className="flex gap-4">
                                         {/* Store Image */}
-                                        <div className="w-[120px] h-[84px] rounded-xl bg-slate-50 shrink-0 relative overflow-hidden border border-slate-100">
+                                        <div className="w-[85px] h-[85px] rounded-[16px] bg-slate-50 shrink-0 overflow-hidden relative border border-slate-100">
                                             {shop.image ? (
-                                                <img src={optimizeImage(shop.image, 300)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                <img src={optimizeImage(shop.image, 300)} className="w-full h-full object-cover" />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-300"><IcoStore /></div>
+                                                <div className="w-full h-full flex items-center justify-center text-3xl">🏪</div>
                                             )}
-                                            {/* Rating Badge */}
-                                            <div className="absolute bottom-1 left-1 bg-green-600/90 backdrop-blur text-white text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                                                <span>{shop.rating || '4.5'}</span> <IcoStar />
-                                            </div>
                                         </div>
 
                                         {/* Store Details */}
-                                        <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                            <div className="flex items-center justify-between mb-0.5">
-                                                <h3 className="text-[15px] font-black text-slate-900 truncate pr-2 tracking-tight">{shop.name}</h3>
+                                        <div className="flex-1 py-1 flex flex-col justify-center">
+                                            <div className="flex items-start justify-between">
+                                                <h3 className="text-[15px] font-black text-slate-900 leading-tight pr-2">{shop.name}</h3>
                                                 {!shop.isOpen && (
-                                                    <span className="text-[9px] font-bold text-red-500 uppercase tracking-widest bg-red-50 px-1.5 py-0.5 rounded shrink-0">Closed</span>
+                                                    <span className="text-[9px] font-bold text-red-500 uppercase bg-red-50 px-1.5 py-0.5 rounded shrink-0">Closed</span>
                                                 )}
                                             </div>
 
-                                            <p className="text-[11px] font-bold text-slate-500 truncate mb-1.5">
-                                                {shop.category || 'Kirana Store'} • {shop.address}
+                                            <p className="text-[12px] font-bold text-slate-500 mt-1">
+                                                {shop.category || 'Kirana & Grocery'}
                                             </p>
 
-                                            <div className="flex items-center gap-3 text-[11px] font-bold text-slate-500 mt-auto bg-slate-50/80 px-2 py-1.5 rounded-lg border border-slate-100/50 self-start">
-                                                <span className="flex items-center gap-1 text-slate-700">
-                                                    📍 {shop.distance !== Infinity ? fmtDist(shop.distance) : 'Nearby'}
-                                                </span>
-                                                <div className="w-1 h-1 rounded-full bg-slate-300"></div>
-                                                <span className="flex items-center gap-1 text-emerald-600">
-                                                    ⏱️ {shop.distance < 2 ? '15 mins' : '30 mins'}
-                                                </span>
+                                            <div className="mt-auto flex items-end justify-between">
+                                                <div className="flex items-center gap-1 text-[12px] font-bold text-slate-600">
+                                                    {shop.rating || '4.5'} <IcoStar />
+                                                </div>
+                                                <div className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                                                    ⏱ {shop.distance < 2 ? '15-20' : '30-40'} min
+                                                </div>
                                             </div>
                                         </div>
-                                    </Link>
-                                ))}
-                            </div>
+                                    </div>
+                                </Link>
+                            ))
                         )}
                     </div>
                 </div>
+
             </div>
         </div>
     );

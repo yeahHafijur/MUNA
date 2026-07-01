@@ -142,41 +142,48 @@ const Search = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans pb-24 text-slate-800">
+        <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans pb-24 text-slate-800">
 
-            {/* ── Sticky Ultra-Clean Top Bar ── */}
-            <div className="sticky top-0 z-50 bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="p-1.5 text-slate-700 rounded-lg active:bg-slate-50 transition-colors flex items-center justify-center"
-                >
-                    <div className="w-5 h-5"><IcoBack /></div>
-                </button>
-                <div className="relative flex-1 flex items-center">
-                    <span className="absolute left-3.5 text-slate-400 w-[18px] h-[18px] pointer-events-none">
-                        <IcoSearch />
-                    </span>
-                    <input
-                        ref={inputRef}
-                        type="search"
-                        name="q"
-                        id="search-input"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        spellCheck="false"
-                        className="w-full py-2.5 pl-11 pr-10 bg-slate-50 border border-slate-200/80 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-slate-800 focus:ring-0 transition-all"
-                        placeholder="Search for items, stores or categories..."
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                    />
-                    {query && (
-                        <button
-                            className="absolute right-3 w-5 h-5 bg-slate-200 text-slate-600 rounded-full text-[9px] font-bold flex items-center justify-center active:scale-90"
-                            onClick={() => setQuery('')}
-                        >
-                            ✕
-                        </button>
-                    )}
+            {/* ── YELLOW THEME HEADER ── */}
+            <div className="sticky top-0 z-50 bg-amber-400 pt-10 px-4 pb-4 shadow-md overflow-hidden rounded-b-[20px]">
+                {/* Decorative Delivery Element */}
+                <div className="absolute right-[-10px] top-2 text-[90px] opacity-[0.15] rotate-12 pointer-events-none drop-shadow-sm">
+                    🛵
+                </div>
+
+                <div className="flex items-center gap-3 relative z-10">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="w-11 h-11 bg-white/50 border border-white/60 text-slate-800 rounded-full active:scale-95 transition-transform flex items-center justify-center shrink-0 shadow-sm"
+                    >
+                        <div className="w-5 h-5"><IcoBack /></div>
+                    </button>
+                    <div className="relative flex-1 flex items-center">
+                        <span className="absolute left-3.5 text-amber-500 w-[18px] h-[18px] pointer-events-none">
+                            <IcoSearch />
+                        </span>
+                        <input
+                            ref={inputRef}
+                            type="search"
+                            name="q"
+                            id="search-input"
+                            autoComplete="off"
+                            autoCorrect="off"
+                            spellCheck="false"
+                            className="w-full py-3.5 pl-10 pr-10 bg-white border-0 shadow-[0_2px_15px_rgba(0,0,0,0.06)] rounded-[14px] text-[13px] font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none active:scale-[0.99] transition-transform"
+                            placeholder="Search for items, stores or categories..."
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                        />
+                        {query && (
+                            <button
+                                className="absolute right-3 w-5 h-5 bg-slate-100 text-slate-500 rounded-full text-[9px] font-black flex items-center justify-center active:scale-90"
+                                onClick={() => setQuery('')}
+                            >
+                                ✕
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -187,12 +194,12 @@ const Search = () => {
 
                 {/* ── Minimal Empty State ── */}
                 {!isLoading && hasSearched && results.shops.length === 0 && results.products.length === 0 && (
-                    <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm max-w-md mx-auto mt-2">
-                        <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                            <div className="w-5 h-5"><IcoSearch /></div>
+                    <div className="text-center py-16 bg-white rounded-[20px] border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)] max-w-md mx-auto mt-2">
+                        <div className="text-5xl mb-3 opacity-80">
+                            🔍
                         </div>
-                        <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-tight">No results found</h3>
-                        <p className="text-xs font-medium text-slate-400 px-8 leading-relaxed">We couldn't find anything matching "{debouncedQuery}". Check spelling or try another term.</p>
+                        <h3 className="text-[16px] font-black text-slate-900 mb-1 tracking-tight">No results found</h3>
+                        <p className="text-[12px] font-medium text-slate-500 px-8 leading-relaxed">We couldn't find anything matching "{debouncedQuery}". Check spelling or try another term.</p>
                     </div>
                 )}
 
@@ -200,25 +207,30 @@ const Search = () => {
                 {!isLoading && results.shops?.length > 0 && (
                     <div className="mb-6">
                         <div className="flex items-center gap-2 mb-3 px-1">
-                            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Stores Near You</h2>
-                            <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-md">{results.shops.length}</span>
+                            <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">Stores Near You</h2>
+                            <span className="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-md">{results.shops.length}</span>
                         </div>
-                        <div className="flex flex-col gap-2.5">
+                        <div className="flex flex-col gap-3">
                             {results.shops.map(shop => (
-                                <Link to={`/shop/${shop._id}`} key={`shop-${shop._id}`} className="flex bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden active:bg-slate-50/50 transition-colors">
-                                    <div className="w-20 min-h-[75px] bg-slate-50 relative shrink-0 flex items-center justify-center border-r border-slate-50">
+                                <Link to={`/shop/${shop._id}`} key={`shop-${shop._id}`} className={`flex bg-white rounded-[14px] border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)] overflow-hidden active:bg-slate-50 transition-colors ${!shop.isOpen ? 'opacity-60 grayscale-[0.3]' : ''}`}>
+                                    <div className="w-[80px] h-[80px] bg-slate-50 relative shrink-0 flex items-center justify-center border-r border-slate-100/50 p-1">
                                         {shop.image ? (
-                                            <img src={optimizeImage(shop.image)} alt={shop.name} className="w-full h-full object-cover" />
+                                            <img src={optimizeImage(shop.image, 200)} alt={shop.name} className="w-full h-full object-cover rounded-[10px]" />
                                         ) : (
-                                            <IcoShop />
+                                            <span className="text-3xl">🏪</span>
                                         )}
-                                        <div className={`absolute bottom-1 left-1 text-[8px] font-bold px-1.5 py-0.5 rounded text-white tracking-wide uppercase ${shop.isOpen ? 'bg-emerald-600' : 'bg-rose-600'}`}>
-                                            {shop.isOpen ? 'Open' : 'Closed'}
-                                        </div>
+                                        {!shop.isOpen && (
+                                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center rounded-[10px]">
+                                                <span className="bg-slate-800 text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm">CLOSED</span>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="p-3 flex flex-col justify-center min-w-0">
-                                        <h4 className="text-sm font-bold text-slate-900 truncate tracking-tight mb-0.5">{shop.name}</h4>
-                                        <p className="text-xs font-medium text-slate-400 truncate">{shop.address}</p>
+                                    <div className="p-3 flex flex-col justify-center min-w-0 flex-1">
+                                        <h4 className="text-[14px] font-black text-slate-900 truncate tracking-tight mb-0.5">{shop.name}</h4>
+                                        <p className="text-[11px] font-semibold text-slate-400 truncate mb-1">{shop.address}</p>
+                                        <div className="flex items-center gap-2 mt-auto">
+                                            <span className="bg-emerald-50 text-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5"><IcoTimer /> 15 MINS</span>
+                                        </div>
                                     </div>
                                 </Link>
                             ))}
@@ -230,45 +242,42 @@ const Search = () => {
                 {!isLoading && results.products?.length > 0 && (
                     <div className="mb-6">
                         <div className="flex items-center gap-2 mb-3 px-1">
-                            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Products</h2>
-                            <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-md">{results.products.length}</span>
+                            <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">Products</h2>
+                            <span className="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-md">{results.products.length}</span>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
+                        <div className="grid grid-cols-3 gap-3">
                             {results.products.map(product => (
-                                <div key={`prod-${product._id}`} className={`bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col transition-all ${!product.inStock || !product.shopIsOpen ? 'opacity-60' : ''}`}>
-                                    <Link to={`/shop/${product.shopId}`} className="h-28 bg-slate-50/50 p-3 relative flex items-center justify-center border-b border-slate-50">
+                                <div key={`prod-${product._id}`} className={`bg-white rounded-[14px] p-2 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col transition-all ${!product.inStock || !product.shopIsOpen ? 'opacity-60' : ''}`}>
+                                    <Link to={`/shop/${product.shopId}`} className="w-full aspect-square rounded-xl bg-slate-50 mb-2 p-2 flex items-center justify-center relative overflow-hidden">
                                         {product.image ? (
                                             <img src={optimizeImage(product.image, 200)} alt={product.name} className="w-full h-full object-contain mix-blend-multiply" />
                                         ) : (
-                                            <IcoProduct />
+                                            <span className="text-3xl">📦</span>
+                                        )}
+                                        {product.inStock && product.shopIsOpen && (
+                                            <div className="absolute top-1 left-1 bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[7.5px] font-black px-1.5 py-0.5 rounded shadow-sm">10% OFF</div>
                                         )}
                                         {(!product.inStock || !product.shopIsOpen) && (
-                                            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center">
-                                                <span className="bg-white text-slate-900 text-[9px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider">
+                                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                                                <span className="bg-slate-800 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm uppercase">
                                                     {!product.shopIsOpen ? 'Closed' : 'Out of Stock'}
                                                 </span>
                                             </div>
                                         )}
                                     </Link>
 
-                                    <div className="p-3 flex flex-col flex-1">
-                                        <div className="inline-flex items-center text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded tracking-wide mb-1.5 self-start">
-                                            <IcoTime /> 15 MINS
-                                        </div>
-                                        <Link to={`/shop/${product.shopId}`} className="block flex-1 mb-2">
-                                            <h4 className="text-xs font-bold text-slate-900 leading-snug line-clamp-2 tracking-tight">{product.name}</h4>
-                                            <p className="text-[10px] font-medium text-slate-400 mt-0.5 truncate">By {product.shopName}</p>
-                                        </Link>
-                                        <div className="flex justify-between items-center pt-1">
-                                            <span className="text-sm font-bold text-slate-900">₹{product.price}</span>
-                                            <button
-                                                className="bg-white text-emerald-600 border border-emerald-200 px-3 py-1 rounded-lg text-xs font-bold hover:border-emerald-600 active:scale-95 transition-all disabled:border-slate-100 disabled:text-slate-300 disabled:bg-slate-50"
-                                                onClick={(e) => handleAddToCart(e, product)}
-                                                disabled={!product.inStock || !product.shopIsOpen}
-                                            >
-                                                Add
-                                            </button>
-                                        </div>
+                                    <h4 className="text-[10px] font-bold text-slate-800 line-clamp-2 leading-tight mb-0.5"><Link to={`/shop/${product.shopId}`}>{product.name}</Link></h4>
+                                    <span className="text-[9px] font-semibold text-slate-400 mb-1.5 truncate">By {product.shopName}</span>
+                                    
+                                    <div className="mt-auto flex items-center justify-between">
+                                        <span className="text-[12px] font-black text-slate-900">₹{product.price}</span>
+                                        <button
+                                            className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 active:bg-emerald-100 transition-colors disabled:border-slate-100 disabled:text-slate-300 disabled:bg-slate-50"
+                                            onClick={(e) => handleAddToCart(e, product)}
+                                            disabled={!product.inStock || !product.shopIsOpen}
+                                        >
+                                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                        </button>
                                     </div>
                                 </div>
                             ))}

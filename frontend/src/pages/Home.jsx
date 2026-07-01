@@ -109,8 +109,12 @@ const Home = () => {
         return list.sort((a, b) => {
             if (a.isOpen !== b.isOpen) return a.isOpen ? -1 : 1;
             return a.distance - b.distance;
-           /* PURE WHITE/LIGHT GRAY BACKGROUND (Blinkit Style) */
-        <div className="fixed inset-0 md:inset-y-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] md:w-full z-[100] flex flex-col bg-slate-50/50 overflow-hidden font-sans antialiased md:shadow-[0_0_40px_rgba(0,0,0,0.1)] md:border-x border-slate-200">
+        });
+    }, [shops, userLocation, activeCategory, searchQuery]);
+
+    return (
+        /* PURE WHITE/LIGHT GRAY BACKGROUND (Blinkit Style) */
+        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50/50 overflow-hidden font-sans antialiased">
 
             {/* ════════ YELLOW THEME HEADER ════════ */}
             <div className="shrink-0 bg-amber-400 pt-10 px-4 pb-4 z-50 shadow-md relative overflow-hidden rounded-b-[20px]">
@@ -119,7 +123,7 @@ const Home = () => {
                     🛵
                 </div>
                 
-                <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center justify-between relative z-10 max-w-7xl mx-auto">
                     {/* Left: Logo & Location */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 pr-4 cursor-pointer active:opacity-70 transition-opacity">
                         {/* MUNA Logo */}
@@ -147,7 +151,7 @@ const Home = () => {
             {/* ════════ SCROLLABLE BODY ════════ */}
             <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-24">
                 
-                <div className="w-full">
+                <div className="w-full max-w-7xl mx-auto">
                     {/* ── Promo Banners Carousel ── */}
                     <div className="pt-4 pb-2">
                         <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4">
@@ -196,7 +200,7 @@ const Home = () => {
                     <div className="px-4 pb-4 mt-2">
                         <div
                             onClick={() => navigate('/search')}
-                            className="w-full bg-white border border-slate-200 shadow-sm rounded-[14px] px-4 py-3.5 flex items-center gap-3 cursor-text active:scale-[0.99] transition-transform"
+                            className="w-full max-w-2xl mx-auto bg-white border border-slate-200 shadow-sm rounded-[14px] px-4 py-3.5 flex items-center gap-3 cursor-text active:scale-[0.99] transition-transform"
                         >
                             <span className="text-slate-400"><IcoSearch /></span>
                             <span className="text-[13px] font-bold text-slate-400">Search for "Atta, Dal, Coke"</span>
@@ -204,12 +208,12 @@ const Home = () => {
                     </div>
 
                     {/* ── Shop by Category (Clean Grid) ── */}
-                    <div className="bg-white px-4 py-6 border-y border-slate-100 mb-2 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                    <div className="bg-white px-4 py-6 border-y border-slate-100 mb-2 md:rounded-2xl md:mx-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-[15px] font-black text-slate-900">Shop by Category</h3>
                         </div>
 
-                        <div className="grid grid-cols-4 gap-y-6 gap-x-2">
+                        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-y-6 gap-x-2">
                             {categoryList.map(catObj => {
                                 const catName = catObj.name;
                                 const isActive = activeCategory === catName;
@@ -244,13 +248,13 @@ const Home = () => {
 
                     {/* ── Top Sellers (Grid) ── */}
                     {featuredProducts && featuredProducts.length > 0 && (
-                        <div className="bg-white px-4 py-6 border-b border-slate-100 mb-2 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                        <div className="bg-white px-4 py-6 border-b border-slate-100 mb-2 md:rounded-2xl md:mx-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-[15px] font-black text-slate-900">Bestsellers</h3>
                                 <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search?q=popular')}>See All</span>
                             </div>
-                            <div className="grid grid-cols-3 gap-3">
-                                {featuredProducts.slice(0, 6).map(prod => (
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+                                {featuredProducts.slice(0, 12).map(prod => (
                                     <div 
                                         key={prod._id} 
                                         onClick={() => navigate(`/search?q=${encodeURIComponent(prod.name)}`)}
@@ -278,7 +282,7 @@ const Home = () => {
                     )}
 
                     {/* ── Daily Market ── */}
-                    <div className="px-4 py-3 mb-2">
+                    <div className="px-4 py-3 mb-2 md:mx-4">
                         <div
                             onClick={() => navigate('/daily-market')}
                             className="w-full bg-slate-900 rounded-[16px] p-4 flex items-center justify-between shadow-lg hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer overflow-hidden relative"
@@ -294,20 +298,20 @@ const Home = () => {
                     </div>
 
                     {/* ── Store Listing (Blinkit Card Style) ── */}
-                    <div className="bg-white min-h-[50vh] px-2.5 py-5 border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+                    <div className="bg-white min-h-[50vh] px-2.5 py-5 border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] md:rounded-t-3xl md:mx-4">
                         <div className="flex items-center justify-between mb-4 px-1.5">
                             <h3 className="text-[15px] font-black text-slate-900">
                                 {activeCategory !== 'All' ? `${activeCategory} Stores` : 'Stores Around You'}
                             </h3>
                             {activeCategory !== 'All' && (
-                                <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => setActiveCategory('All')}>Clear</span>
+                                <span className="text-[12px] font-bold text-emerald-600 cursor-pointer hover:text-emerald-700" onClick={() => setActiveCategory('All')}>Clear</span>
                             )}
                         </div>
 
-                        <div className={sortedShops.length > 0 && !loading ? "grid grid-cols-2 gap-2" : "space-y-4"}>
+                        <div className={sortedShops.length > 0 && !loading ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-4 lg:gap-5" : "space-y-4"}>
                             {loading ? (
-                                <div className="grid grid-cols-2 gap-2">
-                                    {[1, 2, 3, 4].map(i => (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-4 lg:gap-5">
+                                    {[1, 2, 3, 4, 5, 6].map(i => (
                                         <div key={i} className="flex flex-col bg-white rounded-[16px] border border-slate-100 p-1.5 animate-pulse">
                                             <div className="w-full aspect-[4/3] bg-slate-100 rounded-xl mb-3" />
                                             <div className="h-4 bg-slate-100 w-3/4 rounded mb-1.5" />
@@ -329,7 +333,7 @@ const Home = () => {
                                         <Link
                                             to={`/shop/${shop._id}`}
                                             key={shop._id}
-                                            className={`flex flex-col bg-white rounded-[16px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 p-1.5 active:scale-95 transition-all ${!shop.isOpen ? 'opacity-50 grayscale-[0.3]' : ''}`}
+                                            className={`flex flex-col bg-white rounded-[16px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] border border-slate-100 p-1.5 active:scale-95 transition-all ${!shop.isOpen ? 'opacity-50 grayscale-[0.3]' : ''}`}
                                         >
                                             {/* Store Image - Rectangular Banner */}
                                             <div className="w-full aspect-[4/3] rounded-xl bg-slate-50 mb-2 overflow-hidden relative border border-slate-100/50">
@@ -365,7 +369,7 @@ const Home = () => {
                                             </div>
                                         </Link>
                                     );
-                                })
+                                })}
                             )}
                         </div>
                     </div>

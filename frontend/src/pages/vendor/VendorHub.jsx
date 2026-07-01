@@ -15,7 +15,7 @@ const IcoGodown = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} str
 const IcoUser = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>;
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
 
-const NavigationRow = ({ icon, title, subtitle, onClick, badge, isLast }) => (
+const NavigationRow = ({ icon, title, subtitle, onClick, badge, isLast, iconBgClass }) => (
     <div
         onClick={() => {
             if (navigator.vibrate) navigator.vibrate(30);
@@ -24,7 +24,7 @@ const NavigationRow = ({ icon, title, subtitle, onClick, badge, isLast }) => (
         className={`flex items-center justify-between p-4 bg-white active:bg-slate-50 transition-colors cursor-pointer ${!isLast ? 'border-b border-slate-50' : ''}`}
     >
         <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-700 flex items-center justify-center shrink-0 border border-slate-100 shadow-sm">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border border-white/50 shadow-sm ${iconBgClass || 'bg-slate-100 text-slate-700'}`}>
                 {icon}
             </div>
             <div className="flex flex-col">
@@ -177,54 +177,57 @@ const VendorHub = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans pb-10">
+        <div className="min-h-screen bg-[#F4F7F9] flex flex-col font-sans pb-10">
+            
+            {/* ─── IMMERSIVE HEADER (Native Feel) ─── */}
+            <div className="bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 pt-6 pb-20 px-4 rounded-b-[40px] shadow-lg relative z-10">
+                <div className="flex items-center justify-between max-w-7xl mx-auto w-full">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/'); }}
+                            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white active:scale-95 transition-transform shrink-0 border border-white/30"
+                        >
+                            <IconBack />
+                        </button>
+                        <div className="w-12 h-12 rounded-full bg-white border-2 border-white/80 flex items-center justify-center text-xl shadow-md overflow-hidden shrink-0">
+                            {shop.image ? <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" /> : '🏪'}
+                        </div>
+                        <div className="flex flex-col text-white">
+                            <span className="text-[17px] font-black tracking-tight leading-none mb-1 drop-shadow-sm">{shop.name}</span>
+                            <span className="text-[11px] font-bold text-white/80 uppercase tracking-widest">Merchant Hub</span>
+                        </div>
+                    </div>
 
-            {/* ─── NATIVE HEADER ─── */}
-            <div className="bg-white px-4 pt-6 pb-4 flex items-center justify-between shadow-sm sticky top-0 z-50">
-                <div className="flex items-center gap-2.5">
+                    {/* Store Status Toggle */}
                     <button
-                        onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/'); }}
-                        className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform shrink-0"
+                        onClick={handleToggleShopStatus}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 border ${shop.isOpen ? 'bg-white text-emerald-600 border-white/40' : 'bg-slate-900/40 backdrop-blur-md text-white border-white/20'}`}
                     >
-                        <IconBack />
+                        <span className={`w-2 h-2 rounded-full ${shop.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`}></span>
+                        {shop.isOpen ? 'Open' : 'Closed'}
                     </button>
-                    <div className="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xl shadow-inner overflow-hidden shrink-0">
-                        {shop.image ? <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" /> : '🏪'}
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-[16px] font-black text-slate-900 tracking-tight leading-none mb-1">{shop.name}</span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Merchant Hub</span>
-                    </div>
                 </div>
-
-                {/* Store Status Toggle */}
-                <button
-                    onClick={handleToggleShopStatus}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border shadow-sm active:scale-95 ${shop.isOpen ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`}
-                >
-                    <span className={`w-2 h-2 rounded-full ${shop.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
-                    {shop.isOpen ? 'Open' : 'Closed'}
-                </button>
             </div>
 
-            <div className="flex-1 px-4 pt-6 max-w-7xl mx-auto w-full space-y-6">
+            <div className="flex-1 px-4 -mt-12 max-w-7xl mx-auto w-full space-y-6 relative z-20">
 
-                {/* ─── KEY METRICS ─── */}
+                {/* ─── FLOATING KEY METRICS ─── */}
                 <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.02)] flex flex-col items-center justify-center text-center">
-                        <span className="text-3xl font-black text-slate-900 mb-1">{stats.liveOrders}</span>
+                    <div className="bg-white p-5 rounded-[28px] border border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center text-center transform transition-transform hover:-translate-y-1">
+                        <span className="text-[32px] leading-none font-black text-slate-800 mb-1.5">{stats.liveOrders}</span>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Orders</span>
                     </div>
-                    <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.02)] flex flex-col items-center justify-center text-center">
-                        <span className="text-3xl font-black text-emerald-600 mb-1">₹{stats.todayRevenue}</span>
-                        <span className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest">Today's Sales</span>
+                    <div className="bg-white p-5 rounded-[28px] border border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center text-center transform transition-transform hover:-translate-y-1">
+                        <span className="text-[32px] leading-none font-black text-emerald-500 mb-1.5">₹{stats.todayRevenue}</span>
+                        <span className="text-[10px] font-black text-emerald-600/60 uppercase tracking-widest">Today's Sales</span>
                     </div>
                 </div>
 
                 {/* ─── MASTER NAVIGATION LIST ─── */}
-                <div className="bg-white rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+                <div className="bg-white rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/50 overflow-hidden mt-2">
                     <NavigationRow
                         icon={<IcoOrders />}
+                        iconBgClass="bg-blue-50 text-blue-600"
                         title="Manage Orders"
                         subtitle="Accept, dispatch & verify"
                         badge={stats.liveOrders}
@@ -232,24 +235,28 @@ const VendorHub = () => {
                     />
                     <NavigationRow
                         icon={<IcoMenu />}
+                        iconBgClass="bg-purple-50 text-purple-600"
                         title="Catalog & Menu"
                         subtitle={`${stats.totalProducts} Items in your store`}
                         onClick={() => navigate('/vendor/menu')}
                     />
                     <NavigationRow
                         icon={<IcoGodown />}
+                        iconBgClass="bg-amber-50 text-amber-600"
                         title="Master Godown"
                         subtitle="Import bulk items instantly"
                         onClick={() => navigate('/vendor/godown')}
                     />
                     <NavigationRow
                         icon={<IcoSettings />}
+                        iconBgClass="bg-slate-100 text-slate-700"
                         title="Delivery Rules"
                         subtitle={`Max ${shop.deliverySettings?.maxRange || 5}km • Min ₹${shop.deliverySettings?.minOrderAmount || 0}`}
                         onClick={() => setIsDeliveryModalOpen(true)}
                     />
                     <NavigationRow
                         icon={<IcoBell />}
+                        iconBgClass="bg-rose-50 text-rose-500"
                         title="Notifications"
                         subtitle="New order alerts"
                         onClick={handleEnableNotifications}
@@ -258,9 +265,10 @@ const VendorHub = () => {
                 </div>
 
                 {/* ─── ACCOUNT ACTIONS ─── */}
-                <div className="bg-white rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+                <div className="bg-white rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/50 overflow-hidden">
                     <NavigationRow
                         icon={<IcoUser />}
+                        iconBgClass="bg-emerald-50 text-emerald-600"
                         title="My Profile"
                         subtitle="Customer account settings"
                         onClick={() => navigate('/profile')}

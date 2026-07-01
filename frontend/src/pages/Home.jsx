@@ -116,23 +116,30 @@ const Home = () => {
         /* PURE WHITE/LIGHT GRAY BACKGROUND (Blinkit Style) */
         <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50/50 overflow-hidden font-sans antialiased">
 
-            {/* ════════ MINIMALIST HEADER ════════ */}
-            <div className="shrink-0 bg-white pt-10 px-4 pb-3 z-50 shadow-[0_4px_10px_rgba(0,0,0,0.03)] border-b border-slate-100">
-                <div className="flex items-center justify-between mb-3">
+            {/* ════════ YELLOW THEME HEADER ════════ */}
+            <div className="shrink-0 bg-amber-400 pt-10 px-4 pb-4 z-50 shadow-md relative overflow-hidden rounded-b-[20px]">
+                {/* Decorative Delivery Element */}
+                <div className="absolute right-[-10px] top-2 text-[90px] opacity-[0.15] rotate-12 pointer-events-none drop-shadow-sm">
+                    🛵
+                </div>
+                
+                <div className="flex items-center justify-between mb-4 relative z-10">
                     {/* Left: Logo & Location */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 pr-4 cursor-pointer active:opacity-70 transition-opacity">
                         {/* MUNA Logo */}
-                        <img src="/muna-logo-new.png" alt="MUNA" className="w-10 h-10 object-contain drop-shadow-sm rounded-[10px] shrink-0 bg-slate-50 border border-slate-100/50" />
+                        <div className="w-11 h-11 bg-white rounded-[12px] shadow-sm flex items-center justify-center p-1 shrink-0">
+                            <img src="/muna-logo-new.png" alt="MUNA" className="w-full h-full object-contain" />
+                        </div>
                         
                         <div className="flex flex-col flex-1 min-w-0">
-                            <span className="text-[11px] font-black tracking-widest text-emerald-600 uppercase flex items-center gap-1 mb-0.5">
-                                Delivery in 15 mins
+                            <span className="text-[11px] font-black tracking-widest text-amber-950 uppercase flex items-center gap-1.5 mb-0.5">
+                                Delivery in 15 mins <span className="text-[14px]">🛵⚡</span>
                             </span>
                             <div className="flex items-center gap-1">
-                                <span className="text-[16px] font-bold text-slate-900 truncate">
+                                <span className="text-[16px] font-black text-slate-900 truncate">
                                     {userLocation ? 'Location updated' : 'Bhalukmari, Assam'}
                                 </span>
-                                <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <svg className="w-4 h-4 text-slate-900 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </div>
@@ -141,7 +148,7 @@ const Home = () => {
 
                     {/* Right: Profile */}
                     <div
-                        className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center shrink-0 active:scale-95 transition-transform cursor-pointer overflow-hidden text-slate-500"
+                        className="w-11 h-11 bg-white/50 border border-white/60 rounded-full flex items-center justify-center shrink-0 active:scale-95 transition-transform cursor-pointer overflow-hidden text-slate-800 shadow-sm"
                         onClick={() => navigate('/profile')}
                     >
                         {user?.photoURL ? (
@@ -152,13 +159,13 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Search Bar - Crisp and Pill-shaped */}
+                {/* Search Bar - Crisp White inside Yellow */}
                 <div
                     onClick={() => navigate('/search')}
-                    className="w-full bg-slate-100/80 border border-slate-200/60 rounded-[14px] px-4 py-3 flex items-center gap-3 cursor-text active:bg-slate-200/80 transition-colors"
+                    className="w-full bg-white border-0 shadow-[0_2px_15px_rgba(0,0,0,0.06)] rounded-[14px] px-4 py-3.5 flex items-center gap-3 cursor-text active:scale-[0.99] transition-transform relative z-10"
                 >
-                    <span className="text-slate-400"><IcoSearch /></span>
-                    <span className="text-[13px] font-bold text-slate-400">Search "Atta, Dal, Coke"</span>
+                    <span className="text-amber-500"><IcoSearch /></span>
+                    <span className="text-[13px] font-bold text-slate-400">Search for "Atta, Dal, Coke"</span>
                 </div>
             </div>
 

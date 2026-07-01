@@ -54,6 +54,11 @@ const Home = () => {
         queryFn: () => fetch('/api/master-products').then(r => r.json()),
     });
 
+    const { data: dbCategories = [] } = useQuery({
+        queryKey: ['shop-categories'],
+        queryFn: () => fetch('/api/shop-categories').then(r => r.json()),
+    });
+
     /* ── Geolocation ── */
     useEffect(() => {
         if (!('geolocation' in navigator)) {
@@ -71,10 +76,13 @@ const Home = () => {
     }, []);
 
     /* ── Derived Data ── */
-    const categories = useMemo(() => {
-        const cats = new Set(shops.map(s => s.category || 'Grocery'));
-        return ['All', ...Array.from(cats).sort()];
-    }, [shops]);
+    const categoryList = useMemo(() => {
+        if (!dbCategories || dbCategories.length === 0) {
+            const cats = new Set(shops.map(s => s.category || 'Grocery'));
+            return [{ name: 'All' }, ...Array.from(cats).sort().map(c => ({ name: c }))];
+        }
+        return [{ name: 'All' }, ...dbCategories.sort((a, b) => a.sortOrder - b.sortOrder)];
+    }, [shops, dbCategories]);
 
     const sortedShops = useMemo(() => {
         let list = shops.map(shop => {
@@ -180,20 +188,25 @@ const Home = () => {
                     </div>
 
                     <div className="grid grid-cols-4 gap-y-6 gap-x-2">
-                        {categories.map(cat => {
-                            const { emoji, bg } = getCategoryIcon(cat);
-                            const isActive = activeCategory === cat;
+                        {categoryList.map(catObj => {
+                            const catName = catObj.name;
+                            const isActive = activeCategory === catName;
+                            const { emoji, bg } = getCategoryIcon(catName);
                             return (
                                 <button
-                                    key={cat}
-                                    onClick={() => setActiveCategory(cat)}
+                                    key={catName}
+                                    onClick={() => setActiveCategory(catName)}
                                     className="flex flex-col items-center gap-2 active:opacity-60 transition-opacity"
                                 >
-                                    <div className={`w-[65px] h-[65px] rounded-2xl flex items-center justify-center text-[28px] ${isActive ? 'ring-2 ring-slate-900 shadow-md bg-slate-50' : bg}`}>
-                                        {emoji}
+                                    <div className={`w-[65px] h-[65px] rounded-2xl flex items-center justify-center text-[28px] overflow-hidden ${isActive ? 'ring-2 ring-slate-900 shadow-md bg-slate-50' : bg}`}>
+                                        {catObj.image ? (
+                                            <img src={catObj.image} alt={catName} className="w-full h-full object-cover" />
+                                        ) : (
+                                            emoji
+                                        )}
                                     </div>
                                     <span className={`text-[10px] text-center leading-tight px-1 ${isActive ? 'font-black text-slate-900' : 'font-bold text-slate-600'}`}>
-                                        {cat === 'All' ? 'All Stores' : cat}
+                                        {catName === 'All' ? 'All Stores' : catName}
                                     </span>
                                 </button>
                             );

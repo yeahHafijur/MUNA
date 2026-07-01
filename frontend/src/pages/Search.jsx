@@ -193,7 +193,7 @@ const Search = () => {
                 {isLoading && <SearchSkeleton />}
 
                 {/* ── Minimal Empty State ── */}
-                {!isLoading && hasSearched && results.shops.length === 0 && results.products.length === 0 && (
+                {!isLoading && hasSearched && (!results?.shops || results.shops.length === 0) && (!results?.products || results.products.length === 0) && (
                     <div className="text-center py-16 bg-white rounded-[20px] border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)] max-w-md mx-auto mt-2">
                         <div className="text-5xl mb-3 opacity-80">
                             🔍
@@ -204,7 +204,7 @@ const Search = () => {
                 )}
 
                 {/* ── STORES RESULTS ── */}
-                {!isLoading && results.shops?.length > 0 && (
+                {!isLoading && results?.shops?.length > 0 && (
                     <div className="mb-6">
                         <div className="flex items-center gap-2 mb-3 px-1">
                             <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">Stores Near You</h2>
@@ -229,7 +229,7 @@ const Search = () => {
                                         <h4 className="text-[14px] font-black text-slate-900 truncate tracking-tight mb-0.5">{shop.name}</h4>
                                         <p className="text-[11px] font-semibold text-slate-400 truncate mb-1">{shop.address}</p>
                                         <div className="flex items-center gap-2 mt-auto">
-                                            <span className="bg-emerald-50 text-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5"><IcoTimer /> 15 MINS</span>
+                                            <span className="bg-emerald-50 text-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5"><IcoTime /> 15 MINS</span>
                                         </div>
                                     </div>
                                 </Link>
@@ -239,7 +239,7 @@ const Search = () => {
                 )}
 
                 {/* ── PRODUCTS RESULTS ── */}
-                {!isLoading && results.products?.length > 0 && (
+                {!isLoading && results?.products?.length > 0 && (
                     <div className="mb-6">
                         <div className="flex items-center gap-2 mb-3 px-1">
                             <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">Products</h2>

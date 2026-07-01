@@ -91,7 +91,15 @@ const globalSearch = async (req, res) => {
                     $match: {
                         $or: [
                             { name: { $regex: sanitizedQuery, $options: 'i' } },
-                            { category: { $regex: sanitizedQuery, $options: 'i' } }
+                            {
+                                $expr: {
+                                    $regexMatch: {
+                                        input: { $toString: { $ifNull: ["$category", ""] } },
+                                        regex: sanitizedQuery,
+                                        options: "i"
+                                    }
+                                }
+                            }
                         ]
                     }
                 },

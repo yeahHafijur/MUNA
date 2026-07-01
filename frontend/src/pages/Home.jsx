@@ -76,8 +76,11 @@ const Home = () => {
                 setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
                 setLocationText("Current Location");
             },
-            () => setLocationText("Select Location"),
-            { enableHighAccuracy: true, timeout: 5000 }
+            (err) => {
+                console.warn("Geolocation Error:", err.message);
+                setLocationText("Select Location");
+            },
+            { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }
         );
     }, []);
 

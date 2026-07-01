@@ -246,33 +246,38 @@ const VendorOrders = () => {
     return (
         <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col font-sans">
 
-            {/* ─── NATIVE HEADER ─── */}
-            <div className="bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3 sticky top-0 z-50 shadow-sm">
-                <button
-                    onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }}
-                    className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
-                >
-                    <IconBack />
-                </button>
-                <span className="text-base font-extrabold text-slate-900 tracking-tight">Manage Orders</span>
+            {/* ─── NATIVE HEADER & CONTROLS (Sticky) ─── */}
+            <div className="bg-white sticky top-0 z-50 shadow-sm">
+                <div className="px-4 py-3 flex items-center gap-3">
+                    <button
+                        onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }}
+                        className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
+                    >
+                        <IconBack />
+                    </button>
+                    <span className="text-base font-extrabold text-slate-900 tracking-tight">Manage Orders</span>
+                </div>
+                
+                {/* ── Native Segmented Control ── */}
+                <div className="px-4 pb-3">
+                    <div className="flex bg-slate-100/80 p-1.5 rounded-[16px] w-full max-w-md mx-auto shadow-inner">
+                        <button
+                            className={`flex-1 py-2 text-[13px] font-black text-center rounded-[12px] transition-all flex items-center justify-center gap-2 ${activeView === 'live' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setActiveView('live'); }}
+                        >
+                            Live {liveOrders.length > 0 && <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-md leading-none">{liveOrders.length}</span>}
+                        </button>
+                        <button
+                            className={`flex-1 py-2 text-[13px] font-black text-center rounded-[12px] transition-all ${activeView === 'history' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setActiveView('history'); }}
+                        >
+                            History
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-7xl mx-auto w-full">
-                {/* ── Native Segmented Control ── */}
-                <div className="flex bg-slate-200/50 p-1.5 rounded-[16px] w-full sm:max-w-md mb-8 shadow-inner">
-                    <button
-                        className={`flex-1 py-2.5 text-[13px] font-black text-center rounded-[12px] transition-all flex items-center justify-center gap-2 ${activeView === 'live' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
-                        onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setActiveView('live'); }}
-                    >
-                        Live {liveOrders.length > 0 && <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-md leading-none">{liveOrders.length}</span>}
-                    </button>
-                    <button
-                        className={`flex-1 py-2.5 text-[13px] font-black text-center rounded-[12px] transition-all ${activeView === 'history' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
-                        onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setActiveView('history'); }}
-                    >
-                        History
-                    </button>
-                </div>
+            <div className="flex-1 overflow-y-auto p-4 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-7xl mx-auto w-full">
 
                 {/* ── LIVE ORDERS (Inner Tabs UI) ── */}
                 {activeView === 'live' && (

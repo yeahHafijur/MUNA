@@ -165,18 +165,27 @@ const Home = () => {
             {/* ════════ SCROLLABLE BODY ════════ */}
             <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-24">
 
-                {/* ── Banners Area ── */}
-                <div className="px-4 pt-4 pb-6">
-                    <div
-                        onClick={() => navigate('/daily-market')}
-                        className="w-full bg-[#1a1a1a] rounded-[16px] p-4 flex items-center justify-between shadow-sm active:scale-[0.98] transition-transform cursor-pointer overflow-hidden relative"
-                    >
-                        <div className="relative z-10">
-                            <h3 className="text-[16px] font-black text-white tracking-tight mb-0.5">Daily Market</h3>
-                            <p className="text-[11px] font-semibold text-slate-400">Buy & Sell used items locally</p>
+                {/* ── Promo Banners Carousel ── */}
+                <div className="pt-4 pb-2">
+                    <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4">
+                        {/* Placeholder Banner 1 */}
+                        <div className="snap-center shrink-0 w-[85vw] sm:w-[320px] aspect-[21/9] rounded-[16px] bg-gradient-to-r from-emerald-500 to-teal-400 p-4 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer">
+                            <div className="relative z-10 w-2/3">
+                                <h2 className="text-[20px] font-black text-white leading-tight mb-1">MEGA OFFERS</h2>
+                                <p className="text-[12px] font-semibold text-emerald-50 mb-3">Up to 50% OFF on Groceries</p>
+                                <button className="bg-white text-emerald-700 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg shadow-sm w-fit">Shop Now</button>
+                            </div>
+                            <div className="absolute -right-4 -bottom-4 text-[100px] opacity-20 rotate-12">🛒</div>
                         </div>
-                        <div className="relative z-10 bg-white/10 text-white rounded-full p-2">
-                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+
+                        {/* Placeholder Banner 2 */}
+                        <div className="snap-center shrink-0 w-[85vw] sm:w-[320px] aspect-[21/9] rounded-[16px] bg-gradient-to-r from-rose-500 to-pink-500 p-4 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer">
+                            <div className="relative z-10 w-2/3">
+                                <h2 className="text-[20px] font-black text-white leading-tight mb-1">FRESH FRUITS</h2>
+                                <p className="text-[12px] font-semibold text-rose-100 mb-3">Direct from local farms</p>
+                                <button className="bg-white text-rose-600 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg shadow-sm w-fit">Explore</button>
+                            </div>
+                            <div className="absolute -right-4 -bottom-4 text-[100px] opacity-20 rotate-12">🍎</div>
                         </div>
                     </div>
                 </div>
@@ -248,6 +257,22 @@ const Home = () => {
                         </div>
                     </div>
                 )}
+
+                {/* ── Daily Market ── */}
+                <div className="px-4 py-3 mb-2">
+                    <div
+                        onClick={() => navigate('/daily-market')}
+                        className="w-full bg-slate-900 rounded-[16px] p-4 flex items-center justify-between shadow-sm active:scale-[0.98] transition-transform cursor-pointer overflow-hidden relative"
+                    >
+                        <div className="relative z-10">
+                            <h3 className="text-[16px] font-black text-white tracking-tight mb-0.5">Daily Market</h3>
+                            <p className="text-[11px] font-semibold text-slate-400">Buy & Sell used items locally</p>
+                        </div>
+                        <div className="relative z-10 bg-white/10 text-white rounded-full p-2">
+                            <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        </div>
+                    </div>
+                </div>
 
                 {/* ── Store Listing (Blinkit Card Style) ── */}
                 <div className="bg-white min-h-[50vh] px-4 py-5 border-t border-slate-100">

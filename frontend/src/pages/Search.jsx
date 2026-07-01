@@ -285,45 +285,51 @@ const Search = () => {
                     </div>
                 )}
 
-                {/* ── Professional Dashboard Initial View ── */}
+                {/* ── Rich Initial View (Blinkit Style) ── */}
                 {!hasSearched && !isLoading && (
-                    <div className="space-y-6 pt-1 animate-in fade-in duration-200">
-                        <div>
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-1">Popular Categories</h3>
-                            <div className="grid grid-cols-4 gap-2.5">
-                                <div className="flex flex-col items-center cursor-pointer active:scale-95 transition-transform group" onClick={() => setQuery('Milk')}>
-                                    <div className="w-14 h-14 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-1.5 group-hover:border-slate-300 transition-colors"><IcoDairy /></div>
-                                    <span className="text-xs font-medium text-slate-600 tracking-tight">Dairy</span>
-                                </div>
-                                <div className="flex flex-col items-center cursor-pointer active:scale-95 transition-transform group" onClick={() => setQuery('Vegetable')}>
-                                    <div className="w-14 h-14 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-1.5 group-hover:border-slate-300 transition-colors"><IcoVeggies /></div>
-                                    <span className="text-xs font-medium text-slate-600 tracking-tight">Veggies</span>
-                                </div>
-                                <div className="flex flex-col items-center cursor-pointer active:scale-95 transition-transform group" onClick={() => setQuery('Snacks')}>
-                                    <div className="w-14 h-14 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-1.5 group-hover:border-slate-300 transition-colors"><IcoSnacks /></div>
-                                    <span className="text-xs font-medium text-slate-600 tracking-tight">Snacks</span>
-                                </div>
-                                <div className="flex flex-col items-center cursor-pointer active:scale-95 transition-transform group" onClick={() => setQuery('Drink')}>
-                                    <div className="w-14 h-14 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-1.5 group-hover:border-slate-300 transition-colors"><IcoDrinks /></div>
-                                    <span className="text-xs font-medium text-slate-600 tracking-tight">Drinks</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5 px-1">Trending Searches</h3>
-                            <div className="flex flex-wrap gap-1.5">
-                                {['Atta', 'Bread', 'Eggs', 'Maggi', 'Cold Drink', 'Rice', 'Chips'].map(tag => (
+                    <div className="pt-2 pb-10 animate-in fade-in duration-200">
+                        {/* Recent / Trending Badges */}
+                        <div className="mb-8">
+                            <h3 className="text-[14px] font-black text-slate-800 mb-3 px-1">Trending Searches</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {['Fresh Milk', 'Bread', 'Eggs', 'Maggi', 'Coke', 'Atta', 'Chips', 'Onion', 'Rice'].map((tag, i) => (
                                     <span
                                         key={tag}
-                                        onClick={() => setQuery(tag)}
-                                        className="bg-white border border-slate-200/70 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 shadow-none active:bg-slate-900 active:text-white active:border-slate-900 transition-colors cursor-pointer tracking-tight"
+                                        onClick={() => setQuery(tag.split(' ')[0])}
+                                        className="bg-white border border-slate-200/70 px-4 py-2 rounded-[12px] text-[13px] font-bold text-slate-700 shadow-[0_2px_10px_rgba(0,0,0,0.03)] active:bg-amber-100 active:text-amber-900 active:border-amber-200 transition-colors cursor-pointer"
                                     >
-                                        {tag}
+                                        {i === 0 ? '🔥 ' : ''}{tag}
                                     </span>
                                 ))}
                             </div>
                         </div>
+
+                        {/* Top Categories Grid - Colorful */}
+                        <div className="mb-6">
+                            <h3 className="text-[14px] font-black text-slate-800 mb-3 px-1">Explore Categories</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                {[
+                                    { name: 'Dairy & Milk', emoji: '🥛', bg: 'bg-blue-50/80', border: 'border-blue-100', text: 'text-blue-900' },
+                                    { name: 'Fresh Veggies', emoji: '🥬', bg: 'bg-green-50/80', border: 'border-green-100', text: 'text-green-900' },
+                                    { name: 'Snacks & Munchies', emoji: '🍟', bg: 'bg-orange-50/80', border: 'border-orange-100', text: 'text-orange-900' },
+                                    { name: 'Cold Drinks', emoji: '🥤', bg: 'bg-teal-50/80', border: 'border-teal-100', text: 'text-teal-900' },
+                                    { name: 'Meat & Eggs', emoji: '🍗', bg: 'bg-rose-50/80', border: 'border-rose-100', text: 'text-rose-900' },
+                                    { name: 'Personal Care', emoji: '🧴', bg: 'bg-purple-50/80', border: 'border-purple-100', text: 'text-purple-900' },
+                                ].map((cat) => (
+                                    <div
+                                        key={cat.name}
+                                        onClick={() => setQuery(cat.name.split(' ')[0])}
+                                        className={`flex items-center justify-between p-4 rounded-[16px] border ${cat.bg} ${cat.border} shadow-[0_2px_10px_rgba(0,0,0,0.02)] active:scale-95 transition-transform cursor-pointer`}
+                                    >
+                                        <span className={`text-[13px] font-black ${cat.text} max-w-[60%] leading-tight`}>{cat.name}</span>
+                                        <span className="text-3xl drop-shadow-sm">{cat.emoji}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        {/* Empty Space filler to push footer down and make it feel "full" */}
+                        <div className="h-10"></div>
                     </div>
                 )}
             </div>

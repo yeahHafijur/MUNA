@@ -202,6 +202,25 @@ const Home = () => {
                         </div>
                     </div>
 
+                    {/* ── Daily Market ── */}
+                    <div className="px-4 py-2 mb-2 md:mx-4">
+                        <div
+                            onClick={() => navigate('/daily-market')}
+                            className="w-full max-w-2xl mx-auto bg-slate-900 rounded-[14px] p-4 flex items-center justify-between shadow-[0_4px_15px_rgba(15,23,42,0.1)] hover:shadow-[0_8px_20px_rgba(15,23,42,0.15)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden relative"
+                        >
+                            <div className="absolute right-[-10px] top-[-10px] text-[60px] opacity-[0.1] rotate-12 pointer-events-none">
+                                🛒
+                            </div>
+                            <div className="relative z-10">
+                                <h3 className="text-[15px] font-black text-white tracking-tight mb-0.5">Daily Market</h3>
+                                <p className="text-[11px] font-semibold text-slate-400">Buy & Sell used items locally</p>
+                            </div>
+                            <div className="relative z-10 bg-white/10 text-white rounded-full p-2 hover:bg-white/20 transition-colors">
+                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* ── Global Search Bar ── */}
                     <div className="px-4 pb-4 mt-2">
                         <div
@@ -301,22 +320,6 @@ const Home = () => {
                             </div>
                         </div>
                     )}
-
-                    {/* ── Daily Market ── */}
-                    <div className="px-4 py-3 mb-2 md:mx-4">
-                        <div
-                            onClick={() => navigate('/daily-market')}
-                            className="w-full bg-slate-900 rounded-[16px] p-4 flex items-center justify-between shadow-lg hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer overflow-hidden relative"
-                        >
-                            <div className="relative z-10">
-                                <h3 className="text-[16px] font-black text-white tracking-tight mb-0.5">Daily Market</h3>
-                                <p className="text-[11px] font-semibold text-slate-400">Buy & Sell used items locally</p>
-                            </div>
-                            <div className="relative z-10 bg-white/10 text-white rounded-full p-2 hover:bg-white/20 transition-colors">
-                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg>
-                            </div>
-                        </div>
-                    </div>
 
                     {/* ── Store Listing (Blinkit Card Style) ── */}
                     <div className="bg-white min-h-[50vh] px-2.5 py-5 border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] md:rounded-t-3xl md:mx-4">

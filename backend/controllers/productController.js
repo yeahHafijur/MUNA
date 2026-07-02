@@ -18,7 +18,7 @@ const getBestsellers = async (req, res) => {
 
         // 1. Find nearby shops (ignoring isActive to support legacy data)
         const nearbyShops = await Shop.find({
-            location: {
+            'location.coordinates': {
                 $near: {
                     $geometry: {
                         type: "Point",

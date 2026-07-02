@@ -55,7 +55,7 @@ const getNearbyItems = async (req, res) => {
 
         const items = await LiveBazarItem.find({
             status: 'active',
-            location: {
+            'location.coordinates': {
                 $nearSphere: {
                     $geometry: {
                         type: 'Point',

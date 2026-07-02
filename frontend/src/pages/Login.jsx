@@ -63,9 +63,8 @@ const Login = () => {
 
                 {/* Clean Header */}
                 <div className="text-center mb-8">
-                    {/* Stark Monochromatic Logo */}
-                    <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center mx-auto mb-5">
-                        <span className="text-white text-xl font-black tracking-tighter">M</span>
+                    <div className="w-16 h-16 mx-auto mb-5 rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex items-center justify-center p-1 bg-white">
+                        <img src="/muna-logo-new.png" alt="Muna Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-2xl font-bold tracking-tight mb-2">Welcome to MUNA</h1>
                     <p className="text-sm font-medium text-gray-500">

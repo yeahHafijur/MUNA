@@ -139,11 +139,8 @@ const SplashScreen = ({ onFinish }) => {
             ))}
 
             <div className="relative z-10 flex flex-col items-center justify-center">
-                <div className="muna-logo-container">
-                    <span className="muna-letter muna-m">M</span>
-                    <span className="muna-letter muna-u">U</span>
-                    <span className="muna-letter muna-n">N</span>
-                    <span className="muna-letter muna-a">A</span>
+                <div className="flex flex-col items-center justify-center mb-4">
+                    <img src="/muna-logo-new.png" alt="Muna Logo" className="w-32 h-32 object-contain filter drop-shadow-xl animate-bounce" style={{ animationDuration: '2s' }} />
                 </div>
                 <div className="muna-subtitle">GROCERY IN MINUTES</div>
             </div>

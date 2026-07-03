@@ -165,39 +165,39 @@ const Home = () => {
                     <div className="pt-4 pb-2">
                         <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4">
                             
-                            {/* Banner 1: Dark Premium */}
-                            <div className="snap-center shrink-0 w-[85vw] sm:w-[320px] h-[140px] rounded-[20px] bg-[#0A192F] p-5 flex flex-col justify-center relative overflow-hidden shadow-[0_4px_15px_rgba(10,25,47,0.15)] active:scale-[0.98] transition-transform cursor-pointer border border-slate-800">
-                                <div className="absolute top-[-50%] left-[-20%] w-[150px] h-[150px] bg-emerald-500 rounded-full blur-[60px] opacity-30 pointer-events-none"></div>
+                            {/* Banner 1: Blinkit Style Grocery Offer */}
+                            <div className="snap-center shrink-0 w-[90vw] sm:w-[360px] h-[160px] rounded-[20px] bg-[#0052FF] p-5 flex flex-col justify-center relative overflow-hidden shadow-[0_4px_15px_rgba(0,82,255,0.15)] active:scale-[0.98] transition-transform cursor-pointer">
+                                <div className="absolute top-[-50%] left-[-20%] w-[180px] h-[180px] bg-white rounded-full blur-[60px] opacity-10 pointer-events-none"></div>
                                 <div className="relative z-10 w-[70%]">
-                                    <span className="inline-block px-2 py-1 bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest rounded mb-2">Weekend Special</span>
-                                    <h2 className="text-[20px] font-black text-white leading-tight mb-1">MEGA OFFERS</h2>
-                                    <p className="text-[11px] font-medium text-slate-300">Up to 50% OFF on Essentials</p>
+                                    <span className="inline-block px-2.5 py-1 bg-black/20 text-white text-[10px] font-black uppercase tracking-widest rounded-md mb-2 backdrop-blur-sm">Weekend Special</span>
+                                    <h2 className="text-[24px] font-black text-white leading-tight mb-1">MEGA OFFERS</h2>
+                                    <p className="text-[12px] font-semibold text-blue-100">Up to 50% OFF on Essentials</p>
                                 </div>
-                                <div className="absolute -right-2 top-1/2 -translate-y-1/2 text-[80px] drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] rotate-[-10deg] pointer-events-none">
-                                    🛍️
+                                <div className="absolute -right-2 top-1/2 -translate-y-1/2 text-[100px] drop-shadow-[0_15px_15px_rgba(0,0,0,0.3)] rotate-[-10deg] pointer-events-none">
+                                    🛒
                                 </div>
                             </div>
 
                             {/* Banner 2: Fresh Vibrant */}
-                            <div className="snap-center shrink-0 w-[85vw] sm:w-[320px] h-[140px] rounded-[20px] bg-gradient-to-br from-rose-100 to-orange-100 p-5 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer border border-rose-200">
+                            <div className="snap-center shrink-0 w-[90vw] sm:w-[360px] h-[160px] rounded-[20px] bg-[#FFF5EB] p-5 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer border border-[#F2E4D3]">
                                 <div className="relative z-10 w-[65%]">
-                                    <span className="inline-block px-2 py-1 bg-rose-500 text-white text-[9px] font-black uppercase tracking-widest rounded mb-2">Fresh Arrival</span>
-                                    <h2 className="text-[20px] font-black text-rose-950 leading-tight mb-1">FARM FRESH</h2>
-                                    <p className="text-[11px] font-medium text-rose-800">Straight from local farms</p>
+                                    <span className="inline-block px-2.5 py-1 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-md mb-2">Fresh Arrival</span>
+                                    <h2 className="text-[24px] font-black text-[#3A2C1C] leading-tight mb-1">FARM FRESH</h2>
+                                    <p className="text-[12px] font-bold text-[#8C7A65]">Straight from local farms</p>
                                 </div>
-                                <div className="absolute -right-2 top-1/2 -translate-y-1/2 text-[85px] drop-shadow-[0_15px_15px_rgba(225,29,72,0.2)] rotate-[10deg] pointer-events-none">
+                                <div className="absolute -right-2 top-1/2 -translate-y-1/2 text-[100px] drop-shadow-[0_15px_15px_rgba(0,0,0,0.1)] rotate-[10deg] pointer-events-none">
                                     🍎
                                 </div>
                             </div>
 
-                            {/* Banner 3: Minimal Light */}
-                            <div className="snap-center shrink-0 w-[85vw] sm:w-[320px] h-[140px] rounded-[20px] bg-white p-5 flex flex-col justify-center relative overflow-hidden shadow-[0_2px_15px_rgba(0,0,0,0.05)] active:scale-[0.98] transition-transform cursor-pointer border border-slate-100">
+                            {/* Banner 3: Blinkit Yellow */}
+                            <div className="snap-center shrink-0 w-[90vw] sm:w-[360px] h-[160px] rounded-[20px] bg-[#FFDE00] p-5 flex flex-col justify-center relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer border border-[#E6C800]">
                                 <div className="relative z-10 w-[70%]">
-                                    <span className="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest rounded mb-2">Quick Delivery</span>
-                                    <h2 className="text-[20px] font-black text-slate-900 leading-tight mb-1">MIDNIGHT CRAVINGS?</h2>
-                                    <p className="text-[11px] font-medium text-slate-500">We deliver till 2 AM</p>
+                                    <span className="inline-block px-2.5 py-1 bg-black/10 text-amber-900 text-[10px] font-black uppercase tracking-widest rounded-md mb-2">Quick Delivery</span>
+                                    <h2 className="text-[24px] font-black text-slate-900 leading-tight mb-1">MIDNIGHT CRAVINGS?</h2>
+                                    <p className="text-[12px] font-bold text-amber-950/70">We deliver till 2 AM</p>
                                 </div>
-                                <div className="absolute -right-3 top-1/2 -translate-y-1/2 text-[85px] drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)] rotate-[-5deg] pointer-events-none">
+                                <div className="absolute -right-3 top-1/2 -translate-y-1/2 text-[100px] drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)] rotate-[-5deg] pointer-events-none">
                                     🍕
                                 </div>
                             </div>

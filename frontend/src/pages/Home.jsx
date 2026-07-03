@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -7,7 +7,7 @@ import ProductCard from '../components/ProductCard';
 /* ─── Minimal Native Icons (Blinkit Style) ─── */
 const IcoSearch = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>;
 const IcoStar = () => <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3 text-amber-500"><path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" /></svg>;
-const IcoUser = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>;
+
 const IcoTimer = () => <svg fill="currentColor" viewBox="0 0 24 24" className="w-3 h-3"><path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clipRule="evenodd" /></svg>;
 
 /* ─── Category Style Mapper ─── */
@@ -32,15 +32,16 @@ const haversine = (lat1, lon1, lat2, lon2) => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
-const fmtDist = (d) => d < 1 ? `${(d * 1000).toFixed(0)}m` : `${d.toFixed(1)}km`;
-
 const Home = () => {
+    // eslint-disable-next-line no-unused-vars
     const { user } = useAuth();
     const navigate = useNavigate();
 
     const [userLocation, setUserLocation] = useState(null);
+    // eslint-disable-next-line no-unused-vars
     const [locationText, setLocationText] = useState("Fetching location...");
     const [activeCategory, setActiveCategory] = useState('All');
+    // eslint-disable-next-line no-unused-vars
     const [searchQuery, setSearchQuery] = useState('');
     const [showAllCategories, setShowAllCategories] = useState(false);
 
@@ -69,6 +70,7 @@ const Home = () => {
     /* ── Geolocation ── */
     useEffect(() => {
         if (!('geolocation' in navigator)) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLocationText('Location not supported');
             return;
         }
@@ -387,7 +389,6 @@ const Home = () => {
                 </div>
 
             </div>
-        </div>
             
             {/* ─── ALL CATEGORIES MODAL ─── */}
             {showAllCategories && (

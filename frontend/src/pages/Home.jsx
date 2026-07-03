@@ -252,10 +252,10 @@ const Home = () => {
                                     <button
                                         key={catName}
                                         onClick={() => {
-                                            if (catName === 'All') {
-                                                navigate('/search');
-                                            } else {
-                                                navigate(`/search?q=${encodeURIComponent(catName)}`);
+                                            setActiveCategory(catName);
+                                            const storeList = document.getElementById('store-listing');
+                                            if (storeList) {
+                                                storeList.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                             }
                                         }}
                                         className="flex flex-col items-center gap-2 snap-start shrink-0 w-[72px] active:opacity-60 transition-opacity"
@@ -309,7 +309,7 @@ const Home = () => {
                     )}
 
                     {/* ── Store Listing (Blinkit Card Style) ── */}
-                    <div className="bg-white min-h-[50vh] px-2.5 py-5 border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] md:rounded-t-3xl md:mx-4">
+                    <div id="store-listing" className="bg-white min-h-[50vh] px-2.5 py-5 border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] md:rounded-t-3xl md:mx-4">
                         <div className="flex items-center justify-between mb-4 px-1.5">
                             <h3 className="text-[15px] font-black text-slate-900">
                                 {activeCategory !== 'All' ? `${activeCategory} Stores` : 'Stores Around You'}
@@ -409,11 +409,14 @@ const Home = () => {
                                         key={catName}
                                         onClick={() => {
                                             setShowAllCategories(false);
-                                            if (catName === 'All') {
-                                                navigate('/search');
-                                            } else {
-                                                navigate(`/search?q=${encodeURIComponent(catName)}`);
-                                            }
+                                            setActiveCategory(catName);
+                                            // Optional: Scroll to store listing
+                                            setTimeout(() => {
+                                                const storeList = document.getElementById('store-listing');
+                                                if(storeList) {
+                                                    storeList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                }
+                                            }, 100);
                                         }}
                                         className="flex flex-col items-center gap-2 active:opacity-60 transition-opacity"
                                     >

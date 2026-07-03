@@ -283,7 +283,6 @@ const Home = () => {
                         <div className="bg-white px-4 py-6 border-b border-slate-100 mb-2 md:rounded-2xl md:mx-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-[15px] font-black text-slate-900">Bestsellers</h3>
-                                <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search?q=popular')}>See All</span>
                             </div>
                             <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2">
                                 {featuredProducts.slice(0, 8).map(prod => {

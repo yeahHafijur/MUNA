@@ -66,14 +66,15 @@ const VendorHub = () => {
         if (!token || user?.role !== 'vendor') navigate('/');
     }, [token, user, navigate]);
 
-    useEffect(() => {
+    const handleOpenDeliveryModal = () => {
         if (shop) {
             setMinOrder(shop.deliverySettings?.minOrderAmount || 0);
             setMinimumCharge(shop.deliverySettings?.minimumCharge || 0);
             setChargePerKm(shop.deliverySettings?.chargePerKm || 0);
             setMaxDeliveryRange(shop.deliverySettings?.maxRange || 5);
         }
-    }, [shop]);
+        setIsDeliveryModalOpen(true);
+    };
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -101,7 +102,7 @@ const VendorHub = () => {
             } else {
                 toast.error("Failed to update rules.");
             }
-        } catch (error) {
+        } catch {
             toast.error("Error updating rules.");
         } finally {
             toast.dismiss(loadingToast);
@@ -122,7 +123,7 @@ const VendorHub = () => {
             } else {
                 toast.warning("Please allow notifications in browser settings.");
             }
-        } catch (err) {
+        } catch {
             toast.error("Failed to enable notifications.");
         }
     };
@@ -252,7 +253,7 @@ const VendorHub = () => {
                         iconBgClass="bg-slate-100 text-slate-700"
                         title="Delivery Rules"
                         subtitle={`Max ${shop.deliverySettings?.maxRange || 5}km • Min ₹${shop.deliverySettings?.minOrderAmount || 0}`}
-                        onClick={() => setIsDeliveryModalOpen(true)}
+                        onClick={handleOpenDeliveryModal}
                     />
                     <NavigationRow
                         icon={<IcoBell />}

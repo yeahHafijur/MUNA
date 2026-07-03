@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -17,10 +17,9 @@ const VendorOrders = () => {
     // 🔥 Changed: Replaced useOutletContext with useAuth
     const { token } = useAuth();
     const navigate = useNavigate();
-
+    const queryClient = useQueryClient();
     const [activeView, setActiveView] = useState('live');
     const [liveTab, setLiveTab] = useState('pending'); // Inner tab state for Live Orders
-    const [expandedId, setExpandedId] = useState(null);
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
     const [confirmAction, setConfirmAction] = useState(null);
     const [deliveryOtp, setDeliveryOtp] = useState('');
@@ -97,7 +96,10 @@ const VendorOrders = () => {
         setUpdatingStatusId(orderId);
 
         if (newStatus !== 'delivered') {
-            setOrders(prev => prev.map(order => order._id === orderId ? { ...order, status: newStatus } : order));
+            queryClient.setQueryData(['vendor-live-orders'], (prev) => {
+                if (!prev) return [];
+                return prev.map(order => order._id === orderId ? { ...order, status: newStatus } : order);
+            });
         }
 
         try {
@@ -109,17 +111,16 @@ const VendorOrders = () => {
             const data = await res.json();
             if (!res.ok) toast.error(data.message || 'Failed to update');
             else toast.success("Status updated!");
-            fetchLive();
-        } catch (error) {
+            queryClient.invalidateQueries({ queryKey: ['vendor-live-orders'] });
+        } catch {
             toast.error("Network error.");
-            fetchLive();
+            queryClient.invalidateQueries({ queryKey: ['vendor-live-orders'] });
         } finally {
             setUpdatingStatusId(null);
         }
     };
 
     const handleWhatsAppShare = (order) => {
-        const subtotal = order.totalAmount - order.deliveryFee;
         const itemsList = order.items.map(i => `${i.quantity}x ${i.name} (₹${i.price * i.quantity})`).join('\n');
         let mapsLink = "Not available";
         if (order.deliveryLocation?.lat && order.deliveryLocation?.lng) {

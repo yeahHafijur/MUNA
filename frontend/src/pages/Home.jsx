@@ -235,13 +235,14 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* ── Shop by Category (Clean Grid) ── */}
+                    {/* ── Shop by Category (Horizontal Scroll) ── */}
                     <div className="bg-white px-4 py-6 border-y border-slate-100 mb-2 md:rounded-2xl md:mx-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-[15px] font-black text-slate-900">Shop by Category</h3>
+                            <span className="text-[12px] font-bold text-amber-500 cursor-pointer" onClick={() => navigate('/search')}>View All</span>
                         </div>
 
-                        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-y-6 gap-x-2">
+                        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2">
                             {categoryList.map(catObj => {
                                 const catName = catObj.name;
                                 const isActive = activeCategory === catName;
@@ -256,17 +257,17 @@ const Home = () => {
                                                 navigate(`/search?q=${encodeURIComponent(catName)}`);
                                             }
                                         }}
-                                        className="flex flex-col items-center gap-2 active:opacity-60 transition-opacity"
+                                        className="flex flex-col items-center gap-2 snap-start shrink-0 w-[72px] active:opacity-60 transition-opacity"
                                     >
-                                        <div className={`w-[65px] h-[65px] rounded-2xl flex items-center justify-center text-[28px] overflow-hidden ${isActive ? 'ring-2 ring-slate-900 shadow-md bg-slate-50' : bg}`}>
+                                        <div className={`w-[72px] h-[72px] rounded-2xl flex items-center justify-center text-[32px] overflow-hidden ${isActive ? 'ring-2 ring-slate-900 shadow-md bg-slate-50' : bg}`}>
                                             {catObj.image ? (
                                                 <img src={catObj.image} alt={catName} className="w-full h-full object-cover" />
                                             ) : (
                                                 emoji
                                             )}
                                         </div>
-                                        <span className={`text-[10px] text-center leading-tight px-1 ${isActive ? 'font-black text-slate-900' : 'font-bold text-slate-600'}`}>
-                                            {catName === 'All' ? 'All Stores' : catName}
+                                        <span className={`text-[11px] text-center leading-tight px-1 ${isActive ? 'font-black text-slate-900' : 'font-bold text-slate-600'}`}>
+                                            {catName === 'All' ? 'All' : catName}
                                         </span>
                                     </button>
                                 );
@@ -274,21 +275,21 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* ── Top Sellers (Grid) ── */}
+                    {/* ── Top Sellers (Horizontal Scroll) ── */}
                     {featuredProducts && featuredProducts.length > 0 && (
                         <div className="bg-white px-4 py-6 border-b border-slate-100 mb-2 md:rounded-2xl md:mx-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-[15px] font-black text-slate-900">Bestsellers</h3>
                                 <span className="text-[12px] font-bold text-emerald-600 cursor-pointer" onClick={() => navigate('/search?q=popular')}>See All</span>
                             </div>
-                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-                                {featuredProducts.slice(0, 6).map(prod => {
+                            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2">
+                                {featuredProducts.slice(0, 8).map(prod => {
                                     const shopIdToNavigate = prod.shopId?._id || prod.shopId;
                                     const navigateToProduct = () => {
                                         shopIdToNavigate ? navigate(`/shop/${shopIdToNavigate}`) : navigate(`/search?q=${encodeURIComponent(prod.name)}`)
                                     };
                                     return (
-                                        <div key={prod._id}>
+                                        <div key={prod._id} className="snap-start shrink-0 w-[140px] sm:w-[160px]">
                                             <ProductCard 
                                                 product={prod}
                                                 onClick={navigateToProduct}

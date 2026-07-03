@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const { getAllShops, getShopById, createShop, updateShop, getMyShop, calculateDelivery, updateShopImage } = require("../controllers/shopController");
+const { getAllShops, getAllShopsForAdmin, getShopById, createShop, updateShop, getMyShop, calculateDelivery, updateShopImage } = require("../controllers/shopController");
 const { protect, authorize } = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 
+router.get("/admin/all", protect, authorize("super_admin"), getAllShopsForAdmin);
 router.get("/", getAllShops);
 router.get("/my-shop", protect, authorize("vendor"), getMyShop);
 router.get("/:id", getShopById);

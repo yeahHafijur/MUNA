@@ -86,7 +86,7 @@ const ChatScreen = () => {
                 // page 0 contains the newest messages
                 newPages[0] = {
                     ...newPages[0],
-                    messages: [...newPages[0].messages, message]
+                    messages: [message, ...newPages[0].messages]
                 };
                 return { ...oldData, pages: newPages };
             });
@@ -171,7 +171,7 @@ const ChatScreen = () => {
                 const newPages = [...oldData.pages];
                 newPages[0] = {
                     ...newPages[0],
-                    messages: [...newPages[0].messages, optimisticMsg]
+                    messages: [optimisticMsg, ...newPages[0].messages]
                 };
                 return { ...oldData, pages: newPages };
             });

@@ -13,7 +13,8 @@ async function migrate() {
     console.log("Connected to Local DB.");
 
     console.log("Connecting to Atlas DB...");
-    const atlasDb = await mongoose.createConnection('mongodb+srv://yhz01012004_db_user:xJaSdREG247oyMCJ@munacluster.dmjrufn.mongodb.net/muna?retryWrites=true&w=majority').asPromise();
+    require('dotenv').config();
+    const atlasDb = await mongoose.createConnection(process.env.MONGO_URI).asPromise();
     console.log("Connected to Atlas DB.");
 
     const collections = [

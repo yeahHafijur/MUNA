@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
+import { useQuery } from '@tanstack/react-query';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -17,7 +18,6 @@ const VendorOrders = () => {
     const { token } = useAuth();
     const navigate = useNavigate();
 
-    const [orders, setOrders] = useState([]);
     const [activeView, setActiveView] = useState('live');
     const [liveTab, setLiveTab] = useState('pending'); // Inner tab state for Live Orders
     const [expandedId, setExpandedId] = useState(null);
@@ -26,10 +26,8 @@ const VendorOrders = () => {
     const [deliveryOtp, setDeliveryOtp] = useState('');
     const prevLiveRef = useRef(0);
 
-    const [historyOrders, setHistoryOrders] = useState([]);
     // Changed: Date based state for history
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
     const playSound = useCallback(() => {
         try {
@@ -44,36 +42,33 @@ const VendorOrders = () => {
         } catch { /* ignore */ }
     }, []);
 
-    const fetchLive = useCallback(() => {
-        if (!token) return;
-        fetch('/api/orders/vendor?limit=100', { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => {
-                const all = data.orders || data || [];
-                if (!Array.isArray(all)) return;
-                const live = all.filter(o => !['delivered', 'cancelled'].includes(o.status));
-                if (live.length > prevLiveRef.current) playSound();
-                prevLiveRef.current = live.length;
-                setOrders(all);
-            }).catch(() => { });
-    }, [token, playSound]);
+    const { data: orders = [] } = useQuery({
+        queryKey: ['vendor-live-orders'],
+        queryFn: async () => {
+            const res = await fetch('/api/orders/vendor?limit=100', { headers: { Authorization: `Bearer ${token}` } });
+            if (!res.ok) return [];
+            const data = await res.json();
+            const all = data.orders || data || [];
+            if (!Array.isArray(all)) return [];
+            const live = all.filter(o => !['delivered', 'cancelled'].includes(o.status));
+            if (live.length > prevLiveRef.current) playSound();
+            prevLiveRef.current = live.length;
+            return all;
+        },
+        enabled: !!token,
+        refetchInterval: 12000
+    });
 
-    const fetchHistory = useCallback(() => {
-        if (!token) return;
-        setIsHistoryLoading(true);
-        fetch(`/api/orders/vendor?date=${selectedDate}&limit=200`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => {
-                if (data.orders) {
-                    setHistoryOrders(data.orders);
-                }
-            })
-            .catch(() => { })
-            .finally(() => setIsHistoryLoading(false));
-    }, [token, selectedDate]);
-
-    useEffect(() => { fetchLive(); const id = setInterval(fetchLive, 12000); return () => clearInterval(id); }, [fetchLive]);
-    useEffect(() => { if (activeView === 'history') fetchHistory(); }, [activeView, fetchHistory]);
+    const { data: historyOrders = [], isLoading: isHistoryLoading } = useQuery({
+        queryKey: ['vendor-history-orders', selectedDate],
+        queryFn: async () => {
+            const res = await fetch(`/api/orders/vendor?date=${selectedDate}&limit=200`, { headers: { Authorization: `Bearer ${token}` } });
+            if (!res.ok) return [];
+            const data = await res.json();
+            return data.orders || [];
+        },
+        enabled: !!token && activeView === 'history'
+    });
 
     const CONFIRM_CONFIG = {
         accepted: { emoji: '✅', title: 'Accept Order?', desc: 'Move to Accepted column.', color: 'bg-emerald-500 hover:bg-emerald-600' },

@@ -15,6 +15,9 @@ const upload = require('../middleware/uploadMiddleware');
 // Public: Get global item categories only
 router.get("/global", getGlobalCategories);
 
+// Vendor: Reorder categories
+router.put("/reorder/bulk", protect, authorize("vendor"), reorderCategories);
+
 // Public: Get categories for a shop (global + custom)
 router.get("/:shopId", getCategoriesByShop);
 
@@ -29,8 +32,5 @@ router.put("/:id", protect, authorize("vendor", "super_admin"), upload.single('i
 
 // Vendor or Super Admin: Delete category
 router.delete("/:id", protect, authorize("vendor", "super_admin"), deleteCategory);
-
-// Vendor: Reorder categories
-router.put("/reorder/bulk", protect, authorize("vendor"), reorderCategories);
 
 module.exports = router;

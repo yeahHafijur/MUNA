@@ -24,7 +24,7 @@ const getBestsellers = async (req, res) => {
                         type: "Point",
                         coordinates: [parseFloat(lng), parseFloat(lat)]
                     },
-                    $maxDistance: parseFloat(50000) * 1000 // 50,000 km covers the whole earth
+                    $maxDistance: parseFloat(radius) * 1000
                 }
             }
         }).select('_id');
@@ -62,19 +62,23 @@ const getProductsByShop = async (req, res) => {
             return res.status(404).json({ message: "no products found" })
         }
 
-        // Manually populate category since the field is Mixed
         const mongoose = require('mongoose');
-        const Category = require('../models/ItemCategory');
-        const populatedProducts = await Promise.all(products.map(async p => {
+        const ItemCategory = require('../models/ItemCategory');
+        
+        const categoryIds = products
+            .map(p => p.category)
+            .filter(c => mongoose.Types.ObjectId.isValid(c));
+            
+        const categories = await ItemCategory.find({ _id: { $in: categoryIds } }).lean();
+        const catMap = new Map(categories.map(c => [c._id.toString(), c]));
+
+        const populatedProducts = products.map(p => {
             const prodObj = p.toObject();
-            if (prodObj.category && mongoose.Types.ObjectId.isValid(prodObj.category)) {
-                try {
-                    const catInfo = await Category.findById(prodObj.category);
-                    if (catInfo) prodObj.category = catInfo;
-                } catch (err) { }
+            if (prodObj.category && catMap.has(prodObj.category.toString())) {
+                prodObj.category = catMap.get(prodObj.category.toString());
             }
             return prodObj;
-        }));
+        });
 
         res.status(200).json(populatedProducts);
 
@@ -156,6 +160,9 @@ const updateProduct = async (req, res) => {
             return res.status(404).json({ message: "Product not found" });
         }
         const shop = await Shop.findOne({ vendorId: req.user._id });
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" });
+        }
         if (product.shopId.toString() !== shop._id.toString()) {
             return res.status(403).json({ message: "You cannot update products of another shop!" });
         }
@@ -211,6 +218,9 @@ const deleteProduct = async (req, res) => {
             return res.status(404).json({ message: "Product not found" });
         }
         const shop = await Shop.findOne({ vendorId: req.user._id });
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" });
+        }
         if (product.shopId.toString() !== shop._id.toString()) {
             return res.status(403).json({ message: "You cannot delete products of another shop!" });
         }

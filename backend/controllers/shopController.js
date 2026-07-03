@@ -1,37 +1,23 @@
 const Shop = require("../models/Shop");
+const { getDistanceFromLatLonInKm } = require('../utils/geo');
 
 
 const getAllShops = async (req, res) => {
     try {
         let filter = { isActive: true }; // Only active shops by default
+        let query = Shop.find(filter).select('name address image category isOpen location rating udyamNumber');
+        const shops = await query.lean();
+        res.status(200).json(shops);
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" })
+    }
+};
 
-        // Check if admin is requesting all shops
-        if (req.query.admin === 'true' && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-            const jwt = require("jsonwebtoken");
-            const User = require("../models/User");
-            try {
-                const token = req.headers.authorization.split(' ')[1];
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                const user = await User.findById(decoded.id);
-                if (user && user.role === 'super_admin') {
-                    filter = {}; // Admin sees all shops, including inactive
-                }
-            } catch (err) {
-                console.error("Admin token verification failed in getAllShops", err.message);
-            }
-        }
-
-        let query = Shop.find(filter);
-        
-        if (Object.keys(filter).length === 0) {
-            // Admin view: need all fields including isActive and vendorId
-            query = query.select('name address image category isOpen isActive location rating udyamNumber vendorId')
-                         .populate('vendorId', 'name email phone');
-        } else {
-            // Public view: only active shops, basic fields
-            query = query.select('name address image category isOpen location rating udyamNumber');
-        }
-        
+const getAllShopsForAdmin = async (req, res) => {
+    try {
+        const query = Shop.find({})
+            .select('name address image category isOpen isActive location rating udyamNumber vendorId')
+            .populate('vendorId', 'name email phone');
         const shops = await query.lean();
         res.status(200).json(shops);
     } catch (error) {
@@ -202,24 +188,7 @@ const updateShopImage = async (req, res) => {
     }
 };
 
-// Haversine formula
-function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-    var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2 - lat1);
-    var dLon = deg2rad(lon2 - lon1);
-    var a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2)
-        ;
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var d = R * c; // Distance in km
-    return d;
-}
 
-function deg2rad(deg) {
-    return deg * (Math.PI / 180)
-}
 
 const calculateDelivery = async (req, res) => {
     try {
@@ -259,6 +228,7 @@ const calculateDelivery = async (req, res) => {
 
 module.exports = {
     getAllShops,
+    getAllShopsForAdmin,
     getShopById,
     getMyShop,
     createShop,

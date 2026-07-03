@@ -54,6 +54,14 @@ const startSession = async (req, res) => {
 const getMessages = async (req, res) => {
     try {
         const { sessionId } = req.params;
+        
+        const session = await ChatSession.findById(sessionId);
+        if (!session) return res.status(404).json({ message: "Session not found" });
+        const userId = req.user._id.toString();
+        if (session.buyerId.toString() !== userId && session.sellerId.toString() !== userId) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
+
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 30;
         const skip = (page - 1) * limit;
@@ -94,6 +102,13 @@ const sendMessage = async (req, res) => {
         const { sessionId } = req.params;
         const { text } = req.body;
         const senderId = req.user._id;
+
+        const sessionObj = await ChatSession.findById(sessionId);
+        if (!sessionObj) return res.status(404).json({ message: "Session not found" });
+        const userIdStr = req.user._id.toString();
+        if (sessionObj.buyerId.toString() !== userIdStr && sessionObj.sellerId.toString() !== userIdStr) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
 
         if (!text) {
             return res.status(400).json({ message: "Message text is required." });

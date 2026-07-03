@@ -23,5 +23,6 @@ const chatSessionSchema = new mongoose.Schema({
 
 // Ensure unique chat session per buyer, seller, and item
 chatSessionSchema.index({ buyerId: 1, sellerId: 1, itemId: 1 }, { unique: true });
+chatSessionSchema.index({ buyerId: 1, updatedAt: -1 });
 
 module.exports = mongoose.model('ChatSession', chatSessionSchema);

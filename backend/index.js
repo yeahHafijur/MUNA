@@ -11,6 +11,7 @@ const moment = require("moment-timezone");
 const compression = require("compression");
 const helmet = require("helmet");
 const ChatMessage = require("./models/ChatMessage");
+const jwt = require("jsonwebtoken");
 
 dotenv.config();
 
@@ -18,31 +19,86 @@ const app = express();
 const server = http.createServer(app);
 
 // ---- SOCKET.IO SETUP ----
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'http://127.0.0.1:5173',
+    'https://munastore.in',
+    'https://www.munastore.in',
+    'https://munahut.in',
+    'https://www.munahut.in',
+    process.env.FRONTEND_URL   // Set this in .env for production
+].filter(Boolean);
+
 const io = new Server(server, {
     cors: {
-        origin: "*", // Handled by express cors below, but socket needs it too
-        methods: ["GET", "POST"]
-    }
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+            if (origin.endsWith('.vercel.app')) {
+                return callback(null, true);
+            }
+            return callback(new Error('Not allowed by CORS'));
+        },
+        methods: ["GET", "POST"],
+        credentials: true
+    },
+    maxHttpBufferSize: 1e6
 });
 
 app.set('socketio', io); // Make it accessible in controllers
 
+io.use(async (socket, next) => {
+    try {
+        const token = socket.handshake.auth?.token;
+        if (!token) return next(new Error('Authentication required'));
+        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const User = require('./models/User');
+        const user = await User.findById(decoded.id);
+        if (!user) return next(new Error('User not found'));
+        
+        socket.user = user;
+        next();
+    } catch (err) {
+        next(new Error('Invalid token'));
+    }
+});
+
 io.on("connection", (socket) => {
     console.log(`User Connected: ${socket.id}`);
 
-    socket.on("join_room", (sessionId) => {
-        socket.join(sessionId);
-        console.log(`User with ID: ${socket.id} joined room: ${sessionId}`);
+    socket.on("join_room", async (sessionId) => {
+        try {
+            const ChatSession = require('./models/ChatSession');
+            const session = await ChatSession.findById(sessionId);
+            if (!session) return;
+            
+            const userId = socket.user._id.toString();
+            if (session.buyerId.toString() !== userId && session.sellerId.toString() !== userId) {
+                return; // Unauthorized
+            }
+            
+            socket.join(sessionId);
+            console.log(`User with ID: ${socket.id} joined room: ${sessionId}`);
+        } catch(err) {
+            console.error("Socket join_room Error:", err);
+        }
     });
 
     socket.on("mark_as_read", async (data) => {
         // data: { sessionId, messageIds }
         try {
-            if (data.messageIds && data.messageIds.length > 0) {
-                await ChatMessage.updateMany(
-                    { _id: { $in: data.messageIds } },
-                    { $set: { isRead: true } }
-                );
+            if (data.messageIds && Array.isArray(data.messageIds) && data.messageIds.length > 0) {
+                const validIds = data.messageIds.filter(id => mongoose.Types.ObjectId.isValid(id));
+                if (validIds.length > 0) {
+                    await ChatMessage.updateMany(
+                        { _id: { $in: validIds } },
+                        { $set: { isRead: true } }
+                    );
+                }
             }
             // Emit back to the room so the sender's UI updates the ticks
             socket.to(data.sessionId).emit("messages_read", data.messageIds);
@@ -68,17 +124,6 @@ app.set('trust proxy', 1);
 // ---- SECURITY MIDDLEWARE ----
 
 // CORS — Only allow your own frontend origin
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:4173',
-    'http://127.0.0.1:5173',
-    'https://munastore.in',
-    'https://www.munastore.in',
-    'https://munahut.in',
-    'https://www.munahut.in',
-    process.env.FRONTEND_URL   // Set this in .env for production
-].filter(Boolean);
-
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin) return callback(null, true);
@@ -287,3 +332,23 @@ mongoose.connect(process.env.MONGO_URI)
         console.error("MongoDB connection error:", err.message);
         process.exit(1);  // Exit if DB connection fails
     });
+
+// Graceful Shutdown
+const gracefulShutdown = () => {
+    console.log('Received kill signal, shutting down gracefully');
+    server.close(() => {
+        console.log('Closed out remaining connections');
+        mongoose.connection.close(false).then(() => {
+            console.log('MongoDb connection closed.');
+            process.exit(0);
+        });
+    });
+    
+    setTimeout(() => {
+        console.error('Could not close connections in time, forcefully shutting down');
+        process.exit(1);
+    }, 10000);
+};
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);

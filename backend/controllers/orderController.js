@@ -1,4 +1,6 @@
 const Order = require('../models/Order');
+const mongoose = require('mongoose');
+const { getDistanceFromLatLonInKm } = require('../utils/geo');
 const Product = require('../models/Product');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
@@ -82,24 +84,7 @@ const sendAndSaveNotification = async (userIds, heading, message, actionUrl = ""
     }
 };
 
-// Haversine formula: Do (2) GPS points ke beech ka distance (KM) nikalne ke liye
-function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-    var R = 6371; // Prithvi ka radius KM mein
-    var dLat = deg2rad(lat2 - lat1);
-    var dLon = deg2rad(lon2 - lon1);
-    var a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2)
-        ;
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var d = R * c; // Distance KM mein
-    return d;
-}
 
-function deg2rad(deg) {
-    return deg * (Math.PI / 180)
-}
 
 // 1. Place Order (Customer karega)
 const placeOrder = async (req, res) => {
@@ -159,9 +144,10 @@ const placeOrder = async (req, res) => {
 
         const distance = getDistanceFromLatLonInKm(shopLat, shopLng, custLat, custLng);
 
-        if (distance > 100) {
+        const maxRange = shop.deliverySettings?.maxRange || 5;
+        if (distance > maxRange) {
             return res.status(400).json({
-                message: `Sorry, this shop is ${distance.toFixed(1)} KM away. We only deliver within 100 KM.`
+                message: `Sorry, this shop is ${distance.toFixed(1)} KM away. Delivery is only within ${maxRange} KM.`
             });
         }
 
@@ -177,10 +163,7 @@ const placeOrder = async (req, res) => {
         let itemsTotal = 0;
         const verifiedItems = [];
         for (const item of items) {
-            const dbProduct = await Product.findById(item.productId);
-            if (!dbProduct) {
-                return res.status(404).json({ message: `Product ${item.name} not found.` });
-            }
+            const dbProduct = productMap.get(item.productId.toString());
             itemsTotal += (dbProduct.price * item.quantity);
             verifiedItems.push({
                 productId: item.productId,
@@ -279,9 +262,13 @@ const cancelOrder = async (req, res) => {
 // 3. Get Customer's Orders
 const getCustomerOrders = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
         const orders = await Order.find({ customerId: req.user._id })
             .populate('shopId', 'name address image')
-            .sort('-createdAt');
+            .sort('-createdAt')
+            .skip((page - 1) * limit)
+            .limit(limit);
         res.status(200).json(orders);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
@@ -321,6 +308,22 @@ const getVendorOrders = async (req, res) => {
             if (to) filter.createdAt.$lte = new Date(to + 'T23:59:59.999Z');
         }
 
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            const matchingUsers = await User.find({
+                $or: [{ name: searchRegex }, { phone: searchRegex }]
+            }).select('_id');
+            const userIds = matchingUsers.map(u => u._id);
+            
+            filter.$or = [
+                { customerId: { $in: userIds } }
+            ];
+            
+            if (mongoose.Types.ObjectId.isValid(search)) {
+                filter.$or.push({ _id: search });
+            }
+        }
+
         let query = Order.find(filter)
             .select('-deliveryOtp') // Security: Don't send OTP to vendor, otherwise they can cheat via DevTools!
             .populate('customerId', 'name email phone')
@@ -331,18 +334,8 @@ const getVendorOrders = async (req, res) => {
 
         const orders = await query.skip(skip).limit(Number(limit));
 
-        let filteredOrders = orders;
-        if (search) {
-            const searchLower = search.toLowerCase();
-            filteredOrders = orders.filter(o =>
-                o._id.toString().toLowerCase().includes(searchLower) ||
-                (o.customerId?.name || '').toLowerCase().includes(searchLower) ||
-                (o.customerId?.phone || '').includes(search)
-            );
-        }
-
         res.status(200).json({
-            orders: filteredOrders,
+            orders: orders,
             pagination: {
                 total,
                 page: Number(page),
@@ -359,16 +352,28 @@ const updateOrderStatus = async (req, res) => {
     try {
         const { status, deliveryOtp } = req.body;
 
-        // Validate status value
         const validStatuses = ['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'];
         if (!status || !validStatuses.includes(status)) {
             return res.status(400).json({ message: "Invalid status value" });
         }
 
+        const validTransitions = {
+            'pending': ['accepted', 'cancelled'],
+            'accepted': ['preparing', 'cancelled'],
+            'preparing': ['out_for_delivery', 'cancelled'],
+            'out_for_delivery': ['delivered'],
+            'delivered': [],
+            'cancelled': []
+        };
+
         const order = await Order.findById(req.params.id);
 
         if (!order) {
             return res.status(404).json({ message: "Order not found" });
+        }
+
+        if (!validTransitions[order.status]?.includes(status)) {
+            return res.status(400).json({ message: `Cannot transition from '${order.status}' to '${status}'` });
         }
 
         // Security: Kya ye order ishi vendor ki shop ka hai?
@@ -391,11 +396,13 @@ const updateOrderStatus = async (req, res) => {
 
             // Increment salesCount for each product in the order
             try {
-                const productIds = order.items.map(item => item.productId);
-                await Product.updateMany(
-                    { _id: { $in: productIds } },
-                    { $inc: { salesCount: 1 } }
-                );
+                const bulkOps = order.items.map(item => ({
+                    updateOne: {
+                        filter: { _id: item.productId },
+                        update: { $inc: { salesCount: item.quantity } }
+                    }
+                }));
+                await Product.bulkWrite(bulkOps);
             } catch (err) {
                 console.error("Failed to increment salesCount:", err);
             }
@@ -438,10 +445,6 @@ const updateOrderStatus = async (req, res) => {
 // @access  Protected (Super Admin)
 const getAllOrdersForAdmin = async (req, res) => {
     try {
-        if (req.user.role !== 'super_admin') {
-            return res.status(403).json({ message: "Access denied. Super Admin only." });
-        }
-        
         // Date filtering logic (default to today if not provided)
         let queryDate = req.query.date ? new Date(req.query.date) : new Date();
         

@@ -47,13 +47,23 @@ const CustomerSettings = () => {
     const [editPhone, setEditPhone] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
     const [isAddressesModalOpen, setIsAddressesModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
     useEffect(() => {
         if (!token) navigate('/login');
     }, [token, navigate]);
 
-    const handleDeleteAccount = async () => {
-        if (!window.confirm("WARNING: This will permanently delete your account. Proceed?")) return;
+    const handleDeleteAccount = () => {
+        setIsDeleteModalOpen(true);
+        setDeleteConfirmText('');
+    };
+
+    const confirmDeleteAccount = async () => {
+        if (deleteConfirmText !== "DELETE") {
+            toast.error("Type DELETE to confirm");
+            return;
+        }
 
         try {
             const res = await fetch('/api/auth/delete-account', {
@@ -247,6 +257,36 @@ const CustomerSettings = () => {
                                     <p className="text-[12px] font-semibold text-slate-500 mt-1">Addresses save automatically during checkout.</p>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ─── FLOATING BOTTOM SHEET: DELETE ACCOUNT ─── */}
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl animate-in slide-in-from-bottom-full duration-300 ease-out">
+                        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-xl font-black text-rose-600 tracking-tight">Delete Account</h3>
+                            <button onClick={() => setIsDeleteModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:scale-95 transition-transform">✕</button>
+                        </div>
+                        <div className="mb-6">
+                            <p className="text-[13px] font-medium text-slate-600 mb-2">
+                                This action is permanent and cannot be undone. All your orders, settings, and saved data will be erased.
+                            </p>
+                            <p className="text-[13px] font-black text-slate-800">
+                                Please type <span className="text-rose-600 bg-rose-50 px-1 py-0.5 rounded">DELETE</span> to confirm.
+                            </p>
+                        </div>
+                        <div className="space-y-5">
+                            <div className="relative">
+                                <input type="text" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} required className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-rose-400 focus:bg-white transition-all placeholder-transparent" placeholder="DELETE" />
+                                <label className="absolute left-4 top-4 text-[11px] font-black text-rose-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-rose-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Type DELETE</label>
+                            </div>
+                            <button onClick={confirmDeleteAccount} disabled={deleteConfirmText !== "DELETE"} className="w-full mt-2 p-4 bg-rose-50 text-rose-600 border border-rose-100 rounded-2xl font-black text-[15px] active:scale-[0.98] transition-transform shadow-[0_4px_14px_rgba(244,63,94,0.1)] disabled:opacity-50">
+                                Delete Account Permanently
+                            </button>
                         </div>
                     </div>
                 </div>

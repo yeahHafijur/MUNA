@@ -9,6 +9,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUnreadNotifications } from './hooks/useUnreadNotifications';
 import { useUnreadChats } from './hooks/useUnreadChats';
+import InstallPWA from './components/InstallPWA';
 
 // Lazy loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -112,6 +113,7 @@ const AppContent = () => {
   return (
     <>
       <AppBadgeUpdater />
+      <InstallPWA />
       <ScrollToTop />
       {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
 

@@ -12,7 +12,6 @@ import ShopByCategory from '../components/home/ShopByCategory';
 import Bestsellers from '../components/home/Bestsellers';
 import StoreListing from '../components/home/StoreListing';
 import QuickDeliveryStores from '../components/home/QuickDeliveryStores';
-import NewOnMuna from '../components/home/NewOnMuna';
 import BecomeSellerCTA from '../components/home/BecomeSellerCTA';
 import HowItWorks from '../components/home/HowItWorks';
 import HomeFooter from '../components/home/HomeFooter';
@@ -157,7 +156,6 @@ const Home = () => {
                         setActiveCategory={setActiveCategory}
                     />
                     
-                    <NewOnMuna shops={shops} />
                     <BecomeSellerCTA navigate={navigate} />
                     <HowItWorks />
                     <HomeFooter navigate={navigate} />

@@ -5,18 +5,16 @@ import { useAuth } from '../context/AuthContext';
 import { haversine } from '../utils/homeUtils.js';
 
 import HomeHeader from '../components/home/HomeHeader';
-import GlobalSearchBar from '../components/home/GlobalSearchBar';
 import PromoBanners from '../components/home/PromoBanners';
 import DailyMarketBanner from '../components/home/DailyMarketBanner';
-import QuickCategories from '../components/home/QuickCategories';
-import BuyAgain from '../components/home/BuyAgain';
+import GlobalSearchBar from '../components/home/GlobalSearchBar';
+import ShopByCategory from '../components/home/ShopByCategory';
 import Bestsellers from '../components/home/Bestsellers';
 import StoreListing from '../components/home/StoreListing';
 import NewOnMuna from '../components/home/NewOnMuna';
 import BecomeSellerCTA from '../components/home/BecomeSellerCTA';
 import HomeFooter from '../components/home/HomeFooter';
 import AllCategoriesModal from '../components/home/AllCategoriesModal';
-import BottomNav from '../components/home/BottomNav';
 
 const Home = () => {
     // eslint-disable-next-line no-unused-vars
@@ -114,27 +112,22 @@ const Home = () => {
         /* PURE WHITE/LIGHT GRAY BACKGROUND (Blinkit Style) */
         <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50/50 overflow-hidden font-sans antialiased">
 
-            {/* ════════ STICKY HEADER & SEARCH ════════ */}
-            <div className="sticky top-0 z-[60] bg-white/90 backdrop-blur-md pb-2 shadow-sm border-b border-slate-100">
-                <HomeHeader userLocation={userLocation} />
-                <GlobalSearchBar navigate={navigate} />
-            </div>
+            {/* ════════ HEADER ════════ */}
+            <HomeHeader userLocation={userLocation} />
 
             {/* ════════ SCROLLABLE BODY ════════ */}
-            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-32">
+            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-24">
                 <div className="w-full max-w-7xl mx-auto">
                     
                     <PromoBanners />
                     <DailyMarketBanner navigate={navigate} />
+                    <GlobalSearchBar navigate={navigate} />
                     
-                    <QuickCategories 
+                    <ShopByCategory 
                         categoryList={categoryList}
+                        activeCategory={activeCategory}
                         setActiveCategory={setActiveCategory}
-                    />
-
-                    <BuyAgain 
-                        navigate={navigate} 
-                        loading={loading}
+                        setShowAllCategories={setShowAllCategories}
                     />
                     
                     <Bestsellers 
@@ -155,9 +148,6 @@ const Home = () => {
 
                 </div>
             </div>
-
-            {/* ─── BOTTOM NAVIGATION ─── */}
-            <BottomNav setShowAllCategories={setShowAllCategories} />
             
             {/* ─── ALL CATEGORIES MODAL ─── */}
             <AllCategoriesModal 

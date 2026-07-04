@@ -53,63 +53,61 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory 
                             <Link
                                 to={`/shop/${shop._id}`}
                                 key={shop._id}
-                                className={`group flex gap-3 rounded-2xl bg-white p-2.5 shadow-[0_1px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] active:scale-[0.98] transition-all duration-200 ${!shop.isOpen ? 'opacity-55' : ''}`}
+                                className={`group flex flex-col rounded-[20px] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all duration-200 overflow-hidden ${!shop.isOpen ? 'opacity-60' : ''}`}
                             >
-                                {/* Shop Image */}
-                                <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100">
+                                {/* Shop Image - Full Width */}
+                                <div className="w-full aspect-[21/9] sm:aspect-[3/1] relative overflow-hidden bg-slate-100">
                                     {shop.image ? (
                                         <img 
-                                            src={optimizeImage(shop.image, 250)} 
+                                            src={optimizeImage(shop.image, 600)} 
                                             alt={shop.name} 
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                                         />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-3xl bg-gradient-to-br from-amber-50 to-orange-50">🏪</div>
+                                        <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-amber-50 to-orange-50">🏪</div>
                                     )}
 
                                     {/* Closed overlay */}
                                     {!shop.isOpen && (
-                                        <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center">
-                                            <span className="bg-slate-900 text-white text-[8px] font-black px-2 py-0.5 rounded-full tracking-wider">CLOSED</span>
+                                        <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center z-10">
+                                            <span className="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full tracking-wider uppercase shadow-lg">CLOSED</span>
                                         </div>
                                     )}
+
+                                    {/* Gradient overlay for premium feel */}
+                                    <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                                 </div>
 
-                                {/* Shop Info */}
-                                <div className="flex-1 min-w-0 py-1 flex flex-col justify-between">
-                                    <div>
-                                        <h4 className="text-[14px] font-extrabold text-slate-900 leading-tight line-clamp-1">{shop.name}</h4>
-                                        
-                                        {/* Rating + Category */}
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="flex items-center gap-0.5 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+                                {/* Shop Info - Below Image */}
+                                <div className="p-3.5 relative">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-[16px] font-extrabold text-slate-900 leading-tight line-clamp-1">{shop.name}</h4>
+                                            <p className="text-[12px] font-semibold text-slate-500 mt-1 truncate">{shop.category || 'Kirana & Grocery'}</p>
+                                        </div>
+                                        <div className="flex flex-col items-end shrink-0">
+                                            <div className="flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100/50">
                                                 <IcoStar />
-                                                <span className="text-[11px] font-black text-emerald-700">{shop.rating || '4.5'}</span>
+                                                <span className="text-[12px] font-black text-emerald-700">{shop.rating || '4.5'}</span>
                                             </div>
-                                            <span className="text-[10px] font-bold text-slate-400">•</span>
-                                            <span className="text-[11px] font-semibold text-slate-500 truncate">{shop.category || 'Kirana & Grocery'}</span>
                                         </div>
                                     </div>
 
                                     {/* Bottom row: Distance + Delivery */}
-                                    <div className="flex items-center gap-3 mt-2">
+                                    <div className="flex items-center gap-4 mt-3 pt-3 border-t border-slate-100/80">
                                         {shop.isOpen && (
-                                            <div className={`flex items-center gap-1 text-[10px] font-bold ${isFast ? 'text-emerald-600' : 'text-slate-500'}`}>
+                                            <div className={`flex items-center gap-1 text-[11.5px] font-bold ${isFast ? 'text-emerald-600' : 'text-slate-500'}`}>
                                                 <IcoTimer />
                                                 <span>{deliveryTime}</span>
                                             </div>
                                         )}
                                         {distText && (
-                                            <span className="text-[10px] font-semibold text-slate-400">📍 {distText} away</span>
+                                            <div className="flex items-center gap-1 text-[11.5px] font-semibold text-slate-400">
+                                                <span>📍</span>
+                                                <span>{distText} away</span>
+                                            </div>
                                         )}
                                     </div>
-                                </div>
-
-                                {/* Chevron */}
-                                <div className="flex items-center pr-1 opacity-30 group-hover:opacity-60 transition-opacity">
-                                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 text-slate-400">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                                    </svg>
                                 </div>
                             </Link>
                         );

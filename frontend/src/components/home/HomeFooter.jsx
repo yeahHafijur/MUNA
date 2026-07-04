@@ -19,7 +19,7 @@ const HomeFooter = ({ navigate }) => {
                 <h4 className="text-[13px] font-black text-white mb-1">Get the MUNA App</h4>
                 <p className="text-[10px] font-medium text-slate-400 mb-3">For a faster, smoother experience</p>
                 <a 
-                    href="YOUR_PLAYSTORE_LINK_HERE" 
+                    href="https://play.google.com/store/apps/details?id=app.vercel.muna_opal.twa" 
                     target="_blank" 
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded-xl active:scale-95 transition-transform"

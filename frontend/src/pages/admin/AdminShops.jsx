@@ -32,7 +32,7 @@ const AdminShops = () => {
     const { data: shops = [], isLoading } = useQuery({
         queryKey: ['admin-shops'],
         queryFn: async () => {
-            const res = await fetch('/api/shops?admin=true', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await fetch('/api/shops/admin/all', { headers: { Authorization: `Bearer ${token}` } });
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         },

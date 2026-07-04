@@ -154,6 +154,8 @@ const Home = () => {
                         loading={loading}
                         activeCategory={activeCategory}
                         setActiveCategory={setActiveCategory}
+                        limit={5}
+                        showViewAll={true}
                     />
                     
                     <BecomeSellerCTA navigate={navigate} />

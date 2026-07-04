@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { optimizeImage } from '../../utils/imageUtils';
 import { IcoTimer, IcoStar } from './HomeIcons';
 
-const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory }) => {
+const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory, limit, showViewAll }) => {
+    const displayShops = limit ? sortedShops.slice(0, limit) : sortedShops;
+
     return (
         <div id="store-listing" className="px-4 py-5 md:mx-4">
             <div className="flex items-center justify-between mb-5 px-1">
@@ -43,7 +45,7 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory 
                         <p className="text-[11px] font-semibold text-slate-300 mt-1">Try a different category</p>
                     </div>
                 ) : (
-                    sortedShops.map((shop) => {
+                    displayShops.map((shop) => {
                         const distVal = shop.distance !== Infinity ? shop.distance : null;
                         const isFast = distVal !== null && distVal < 2;
                         const distText = distVal !== null ? (distVal < 1 ? `${(distVal * 1000).toFixed(0)}m` : `${distVal.toFixed(1)} km`) : null;
@@ -114,6 +116,21 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory 
                     })
                 )}
             </div>
+
+            {/* View All Button */}
+            {showViewAll && sortedShops.length > limit && (
+                <div className="mt-5 text-center">
+                    <Link 
+                        to="/all-stores" 
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-50 text-amber-700 font-bold text-[13px] rounded-xl border border-amber-100 active:scale-95 transition-transform"
+                    >
+                        View all {sortedShops.length} stores
+                        <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </Link>
+                </div>
+            )}
         </div>
     );
 };

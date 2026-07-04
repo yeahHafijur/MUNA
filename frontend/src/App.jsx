@@ -23,6 +23,7 @@ const CustomerSettings = lazy(() => import('./pages/CustomerSettings'));
 const Search = lazy(() => import('./pages/Search'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const AllStores = lazy(() => import('./pages/AllStores'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const VendorRequestForm = lazy(() => import('./pages/VendorRequestForm'));
 const DailyMarket = lazy(() => import('./pages/DailyMarket'));
@@ -146,6 +147,7 @@ const AppContent = () => {
                 <Route path="/search" element={<Search />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/all-stores" element={<AllStores />} />
                 <Route path="/daily-market" element={<DailyMarket />} />
                 <Route path="/daily-market/post" element={<DailyMarketPost />} />
                 <Route path="/daily-market/item/:id" element={<DailyMarketItemDetail />} />

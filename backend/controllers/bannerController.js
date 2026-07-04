@@ -21,9 +21,18 @@ exports.createBanner = async (req, res) => {
     try {
         const { position, link, isActive, sortOrder } = req.body;
         
-        // image URL is expected to be returned by our upload middleware/route
-        // But if they just pass image string in body:
-        const image = req.body.image || (req.file ? `/uploads/${req.file.filename}` : '');
+        let image = req.body.image || '';
+
+        // Handle image upload using cloudinary
+        if (req.file) {
+            const { uploadStream } = require('../utils/cloudinary');
+            const result = await uploadStream(req.file.buffer, 'muna/banners');
+            image = result.secure_url;
+        } else if (req.body.image && req.body.image.startsWith('data:image')) {
+            const { uploadBase64 } = require('../utils/cloudinary');
+            const result = await uploadBase64(req.body.image, 'muna/banners');
+            image = result.secure_url;
+        }
 
         if (!image) {
             return res.status(400).json({ message: 'Image is required' });
@@ -63,7 +72,19 @@ exports.updateBanner = async (req, res) => {
         if (sortOrder !== undefined) banner.sortOrder = sortOrder;
         if (link !== undefined) banner.link = link;
         if (position !== undefined) banner.position = position;
-        if (image) banner.image = image;
+
+        // Handle image upload
+        if (req.file) {
+            const { uploadStream } = require('../utils/cloudinary');
+            const result = await uploadStream(req.file.buffer, 'muna/banners');
+            banner.image = result.secure_url;
+        } else if (req.body.image && req.body.image.startsWith('data:image')) {
+            const { uploadBase64 } = require('../utils/cloudinary');
+            const result = await uploadBase64(req.body.image, 'muna/banners');
+            banner.image = result.secure_url;
+        } else if (req.body.image) {
+            banner.image = req.body.image;
+        }
 
         await banner.save();
         res.json(banner);

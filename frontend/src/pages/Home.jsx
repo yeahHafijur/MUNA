@@ -133,6 +133,11 @@ const Home = () => {
                     <DailyMarketBanner navigate={navigate} />
                     <GlobalSearchBar navigate={navigate} />
                     
+                    <Bestsellers 
+                        featuredProducts={featuredProducts} 
+                        navigate={navigate} 
+                    />
+                    
                     <ShopByCategory 
                         categoryList={categoryList}
                         activeCategory={activeCategory}
@@ -143,11 +148,6 @@ const Home = () => {
                     <QuickDeliveryStores shops={sortedShops} />
                     
                     <MidPageBanner banners={midBanners} navigate={navigate} />
-                    
-                    <Bestsellers 
-                        featuredProducts={featuredProducts} 
-                        navigate={navigate} 
-                    />
                     
                     <StoreListing 
                         sortedShops={sortedShops}

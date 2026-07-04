@@ -104,7 +104,8 @@ const updateShop = async (req, res) => {
             return res.status(404).json({ message: "Shop not found" });
         }
         // Security Check: Kya ye shop ishi logged-in vendor ki hai? (Ya fir super_admin hai?)
-        if (shop.vendorId.toString() !== req.user._id.toString() && req.user.role !== 'super_admin') {
+        const isOwner = shop.vendorId && shop.vendorId.toString() === req.user._id.toString();
+        if (!isOwner && req.user.role !== 'super_admin') {
             return res.status(403).json({ message: "Not authorized to update this shop" });
         }
         // Super admin can change name, vendor cannot
@@ -168,7 +169,8 @@ const updateShopImage = async (req, res) => {
         if (!shop) {
             return res.status(404).json({ message: "Shop not found" });
         }
-        if (shop.vendorId.toString() !== req.user._id.toString() && req.user.role !== 'super_admin') {
+        const isOwner = shop.vendorId && shop.vendorId.toString() === req.user._id.toString();
+        if (!isOwner && req.user.role !== 'super_admin') {
             return res.status(403).json({ message: "Not authorized to update this shop" });
         }
         

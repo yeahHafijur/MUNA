@@ -11,6 +11,7 @@ import GlobalSearchBar from '../components/home/GlobalSearchBar';
 import ShopByCategory from '../components/home/ShopByCategory';
 import Bestsellers from '../components/home/Bestsellers';
 import StoreListing from '../components/home/StoreListing';
+import QuickDeliveryStores from '../components/home/QuickDeliveryStores';
 import NewOnMuna from '../components/home/NewOnMuna';
 import BecomeSellerCTA from '../components/home/BecomeSellerCTA';
 import HowItWorks from '../components/home/HowItWorks';
@@ -139,6 +140,8 @@ const Home = () => {
                         setActiveCategory={setActiveCategory}
                         setShowAllCategories={setShowAllCategories}
                     />
+                    
+                    <QuickDeliveryStores shops={sortedShops} />
                     
                     <MidPageBanner banners={midBanners} navigate={navigate} />
                     

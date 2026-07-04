@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { optimizeImage } from '../../utils/imageUtils';
 import { IcoTimer, IcoStar } from './HomeIcons';
+import StoreSkeleton from './StoreSkeleton';
 
 const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory }) => {
     return (
@@ -26,14 +27,8 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory 
             <div className={sortedShops.length > 0 && !loading ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4" : "space-y-4"}>
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
-                            <div key={i} className="rounded-[20px] overflow-hidden animate-pulse bg-white shadow-sm">
-                                <div className="w-full aspect-[4/3] bg-slate-100" />
-                                <div className="p-3 space-y-2">
-                                    <div className="h-4 bg-slate-100 w-3/4 rounded-full" />
-                                    <div className="h-3 bg-slate-100 w-1/2 rounded-full" />
-                                </div>
-                            </div>
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                            <StoreSkeleton key={i} />
                         ))}
                     </div>
                 ) : sortedShops.length === 0 ? (

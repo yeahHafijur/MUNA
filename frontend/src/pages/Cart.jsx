@@ -44,51 +44,70 @@ const Cart = () => {
 
     const navigate = useNavigate();
 
-    const handleGetLocation = () => {
+    const handleGetLocation = async () => {
         setLocating(true);
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    setGpsLocation({ lat, lng });
-                    
-                    try {
-                        const res = await fetch(`/api/shops/${cartShopId}/calculate-delivery`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ lat, lng })
-                        });
-                        const data = await res.json();
-                        if (res.ok) {
-                            setDeliveryFee(data.deliveryFee);
-                            setDistance(data.distance);
-                            setShowSavePrompt(true); // Ask if they want to save this new GPS location
-                            setSelectedSavedLoc(null); // Deselect any saved location
-                        } else {
-                            alert(data.message || "Could not calculate delivery fee");
-                            setGpsLocation(null);
-                        }
-                    } catch (error) {
-                        console.error("Error calculating delivery fee:", error);
-                    }
-                    
-                    setLocating(false);
-                },
-                (error) => {
+        if (!("geolocation" in navigator)) {
+            alert("Your browser does not support location services.");
+            setLocating(false);
+            return;
+        }
+
+        const getPosition = (options) => {
+            return new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, options);
+            });
+        };
+
+        const processPosition = async (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            setGpsLocation({ lat, lng });
+            
+            try {
+                const res = await fetch(`/api/shops/${cartShopId}/calculate-delivery`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lat, lng })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    setDeliveryFee(data.deliveryFee);
+                    setDistance(data.distance);
+                    setShowSavePrompt(true);
+                    setSelectedSavedLoc(null);
+                } else {
+                    alert(data.message || "Could not calculate delivery fee");
+                    setGpsLocation(null);
+                }
+            } catch (error) {
+                console.error("Error calculating delivery fee:", error);
+            }
+            setLocating(false);
+        };
+
+        try {
+            // Try high accuracy first (GPS)
+            const position = await getPosition({ enableHighAccuracy: true, timeout: 8000, maximumAge: 0 });
+            await processPosition(position);
+        } catch (error) {
+            // If high accuracy fails, fallback to low accuracy (Network/Wi-Fi)
+            if (error.code === 1) {
+                alert("Location permission denied. Please allow location access in your app settings.");
+                setLocating(false);
+            } else {
+                try {
+                    const fallbackPos = await getPosition({ enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 });
+                    await processPosition(fallbackPos);
+                } catch (fallbackError) {
                     let msg = "Location fetch failed.";
-                    if (error.code === 1) msg = "Location permission denied. Please allow location access in your app settings.";
-                    else if (error.code === 2) msg = "Location unavailable. Please ensure your device GPS is turned on and try again!";
-                    else if (error.code === 3) msg = "Location request timed out. Please try again or check your signal.";
+                    if (fallbackError.code === 1) msg = "Location permission denied. Please allow location access in your app settings.";
+                    else if (fallbackError.code === 2) msg = "Location unavailable. Please ensure your device GPS is turned on and try again!";
+                    else if (fallbackError.code === 3) msg = "Location request timed out. Please try again or check your signal.";
                     
                     alert(msg);
                     setLocating(false);
-                },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-            );
-        } else {
-            alert("Your browser does not support location services.");
-            setLocating(false);
+                }
+            }
         }
     };
 

@@ -14,23 +14,6 @@ const HomeFooter = ({ navigate }) => {
                 </div>
             </div>
 
-            {/* App Download */}
-            <div className="mb-8 bg-slate-800/50 rounded-2xl p-5 border border-slate-700/50 flex flex-col items-center text-center">
-                <h4 className="text-[14px] font-black text-white mb-1">Get the MUNA App</h4>
-                <p className="text-[11px] font-medium text-slate-400 mb-4">For a faster, smoother experience</p>
-                <a 
-                    href="https://play.google.com/store/apps/details?id=app.vercel.muna_opal.twa" 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="inline-block active:scale-95 transition-transform"
-                >
-                    <img 
-                        src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" 
-                        alt="Get it on Google Play" 
-                        className="h-[45px] w-auto object-contain"
-                    />
-                </a>
-            </div>
 
             {/* Links Grid */}
             <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-8">
@@ -46,9 +29,27 @@ const HomeFooter = ({ navigate }) => {
             <div className="h-px bg-slate-800 mb-5" />
 
             {/* Bottom */}
-            <div className="text-center">
+            <div className="text-center mb-8">
                 <p className="text-[11px] font-bold text-slate-600 mb-1">Made with ❤️ in Assam</p>
                 <p className="text-[10px] font-semibold text-slate-700">© {new Date().getFullYear()} MUNA. All rights reserved.</p>
+            </div>
+
+            {/* App Download */}
+            <div className="bg-slate-800/50 rounded-2xl p-5 border border-slate-700/50 flex flex-col items-center text-center">
+                <h4 className="text-[14px] font-black text-white mb-1">Get the MUNA App</h4>
+                <p className="text-[11px] font-medium text-slate-400 mb-4">For a faster, smoother experience</p>
+                <a 
+                    href="https://play.google.com/store/apps/details?id=app.vercel.muna_opal.twa" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="inline-block active:scale-95 transition-transform"
+                >
+                    <img 
+                        src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" 
+                        alt="Get it on Google Play" 
+                        className="h-[45px] w-auto object-contain"
+                    />
+                </a>
             </div>
         </div>
     );

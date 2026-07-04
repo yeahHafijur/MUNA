@@ -5,10 +5,10 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.route('/')
     .get(getBanners)
-    .post(protect, authorize('superadmin', 'admin'), createBanner);
+    .post(protect, authorize('super_admin', 'admin'), createBanner);
 
 router.route('/:id')
-    .put(protect, authorize('superadmin', 'admin'), updateBanner)
-    .delete(protect, authorize('superadmin', 'admin'), deleteBanner);
+    .put(protect, authorize('super_admin', 'admin'), updateBanner)
+    .delete(protect, authorize('super_admin', 'admin'), deleteBanner);
 
 module.exports = router;

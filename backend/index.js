@@ -206,6 +206,7 @@ app.use('/api/categories', require('./routes/categoryRoutes'));
 app.use('/api/vendor-requests', require('./routes/vendorRequestRoutes'));
 app.use('/api/live-bazar', require('./routes/liveBazarRoutes'));
 app.use('/api/chat', require('./routes/chatRoutes'));
+app.use('/api/banners', require('./routes/bannerRoutes'));
 
 app.get("/", (req, res) => {
     res.send("MUNA is running")

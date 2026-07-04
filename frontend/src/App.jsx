@@ -46,6 +46,7 @@ const AdminApprovals = lazy(() => import('./pages/admin/AdminApprovals'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminVendorRequests = lazy(() => import('./pages/admin/AdminVendorRequests'));
 const AdminLiveOrders = lazy(() => import('./pages/admin/AdminLiveOrders'));
+const AdminBanners = lazy(() => import('./pages/admin/AdminBanners'));
 const GodownBrowser = lazy(() => import('./pages/GodownBrowser'));
 
 // Global Badge Updater Component
@@ -188,6 +189,7 @@ const AppContent = () => {
             <Route path="/admin/approvals" element={<AdminApprovals />} />
             <Route path="/admin/vendor-requests" element={<AdminVendorRequests />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/banners" element={<AdminBanners />} />
           </Routes>
         </Suspense>
       )}

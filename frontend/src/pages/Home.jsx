@@ -53,6 +53,14 @@ const Home = () => {
         queryFn: () => fetch('/api/shop-categories').then(r => r.json()),
     });
 
+    const { data: banners = [] } = useQuery({
+        queryKey: ['banners'],
+        queryFn: () => fetch('/api/banners').then(r => r.json()),
+    });
+
+    const topBanners = useMemo(() => banners.filter(b => b.position === 'top'), [banners]);
+    const midBanners = useMemo(() => banners.filter(b => b.position === 'mid'), [banners]);
+
     /* ── Geolocation ── */
     useEffect(() => {
         if (!('geolocation' in navigator)) {
@@ -121,7 +129,7 @@ const Home = () => {
             <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-24">
                 <div className="w-full max-w-7xl mx-auto">
                     
-                    <PromoBanners />
+                    <PromoBanners banners={topBanners} />
                     <DailyMarketBanner navigate={navigate} />
                     <GlobalSearchBar navigate={navigate} />
                     
@@ -132,7 +140,7 @@ const Home = () => {
                         setShowAllCategories={setShowAllCategories}
                     />
                     
-                    <MidPageBanner />
+                    <MidPageBanner banners={midBanners} navigate={navigate} />
                     
                     <Bestsellers 
                         featuredProducts={featuredProducts} 

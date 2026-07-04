@@ -411,10 +411,15 @@ const Home = () => {
 
                     {/* ── New on MUNA (Recently Added Shops) ── */}
                     {(() => {
+                        // Sort by createdAt if available, otherwise just take the last added ones
                         const newShops = [...shops]
-                            .filter(s => s.createdAt)
-                            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                            .sort((a, b) => {
+                                const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                                const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                                return dateB - dateA;
+                            })
                             .slice(0, 6);
+                            
                         if (newShops.length === 0) return null;
                         return (
                             <div className="px-4 py-6 mb-2">

@@ -1,8 +1,10 @@
 import { memo } from 'react';
 
 const MidPageBanner = ({ banners }) => {
-    // Show the first active mid banner, or fallback to the static one
-    const banner = banners && banners.length > 0 ? banners[0] : { image: '/promo-banner-free-delivery.png', link: '' };
+    // Return null if no active banners
+    if (!banners || banners.length === 0) return null;
+
+    const banner = banners[0];
 
     return (
         <div className="px-4 py-2 mt-4 mb-2 md:mx-4">

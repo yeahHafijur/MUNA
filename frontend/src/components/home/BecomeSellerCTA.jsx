@@ -4,7 +4,7 @@ const BecomeSellerCTA = ({ navigate }) => {
     return (
         <div className="px-4 py-3 mb-4 md:mx-4">
             <div
-                onClick={() => navigate('/vendor-request')}
+                onClick={() => navigate('/profile/vendor-request')}
                 className="w-full max-w-2xl mx-auto bg-gradient-to-r from-amber-400 via-amber-500 to-orange-400 rounded-[20px] p-5 flex items-center gap-4 shadow-[0_4px_20px_rgba(251,191,36,0.3)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden relative"
             >
                 <div className="absolute right-[-20px] bottom-[-20px] text-[100px] opacity-[0.15] rotate-[-15deg] pointer-events-none">

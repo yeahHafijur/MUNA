@@ -76,9 +76,15 @@ const Cart = () => {
                     setLocating(false);
                 },
                 (error) => {
-                    alert("Location fetch failed. Please turn on your device GPS!");
+                    let msg = "Location fetch failed.";
+                    if (error.code === 1) msg = "Location permission denied. Please allow location access in your app settings.";
+                    else if (error.code === 2) msg = "Location unavailable. Please ensure your device GPS is turned on and try again!";
+                    else if (error.code === 3) msg = "Location request timed out. Please try again or check your signal.";
+                    
+                    alert(msg);
                     setLocating(false);
-                }
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
             );
         } else {
             alert("Your browser does not support location services.");

@@ -22,12 +22,12 @@ const QuickDeliveryStores = ({ shops }) => {
                     <Link
                         to={`/shop/${shop._id}`}
                         key={shop._id}
-                        className="snap-start shrink-0 w-[140px] group"
+                        className="snap-start shrink-0 w-[200px] group"
                     >
-                        <div className="w-full aspect-square rounded-2xl overflow-hidden relative bg-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.06)]">
+                        <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden relative bg-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.06)]">
                             {shop.image ? (
                                 <img 
-                                    src={optimizeImage(shop.image, 300)} 
+                                    src={optimizeImage(shop.image, 400)} 
                                     alt={shop.name} 
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                                 />
@@ -40,13 +40,13 @@ const QuickDeliveryStores = ({ shops }) => {
                                 ⚡ 15 MIN
                             </div>
 
-                            {/* Bottom gradient */}
-                            <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/60 to-transparent" />
+                            {/* Bottom gradient + shop name on image */}
+                            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+                            <h4 className="absolute bottom-2 left-2.5 right-2 text-[13px] font-black text-white leading-tight line-clamp-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">{shop.name}</h4>
                         </div>
 
                         <div className="mt-1.5 px-0.5">
-                            <h4 className="text-[12px] font-extrabold text-slate-800 leading-tight line-clamp-1">{shop.name}</h4>
-                            <p className="text-[10px] font-semibold text-slate-400 mt-0.5 truncate">{shop.category || 'Grocery'}</p>
+                            <p className="text-[10px] font-semibold text-slate-400 truncate">{shop.category || 'Grocery'}</p>
                         </div>
                     </Link>
                 ))}

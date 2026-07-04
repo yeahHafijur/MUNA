@@ -6,20 +6,20 @@ import { IcoTimer, IcoStar } from './HomeIcons';
 const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory }) => {
     return (
         <div id="store-listing" className="px-4 py-5 md:mx-4">
-            <div className="flex items-center justify-between mb-4 px-0.5">
-                <div className="flex items-center gap-2">
-                    <span className="text-[20px]">🏪</span>
-                    <div>
-                        <h3 className="text-[16px] font-black text-slate-900 tracking-tight leading-none">
-                            {activeCategory !== 'All' ? `${activeCategory} Stores` : 'All Stores Near You'}
+            <div className="flex items-center justify-between mb-5 px-1">
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-5 bg-amber-400 rounded-full"></div>
+                        <h3 className="text-[18px] font-black text-slate-900 tracking-tight leading-none">
+                            {activeCategory !== 'All' ? `${activeCategory} Stores` : 'Explore Stores Around You'}
                         </h3>
-                        <p className="text-[11px] font-bold text-slate-400 mt-0.5">
-                            {sortedShops.length} {sortedShops.length === 1 ? 'store' : 'stores'} available
-                        </p>
                     </div>
+                    <p className="text-[11px] font-bold text-slate-500 mt-1.5 pl-3.5">
+                        {sortedShops.length} {sortedShops.length === 1 ? 'store' : 'stores'} available for you
+                    </p>
                 </div>
                 {activeCategory !== 'All' && (
-                    <button className="text-[11px] font-black text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full active:scale-95 transition-transform border border-amber-100" onClick={() => setActiveCategory('All')}>✕ Clear</button>
+                    <button className="text-[11px] font-black text-amber-700 bg-amber-100/70 px-3 py-1.5 rounded-full active:scale-95 transition-transform" onClick={() => setActiveCategory('All')}>✕ Clear</button>
                 )}
             </div>
 

@@ -408,6 +408,102 @@ const Home = () => {
                             )}
                         </div>
                     </div>
+
+                    {/* ── New on MUNA (Recently Added Shops) ── */}
+                    {(() => {
+                        const newShops = [...shops]
+                            .filter(s => s.createdAt)
+                            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                            .slice(0, 6);
+                        if (newShops.length === 0) return null;
+                        return (
+                            <div className="px-4 py-6 mb-2">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <span className="text-[18px]">✨</span>
+                                    <h3 className="text-[16px] font-black text-slate-900 tracking-tight">New on MUNA</h3>
+                                </div>
+                                <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2">
+                                    {newShops.map(shop => (
+                                        <Link
+                                            to={`/shop/${shop._id}`}
+                                            key={shop._id}
+                                            className="snap-start shrink-0 w-[200px] rounded-[20px] overflow-hidden bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06)] active:scale-[0.97] transition-all group"
+                                        >
+                                            <div className="w-full h-[120px] relative overflow-hidden">
+                                                {shop.image ? (
+                                                    <img src={optimizeImage(shop.image, 400)} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-3xl bg-gradient-to-br from-amber-50 to-orange-50">🏪</div>
+                                                )}
+                                                <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/40 to-transparent" />
+                                                <div className="absolute top-2 left-2 bg-amber-400 text-amber-950 text-[8px] font-black px-2 py-0.5 rounded-full tracking-wider uppercase shadow-sm">NEW</div>
+                                                <h4 className="absolute bottom-2 left-2 right-2 text-[12px] font-black text-white line-clamp-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">{shop.name}</h4>
+                                            </div>
+                                            <div className="px-3 py-2">
+                                                <p className="text-[10px] font-bold text-slate-400 truncate">{shop.category || 'Kirana & Grocery'}</p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })()}
+
+                    {/* ── Become a Seller CTA ── */}
+                    <div className="px-4 py-3 mb-4 md:mx-4">
+                        <div
+                            onClick={() => navigate('/vendor-request')}
+                            className="w-full max-w-2xl mx-auto bg-gradient-to-r from-amber-400 via-amber-500 to-orange-400 rounded-[20px] p-5 flex items-center gap-4 shadow-[0_4px_20px_rgba(251,191,36,0.3)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden relative"
+                        >
+                            <div className="absolute right-[-20px] bottom-[-20px] text-[100px] opacity-[0.15] rotate-[-15deg] pointer-events-none">
+                                🏪
+                            </div>
+                            <div className="w-14 h-14 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center text-[28px] shadow-inner shrink-0">
+                                🚀
+                            </div>
+                            <div className="relative z-10 flex-1">
+                                <h3 className="text-[16px] font-black text-amber-950 tracking-tight leading-tight mb-0.5">Become a Seller</h3>
+                                <p className="text-[12px] font-bold text-amber-900/70">Start selling on MUNA — reach thousands of local customers!</p>
+                            </div>
+                            <div className="relative z-10 bg-white/30 backdrop-blur-sm text-amber-950 rounded-full p-2.5 shrink-0">
+                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Footer ── */}
+                    <div className="bg-slate-900 rounded-t-[32px] px-6 pt-8 pb-28 mt-2">
+                        {/* Brand */}
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center shadow-md">
+                                <img src="/muna-logo-new.png" alt="MUNA" className="w-7 h-7 object-contain" />
+                            </div>
+                            <div>
+                                <h4 className="text-[16px] font-black text-white tracking-tight">MUNA</h4>
+                                <p className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">Delivery in Minutes</p>
+                            </div>
+                        </div>
+
+                        {/* Links Grid */}
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-8">
+                            <button onClick={() => navigate('/profile')} className="text-left text-[12px] font-bold text-slate-400 hover:text-white transition-colors">My Account</button>
+                            <button onClick={() => navigate('/orders')} className="text-left text-[12px] font-bold text-slate-400 hover:text-white transition-colors">My Orders</button>
+                            <button onClick={() => navigate('/daily-market')} className="text-left text-[12px] font-bold text-slate-400 hover:text-white transition-colors">Daily Market</button>
+                            <button onClick={() => navigate('/wishlist')} className="text-left text-[12px] font-bold text-slate-400 hover:text-white transition-colors">Wishlist</button>
+                            <button onClick={() => navigate('/privacy-policy')} className="text-left text-[12px] font-bold text-slate-400 hover:text-white transition-colors">Privacy Policy</button>
+                            <button onClick={() => navigate('/settings')} className="text-left text-[12px] font-bold text-slate-400 hover:text-white transition-colors">Settings</button>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="h-px bg-slate-800 mb-5" />
+
+                        {/* Bottom */}
+                        <div className="text-center">
+                            <p className="text-[11px] font-bold text-slate-600 mb-1">Made with ❤️ in Assam</p>
+                            <p className="text-[10px] font-semibold text-slate-700">© {new Date().getFullYear()} MUNA. All rights reserved.</p>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>

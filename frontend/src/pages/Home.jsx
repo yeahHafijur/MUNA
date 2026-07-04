@@ -13,8 +13,10 @@ import Bestsellers from '../components/home/Bestsellers';
 import StoreListing from '../components/home/StoreListing';
 import NewOnMuna from '../components/home/NewOnMuna';
 import BecomeSellerCTA from '../components/home/BecomeSellerCTA';
+import HowItWorks from '../components/home/HowItWorks';
 import HomeFooter from '../components/home/HomeFooter';
 import AllCategoriesModal from '../components/home/AllCategoriesModal';
+import MidPageBanner from '../components/home/MidPageBanner';
 
 const Home = () => {
     // eslint-disable-next-line no-unused-vars
@@ -130,6 +132,8 @@ const Home = () => {
                         setShowAllCategories={setShowAllCategories}
                     />
                     
+                    <MidPageBanner />
+                    
                     <Bestsellers 
                         featuredProducts={featuredProducts} 
                         navigate={navigate} 
@@ -144,6 +148,7 @@ const Home = () => {
                     
                     <NewOnMuna shops={shops} />
                     <BecomeSellerCTA navigate={navigate} />
+                    <HowItWorks />
                     <HomeFooter navigate={navigate} />
 
                 </div>

@@ -2,21 +2,20 @@ import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './Cart.css';
 
-/* ─── Premium Icons ─── */
+/* ─── Icons ─── */
 const IconBack = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{width: '20px', height: '20px'}}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
     </svg>
 );
-
 const IconTrash = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width: '14px', height: '14px'}}>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width: '15px', height: '15px'}}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
     </svg>
 );
-
 const IconLocation = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{width: '16px', height: '16px'}}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -42,7 +41,12 @@ const Cart = () => {
     const [showSavePrompt, setShowSavePrompt] = useState(false);
     const [selectedSavedLoc, setSelectedSavedLoc] = useState(null);
 
+    // Clear cart confirm
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
+
     const navigate = useNavigate();
+
+    const locationReady = gpsLocation && deliveryFee !== null;
 
     const handleGetLocation = async () => {
         setLocating(true);
@@ -86,11 +90,9 @@ const Cart = () => {
         };
 
         try {
-            // Try high accuracy first (GPS)
             const position = await getPosition({ enableHighAccuracy: true, timeout: 8000, maximumAge: 0 });
             await processPosition(position);
         } catch (error) {
-            // If high accuracy fails, fallback to low accuracy (Network/Wi-Fi)
             if (error.code === 1) {
                 alert("Location permission denied. Please allow location access in your app settings.");
                 setLocating(false);
@@ -159,7 +161,7 @@ const Cart = () => {
             if (res.ok) {
                 login({ ...user, savedLocations: data.savedLocations }, token);
                 setShowSavePrompt(false);
-                alert("Location saved successfully!");
+                toast.success("Location saved!");
             } else {
                 alert(data.message || "Could not save location");
             }
@@ -171,7 +173,7 @@ const Cart = () => {
 
     const handlePlaceOrder = async () => {
         if (!gpsLocation) {
-            alert("Please tap on 'Get My Location' to verify you are near the shop!");
+            toast.error("📍 Please select your delivery location first!");
             return;
         }
 
@@ -183,7 +185,7 @@ const Cart = () => {
 
         const isPhoneMissing = !user.phone;
         if (isPhoneMissing && (!customerPhone || customerPhone.length < 10)) {
-            alert("Please enter a valid 10-digit phone number!");
+            toast.error("Please enter a valid 10-digit phone number!");
             return;
         }
 
@@ -228,15 +230,23 @@ const Cart = () => {
             }
             
             clearCart();
-            navigate('/profile');
+            toast.success("🎉 Order placed successfully! Track your order in My Orders.");
+            navigate('/orders');
 
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }
     };
 
+    const handleClearCart = () => {
+        clearCart();
+        setShowClearConfirm(false);
+        toast.success("Cart cleared");
+    };
+
+    /* ── EMPTY CART STATE ── */
     if (cartItems.length === 0) {
         return (
             <div className="crt-root" style={{background: '#ffffff'}}>
@@ -260,7 +270,7 @@ const Cart = () => {
 
     return (
         <div className="crt-root">
-            {/* ---- HEADER ---- */}
+            {/* ──── HEADER ──── */}
             <header className="crt-header">
                 <button className="crt-back-btn" onClick={() => navigate(-1)}>
                     <IconBack />
@@ -268,14 +278,37 @@ const Cart = () => {
                 <span className="crt-header-title">Checkout</span>
             </header>
 
-            {/* ---- BODY ---- */}
+            {/* ──── PROGRESS STEPS ──── */}
+            <div className="crt-progress">
+                <div className={`crt-step ${cartItems.length > 0 ? 'crt-step--done' : ''}`}>
+                    <div className="crt-step-num">1</div>
+                    <span>Cart</span>
+                </div>
+                <div className="crt-step-line"></div>
+                <div className={`crt-step ${locationReady ? 'crt-step--done' : ''}`}>
+                    <div className="crt-step-num">2</div>
+                    <span>Location</span>
+                </div>
+                <div className="crt-step-line"></div>
+                <div className={`crt-step ${loading ? 'crt-step--done' : ''}`}>
+                    <div className="crt-step-num">3</div>
+                    <span>Order</span>
+                </div>
+            </div>
+
+            {/* ──── BODY ──── */}
             <div className="crt-body">
                 
-                {/* ITEMS SECTION */}
+                {/* ═══ STEP 1: CART ITEMS ═══ */}
                 <div className="crt-section">
-                    <div className="crt-section-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                        Items in Cart
+                    <div className="crt-section-header">
+                        <div className="crt-section-title">
+                            <span className="crt-step-badge">1</span>
+                            Review Cart
+                        </div>
+                        <button className="crt-clear-btn" onClick={() => setShowClearConfirm(true)}>
+                            <IconTrash /> Clear All
+                        </button>
                     </div>
                     <div>
                         {cartItems.map((item, index) => (
@@ -286,12 +319,15 @@ const Cart = () => {
                                 </div>
                                 <div className="crt-item-price-wrap">
                                     <div className="crt-item-total">₹{item.price * item.quantity}</div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
-                                            <button onClick={() => updateQuantity(item.productId, item.quantity - 1)} style={{ padding: '4px 10px', background: '#f8fafc', color: '#475569', fontWeight: 'bold' }}>-</button>
-                                            <span style={{ padding: '4px 10px', fontSize: '13px', fontWeight: 'bold', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', minWidth: '32px', textAlign: 'center' }}>{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} style={{ padding: '4px 10px', background: '#f8fafc', color: '#475569', fontWeight: 'bold' }}>+</button>
+                                    <div className="crt-item-actions">
+                                        <div className="crt-qty-control">
+                                            <button onClick={() => updateQuantity(item.productId, item.quantity - 1)} className="crt-qty-btn">−</button>
+                                            <span className="crt-qty-val">{item.quantity}</span>
+                                            <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} className="crt-qty-btn">+</button>
                                         </div>
+                                        <button className="crt-remove-btn" onClick={() => removeFromCart(item.productId)}>
+                                            <IconTrash />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -299,23 +335,35 @@ const Cart = () => {
                     </div>
                 </div>
 
-                {/* DELIVERY & PHONE SECTION */}
-                <div className="crt-section">
-                    <div className="crt-section-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg>
-                        Delivery Details
+                {/* ═══ STEP 2: DELIVERY LOCATION ═══ */}
+                <div className={`crt-section ${locationReady ? 'crt-section--success' : 'crt-section--highlight'}`}>
+                    <div className="crt-section-header">
+                        <div className="crt-section-title">
+                            <span className={`crt-step-badge ${locationReady ? 'crt-step-badge--success' : 'crt-step-badge--pending'}`}>2</span>
+                            Delivery Location
+                        </div>
+                        {locationReady && (
+                            <span className="crt-status-badge crt-status-badge--success">✅ Verified</span>
+                        )}
                     </div>
-                    
+
+                    {!locationReady && (
+                        <div className="crt-loc-alert">
+                            <span className="crt-loc-alert-icon">📍</span>
+                            <span>Location is required to place your order</span>
+                        </div>
+                    )}
+
+                    {/* Saved Locations */}
                     {user?.savedLocations && user.savedLocations.length > 0 && (
-                        <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a', marginBottom: '8px' }}>Saved Locations</div>
-                            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+                        <div className="crt-saved-locs">
+                            <div className="crt-saved-locs-label">Saved Locations</div>
+                            <div className="crt-saved-locs-list">
                                 {user.savedLocations.map(loc => (
                                     <button 
                                         key={loc._id}
                                         onClick={() => handleSelectSavedLocation(loc)}
-                                        className={`crt-loc-btn ${selectedSavedLoc === loc._id ? 'crt-loc-btn--success' : ''}`}
-                                        style={{ whiteSpace: 'nowrap', padding: '6px 12px', fontSize: '12px' }}
+                                        className={`crt-saved-loc-chip ${selectedSavedLoc === loc._id ? 'crt-saved-loc-chip--active' : ''}`}
                                     >
                                         📍 {loc.name}
                                     </button>
@@ -324,47 +372,50 @@ const Cart = () => {
                         </div>
                     )}
 
+                    {/* GPS Button */}
                     <div className="crt-loc-box">
                         <div className="crt-loc-text">
-                            <div className="crt-loc-title">Fetch New Location</div>
-                            <div className="crt-loc-sub">Use current GPS to calculate distance</div>
+                            <div className="crt-loc-title">{locationReady ? 'Location Acquired' : 'Use Current GPS'}</div>
+                            <div className="crt-loc-sub">{locationReady ? `${distance} km from shop • ₹${deliveryFee} delivery` : 'Tap to detect your location'}</div>
                         </div>
                         <button 
                             onClick={handleGetLocation} 
                             disabled={locating}
-                            className={`crt-loc-btn ${gpsLocation && !selectedSavedLoc ? 'crt-loc-btn--success' : ''}`}
+                            className={`crt-loc-btn ${locationReady && !selectedSavedLoc ? 'crt-loc-btn--success' : ''}`}
                         >
                             <IconLocation />
-                            {locating ? 'Locating...' : (gpsLocation && !selectedSavedLoc) ? 'GPS Acquired' : 'Get GPS'}
+                            {locating ? 'Locating...' : locationReady && !selectedSavedLoc ? '✅ Done' : '📍 Get GPS'}
                         </button>
                     </div>
 
+                    {/* Save Location Prompt */}
                     {showSavePrompt && gpsLocation && !selectedSavedLoc && user && (
-                        <div style={{ marginTop: '12px', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                            <div style={{ fontSize: '12px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}>Save this location for next time?</div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="crt-save-prompt">
+                            <div className="crt-save-prompt-label">Save this location for next time?</div>
+                            <div className="crt-save-prompt-row">
                                 <input 
                                     type="text" 
                                     value={locationName} 
                                     onChange={(e) => setLocationName(e.target.value)}
                                     placeholder="e.g. Home, Office"
-                                    style={{ flex: 1, padding: '6px 10px', fontSize: '13px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                                    className="crt-save-input"
                                 />
                                 <button 
                                     onClick={handleSaveLocation}
                                     disabled={savingLocation || !locationName.trim()}
-                                    style={{ background: '#f59e0b', color: '#fff', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' }}
+                                    className="crt-save-btn"
                                 >
-                                    {savingLocation ? 'Saving...' : 'Save'}
+                                    {savingLocation ? '...' : 'Save'}
                                 </button>
                             </div>
                         </div>
                     )}
 
+                    {/* Phone Number */}
                     {user && !user.phone && (
-                        <div style={{marginTop: '20px'}}>
+                        <div style={{marginTop: '16px'}}>
                             <div style={{fontSize: '13px', fontWeight: '800', color: '#0f172a'}}>Phone Number</div>
-                            <div style={{fontSize: '11px', color: '#64748b'}}>For delivery updates</div>
+                            <div style={{fontSize: '11px', color: '#64748b', marginBottom: '8px'}}>For delivery updates</div>
                             <div className="crt-phone-input">
                                 <span className="crt-phone-prefix">+91</span>
                                 <input
@@ -381,22 +432,21 @@ const Cart = () => {
                     )}
                 </div>
 
-                {/* INSTRUCTIONS SECTION */}
+                {/* ═══ INSTRUCTIONS ═══ */}
                 <div className="crt-section">
                     <div className="crt-section-title">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         Add Instructions
                     </div>
                     <textarea 
-                        className="v-input" 
-                        style={{ minHeight: '60px', marginTop: '8px', fontSize: '13px', width: '100%', boxSizing: 'border-box' }} 
+                        className="crt-textarea" 
                         placeholder="e.g. Make it spicy, leave at door..." 
                         value={instructions} 
                         onChange={e => setInstructions(e.target.value)}
                     ></textarea>
                 </div>
 
-                {/* BILL RECEIPT SECTION */}
+                {/* ═══ BILL SUMMARY ═══ */}
                 <div className="crt-section" style={{background: 'transparent', boxShadow: 'none', border: 'none', padding: '0'}}>
                     <div className="crt-section-title" style={{marginBottom: '8px', paddingLeft: '4px'}}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -426,32 +476,63 @@ const Cart = () => {
 
             </div>
 
-            {/* ---- FIXED BOTTOM BAR ---- */}
+            {/* ──── STICKY BOTTOM BAR ──── */}
             <div className="crt-bottom-bar">
-                <div className="crt-bottom-price">
-                    <span className="crt-bottom-price-lbl">Total</span>
-                    <span className="crt-bottom-price-val">₹{getTotal() + (deliveryFee || 0)}</span>
+                <div className="crt-bottom-left">
+                    <div className="crt-bottom-price-val">₹{getTotal() + (deliveryFee || 0)}</div>
+                    <div className={`crt-bottom-loc-status ${locationReady ? 'crt-bottom-loc-status--ok' : ''}`}>
+                        {locationReady ? '✅ Location Verified' : '📍 Location Required'}
+                    </div>
                 </div>
-                <button
-                    onClick={handlePlaceOrder}
-                    disabled={loading || deliveryFee === null}
-                    className="crt-action-btn"
-                >
-                    {loading ? (
-                        <>
-                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            Placing...
-                        </>
-                    ) : (
-                        <>
-                            Place Order
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" style={{width: '18px', height: '18px'}}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
-                        </>
+                <div className="crt-bottom-btns">
+                    {!locationReady && (
+                        <button onClick={handleGetLocation} disabled={locating} className="crt-bottom-loc-btn">
+                            📍 {locating ? 'Locating...' : 'Get Location'}
+                        </button>
                     )}
-                </button>
+                    {locationReady && (
+                        <button onClick={handleGetLocation} className="crt-bottom-change-btn">
+                            Change
+                        </button>
+                    )}
+                    <button
+                        onClick={handlePlaceOrder}
+                        disabled={loading || !locationReady}
+                        className={`crt-action-btn ${!locationReady ? 'crt-action-btn--disabled' : ''}`}
+                    >
+                        {loading ? (
+                            <>
+                                <svg className="crt-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Placing...
+                            </>
+                        ) : !locationReady ? (
+                            'Select Location First'
+                        ) : (
+                            <>
+                                Place Order
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" style={{width: '16px', height: '16px'}}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </>
+                        )}
+                    </button>
+                </div>
             </div>
+
+            {/* ──── CLEAR CART CONFIRM DIALOG ──── */}
+            {showClearConfirm && (
+                <div className="crt-overlay" onClick={() => setShowClearConfirm(false)}>
+                    <div className="crt-dialog" onClick={e => e.stopPropagation()}>
+                        <div className="crt-dialog-icon">🗑️</div>
+                        <div className="crt-dialog-title">Remove all items from your cart?</div>
+                        <div className="crt-dialog-sub">This action cannot be undone.</div>
+                        <div className="crt-dialog-btns">
+                            <button className="crt-dialog-cancel" onClick={() => setShowClearConfirm(false)}>Cancel</button>
+                            <button className="crt-dialog-confirm" onClick={handleClearCart}>Clear Cart</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

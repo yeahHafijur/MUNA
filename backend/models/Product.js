@@ -35,6 +35,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    quantity: {
+        type: String,
+        default: ''
+    },
     isHidden: {
         type: Boolean,
         default: false

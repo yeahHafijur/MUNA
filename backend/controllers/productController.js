@@ -90,7 +90,7 @@ const getProductsByShop = async (req, res) => {
 };
 const createProduct = async (req, res) => {
     try {
-        const { name, price, category, categoryId, stock } = req.body;
+        const { name, price, category, categoryId, stock, quantity } = req.body;
         
         let image = req.body.image;
         if (req.files && req.files['image']) {
@@ -143,6 +143,7 @@ const createProduct = async (req, res) => {
             name,
             price,
             category: resolvedCategory,
+            quantity: quantity || '',
             image,
             gallery: galleryUrls,
             stock,
@@ -168,6 +169,9 @@ const updateProduct = async (req, res) => {
         }
         product.name = req.body.name || product.name;
         product.price = req.body.price !== undefined ? req.body.price : product.price;
+        if (req.body.quantity !== undefined) {
+            product.quantity = req.body.quantity;
+        }
         
         // Support both categoryId (ObjectId) and legacy category (string)
         if (req.body.categoryId) {

@@ -47,6 +47,7 @@ const AdminCatalog = () => {
     // Product modal
     const [prodModal, setProdModal] = useState(null); // null | 'add' | product object
     const [prodName, setProdName] = useState('');
+    const [prodQuantity, setProdQuantity] = useState('');
     const [prodPrice, setProdPrice] = useState('');
     const [prodDesc, setProdDesc] = useState('');
     const [prodCatId, setProdCatId] = useState('');
@@ -227,7 +228,7 @@ const AdminCatalog = () => {
 
     const openAddProd = () => {
         if (navigator.vibrate) navigator.vibrate(30);
-        setProdModal('add'); setProdName(''); setProdPrice(''); setProdDesc('');
+        setProdModal('add'); setProdName(''); setProdQuantity(''); setProdPrice(''); setProdDesc('');
         setProdImage(null); setProdImagePreview('');
         setProdGallery([]); setProdGalleryPreviews([]);
         setProdInStock(true); setProdIsHidden(false);
@@ -236,7 +237,7 @@ const AdminCatalog = () => {
 
     const openEditProd = (p) => {
         if (navigator.vibrate) navigator.vibrate(30);
-        setProdModal(p); setProdName(p.name); setProdPrice(p.price);
+        setProdModal(p); setProdName(p.name); setProdQuantity(p.quantity || ''); setProdPrice(p.price);
         setProdDesc(p.description || '');
         setProdCatId(getProductCatId(p));
         setProdImage(null); setProdImagePreview('');
@@ -282,6 +283,7 @@ const AdminCatalog = () => {
         const isEdit = prodModal && prodModal._id;
         const fd = new FormData();
         fd.append('name', prodName);
+        fd.append('quantity', prodQuantity);
         fd.append('price', Number(prodPrice));
         fd.append('categoryId', prodCatId);
         fd.append('description', prodDesc);
@@ -497,7 +499,9 @@ const AdminCatalog = () => {
                                                 {!p.inStock && <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center"><span className="bg-slate-900 text-white text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest shadow-lg">Out of Stock</span></div>}
                                             </div>
                                             <div className="p-3.5 flex flex-col flex-1 border-t border-slate-50">
-                                                <h4 className="text-[13px] font-black text-slate-900 line-clamp-2 leading-snug mb-1">{p.name}</h4>
+                                                <h4 className="text-[13px] font-black text-slate-900 line-clamp-2 leading-snug mb-1">
+                                                    {p.name} {p.quantity && <span className="text-slate-500 font-bold">({p.quantity})</span>}
+                                                </h4>
                                                 <p className="text-[10px] font-bold text-slate-400 mb-2">{getCatName(getProductCatId(p))}</p>
                                                 <div className="mt-auto">
                                                     <div className="flex items-center justify-between mb-2">
@@ -597,9 +601,13 @@ const AdminCatalog = () => {
                         <div className="px-6 pb-6 space-y-5 overflow-y-auto [scrollbar-width:none]">
 
                             <div className="relative">
-                                <input type="text" className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" required placeholder="e.g. Rice (1 Kg)" value={prodName} onChange={e => setProdName(e.target.value)} />
-                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Item Name with Qty</label>
-                                <p className="text-[10px] font-semibold text-slate-400 mt-1.5 px-1">Include quantity in name, e.g. Sugar (500 g), Milk (1 L)</p>
+                                <input type="text" className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" required placeholder="Item Name" value={prodName} onChange={e => setProdName(e.target.value)} />
+                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Item Name</label>
+                            </div>
+
+                            <div className="relative">
+                                <input type="text" className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Quantity (e.g. 1 Kg)" value={prodQuantity} onChange={e => setProdQuantity(e.target.value)} />
+                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Quantity/Unit (Optional)</label>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">

@@ -73,7 +73,7 @@ const getShopProducts = async (req, res) => {
 const createProduct = async (req, res) => {
     try {
         const { shopId } = req.params;
-        const { name, price, categoryId, description } = req.body;
+        const { name, price, categoryId, description, quantity } = req.body;
 
         const shop = await Shop.findById(shopId).lean();
         if (!shop) return res.status(404).json({ message: "Shop not found" });
@@ -103,6 +103,7 @@ const createProduct = async (req, res) => {
             price: Number(price),
             category: categoryId,
             description: description || '',
+            quantity: quantity || '',
             image,
             gallery: galleryUrls,
             shopId: shop._id
@@ -135,6 +136,10 @@ const updateProduct = async (req, res) => {
         if (req.body.description !== undefined) {
             changedFields.push('description');
             product.description = req.body.description;
+        }
+        if (req.body.quantity !== undefined) {
+            changedFields.push('quantity');
+            product.quantity = req.body.quantity;
         }
         if (req.body.categoryId) {
             changedFields.push('category');

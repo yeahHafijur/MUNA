@@ -13,7 +13,7 @@ const AdminApprovals = () => {
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        if (!token || user?.role !== 'super_admin') navigate('/');
+        if (user?.role !== 'super_admin') navigate('/');
     }, [token, user, navigate]);
 
     const { data: allGodownItems = [], isLoading } = useQuery({

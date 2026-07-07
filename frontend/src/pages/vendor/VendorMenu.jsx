@@ -21,7 +21,7 @@ const VendorMenu = () => {
             const data = await res.json();
             return data._id ? data : null;
         },
-        enabled: !!token && user?.role === 'vendor'
+        enabled:  user?.role === 'vendor'
     });
 
     const [categories, setCategories] = useState([]);
@@ -30,7 +30,7 @@ const VendorMenu = () => {
     const [search, setSearch] = useState('');
 
     useEffect(() => {
-        if (!token || user?.role !== 'vendor') navigate('/');
+        if (user?.role !== 'vendor') navigate('/');
     }, [token, user, navigate]);
 
     // Category modals

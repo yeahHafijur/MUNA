@@ -41,7 +41,7 @@ const ChatScreen = () => {
         },
         initialPageParam: 1,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        enabled: !!token && !!sessionId,
+        enabled:  !!sessionId,
     });
 
     // Flatten pages: page 1 is latest (but reversed), page 2 is older. 

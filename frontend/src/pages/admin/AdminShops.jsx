@@ -26,7 +26,7 @@ const AdminShops = () => {
     const [savingCat, setSavingCat] = useState(false);
 
     useEffect(() => {
-        if (!token || user?.role !== 'super_admin') navigate('/');
+        if (user?.role !== 'super_admin') navigate('/');
     }, [token, user, navigate]);
 
     const { data: shops = [], isLoading } = useQuery({
@@ -36,7 +36,7 @@ const AdminShops = () => {
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         },
-        enabled: !!token && user?.role === 'super_admin'
+        enabled:  user?.role === 'super_admin'
     });
 
     const { data: shopCategories = [], refetch: refetchCategories } = useQuery({

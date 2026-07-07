@@ -59,11 +59,11 @@ const VendorHub = () => {
             const data = await res.json();
             return data._id ? data : null;
         },
-        enabled: !!token && user?.role === 'vendor'
+        enabled:  user?.role === 'vendor'
     });
 
     useEffect(() => {
-        if (!token || user?.role !== 'vendor') navigate('/');
+        if (user?.role !== 'vendor') navigate('/');
     }, [token, user, navigate]);
 
     const handleOpenDeliveryModal = () => {
@@ -91,7 +91,7 @@ const VendorHub = () => {
             };
             const res = await fetch(`/api/shops/${shop._id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json',  },
                 body: JSON.stringify(body)
             });
             if (res.ok) {
@@ -152,7 +152,7 @@ const VendorHub = () => {
 
             return { liveOrders: liveOrders.length, todayRevenue, totalProducts: productCount };
         },
-        enabled: !!token && !!shop,
+        enabled:  !!shop,
         refetchInterval: 15000 // Refresh stats every 15 seconds
     });
 
@@ -161,7 +161,7 @@ const VendorHub = () => {
         if (navigator.vibrate) navigator.vibrate(50);
         const res = await fetch(`/api/shops/${shop._id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json',  },
             body: JSON.stringify({ isOpen: !shop.isOpen }),
         });
         if (res.ok) {

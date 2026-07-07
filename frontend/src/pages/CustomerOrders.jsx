@@ -64,7 +64,7 @@ const CustomerOrders = () => {
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         },
-        enabled: !!token
+        enabled: true
     });
 
     const filteredOrders = selectedDate 

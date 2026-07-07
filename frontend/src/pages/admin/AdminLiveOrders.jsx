@@ -14,7 +14,7 @@ const AdminLiveOrders = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
-        if (!token || user?.role !== 'super_admin') {
+        if (user?.role !== 'super_admin') {
             navigate('/');
         }
     }, [token, user, navigate]);
@@ -29,7 +29,7 @@ const AdminLiveOrders = () => {
             if (!res.ok) throw new Error('Failed to fetch orders');
             return res.json();
         },
-        enabled: !!token && user?.role === 'super_admin',
+        enabled:  user?.role === 'super_admin',
         refetchInterval: 10000 // Auto refresh every 10 seconds
     });
 

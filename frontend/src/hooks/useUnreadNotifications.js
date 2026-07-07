@@ -14,7 +14,7 @@ export const useUnreadNotifications = () => {
             const data = await res.json();
             return data.count || 0;
         },
-        enabled: !!token && !!user,
+        enabled:  !!user,
         refetchInterval: 30000, // Fallback background fetch
     });
 };

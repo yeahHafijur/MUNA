@@ -113,7 +113,7 @@ const Profile = () => {
                     <div className="flex items-center gap-4">
                         <div className="relative shrink-0">
                             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center text-amber-950 text-2xl font-black shadow-sm ring-2 ring-amber-100">
-                                {user.name.charAt(0).toUpperCase()}
+                                {(user?.name || 'U').charAt(0).toUpperCase()}
                             </div>
                             <button onClick={() => navigate('/profile/settings')} className="absolute bottom-0 right-0 w-6 h-6 bg-white rounded-full shadow flex items-center justify-center text-slate-600 border border-slate-100 active:scale-90">
                                 <IconEdit />

@@ -54,7 +54,7 @@ const VendorOrders = () => {
             prevLiveRef.current = live.length;
             return all;
         },
-        enabled: !!token,
+        enabled: true,
         refetchInterval: 12000
     });
 
@@ -66,7 +66,7 @@ const VendorOrders = () => {
             const data = await res.json();
             return data.orders || [];
         },
-        enabled: !!token && activeView === 'history'
+        enabled:  activeView === 'history'
     });
 
     const CONFIRM_CONFIG = {
@@ -105,7 +105,7 @@ const VendorOrders = () => {
         try {
             const res = await fetch(`/api/orders/${orderId}/status`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json',  },
                 body: JSON.stringify({ status: newStatus, deliveryOtp: newStatus === 'delivered' ? deliveryOtp : undefined }),
             });
             const data = await res.json();

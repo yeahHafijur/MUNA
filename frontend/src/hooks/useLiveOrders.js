@@ -16,7 +16,7 @@ export const useLiveOrders = () => {
             if (!Array.isArray(orders)) return 0;
             return orders.filter(o => !['delivered', 'cancelled'].includes(o.status)).length;
         },
-        enabled: !!token && user?.role === 'vendor',
+        enabled:  user?.role === 'vendor',
         refetchInterval: 15000, // Fetch every 15s to keep live orders updated
     });
 };

@@ -31,7 +31,7 @@ const GodownBrowser = () => {
             toast.error("Please create a shop first");
             navigate('/');
         },
-        enabled: !!token && !!user
+        enabled:  !!user
     });
 
     // 2. React Query: Fetch Godown Master Items
@@ -52,7 +52,7 @@ const GodownBrowser = () => {
             // Step A: Ensure the category exists in the shop's Category collection
             const catRes = await fetch('/api/categories', { credentials: 'include', 
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json',  },
                 body: JSON.stringify({ name: item.category || 'General' })
             });
 
@@ -71,7 +71,7 @@ const GodownBrowser = () => {
             // Step B: Create the product
             const prodRes = await fetch('/api/products', { credentials: 'include', 
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json',  },
                 body: JSON.stringify({
                     name: item.name,
                     price: 0, // Default to 0, vendor will edit later

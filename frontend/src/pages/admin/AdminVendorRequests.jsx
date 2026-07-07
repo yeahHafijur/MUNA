@@ -17,7 +17,7 @@ const AdminVendorRequests = () => {
     const [updating, setUpdating] = useState(null);
 
     useEffect(() => {
-        if (!token || user?.role !== 'super_admin') {
+        if (user?.role !== 'super_admin') {
             navigate('/');
             return;
         }

@@ -65,7 +65,7 @@ const BottomNav = () => {
         queryFn: () => fetch('/api/notifications/unread-count', { credentials: 'include', 
             
         }).then(r => r.json()),
-        enabled: !!user && !!token,
+        enabled: !!user ,
     });
     const unreadCount = unreadData?.count || 0;
     const { data: unreadChatCount = 0 } = useUnreadChats();

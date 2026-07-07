@@ -68,7 +68,7 @@ const AdminCatalog = () => {
 
     // ── Auth guard ──
     useEffect(() => {
-        if (!token || user?.role !== 'super_admin') navigate('/');
+        if (user?.role !== 'super_admin') navigate('/');
     }, [token, user, navigate]);
 
     // ── Debounce search ──
@@ -93,7 +93,7 @@ const AdminCatalog = () => {
             if (!res.ok) throw new Error('Failed to fetch products');
             return res.json();
         },
-        enabled: !!token && !!shopId && user?.role === 'super_admin',
+        enabled:  !!shopId && user?.role === 'super_admin',
         keepPreviousData: true
     });
 
@@ -112,7 +112,7 @@ const AdminCatalog = () => {
             if (!res.ok) throw new Error('Failed to fetch categories');
             return res.json();
         },
-        enabled: !!token && !!shopId && user?.role === 'super_admin'
+        enabled:  !!shopId && user?.role === 'super_admin'
     });
 
     // ── Fetch audit logs ──
@@ -125,7 +125,7 @@ const AdminCatalog = () => {
             if (!res.ok) throw new Error('Failed to fetch audit logs');
             return res.json();
         },
-        enabled: !!token && !!shopId && showAuditLog && user?.role === 'super_admin'
+        enabled:  !!shopId && showAuditLog && user?.role === 'super_admin'
     });
 
     const auditLogs = auditData?.logs || [];
@@ -214,7 +214,7 @@ const AdminCatalog = () => {
         try {
             await fetch(`/api/admin/catalog/${shopId}/categories/reorder`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json',  },
                 body: JSON.stringify({ orderedIds: newOrder })
             });
             invalidate();

@@ -23,7 +23,7 @@ const Wishlist = () => {
             if (!res.ok) throw new Error('Failed to fetch wishlist');
             return res.json();
         },
-        enabled: !!token
+        enabled: true
     });
 
     if (isLoading) {

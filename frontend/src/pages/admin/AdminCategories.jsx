@@ -28,7 +28,7 @@ const AdminCategories = () => {
     const [savingItemCat, setSavingItemCat] = useState(false);
 
     useEffect(() => {
-        if (!token || user?.role !== 'super_admin') navigate('/');
+        if (user?.role !== 'super_admin') navigate('/');
     }, [token, user, navigate]);
 
     const { data: shopCategories = [] } = useQuery({

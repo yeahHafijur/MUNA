@@ -44,7 +44,7 @@ const AdminHub = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!token || user?.role !== 'super_admin') navigate('/');
+        if (user?.role !== 'super_admin') navigate('/');
     }, [token, user, navigate]);
 
     // Fetch stats
@@ -67,7 +67,7 @@ const AdminHub = () => {
                 pendingApprovals: godownList.filter(i => i.status === 'pending').length
             };
         },
-        enabled: !!token && user?.role === 'super_admin',
+        enabled:  user?.role === 'super_admin',
         refetchInterval: 30000
     });
 

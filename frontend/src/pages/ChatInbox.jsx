@@ -20,7 +20,7 @@ const ChatInbox = () => {
             if (!res.ok) throw new Error('Failed to fetch');
             return res.json();
         },
-        enabled: !!token,
+        enabled: true,
         refetchInterval: 5000
     });
 

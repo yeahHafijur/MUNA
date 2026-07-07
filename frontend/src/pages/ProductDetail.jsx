@@ -213,7 +213,7 @@ const ProductDetail = () => {
                     {typeof product.category === 'object' ? product.category?.name || 'Category' : product.category || 'Category'}
                 </p>
                 <h1 className="text-xl font-bold text-gray-900 leading-snug mb-3 tracking-tight">
-                    {product.name}
+                    {product.name} {product.quantity && <span className="text-gray-500 font-medium text-lg">({product.quantity})</span>}
                 </h1>
 
                 <div className="flex items-center gap-2 mb-2">
@@ -260,7 +260,9 @@ const ProductDetail = () => {
                                         </div>
                                     )}
                                 </div>
-                                <h3 className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug mb-2 flex-1">{p.name}</h3>
+                                <h3 className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug mb-2 flex-1">
+                                    {p.name} {p.quantity && <span className="text-gray-500">({p.quantity})</span>}
+                                </h3>
                                 <div className="flex items-center justify-between mt-auto">
                                     <span className="text-sm font-bold text-gray-900 tracking-tight">₹{p.price}</span>
                                     <button

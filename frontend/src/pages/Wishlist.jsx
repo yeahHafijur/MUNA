@@ -100,7 +100,9 @@ const Wishlist = () => {
                                     )}
                                 </div>
                                 <div className="flex-1 flex flex-col">
-                                    <h3 className="text-sm font-medium text-gray-900 leading-snug line-clamp-2 mb-1">{product.name}</h3>
+                                    <h3 className="text-sm font-medium text-gray-900 leading-snug line-clamp-2 mb-1">
+                                        {product.name} {product.quantity && <span className="text-gray-500">({product.quantity})</span>}
+                                    </h3>
                                     <span className="text-sm font-semibold text-gray-900 mt-auto">₹{product.price}</span>
                                 </div>
                             </div>

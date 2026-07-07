@@ -63,7 +63,7 @@ const ProductCard = ({
 
             {/* ── TITLE ── */}
             <h4 className="text-[13px] font-bold text-slate-900 line-clamp-2 leading-tight mb-1 tracking-tight min-h-[30px]">
-                {product.name}
+                {product.name} {product.quantity && <span className="text-slate-500 text-[12px]">({product.quantity})</span>}
             </h4>
 
             {/* ── SUBTITLE (Weight/Unit) ── */}

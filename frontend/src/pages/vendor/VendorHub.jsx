@@ -177,6 +177,7 @@ const VendorHub = () => {
         </div>
     );
 
+    return (
         <div className="fixed inset-0 z-[100] flex flex-col bg-[#F5F6F8] overflow-hidden font-sans pb-4">
             
             {/* ── HEADER ── */}

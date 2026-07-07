@@ -5,7 +5,20 @@ html, body {
   touch-action: pan-x pan-y;
   /* Prevent font scaling in landscape mode */
   -webkit-text-size-adjust: 100%;
+  
+  /* Disable text selection globally */
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
+
+/* Allow text selection in form inputs and textareas so users can still type/copy/paste */
+input, textarea {
+  -webkit-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {

@@ -177,147 +177,123 @@ const VendorHub = () => {
         </div>
     );
 
-    return (
-        <div className="min-h-screen bg-[#F4F7F9] flex flex-col font-sans pb-10">
+        <div className="fixed inset-0 z-[100] flex flex-col bg-[#F5F6F8] overflow-hidden font-sans pb-4">
             
-            {/* ─── IMMERSIVE HEADER (Native Feel) ─── */}
-            <div className="bg-gradient-to-br from-amber-300 via-amber-400 to-amber-500 pt-6 pb-20 px-4 rounded-b-[40px] shadow-lg relative z-10">
-                <div className="flex items-center justify-between max-w-7xl mx-auto w-full">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/'); }}
-                            className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-amber-950 active:scale-95 transition-transform shrink-0 border border-white/40"
-                        >
-                            <IconBack />
-                        </button>
-                        <div className="w-12 h-12 rounded-full bg-white border-2 border-white/80 flex items-center justify-center text-xl shadow-md overflow-hidden shrink-0">
-                            {shop.image ? <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" /> : '🏪'}
-                        </div>
-                        <div className="flex flex-col text-amber-950">
-                            <span className="text-[17px] font-black tracking-tight leading-none mb-1 drop-shadow-sm">{shop.name}</span>
-                            <span className="text-[11px] font-bold text-amber-900/80 uppercase tracking-widest">Merchant Hub</span>
-                        </div>
-                    </div>
-
+            {/* ── HEADER ── */}
+            <div className="sticky top-0 z-20 bg-white border-b border-slate-100 shadow-sm">
+                <div className="flex items-center justify-between px-4 py-3">
+                    <button onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/'); }} className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform">
+                        <IconBack />
+                    </button>
+                    <span className="text-[17px] font-extrabold text-slate-900 tracking-tight">Merchant Hub</span>
+                    
                     {/* Store Status Toggle */}
                     <button
                         onClick={handleToggleShopStatus}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 border ${shop.isOpen ? 'bg-white text-emerald-700 border-white/60' : 'bg-slate-900/40 backdrop-blur-md text-white border-slate-900/20'}`}
+                        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 border ${shop.isOpen ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}
                     >
-                        <span className={`w-2 h-2 rounded-full ${shop.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`}></span>
+                        <span className={`w-2 h-2 rounded-full ${shop.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
                         {shop.isOpen ? 'Open' : 'Closed'}
                     </button>
                 </div>
             </div>
 
-            <div className="flex-1 px-4 -mt-12 max-w-7xl mx-auto w-full space-y-6 relative z-20">
-
-                {/* ─── FLOATING KEY METRICS ─── */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white p-5 rounded-[28px] border border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center text-center transform transition-transform hover:-translate-y-1">
-                        <span className="text-[32px] leading-none font-black text-slate-800 mb-1.5">{stats.liveOrders}</span>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Orders</span>
+            <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                
+                {/* ── SHOP PROFILE CARD ── */}
+                <div className="bg-white p-5 border-b border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+                    <div className="flex items-center gap-4">
+                        <div className="shrink-0">
+                            <div className="w-16 h-16 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center text-2xl shadow-sm overflow-hidden bg-gradient-to-br from-amber-100 to-amber-200">
+                                {shop.image ? <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" /> : '🏪'}
+                            </div>
+                        </div>
+                        <div className="flex flex-col min-w-0 flex-1">
+                            <h2 className="text-[18px] font-extrabold text-slate-900 truncate tracking-tight">{shop.name}</h2>
+                            <p className="text-[12px] font-medium text-slate-500 truncate mb-1.5">{shop.address || 'Vendor Store'}</p>
+                            <span className="inline-flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded text-[10px] font-black text-amber-700 w-max tracking-wider uppercase border border-amber-100/50">
+                                ⭐ {shop.rating || 'New Shop'}
+                            </span>
+                        </div>
                     </div>
-                    <div className="bg-white p-5 rounded-[28px] border border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center text-center transform transition-transform hover:-translate-y-1">
-                        <span className="text-[32px] leading-none font-black text-emerald-500 mb-1.5">₹{stats.todayRevenue}</span>
-                        <span className="text-[10px] font-black text-emerald-600/60 uppercase tracking-widest">Today's Sales</span>
+                </div>
+
+                {/* ── QUICK METRICS ── */}
+                <div className="grid grid-cols-2 gap-3 p-4">
+                    <div className="bg-white p-3 rounded-[20px] border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col items-center justify-center text-center">
+                        <span className="text-[24px] leading-none font-black text-slate-800 mb-1">{stats.liveOrders}</span>
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active Orders</span>
+                    </div>
+                    <div className="bg-white p-3 rounded-[20px] border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col items-center justify-center text-center">
+                        <span className="text-[24px] leading-none font-black text-emerald-500 mb-1">₹{stats.todayRevenue}</span>
+                        <span className="text-[9px] font-black text-emerald-600/60 uppercase tracking-widest">Today's Sales</span>
                     </div>
                 </div>
 
-                {/* ─── MASTER NAVIGATION LIST ─── */}
-                <div className="bg-white rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/50 overflow-hidden mt-2">
-                    <NavigationRow
-                        icon={<IcoOrders />}
-                        iconBgClass="bg-blue-50 text-blue-600"
-                        title="Manage Orders"
-                        subtitle="Accept, dispatch & verify"
-                        badge={stats.liveOrders}
-                        onClick={() => navigate('/vendor/orders')}
-                    />
-                    <NavigationRow
-                        icon={<IcoMenu />}
-                        iconBgClass="bg-purple-50 text-purple-600"
-                        title="Catalog & Menu"
-                        subtitle={`${stats.totalProducts} Items in your store`}
-                        onClick={() => navigate('/vendor/menu')}
-                    />
-                    <NavigationRow
-                        icon={<IcoGodown />}
-                        iconBgClass="bg-amber-50 text-amber-600"
-                        title="Master Godown"
-                        subtitle="Import bulk items instantly"
-                        onClick={() => navigate('/vendor/godown')}
-                    />
-                    <NavigationRow
-                        icon={<IcoSettings />}
-                        iconBgClass="bg-slate-100 text-slate-700"
-                        title="Delivery Rules"
-                        subtitle={`Max ${shop.deliverySettings?.maxRange || 5}km • Min ₹${shop.deliverySettings?.minOrderAmount || 0}`}
-                        onClick={handleOpenDeliveryModal}
-                    />
-                    <NavigationRow
-                        icon={<IcoBell />}
-                        iconBgClass="bg-rose-50 text-rose-500"
-                        title="Notifications"
-                        subtitle="New order alerts"
-                        onClick={handleEnableNotifications}
-                        isLast={true}
-                    />
-                </div>
+                {/* ── MENUS ── */}
+                <div className="px-4 space-y-3 pb-8">
+                    
+                    <div className="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                        <NavigationRow icon={<IcoOrders />} iconBgClass="bg-blue-50 text-blue-600" title="Manage Orders" subtitle="Accept, dispatch & verify" badge={stats.liveOrders} onClick={() => navigate('/vendor/orders')} />
+                        <NavigationRow icon={<IcoMenu />} iconBgClass="bg-purple-50 text-purple-600" title="Catalog & Menu" subtitle={`${stats.totalProducts} Items in your store`} onClick={() => navigate('/vendor/menu')} />
+                        <NavigationRow icon={<IcoGodown />} iconBgClass="bg-amber-50 text-amber-600" title="Master Godown" subtitle="Import bulk items instantly" onClick={() => navigate('/vendor/godown')} />
+                        <NavigationRow icon={<IcoSettings />} iconBgClass="bg-slate-50 text-slate-700" title="Delivery Rules" subtitle={`Max ${shop.deliverySettings?.maxRange || 5}km • Min ₹${shop.deliverySettings?.minOrderAmount || 0}`} onClick={handleOpenDeliveryModal} />
+                        <NavigationRow icon={<IcoBell />} iconBgClass="bg-rose-50 text-rose-500" title="Notifications" subtitle="New order alerts" onClick={handleEnableNotifications} isLast />
+                    </div>
 
-                {/* ─── ACCOUNT ACTIONS ─── */}
-                <div className="bg-white rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/50 overflow-hidden">
-                    <NavigationRow
-                        icon={<IcoUser />}
-                        iconBgClass="bg-emerald-50 text-emerald-600"
-                        title="My Profile"
-                        subtitle="Customer account settings"
-                        onClick={() => navigate('/profile')}
-                        isLast={true}
-                    />
-                </div>
+                    <div className="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                        <NavigationRow icon={<IcoUser />} iconBgClass="bg-emerald-50 text-emerald-600" title="My Profile" subtitle="Customer account settings" onClick={() => navigate('/profile')} isLast />
+                    </div>
 
-                <button
-                    onClick={() => { toast.info("Logged out successfully"); logout(); navigate('/'); }}
-                    className="w-full py-4 bg-rose-50 text-rose-600 rounded-[24px] text-[14px] font-black uppercase tracking-widest active:scale-95 transition-transform border border-rose-100"
-                >
-                    Sign Out
-                </button>
+                    <div className="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                        <button
+                            onClick={() => { toast.info("Logged out successfully"); logout(); navigate('/'); }}
+                            className="w-full flex items-center justify-between p-3.5 bg-white active:bg-slate-50 transition-colors"
+                        >
+                            <div className="flex items-center gap-3.5">
+                                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 text-rose-500">
+                                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                                </div>
+                                <span className="text-[14px] font-bold tracking-tight text-rose-600">Sign Out</span>
+                            </div>
+                        </button>
+                    </div>
 
-                <div className="text-center pt-2">
-                    <p className="text-xs text-slate-400 font-bold tracking-wide">MUNA Merchant App v2.0</p>
+                    <div className="text-center pt-4">
+                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">MUNA Merchant App v2.0</p>
+                    </div>
                 </div>
             </div>
 
-            {/* ─── FLOATING BOTTOM SHEET: DELIVERY RULES ─── */}
+            {/* ── FLOATING BOTTOM SHEET: DELIVERY RULES ── */}
             {isDeliveryModalOpen && (
                 <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
                     <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-full duration-300 ease-out" onClick={e => e.stopPropagation()}>
                         <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 shrink-0"></div>
                         <div className="flex items-center justify-between mb-8 shrink-0">
-                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Delivery Rules</h3>
+                            <h3 className="text-[18px] font-extrabold text-slate-900 tracking-tight">Delivery Rules</h3>
                             <button onClick={() => setIsDeliveryModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:scale-95 transition-transform">✕</button>
                         </div>
-                        <form onSubmit={handleSave} className="space-y-5">
+                        <form onSubmit={handleSave} className="space-y-4">
                             <div className="relative">
-                                <input type="number" required value={minOrder} onChange={(e) => setMinOrder(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Min Order" />
-                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Minimum Order Amount (₹)</label>
+                                <input type="number" required value={minOrder} onChange={(e) => setMinOrder(e.target.value)} className="peer w-full pt-5 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-[16px] text-[15px] text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Min Order" />
+                                <label className="absolute left-4 top-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-1.5 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-[13px] peer-placeholder-shown:normal-case">Minimum Order (₹)</label>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div className="relative">
-                                    <input type="number" required value={minimumCharge} onChange={(e) => setMinimumCharge(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Base Charge" />
-                                    <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Base Charge (₹)</label>
+                                    <input type="number" required value={minimumCharge} onChange={(e) => setMinimumCharge(e.target.value)} className="peer w-full pt-5 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-[16px] text-[15px] text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Base Charge" />
+                                    <label className="absolute left-4 top-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-1.5 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-[13px] peer-placeholder-shown:normal-case">Base Charge (₹)</label>
                                 </div>
                                 <div className="relative">
-                                    <input type="number" required value={chargePerKm} onChange={(e) => setChargePerKm(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Per KM" />
-                                    <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Charge Per KM (₹)</label>
+                                    <input type="number" required value={chargePerKm} onChange={(e) => setChargePerKm(e.target.value)} className="peer w-full pt-5 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-[16px] text-[15px] text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Per KM" />
+                                    <label className="absolute left-4 top-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-1.5 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-[13px] peer-placeholder-shown:normal-case">Charge/KM (₹)</label>
                                 </div>
                             </div>
                             <div className="relative">
-                                <input type="number" required value={maxDeliveryRange} onChange={(e) => setMaxDeliveryRange(e.target.value)} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Max Range" />
-                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Max Delivery Range (KM)</label>
+                                <input type="number" required value={maxDeliveryRange} onChange={(e) => setMaxDeliveryRange(e.target.value)} className="peer w-full pt-5 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-[16px] text-[15px] text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Max Range" />
+                                <label className="absolute left-4 top-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-1.5 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-[13px] peer-placeholder-shown:normal-case">Max Range (KM)</label>
                             </div>
-                            <button type="submit" disabled={isSaving} className="w-full mt-2 p-4 bg-amber-400 text-slate-900 rounded-2xl font-black text-[15px] active:scale-[0.98] transition-transform shadow-[0_4px_14px_rgba(251,191,36,0.3)] disabled:opacity-70">
+                            <button type="submit" disabled={isSaving} className="w-full mt-2 p-3.5 bg-amber-400 text-slate-900 rounded-[16px] font-black text-[14px] active:scale-[0.98] transition-transform shadow-[0_4px_14px_rgba(251,191,36,0.3)] disabled:opacity-70">
                                 {isSaving ? 'Saving...' : 'Save Rules'}
                             </button>
                         </form>

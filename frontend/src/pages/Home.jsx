@@ -129,38 +129,63 @@ const Home = () => {
             <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-24">
                 <div className="w-full max-w-7xl mx-auto">
                     
-                    <PromoBanners banners={topBanners} />
-                    <DailyMarketBanner navigate={navigate} />
-                    <GlobalSearchBar navigate={navigate} />
+                    {/* ═══ SECTION: BANNER CAROUSEL ═══ */}
+                    <section className="bg-white pb-4">
+                        <PromoBanners banners={topBanners} />
+                        <DailyMarketBanner navigate={navigate} />
+                    </section>
+
+                    {/* ═══ SECTION: SEARCH ═══ */}
+                    <section className="bg-slate-50/80 py-1">
+                        <GlobalSearchBar navigate={navigate} />
+                    </section>
+
+                    {/* ═══ SECTION: BESTSELLERS ═══ */}
+                    <section className="mt-2">
+                        <Bestsellers 
+                            featuredProducts={featuredProducts} 
+                            navigate={navigate} 
+                        />
+                    </section>
                     
-                    <Bestsellers 
-                        featuredProducts={featuredProducts} 
-                        navigate={navigate} 
-                    />
+                    {/* ═══ SECTION: SHOP BY CATEGORY ═══ */}
+                    <section className="mt-2">
+                        <ShopByCategory 
+                            categoryList={categoryList}
+                            activeCategory={activeCategory}
+                            setActiveCategory={setActiveCategory}
+                            setShowAllCategories={setShowAllCategories}
+                        />
+                    </section>
                     
-                    <ShopByCategory 
-                        categoryList={categoryList}
-                        activeCategory={activeCategory}
-                        setActiveCategory={setActiveCategory}
-                        setShowAllCategories={setShowAllCategories}
-                    />
+                    {/* ═══ SECTION: QUICK DELIVERY ═══ */}
+                    <section className="mt-2 bg-white border-y border-slate-100/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+                        <QuickDeliveryStores shops={sortedShops} />
+                    </section>
                     
-                    <QuickDeliveryStores shops={sortedShops} />
+                    {/* ═══ SECTION: MID BANNER ═══ */}
+                    <section className="mt-2">
+                        <MidPageBanner banners={midBanners} navigate={navigate} />
+                    </section>
                     
-                    <MidPageBanner banners={midBanners} navigate={navigate} />
+                    {/* ═══ SECTION: ALL STORES ═══ */}
+                    <section className="mt-4 bg-white border-t border-slate-100 pt-4">
+                        <StoreListing 
+                            sortedShops={sortedShops}
+                            loading={loading}
+                            activeCategory={activeCategory}
+                            setActiveCategory={setActiveCategory}
+                            limit={5}
+                            showViewAll={true}
+                        />
+                    </section>
                     
-                    <StoreListing 
-                        sortedShops={sortedShops}
-                        loading={loading}
-                        activeCategory={activeCategory}
-                        setActiveCategory={setActiveCategory}
-                        limit={5}
-                        showViewAll={true}
-                    />
-                    
-                    <BecomeSellerCTA navigate={navigate} />
-                    <HowItWorks />
-                    <HomeFooter navigate={navigate} />
+                    {/* ═══ SECTION: CTA & FOOTER ═══ */}
+                    <section className="mt-6 bg-slate-50 border-t border-slate-100">
+                        <BecomeSellerCTA navigate={navigate} />
+                        <HowItWorks />
+                        <HomeFooter navigate={navigate} />
+                    </section>
 
                 </div>
             </div>

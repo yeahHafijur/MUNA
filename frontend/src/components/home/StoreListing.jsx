@@ -7,17 +7,18 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory,
     const displayShops = limit ? sortedShops.slice(0, limit) : sortedShops;
 
     return (
-        <div id="store-listing" className="px-4 py-5 md:mx-4">
+        <div id="store-listing" className="px-4 pt-2 pb-6 md:mx-4">
+            {/* ── Section Header ── */}
             <div className="flex items-center justify-between mb-5 px-1">
                 <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-5 bg-amber-400 rounded-full"></div>
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-1.5 h-6 bg-amber-400 rounded-full"></div>
                         <h3 className="text-[18px] font-black text-slate-900 tracking-tight leading-none">
-                            {activeCategory !== 'All' ? `${activeCategory} Stores` : 'Explore Stores Around You'}
+                            {activeCategory !== 'All' ? `${activeCategory} Stores` : 'Nearby Shops'}
                         </h3>
                     </div>
-                    <p className="text-[11px] font-bold text-slate-500 mt-1.5 pl-3.5">
-                        {sortedShops.length} {sortedShops.length === 1 ? 'store' : 'stores'} available for you
+                    <p className="text-[11px] font-bold text-slate-400 mt-1.5 pl-4">
+                        {sortedShops.length} {sortedShops.length === 1 ? 'store' : 'stores'} available near you
                     </p>
                 </div>
                 {activeCategory !== 'All' && (
@@ -25,21 +26,21 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory,
                 )}
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3.5">
                 {loading ? (
                     /* Skeleton loaders */
                     [1, 2, 3, 4].map(i => (
-                        <div key={i} className="flex gap-3 rounded-2xl overflow-hidden animate-pulse bg-white p-3 shadow-sm">
-                            <div className="w-[100px] h-[100px] rounded-xl bg-slate-100 shrink-0" />
-                            <div className="flex-1 py-1 space-y-2.5">
+                        <div key={i} className="rounded-[22px] overflow-hidden animate-pulse bg-white border border-slate-100 shadow-sm">
+                            <div className="w-full h-36 bg-slate-100" />
+                            <div className="p-4 space-y-2.5">
                                 <div className="h-4 bg-slate-100 w-3/4 rounded-full" />
-                                <div className="h-3 bg-slate-100 w-1/2 rounded-full" />
-                                <div className="h-3 bg-slate-100 w-1/3 rounded-full" />
+                                <div className="h-3 bg-slate-50 w-1/2 rounded-full" />
+                                <div className="h-3 bg-slate-50 w-1/3 rounded-full" />
                             </div>
                         </div>
                     ))
                 ) : sortedShops.length === 0 ? (
-                    <div className="text-center py-14 bg-gradient-to-b from-slate-50 to-white rounded-[24px] border border-slate-100 border-dashed mx-1">
+                    <div className="text-center py-16 bg-white rounded-[24px] border border-slate-100 border-dashed mx-1 shadow-sm">
                         <span className="text-5xl block mb-3 animate-bounce">🔍</span>
                         <p className="text-[14px] font-black text-slate-400">No stores found</p>
                         <p className="text-[11px] font-semibold text-slate-300 mt-1">Try a different category</p>
@@ -55,7 +56,7 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory,
                             <Link
                                 to={`/shop/${shop._id}`}
                                 key={shop._id}
-                                className={`group flex flex-col rounded-[20px] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all duration-200 overflow-hidden ${!shop.isOpen ? 'opacity-60' : ''}`}
+                                className={`group flex flex-col rounded-[22px] bg-white border border-slate-100/80 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] active:scale-[0.985] transition-all duration-200 overflow-hidden ${!shop.isOpen ? 'opacity-60' : ''}`}
                             >
                                 {/* Shop Image - Full Width */}
                                 <div className="w-full aspect-[21/9] sm:aspect-[3/1] relative overflow-hidden bg-slate-100">
@@ -81,7 +82,7 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory,
                                 </div>
 
                                 {/* Shop Info - Below Image */}
-                                <div className="p-3.5 relative">
+                                <div className="p-4 relative">
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-[16px] font-extrabold text-slate-900 leading-tight line-clamp-1">{shop.name}</h4>
@@ -119,10 +120,10 @@ const StoreListing = ({ sortedShops, loading, activeCategory, setActiveCategory,
 
             {/* View All Button */}
             {showViewAll && sortedShops.length > limit && (
-                <div className="mt-5 text-center">
+                <div className="mt-6 text-center">
                     <Link 
                         to="/all-stores" 
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-50 text-amber-700 font-bold text-[13px] rounded-xl border border-amber-100 active:scale-95 transition-transform"
+                        className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-slate-900 text-white font-black text-[13px] rounded-2xl active:scale-95 transition-transform shadow-[0_4px_16px_rgba(0,0,0,0.15)]"
                     >
                         View all {sortedShops.length} stores
                         <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">

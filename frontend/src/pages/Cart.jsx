@@ -131,7 +131,7 @@ const Cart = () => {
             if (isPhoneMissing) login({ ...user, phone: customerPhone }, token);
             clearCart();
             toast.success("🎉 Order placed! Track it in My Orders.");
-            navigate('/orders');
+            navigate('/profile/orders');
         } catch (e) { toast.error(e.message); }
         finally { setLoading(false); }
     };

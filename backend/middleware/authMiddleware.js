@@ -3,13 +3,15 @@ const User = require("../models/User");
 
 // 1. Protect Logic: Token verify karna
 const protect = async (req, res, next) => {
-    let token;
+    let token = req.cookies?.token;
 
-    // Check kar rahe hain ki header me token bheja gaya hai ya nahi
-    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    // Fallback for mobile app or postman if needed
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        token = req.headers.authorization.split(" ")[1];
+    }
+
+    if (token) {
         try {
-            // "Bearer token123" me se sirf "token123" ko nikal rahe hain
-            token = req.headers.authorization.split(" ")[1];
 
             // JWT Secret se token ko verify karte hain
             const decoded = jwt.verify(token, process.env.JWT_SECRET);

@@ -14,8 +14,8 @@ const ChatInbox = () => {
     const { data: sessions = [], isLoading } = useQuery({
         queryKey: ['chatSessions'],
         queryFn: async () => {
-            const res = await fetch('/api/chat/sessions', {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const res = await fetch('/api/chat/sessions', { credentials: 'include', 
+                
             });
             if (!res.ok) throw new Error('Failed to fetch');
             return res.json();

@@ -24,7 +24,7 @@ const AdminLiveOrders = () => {
         queryKey: ['admin-live-orders', selectedDate],
         queryFn: async () => {
             const res = await fetch(`/api/orders/admin/all?date=${selectedDate}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                
             });
             if (!res.ok) throw new Error('Failed to fetch orders');
             return res.json();

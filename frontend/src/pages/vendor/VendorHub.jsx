@@ -55,7 +55,7 @@ const VendorHub = () => {
     const { data: shop } = useQuery({
         queryKey: ['my-shop'],
         queryFn: async () => {
-            const res = await fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await fetch('/api/shops/my-shop', { credentials: 'include',   });
             const data = await res.json();
             return data._id ? data : null;
         },
@@ -114,7 +114,7 @@ const VendorHub = () => {
         try {
             const fcmToken = await requestFirebaseNotificationPermission();
             if (fcmToken) {
-                await fetch('/api/auth/fcm-token', {
+                await fetch('/api/auth/fcm-token', { credentials: 'include', 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ fcmToken })
@@ -132,7 +132,7 @@ const VendorHub = () => {
     const { data: stats = { liveOrders: 0, todayRevenue: 0, totalProducts: 0 } } = useQuery({
         queryKey: ['vendor-hub-stats'],
         queryFn: async () => {
-            const res = await fetch('/api/orders/vendor?limit=100', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await fetch('/api/orders/vendor?limit=100', { credentials: 'include',   });
             const data = await res.json();
             const orders = data.orders || [];
 
@@ -145,7 +145,7 @@ const VendorHub = () => {
             // Fetch products count separately
             let productCount = 0;
             if (shop?._id) {
-                const prodRes = await fetch(`/api/products/${shop._id}`);
+                const prodRes = await fetch(`/api/products/${shop._id}`, { credentials: 'include' });
                 const prodData = await prodRes.json();
                 productCount = Array.isArray(prodData) ? prodData.length : 0;
             }

@@ -30,7 +30,7 @@ const AdminSettings = () => {
     const { data: settings } = useQuery({
         queryKey: ['admin-settings'],
         queryFn: async () => {
-            const res = await fetch('/api/settings/navbar-message');
+            const res = await fetch('/api/settings/navbar-message', { credentials: 'include' });
             const data = await res.json();
             return res.ok ? data : { line1: '', line2: '' };
         }
@@ -39,14 +39,14 @@ const AdminSettings = () => {
     // Fetch all godown items (with images)
     const { data: allGodownItems = [] } = useQuery({
         queryKey: ['godown-all-items'],
-        queryFn: () => fetch('/api/master-products').then(r => r.json()),
+        queryFn: () => fetch('/api/master-products', { credentials: 'include' }).then(r => r.json()),
         select: (data) => (Array.isArray(data) ? data : []).filter(item => item.image),
     });
 
     // Fetch currently featured item IDs
     const { data: featuredItems = [] } = useQuery({
         queryKey: ['featured-items-admin'],
-        queryFn: () => fetch('/api/settings/featured-items').then(r => r.json()),
+        queryFn: () => fetch('/api/settings/featured-items', { credentials: 'include' }).then(r => r.json()),
     });
 
     useEffect(() => {
@@ -66,7 +66,7 @@ const AdminSettings = () => {
         setSavingSettings(true);
         const loadingToast = toast.loading("Saving settings...");
         try {
-            const res = await fetch('/api/settings/navbar-message', {
+            const res = await fetch('/api/settings/navbar-message', { credentials: 'include', 
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(navbarMsg)
@@ -88,7 +88,7 @@ const AdminSettings = () => {
         setSavingFeatured(true);
         const loadingToast = toast.loading("Saving featured items...");
         try {
-            const res = await fetch('/api/settings/featured-items', {
+            const res = await fetch('/api/settings/featured-items', { credentials: 'include', 
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ itemIds: selectedItemIds })

@@ -88,61 +88,47 @@ const sendAndSaveNotification = async (userIds, heading, message, actionUrl = ""
 
 // 1. Place Order (Customer karega)
 const placeOrder = async (req, res) => {
+    let session;
     try {
         const { shopId, items, totalAmount, deliveryLocation, customerPhone, instructions } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({ message: "Your cart is empty!" });
         }
-
-        // --- ZOMATO/SWIGGY LOGIC (Single Shop & In-Stock Check) ---
-        const productIds = items.map(i => i.productId);
-        const dbProducts = await Product.find({ _id: { $in: productIds } }).lean();
-        const productMap = new Map(dbProducts.map(p => [p._id.toString(), p]));
-
-        for (const item of items) {
-            const product = productMap.get(item.productId.toString());
-
-            if (!product) {
-                return res.status(404).json({ message: `Product ${item.name} not found.` });
-            }
-
-            // Rule 1: Kya ye product usi dukan ka hai jis dukan se order ho raha hai?
-            if (product.shopId.toString() !== shopId.toString()) {
-                return res.status(400).json({
-                    message: "You cannot order items from different shops at the same time!"
-                });
-            }
-
-            // Rule 2: Kya ye product In Stock hai? 
-            if (product.inStock === false) {
-                return res.status(400).json({
-                    message: `Sorry, ${product.name} is currently out of stock.`
-                });
-            }
+        
+        if (!mongoose.Types.ObjectId.isValid(shopId)) {
+            return res.status(400).json({ message: "Invalid Shop ID" });
         }
-
-        // Rule 3: Kya customer dukan ke 4 KM ke daayre me hai?
-        const shop = await Shop.findById(shopId);
-        if (!shop) {
-            return res.status(404).json({ message: "Shop not found!" });
-        }
-
-        // Rule 4: Shop open hai ya closed?
-        if (!shop.isOpen) {
-            return res.status(400).json({
-                message: "This shop is currently closed. You cannot place an order right now."
-            });
-        }
-
-        // Agar dukan ke paas location nahi hai, toh default Delhi ki location maan lo (testing ke liye)
-        const shopLat = shop.location?.coordinates?.[1] || 28.6139;
-        const shopLng = shop.location?.coordinates?.[0] || 77.2090;
 
         const custLat = deliveryLocation.lat;
         const custLng = deliveryLocation.lng;
 
-        const distance = getDistanceFromLatLonInKm(shopLat, shopLng, custLat, custLng);
+        // Rule 3: Distance calculation using MongoDB $geoNear
+        const shopResults = await Shop.aggregate([
+            {
+                $geoNear: {
+                    near: { type: "Point", coordinates: [custLng, custLat] },
+                    distanceField: "calculatedDistance",
+                    distanceMultiplier: 0.001, // convert meters to km
+                    query: { _id: new mongoose.Types.ObjectId(shopId) },
+                    spherical: true
+                }
+            }
+        ]);
+
+        if (!shopResults || shopResults.length === 0) {
+            // Fallback: If no coordinates or index fails, just find the shop normally
+            const fallbackShop = await Shop.findById(shopId);
+            if (!fallbackShop) return res.status(404).json({ message: "Shop not found!" });
+            shopResults.push({ ...fallbackShop.toObject(), calculatedDistance: 0 });
+        }
+
+        const shop = shopResults[0];
+        const distance = shop.calculatedDistance || 0;
+
+        if (!shop.isOpen) {
+            return res.status(400).json({ message: "This shop is currently closed. You cannot place an order right now." });
+        }
 
         const maxRange = shop.deliverySettings?.maxRange || 5;
         if (distance > maxRange) {
@@ -151,7 +137,6 @@ const placeOrder = async (req, res) => {
             });
         }
 
-        // Recalculate delivery fee securely on backend
         const settings = shop.deliverySettings || { minOrderAmount: 0, minimumCharge: 10, minimumDistance: 1, chargePerKm: 5 };
         let fee = settings.minimumCharge;
         if (distance > settings.minimumDistance) {
@@ -159,35 +144,55 @@ const placeOrder = async (req, res) => {
             fee += (extraKm * settings.chargePerKm);
         }
 
-        // Securely calculate items total using DATABASE prices (not frontend prices)
+        session = await mongoose.startSession();
+        session.startTransaction();
+
+        const productIds = items.map(i => i.productId);
+        const dbProducts = await Product.find({ _id: { $in: productIds } }).session(session).lean();
+        const productMap = new Map(dbProducts.map(p => [p._id.toString(), p]));
+
         let itemsTotal = 0;
         const verifiedItems = [];
+
         for (const item of items) {
-            const dbProduct = productMap.get(item.productId.toString());
-            itemsTotal += (dbProduct.price * item.quantity);
+            const product = productMap.get(item.productId.toString());
+            if (!product) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(404).json({ message: `Product ${item.name} not found.` });
+            }
+            if (product.shopId.toString() !== shopId.toString()) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: "You cannot order items from different shops at the same time!" });
+            }
+            if (product.inStock === false) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: `Sorry, ${product.name} is currently out of stock.` });
+            }
+
+            itemsTotal += (product.price * item.quantity);
             verifiedItems.push({
                 productId: item.productId,
-                name: dbProduct.name,
-                price: dbProduct.price,
+                name: product.name,
+                price: product.price,
                 quantity: item.quantity
             });
         }
 
-        // Rule 5: Minimum Order Amount Check
         if (settings.minOrderAmount > 0 && itemsTotal < settings.minOrderAmount) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({
                 message: `Minimum order amount (excluding delivery) for this shop is ₹${settings.minOrderAmount}. Your current item total is ₹${itemsTotal}. Please add more items.`
             });
         }
 
-        // Final total amount
         const finalTotalAmount = itemsTotal + fee;
-
-        // 🚀 NEW LOGIC: GENERATE 4-DIGIT DELIVERY OTP
         const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
-        // Sab theek hai, toh ab Order banate hain!
-        const order = await Order.create({
+        const orderResult = await Order.create([{
             customerId: req.user._id,
             shopId,
             items: verifiedItems,
@@ -196,9 +201,13 @@ const placeOrder = async (req, res) => {
             deliveryLocation,
             instructions: instructions || '',
             deliveryOtp: generatedOtp
-        });
+        }], { session });
 
-        // 🔔 PUSH NOTIFICATION ALERT TO VENDOR
+        await session.commitTransaction();
+        session.endSession();
+
+        const order = orderResult[0];
+
         try {
             const vendor = await User.findById(shop.vendorId);
             if (vendor) {
@@ -213,18 +222,20 @@ const placeOrder = async (req, res) => {
             console.error("Error sending push notification to vendor:", pushErr);
         }
 
-        // Update user's phone number if provided (saves for future)
         if (customerPhone) {
-            const customer = await User.findById(req.user._id);
-            if (customer && !customer.phone) {
-                customer.phone = customerPhone;
-                await customer.save();
-            }
+            await User.updateOne(
+                { _id: req.user._id, phone: { $exists: false } },
+                { $set: { phone: customerPhone } }
+            );
         }
 
         res.status(201).json(order);
 
     } catch (error) {
+        if (session) {
+            await session.abortTransaction();
+            session.endSession();
+        }
         console.error("placeOrder error:", error);
         res.status(500).json({ message: "Something went wrong. Please try again." });
     }

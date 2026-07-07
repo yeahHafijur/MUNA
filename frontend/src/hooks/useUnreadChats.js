@@ -7,8 +7,8 @@ export const useUnreadChats = () => {
     return useQuery({
         queryKey: ['unreadChatCount'],
         queryFn: async () => {
-            const res = await fetch('/api/chat/unread-count', {
-                headers: { Authorization: `Bearer ${token}` }
+            const res = await fetch('/api/chat/unread-count', { credentials: 'include', 
+                
             });
             if (!res.ok) throw new Error('Failed to fetch chat unread count');
             const data = await res.json();

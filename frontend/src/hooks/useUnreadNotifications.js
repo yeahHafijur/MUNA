@@ -7,8 +7,8 @@ export const useUnreadNotifications = () => {
     return useQuery({
         queryKey: ['unreadCount'],
         queryFn: async () => {
-            const res = await fetch('/api/notifications/unread-count', {
-                headers: { Authorization: `Bearer ${token}` }
+            const res = await fetch('/api/notifications/unread-count', { credentials: 'include', 
+                
             });
             if (!res.ok) throw new Error('Failed to fetch unread count');
             const data = await res.json();

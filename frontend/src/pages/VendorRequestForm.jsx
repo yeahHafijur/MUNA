@@ -42,7 +42,7 @@ const VendorRequestForm = () => {
         setLoading(true);
 
         try {
-            const res = await fetch('/api/vendor-requests', {
+            const res = await fetch('/api/vendor-requests', { credentials: 'include', 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

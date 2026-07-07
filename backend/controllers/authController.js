@@ -64,6 +64,13 @@ const googleLogin = async (req, res) => {
 
         const token = generateToken(user._id, user.role);
 
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict', // Use strict to prevent CSRF
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
         res.status(200).json({
             message: "Login successful!",
             _id: user._id,
@@ -276,8 +283,24 @@ const getWishlist = async (req, res) => {
     }
 };
 
+const logout = async (req, res) => {
+    try {
+        res.cookie('token', '', {
+            httpOnly: true,
+            expires: new Date(0),
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });
+        res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error) {
+        console.error("Logout Error:", error);
+        res.status(500).json({ message: 'Server error during logout' });
+    }
+};
+
 module.exports = {
     googleLogin,
+    logout,
     saveLocation,
     deleteLocation,
     saveFcmToken,

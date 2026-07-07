@@ -48,19 +48,19 @@ const ShopDetail = () => {
     /* ── Fetch data with React Query ── */
     const { data: shop, isLoading: shopLoading } = useQuery({
         queryKey: ['shop', id],
-        queryFn: () => fetch(`/api/shops/${id}`).then(r => r.json()),
+        queryFn: () => fetch(`/api/shops/${id}`, { credentials: 'include' }).then(r => r.json()),
     });
 
     const { data: productsData = [], isLoading: productsLoading } = useQuery({
         queryKey: ['products', id],
-        queryFn: () => fetch(`/api/products/${id}`).then(r => r.json()),
+        queryFn: () => fetch(`/api/products/${id}`, { credentials: 'include' }).then(r => r.json()),
     });
     // Ensure products is an array
     const products = Array.isArray(productsData) ? productsData : [];
 
     const { data: categoriesData = [], isLoading: categoriesLoading } = useQuery({
         queryKey: ['categories', id],
-        queryFn: () => fetch(`/api/categories/${id}`).then(r => r.json()),
+        queryFn: () => fetch(`/api/categories/${id}`, { credentials: 'include' }).then(r => r.json()),
     });
     // Ensure categoriesList is an array
     const categoriesList = Array.isArray(categoriesData) ? categoriesData : [];

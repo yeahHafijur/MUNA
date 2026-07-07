@@ -44,7 +44,7 @@ const VendorOrders = () => {
     const { data: orders = [] } = useQuery({
         queryKey: ['vendor-live-orders'],
         queryFn: async () => {
-            const res = await fetch('/api/orders/vendor?limit=100', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await fetch('/api/orders/vendor?limit=100', { credentials: 'include',   });
             if (!res.ok) return [];
             const data = await res.json();
             const all = data.orders || data || [];
@@ -61,7 +61,7 @@ const VendorOrders = () => {
     const { data: historyOrders = [], isLoading: isHistoryLoading } = useQuery({
         queryKey: ['vendor-history-orders', selectedDate],
         queryFn: async () => {
-            const res = await fetch(`/api/orders/vendor?date=${selectedDate}&limit=200`, { headers: { Authorization: `Bearer ${token}` } });
+            const res = await fetch(`/api/orders/vendor?date=${selectedDate}&limit=200`, {  });
             if (!res.ok) return [];
             const data = await res.json();
             return data.orders || [];

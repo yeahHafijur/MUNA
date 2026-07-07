@@ -34,7 +34,7 @@ const Home = () => {
     /* ── Fetch Data ── */
     const { data: shops = [], isLoading: loading } = useQuery({
         queryKey: ['shops'],
-        queryFn: () => fetch('/api/shops').then(r => r.json()),
+        queryFn: () => fetch('/api/shops', { credentials: 'include' }).then(r => r.json()),
     });
 
     const { data: featuredProducts = [] } = useQuery({
@@ -50,12 +50,12 @@ const Home = () => {
 
     const { data: dbCategories = [] } = useQuery({
         queryKey: ['shop-categories'],
-        queryFn: () => fetch('/api/shop-categories').then(r => r.json()),
+        queryFn: () => fetch('/api/shop-categories', { credentials: 'include' }).then(r => r.json()),
     });
 
     const { data: banners = [] } = useQuery({
         queryKey: ['banners'],
-        queryFn: () => fetch('/api/banners').then(r => r.json()),
+        queryFn: () => fetch('/api/banners', { credentials: 'include' }).then(r => r.json()),
     });
 
     const topBanners = useMemo(() => banners.filter(b => b.position === 'top'), [banners]);

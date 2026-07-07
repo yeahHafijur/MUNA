@@ -32,7 +32,7 @@ const AdminShops = () => {
     const { data: shops = [], isLoading } = useQuery({
         queryKey: ['admin-shops'],
         queryFn: async () => {
-            const res = await fetch('/api/shops/admin/all', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await fetch('/api/shops/admin/all', { credentials: 'include',   });
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         },
@@ -43,7 +43,7 @@ const AdminShops = () => {
         queryKey: ['admin-shop-categories', editingShop?._id],
         queryFn: async () => {
             if (!editingShop) return [];
-            const res = await fetch(`/api/categories/${editingShop._id}`);
+            const res = await fetch(`/api/categories/${editingShop._id}`, { credentials: 'include' });
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         },
@@ -86,7 +86,7 @@ const AdminShops = () => {
                     const fd = new FormData();
                     fd.append('image', editFormData.image);
                     const imgRes = await fetch(`/api/shops/${editingShop._id}/image`, {
-                        method: 'PUT', headers: { 'Authorization': `Bearer ${token}` }, body: fd
+                        method: 'PUT', body: fd
                     });
                     if (!imgRes.ok) toast.warning("Text updated but image upload failed.");
                 }
@@ -130,9 +130,8 @@ const AdminShops = () => {
         if (newCatForm.image) fd.append('image', newCatForm.image);
 
         try {
-            const res = await fetch('/api/categories', {
+            const res = await fetch('/api/categories', { credentials: 'include', 
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
                 body: fd
             });
             if (res.ok) {
@@ -154,8 +153,7 @@ const AdminShops = () => {
         if (!window.confirm("Delete this category?")) return;
         try {
             const res = await fetch(`/api/categories/${catId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                method: 'DELETE'
             });
             if (res.ok) {
                 refetchCategories();

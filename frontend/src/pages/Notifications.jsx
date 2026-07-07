@@ -21,7 +21,7 @@ const Notifications = () => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await fetch('/api/notifications', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch('/api/notifications', { credentials: 'include',   });
             const data = await res.json();
             
             // Render them exactly as fetched (so unread items show visually as unread)
@@ -30,9 +30,8 @@ const Notifications = () => {
             // Automatically mark all as read in the backend if there are unread items
             const hasUnread = data.some(n => !n.isRead);
             if (hasUnread) {
-                await fetch('/api/notifications/read-all', {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                await fetch('/api/notifications/read-all', { credentials: 'include', 
+                    method: 'PUT'
                 });
                 // Invalidate the unread count so the global badge clears immediately
                 queryClient.invalidateQueries(['unread-count']);
@@ -52,8 +51,7 @@ const Notifications = () => {
         e.stopPropagation();
         try {
             await fetch(`/api/notifications/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                method: 'DELETE'
             });
             setNotifications(notifications.filter(n => n._id !== id));
         } catch (err) { console.error("Failed to delete notification:", err); }

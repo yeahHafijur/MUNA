@@ -14,13 +14,9 @@ const getInitialUser = () => {
     }
 };
 
-const getInitialToken = () => {
-    return localStorage.getItem('token') || null;
-};
-
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(getInitialUser);
-    const [token, setToken] = useState(getInitialToken);
+    const [token, setToken] = useState(null); // Keep token state for backward compatibility briefly if needed, but not in localStorage
 
     // Auto-sync FCM token on app load for already logged in users
     useEffect(() => {
@@ -31,7 +27,7 @@ export const AuthProvider = ({ children }) => {
                     try {
                         const fcmToken = await requestFirebaseNotificationPermission();
                     if (fcmToken) {
-                        await fetch('/api/auth/fcm-token', {
+                        await fetch('/api/auth/fcm-token', { credentials: 'include', 
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -50,19 +46,19 @@ export const AuthProvider = ({ children }) => {
         syncFCMToken();
     }, [user, token]);
 
-    // Login hone par Token aur User data save karne ka function
+    // Login hone par User data save karne ka function
     const login = async (userData, userToken) => {
         setUser(userData);
-        setToken(userToken);
+        if (userToken) setToken(userToken); // Some APIs might still return it, but we rely on cookie
         localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('token', userToken);
+        // Token is now set via HttpOnly cookie by the backend!
 
         // Firebase Cloud Messaging logic
         try {
             const fcmToken = await requestFirebaseNotificationPermission();
             if (fcmToken) {
                 // Send FCM token to backend
-                await fetch('/api/auth/fcm-token', {
+                await fetch('/api/auth/fcm-token', { credentials: 'include', 
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -78,11 +74,15 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Logout hone par sab delete karne ka function
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        } catch (err) {
+            console.error("Logout failed on backend", err);
+        }
         setUser(null);
         setToken(null);
         localStorage.removeItem('user');
-        localStorage.removeItem('token');
         // FCM token is kept on the device, but the user is logged out locally
     };
 

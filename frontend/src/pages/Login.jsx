@@ -15,7 +15,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const res = await fetch('/api/auth/google-login', {
+            const res = await fetch('/api/auth/google-login', { credentials: 'include', 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: credentialResponse.credential })

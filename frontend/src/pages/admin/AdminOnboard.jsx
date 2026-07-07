@@ -31,7 +31,7 @@ const AdminOnboard = () => {
     const { data: shopCategories = [] } = useQuery({
         queryKey: ['shop-categories'],
         queryFn: async () => {
-            const res = await fetch('/api/shop-categories');
+            const res = await fetch('/api/shop-categories', { credentials: 'include' });
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         }
@@ -44,7 +44,7 @@ const AdminOnboard = () => {
         setIsSubmitting(true);
         const loadingToast = toast.loading("Creating vendor...");
         try {
-            const res = await fetch('/api/admin/onboard', {
+            const res = await fetch('/api/admin/onboard', { credentials: 'include', 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(formData)

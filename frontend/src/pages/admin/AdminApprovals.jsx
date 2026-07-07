@@ -19,7 +19,7 @@ const AdminApprovals = () => {
     const { data: allGodownItems = [], isLoading } = useQuery({
         queryKey: ['master-products'],
         queryFn: async () => {
-            const res = await fetch('/api/master-products');
+            const res = await fetch('/api/master-products', { credentials: 'include' });
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         }
@@ -30,7 +30,7 @@ const AdminApprovals = () => {
     const handleApproveGodownItem = async (id) => {
         if (!window.confirm("Approve this item? It will be visible to all vendors.")) return;
         try {
-            const res = await fetch(`/api/master-products/${id}/approve`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`/api/master-products/${id}/approve`, { method: 'PUT' });
             if (res.ok) {
                 queryClient.invalidateQueries({ queryKey: ['master-products'] });
                 toast.success("Item approved!");
@@ -42,7 +42,7 @@ const AdminApprovals = () => {
     const handleRejectGodownItem = async (id) => {
         if (!window.confirm("Reject and delete this item?")) return;
         try {
-            const res = await fetch(`/api/master-products/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`/api/master-products/${id}`, { method: 'DELETE' });
             if (res.ok) {
                 queryClient.invalidateQueries({ queryKey: ['master-products'] });
                 toast.success("Item rejected.");

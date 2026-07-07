@@ -62,8 +62,8 @@ const BottomNav = () => {
     const token = localStorage.getItem('token');
     const { data: unreadData } = useQuery({
         queryKey: ['unread-count', user?._id],
-        queryFn: () => fetch('/api/notifications/unread-count', {
-            headers: { 'Authorization': `Bearer ${token}` }
+        queryFn: () => fetch('/api/notifications/unread-count', { credentials: 'include', 
+            
         }).then(r => r.json()),
         enabled: !!user && !!token,
     });

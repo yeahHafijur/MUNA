@@ -34,7 +34,7 @@ const AdminCategories = () => {
     const { data: shopCategories = [] } = useQuery({
         queryKey: ['shop-categories'],
         queryFn: async () => {
-            const res = await fetch('/api/shop-categories');
+            const res = await fetch('/api/shop-categories', { credentials: 'include' });
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         }
@@ -43,7 +43,7 @@ const AdminCategories = () => {
     const { data: globalItemCats = [] } = useQuery({
         queryKey: ['global-item-categories'],
         queryFn: async () => {
-            const res = await fetch('/api/categories/global');
+            const res = await fetch('/api/categories/global', { credentials: 'include' });
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         }
@@ -57,7 +57,7 @@ const AdminCategories = () => {
         if (shopCatForm.image) fd.append('image', shopCatForm.image);
         try {
             const url = editingShopCat ? `/api/shop-categories/${editingShopCat._id}` : '/api/shop-categories';
-            const res = await fetch(url, { method: editingShopCat ? 'PUT' : 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
+            const res = await fetch(url, { credentials: 'include',  method: editingShopCat ? 'PUT' : 'POST', body: fd });
             if (res.ok) {
                 setShopCatForm({ name: '', image: null, imagePreview: '' }); setEditingShopCat(null);
                 queryClient.invalidateQueries({ queryKey: ['shop-categories'] });
@@ -70,7 +70,7 @@ const AdminCategories = () => {
     const handleDeleteShopCat = async (id) => {
         if (!window.confirm('Delete this shop category?')) return;
         try {
-            const res = await fetch(`/api/shop-categories/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`/api/shop-categories/${id}`, { method: 'DELETE' });
             if (res.ok) queryClient.invalidateQueries({ queryKey: ['shop-categories'] });
             else { const d = await res.json(); toast.error(d.message || 'Failed'); }
         } catch (err) { toast.error("Error deleting category."); }
@@ -84,7 +84,7 @@ const AdminCategories = () => {
         if (itemCatForm.image) fd.append('image', itemCatForm.image);
         try {
             const url = editingItemCat ? `/api/categories/${editingItemCat._id}` : '/api/categories/global';
-            const res = await fetch(url, { method: editingItemCat ? 'PUT' : 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
+            const res = await fetch(url, { credentials: 'include',  method: editingItemCat ? 'PUT' : 'POST', body: fd });
             if (res.ok) {
                 setItemCatForm({ name: '', image: null, imagePreview: '' }); setEditingItemCat(null);
                 queryClient.invalidateQueries({ queryKey: ['global-item-categories'] });
@@ -97,7 +97,7 @@ const AdminCategories = () => {
     const handleDeleteItemCat = async (id) => {
         if (!window.confirm('Delete this global item category?')) return;
         try {
-            const res = await fetch(`/api/categories/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
             if (res.ok) queryClient.invalidateQueries({ queryKey: ['global-item-categories'] });
             else { const d = await res.json(); toast.error(d.message || 'Failed'); }
         } catch (err) { toast.error("Error deleting category."); }

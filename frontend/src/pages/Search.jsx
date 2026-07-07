@@ -112,7 +112,7 @@ const Search = () => {
     const { data: results = { shops: [], products: [] }, isFetching } = useQuery({
         queryKey: ['search', debouncedQuery],
         queryFn: async () => {
-            const res = await fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}`);
+            const res = await fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}`, { credentials: 'include' });
             if (!res.ok) throw new Error("Search failed");
             return res.json();
         },

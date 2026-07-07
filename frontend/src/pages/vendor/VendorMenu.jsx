@@ -17,7 +17,7 @@ const VendorMenu = () => {
     const { data: shop } = useQuery({
         queryKey: ['my-shop'],
         queryFn: async () => {
-            const res = await fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await fetch('/api/shops/my-shop', { credentials: 'include',   });
             const data = await res.json();
             return data._id ? data : null;
         },
@@ -60,14 +60,14 @@ const VendorMenu = () => {
 
     const fetchCategories = useCallback(() => {
         if (!shop?._id) return;
-        fetch(`/api/categories/${shop._id}`).then(r => r.json()).then(data => {
+        fetch(`/api/categories/${shop._id}`, { credentials: 'include' }).then(r => r.json()).then(data => {
             if (Array.isArray(data)) setCategories(data);
         });
     }, [shop]);
 
     const fetchProducts = useCallback(() => {
         if (!shop?._id) return;
-        fetch(`/api/products/${shop._id}`).then(r => r.json()).then(data => {
+        fetch(`/api/products/${shop._id}`, { credentials: 'include' }).then(r => r.json()).then(data => {
             if (Array.isArray(data)) setProducts(data);
         });
     }, [shop]);
@@ -88,7 +88,6 @@ const VendorMenu = () => {
         try {
             const res = await fetch(isEdit ? `/api/categories/${catModal._id}` : '/api/categories', {
                 method: isEdit ? 'PUT' : 'POST',
-                headers: { Authorization: `Bearer ${token}` },
                 body: fd,
             });
             if (res.ok) {
@@ -107,7 +106,7 @@ const VendorMenu = () => {
         if (!window.confirm(`Delete category "${cat.name}"?`)) return;
         if (navigator.vibrate) navigator.vibrate(50);
         const res = await fetch(`/api/categories/${cat._id}`, {
-            method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
+            method: 'DELETE'
         });
         if (res.ok) {
             fetchCategories();
@@ -178,7 +177,6 @@ const VendorMenu = () => {
         try {
             const res = await fetch(isEdit ? `/api/products/${prodModal._id}` : '/api/products', {
                 method: isEdit ? 'PUT' : 'POST',
-                headers: { Authorization: `Bearer ${token}` },
                 body: fd,
             });
             if (res.ok) {
@@ -196,7 +194,7 @@ const VendorMenu = () => {
     const deleteProd = async (p) => {
         if (!window.confirm(`Delete "${p.name}"?`)) return;
         if (navigator.vibrate) navigator.vibrate(50);
-        await fetch(`/api/products/${p._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        await fetch(`/api/products/${p._id}`, { method: 'DELETE' });
         fetchProducts();
         toast.success("Item deleted");
     };

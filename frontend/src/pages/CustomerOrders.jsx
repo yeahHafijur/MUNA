@@ -59,7 +59,7 @@ const CustomerOrders = () => {
     const { data: orders = [], isLoading } = useQuery({
         queryKey: ['customer-orders'],
         queryFn: async () => {
-            const res = await fetch('/api/orders/customer', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch('/api/orders/customer', { credentials: 'include',   });
             if (!res.ok) throw new Error("Failed to fetch");
             const data = await res.json();
             return Array.isArray(data) ? data : [];
@@ -80,8 +80,7 @@ const CustomerOrders = () => {
 
         try {
             const res = await fetch(`/api/orders/${orderId}/cancel`, {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}` }
+                method: 'PUT'
             });
             if (res.ok) {
                 toast.update(loadingToast, { render: "Order cancelled successfully", type: "success", isLoading: false, autoClose: 3000 });

@@ -18,7 +18,7 @@ const DailyMarketItemDetail = () => {
     const { data: item, isLoading, error } = useQuery({
         queryKey: ['dailyMarketItem', id],
         queryFn: async () => {
-            const res = await fetch(`/api/live-bazar/${id}`);
+            const res = await fetch(`/api/live-bazar/${id}`, { credentials: 'include' });
             if (!res.ok) throw new Error('Item not found');
             return res.json();
         }
@@ -27,7 +27,7 @@ const DailyMarketItemDetail = () => {
     // Start Chat Mutation
     const startChatMutation = useMutation({
         mutationFn: async (targetItem) => {
-            const res = await fetch('/api/chat/session/live-bazar', {
+            const res = await fetch('/api/chat/session/live-bazar', { credentials: 'include', 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

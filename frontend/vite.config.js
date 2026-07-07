@@ -87,6 +87,26 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor';
+            }
+            if (id.includes('firebase')) {
+              return 'firebase';
+            }
+            if (id.includes('@tanstack')) {
+              return 'query';
+            }
+            return 'vendor-other';
+          }
+        }
+      }
+    }
+  },
   server: {
     host: true,
     proxy: {

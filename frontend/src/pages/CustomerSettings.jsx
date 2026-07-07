@@ -66,9 +66,8 @@ const CustomerSettings = () => {
         }
 
         try {
-            const res = await fetch('/api/auth/delete-account', {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+            const res = await fetch('/api/auth/delete-account', { credentials: 'include', 
+                method: 'DELETE'
             });
             if (res.ok) {
                 toast.success("Account deleted.");
@@ -86,8 +85,7 @@ const CustomerSettings = () => {
         if (!window.confirm("Delete this saved location?")) return;
         try {
             const res = await fetch(`/api/auth/delete-location/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                method: 'DELETE'
             });
             const data = await res.json();
             if (res.ok) {
@@ -101,7 +99,7 @@ const CustomerSettings = () => {
         try {
             const fcmToken = await requestFirebaseNotificationPermission();
             if (fcmToken) {
-                await fetch('/api/auth/fcm-token', {
+                await fetch('/api/auth/fcm-token', { credentials: 'include', 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ fcmToken })
@@ -128,7 +126,7 @@ const CustomerSettings = () => {
 
         setIsUpdating(true);
         try {
-            const res = await fetch('/api/auth/update-profile', {
+            const res = await fetch('/api/auth/update-profile', { credentials: 'include', 
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: editName, phone: editPhone })

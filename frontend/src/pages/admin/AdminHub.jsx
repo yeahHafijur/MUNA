@@ -52,8 +52,8 @@ const AdminHub = () => {
         queryKey: ['admin-hub-stats'],
         queryFn: async () => {
             const [shopsRes, godownRes] = await Promise.all([
-                fetch('/api/shops?admin=true', { headers: { Authorization: `Bearer ${token}` } }),
-                fetch('/api/master-products')
+                fetch('/api/shops?admin=true', { credentials: 'include',   }),
+                fetch('/api/master-products', { credentials: 'include' })
             ]);
             const shops = await shopsRes.json();
             const godown = await godownRes.json();

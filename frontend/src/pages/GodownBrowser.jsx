@@ -21,7 +21,7 @@ const GodownBrowser = () => {
         queryKey: ['my-shop', user?._id],
         queryFn: async () => {
             if (!token) throw new Error("No token");
-            const res = await fetch('/api/shops/my-shop', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await fetch('/api/shops/my-shop', { credentials: 'include',   });
             if (!res.ok) throw new Error("Shop not found");
             const data = await res.json();
             if (!data._id) throw new Error("Create a shop first");
@@ -38,7 +38,7 @@ const GodownBrowser = () => {
     const { data: masterItems = [], isLoading: isItemsLoading } = useQuery({
         queryKey: ['master-products'],
         queryFn: async () => {
-            const res = await fetch('/api/master-products');
+            const res = await fetch('/api/master-products', { credentials: 'include' });
             if (!res.ok) throw new Error('Failed to load');
             return res.json();
         }
@@ -50,7 +50,7 @@ const GodownBrowser = () => {
             setImportingId(item._id);
 
             // Step A: Ensure the category exists in the shop's Category collection
-            const catRes = await fetch('/api/categories', {
+            const catRes = await fetch('/api/categories', { credentials: 'include', 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ name: item.category || 'General' })
@@ -62,14 +62,14 @@ const GodownBrowser = () => {
                 catId = cat._id;
             } else if (catRes.status === 400) {
                 // Category probably already exists, fetch it
-                const allCatsRes = await fetch(`/api/categories/${shop._id}`);
+                const allCatsRes = await fetch(`/api/categories/${shop._id}`, { credentials: 'include' });
                 const allCats = await allCatsRes.json();
                 const existing = allCats.find(c => c.name === (item.category || 'General'));
                 if (existing) catId = existing._id;
             }
 
             // Step B: Create the product
-            const prodRes = await fetch('/api/products', {
+            const prodRes = await fetch('/api/products', { credentials: 'include', 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({

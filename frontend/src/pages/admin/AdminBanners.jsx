@@ -21,16 +21,15 @@ const AdminBanners = () => {
 
     const { data: banners = [], isLoading } = useQuery({
         queryKey: ['admin-banners'],
-        queryFn: () => fetch('/api/banners?all=true', {
-            headers: { 'Authorization': `Bearer ${token}` }
+        queryFn: () => fetch('/api/banners?all=true', { credentials: 'include', 
+            
         }).then(r => r.json()),
     });
 
     const createMutation = useMutation({
         mutationFn: async (fd) => {
-            const res = await fetch('/api/banners', {
+            const res = await fetch('/api/banners', { credentials: 'include', 
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
                 body: fd
             });
             if (!res.ok) throw new Error('Failed to create banner');
@@ -65,8 +64,7 @@ const AdminBanners = () => {
     const deleteMutation = useMutation({
         mutationFn: async (id) => {
             const res = await fetch(`/api/banners/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                method: 'DELETE'
             });
             if (!res.ok) throw new Error('Failed to delete banner');
             return res.json();

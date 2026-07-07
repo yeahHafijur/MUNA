@@ -38,7 +38,7 @@ const AdminGodown = () => {
     const { data: allGodownItems = [], isLoading } = useQuery({
         queryKey: ['master-products'],
         queryFn: async () => {
-            const res = await fetch('/api/master-products');
+            const res = await fetch('/api/master-products', { credentials: 'include' });
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         }
@@ -105,7 +105,7 @@ const AdminGodown = () => {
         });
         try {
             const url = editingGodownItem ? `/api/master-products/${editingGodownItem._id}` : '/api/master-products';
-            const res = await fetch(url, { method: editingGodownItem ? 'PUT' : 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
+            const res = await fetch(url, { credentials: 'include',  method: editingGodownItem ? 'PUT' : 'POST', body: fd });
             if (res.ok) {
                 setGodownFormData({ name: '', category: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] });
                 setEditingGodownItem(null);
@@ -125,7 +125,7 @@ const AdminGodown = () => {
     const handleDeleteGodownItem = async (id) => {
         if (!window.confirm("Delete this item from Godown?")) return;
         try {
-            const res = await fetch(`/api/master-products/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`/api/master-products/${id}`, { method: 'DELETE' });
             if (res.ok) queryClient.invalidateQueries({ queryKey: ['master-products'] });
             else { const d = await res.json(); toast.error(d.message || 'Failed'); }
         } catch (err) { toast.error("Error deleting item."); }

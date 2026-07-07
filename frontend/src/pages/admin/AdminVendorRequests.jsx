@@ -26,8 +26,8 @@ const AdminVendorRequests = () => {
 
     const fetchRequests = async () => {
         try {
-            const res = await fetch('/api/vendor-requests', {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const res = await fetch('/api/vendor-requests', { credentials: 'include', 
+                
             });
             const data = await res.json();
             if (res.ok) {

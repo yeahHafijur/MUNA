@@ -34,7 +34,7 @@ const ChatScreen = () => {
         queryKey: ['chatMessages', sessionId],
         queryFn: async ({ pageParam = 1 }) => {
             const res = await fetch(`/api/chat/sessions/${sessionId}/messages?page=${pageParam}&limit=30`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                
             });
             if (!res.ok) throw new Error('Failed to fetch messages');
             return res.json();

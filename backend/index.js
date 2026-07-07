@@ -10,6 +10,7 @@ const cron = require("node-cron");
 const moment = require("moment-timezone");
 const compression = require("compression");
 const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
 const ChatMessage = require("./models/ChatMessage");
 const jwt = require("jsonwebtoken");
 
@@ -116,6 +117,9 @@ app.use(helmet());
 
 // Compress all responses for extreme performance
 app.use(compression());
+
+// Parse cookies
+app.use(cookieParser());
 
 // Render and other cloud providers use reverse proxies.
 // We must trust the proxy for express-rate-limit to get the correct user IP.

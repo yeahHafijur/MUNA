@@ -88,7 +88,7 @@ const AdminCatalog = () => {
             if (debouncedSearch) params.set('search', debouncedSearch);
             if (selectedCat) params.set('categoryId', selectedCat);
             const res = await fetch(`/api/admin/catalog/${shopId}/products?${params}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                
             });
             if (!res.ok) throw new Error('Failed to fetch products');
             return res.json();
@@ -107,7 +107,7 @@ const AdminCatalog = () => {
         queryKey: ['admin-catalog-categories', shopId],
         queryFn: async () => {
             const res = await fetch(`/api/admin/catalog/${shopId}/categories`, {
-                headers: { Authorization: `Bearer ${token}` }
+                
             });
             if (!res.ok) throw new Error('Failed to fetch categories');
             return res.json();
@@ -120,7 +120,7 @@ const AdminCatalog = () => {
         queryKey: ['admin-catalog-audit', shopId],
         queryFn: async () => {
             const res = await fetch(`/api/admin/catalog/${shopId}/audit-logs?limit=20`, {
-                headers: { Authorization: `Bearer ${token}` }
+                
             });
             if (!res.ok) throw new Error('Failed to fetch audit logs');
             return res.json();
@@ -165,9 +165,8 @@ const AdminCatalog = () => {
             const url = isEdit
                 ? `/api/admin/catalog/categories/${catModal._id}`
                 : `/api/admin/catalog/${shopId}/categories`;
-            const res = await fetch(url, {
+            const res = await fetch(url, { credentials: 'include', 
                 method: isEdit ? 'PUT' : 'POST',
-                headers: { Authorization: `Bearer ${token}` },
                 body: fd,
             });
             if (res.ok) {
@@ -186,7 +185,7 @@ const AdminCatalog = () => {
         if (navigator.vibrate) navigator.vibrate(50);
         try {
             const res = await fetch(`/api/admin/catalog/categories/${cat._id}${force ? '?force=true' : ''}`, {
-                method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
+                method: 'DELETE'
             });
             const data = await res.json();
             if (res.ok) {
@@ -296,9 +295,8 @@ const AdminCatalog = () => {
             const url = isEdit
                 ? `/api/admin/catalog/products/${prodModal._id}`
                 : `/api/admin/catalog/${shopId}/products`;
-            const res = await fetch(url, {
+            const res = await fetch(url, { credentials: 'include', 
                 method: isEdit ? 'PUT' : 'POST',
-                headers: { Authorization: `Bearer ${token}` },
                 body: fd,
             });
             if (res.ok) {
@@ -318,7 +316,7 @@ const AdminCatalog = () => {
         if (navigator.vibrate) navigator.vibrate(50);
         try {
             await fetch(`/api/admin/catalog/products/${p._id}`, {
-                method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
+                method: 'DELETE'
             });
             invalidate();
             toast.success("Product deleted");
@@ -328,7 +326,7 @@ const AdminCatalog = () => {
     const toggleStock = async (p) => {
         try {
             const res = await fetch(`/api/admin/catalog/products/${p._id}/stock`, {
-                method: 'PATCH', headers: { Authorization: `Bearer ${token}` }
+                method: 'PATCH'
             });
             if (res.ok) {
                 invalidate();
@@ -340,7 +338,7 @@ const AdminCatalog = () => {
     const toggleVisibility = async (p) => {
         try {
             const res = await fetch(`/api/admin/catalog/products/${p._id}/visibility`, {
-                method: 'PATCH', headers: { Authorization: `Bearer ${token}` }
+                method: 'PATCH'
             });
             if (res.ok) {
                 invalidate();

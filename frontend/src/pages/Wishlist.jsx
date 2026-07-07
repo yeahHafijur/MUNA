@@ -17,8 +17,8 @@ const Wishlist = () => {
     const { data: wishlist = [], isLoading, isError } = useQuery({
         queryKey: ['wishlist'],
         queryFn: async () => {
-            const res = await fetch('/api/user/wishlist', {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const res = await fetch('/api/user/wishlist', { credentials: 'include', 
+                
             });
             if (!res.ok) throw new Error('Failed to fetch wishlist');
             return res.json();

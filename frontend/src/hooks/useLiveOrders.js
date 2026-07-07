@@ -7,8 +7,8 @@ export const useLiveOrders = () => {
     return useQuery({
         queryKey: ['liveOrderCount'],
         queryFn: async () => {
-            const res = await fetch('/api/orders/vendor?status=pending&limit=100', {
-                headers: { Authorization: `Bearer ${token}` }
+            const res = await fetch('/api/orders/vendor?status=pending&limit=100', { credentials: 'include', 
+                
             });
             if (!res.ok) throw new Error('Failed to fetch live orders');
             const data = await res.json();

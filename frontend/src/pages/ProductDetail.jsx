@@ -47,7 +47,6 @@ const ProductDetail = () => {
             try {
                 await fetch(`/api/user/wishlist/${productId}`, {
                     method: newLiked ? 'POST' : 'DELETE',
-                    headers: { Authorization: `Bearer ${token}` },
                 });
             } catch (err) {
                 console.error('Wishlist sync failed', err);
@@ -73,7 +72,7 @@ const ProductDetail = () => {
     const { data: shop, isLoading: shopLoading } = useQuery({
         queryKey: ['shop', shopId],
         queryFn: async () => {
-            const res = await fetch(`/api/shops/${shopId}`);
+            const res = await fetch(`/api/shops/${shopId}`, { credentials: 'include' });
             if (!res.ok) throw new Error('Shop not found');
             return res.json();
         },
@@ -82,7 +81,7 @@ const ProductDetail = () => {
     const { data: product, isLoading: productLoading } = useQuery({
         queryKey: ['product', productId],
         queryFn: async () => {
-            const res = await fetch(`/api/products/detail/${productId}`);
+            const res = await fetch(`/api/products/detail/${productId}`, { credentials: 'include' });
             if (!res.ok) throw new Error('Product not found');
             return res.json();
         },
@@ -92,7 +91,7 @@ const ProductDetail = () => {
     const { data: allShopProducts = [] } = useQuery({
         queryKey: ['products', shopId],
         queryFn: async () => {
-            const res = await fetch(`/api/products/${shopId}`);
+            const res = await fetch(`/api/products/${shopId}`, { credentials: 'include' });
             if (!res.ok) throw new Error('Products not found');
             return res.json();
         },

@@ -12,7 +12,7 @@ const AllStores = () => {
     /* ── Fetch Data ── */
     const { data: shops = [], isLoading: loading } = useQuery({
         queryKey: ['shops'],
-        queryFn: () => fetch('/api/shops').then(r => r.json()),
+        queryFn: () => fetch('/api/shops', { credentials: 'include' }).then(r => r.json()),
     });
 
     /* ── Geolocation ── */

@@ -85,9 +85,8 @@ const DailyMarketPost = () => {
 
     const postMutation = useMutation({
         mutationFn: async (fd) => {
-            const res = await fetch('/api/live-bazar', {
+            const res = await fetch('/api/live-bazar', { credentials: 'include', 
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
                 body: fd
             });
             if (!res.ok) throw new Error(await res.text());

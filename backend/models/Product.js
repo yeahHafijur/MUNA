@@ -31,6 +31,14 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    description: {
+        type: String,
+        default: ''
+    },
+    isHidden: {
+        type: Boolean,
+        default: false
+    },
     shopId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Shop',

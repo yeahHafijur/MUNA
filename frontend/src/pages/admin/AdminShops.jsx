@@ -211,6 +211,7 @@ const AdminShops = () => {
                                     </div>
                                     <div className="flex flex-col gap-2 shrink-0">
                                         <button onClick={() => handleEditClick(shop)} className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all">Edit</button>
+                                        <button onClick={() => navigate(`/admin/catalog/${shop._id}`)} className="px-3 py-1.5 bg-amber-400 border border-amber-400 rounded-lg text-xs font-bold text-amber-950 hover:bg-amber-500 active:scale-95 transition-all shadow-sm">Catalogue</button>
                                         <button onClick={() => handleToggleActive(shop)} className={`px-3 py-1.5 border rounded-lg text-xs font-bold active:scale-95 transition-all ${shop.isActive ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-white border-emerald-200 text-emerald-600 hover:bg-emerald-50'}`}>
                                             {shop.isActive ? 'Deactivate' : 'Activate'}
                                         </button>

@@ -197,6 +197,7 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/shops', require('./routes/shopRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/admin/catalog', require('./routes/adminCatalogRoutes'));
 app.use('/api/master-products', require('./routes/masterProductRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/search', require('./routes/searchRoutes'));

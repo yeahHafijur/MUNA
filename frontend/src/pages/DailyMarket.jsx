@@ -164,7 +164,7 @@ const DailyMarket = () => {
                                     <button 
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            if (!token) { toast.error("Please login first"); navigate('/login'); return; }
+                                            if (!user) { toast.error("Please login first"); navigate('/login'); return; }
                                             startChatMutation.mutate(item);
                                         }}
                                         disabled={startChatMutation.isPending || item.userId._id === user?._id}
@@ -182,7 +182,7 @@ const DailyMarket = () => {
             {/* Floating Sell Button */}
             <button
                 onClick={() => {
-                    if (!token) { toast.error("Please login to sell"); navigate('/login'); return; }
+                    if (!user) { toast.error("Please login to sell"); navigate('/login'); return; }
                     navigate('/daily-market/post');
                 }}
                 className="absolute bottom-6 right-4 z-50 bg-slate-900 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgba(15,23,42,0.4)] active:scale-90 transition-transform"

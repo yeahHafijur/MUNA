@@ -20,7 +20,7 @@ const GodownBrowser = () => {
     const { data: shop, isLoading: isShopLoading } = useQuery({
         queryKey: ['my-shop', user?._id],
         queryFn: async () => {
-            if (!token) throw new Error("No token");
+            if (!user) throw new Error("No token");
             const res = await fetch('/api/shops/my-shop', { credentials: 'include',   });
             if (!res.ok) throw new Error("Shop not found");
             const data = await res.json();

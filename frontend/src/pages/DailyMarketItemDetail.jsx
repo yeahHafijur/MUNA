@@ -161,7 +161,7 @@ const DailyMarketItemDetail = () => {
 
                     <button 
                         onClick={() => {
-                            if (!token) { toast.error("Please login first"); navigate('/login'); return; }
+                            if (!user) { toast.error("Please login first"); navigate('/login'); return; }
                             startChatMutation.mutate(item);
                         }}
                         disabled={startChatMutation.isPending || isOwner}

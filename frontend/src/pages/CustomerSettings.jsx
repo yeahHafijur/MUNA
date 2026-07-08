@@ -53,8 +53,8 @@ const CustomerSettings = () => {
     const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
     useEffect(() => {
-        if (!token) navigate('/login');
-    }, [token, navigate]);
+        if (!user) navigate('/login');
+    }, [user, navigate]);
 
     const handleDeleteAccount = () => {
         setIsDeleteModalOpen(true);

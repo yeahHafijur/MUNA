@@ -24,3 +24,28 @@ messaging.onBackgroundMessage((payload) => {
     navigator.setAppBadge().catch(console.error);
   }
 });
+
+// Click-to-Navigate: When user taps a push notification, open the correct page
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  // Get the route from FCM data payload
+  const route = event.notification?.data?.FCM_MSG?.data?.route || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // If the app is already open, focus it and navigate
+      for (const client of clientList) {
+        if ('focus' in client) {
+          client.focus();
+          client.navigate(route);
+          return;
+        }
+      }
+      // Otherwise, open a new window
+      if (clients.openWindow) {
+        return clients.openWindow(route);
+      }
+    })
+  );
+});

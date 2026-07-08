@@ -51,7 +51,8 @@ const Notifications = () => {
         e.stopPropagation();
         try {
             await fetch(`/api/notifications/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                credentials: 'include'
             });
             setNotifications(notifications.filter(n => n._id !== id));
         } catch (err) { console.error("Failed to delete notification:", err); }

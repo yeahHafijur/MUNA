@@ -18,6 +18,11 @@ const notificationSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    type: {
+        type: String,
+        enum: ['order', 'chat', 'promo', 'system', 'broadcast'],
+        default: 'system'
+    },
     actionUrl: {
         type: String,
         default: ''

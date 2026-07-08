@@ -46,6 +46,7 @@ const AdminGodown = lazy(() => import('./pages/admin/AdminGodown'));
 const AdminApprovals = lazy(() => import('./pages/admin/AdminApprovals'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminVendorRequests = lazy(() => import('./pages/admin/AdminVendorRequests'));
+const AdminBroadcast = lazy(() => import('./pages/admin/AdminBroadcast'));
 const AdminLiveOrders = lazy(() => import('./pages/admin/AdminLiveOrders'));
 const AdminBanners = lazy(() => import('./pages/admin/AdminBanners'));
 const AdminCatalog = lazy(() => import('./pages/admin/AdminCatalog'));
@@ -191,6 +192,7 @@ const AppContent = () => {
             <Route path="/admin/godown" element={<AdminGodown />} />
             <Route path="/admin/approvals" element={<AdminApprovals />} />
             <Route path="/admin/vendor-requests" element={<AdminVendorRequests />} />
+            <Route path="/admin/broadcast" element={<AdminBroadcast />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/banners" element={<AdminBanners />} />
             <Route path="/admin/catalog/:shopId" element={<AdminCatalog />} />

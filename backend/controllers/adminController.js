@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Shop = require("../models/Shop");
+const { sendAndSaveNotification } = require('../utils/notificationService');
 
 // 1. Onboard Vendor & Shop (Super Admin only)
 const onboardVendorAndShop = async (req, res) => {
@@ -91,6 +92,59 @@ const onboardVendorAndShop = async (req, res) => {
     }
 };
 
-module.exports = {
-    onboardVendorAndShop
+// 2. Broadcast Notification to Users (Super Admin only)
+const broadcastNotification = async (req, res) => {
+    try {
+        const { title, message, targetAudience } = req.body;
+
+        if (!title || !title.trim()) {
+            return res.status(400).json({ message: "Title is required." });
+        }
+        if (!message || !message.trim()) {
+            return res.status(400).json({ message: "Message is required." });
+        }
+
+        const validAudiences = ['all', 'customers', 'vendors'];
+        const audience = validAudiences.includes(targetAudience) ? targetAudience : 'all';
+
+        // Build query based on target audience
+        let filter = {};
+        if (audience === 'customers') {
+            filter.role = 'customer';
+        } else if (audience === 'vendors') {
+            filter.role = 'vendor';
+        }
+        // 'all' = no filter, everyone gets it
+
+        // Only get users who have at least one FCM token (they can receive pushes)
+        const users = await User.find(filter).select('_id').lean();
+        const userIds = users.map(u => u._id);
+
+        if (userIds.length === 0) {
+            return res.status(400).json({ message: "No users found for the selected audience." });
+        }
+
+        // Fire-and-forget: send notifications in the background
+        sendAndSaveNotification(
+            userIds,
+            title.trim(),
+            message.trim(),
+            { actionUrl: "/notifications", route: "/notifications", type: "broadcast" }
+        );
+
+        res.status(200).json({
+            message: `Broadcast sent to ${userIds.length} ${audience === 'all' ? 'users' : audience}!`,
+            recipientCount: userIds.length
+        });
+
+    } catch (error) {
+        console.error("broadcastNotification error:", error);
+        res.status(500).json({ message: "Failed to send broadcast." });
+    }
 };
+
+module.exports = {
+    onboardVendorAndShop,
+    broadcastNotification
+};
+

@@ -76,14 +76,28 @@ export const AuthProvider = ({ children }) => {
     // Logout hone par sab delete karne ka function
     const logout = async () => {
         try {
-            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+            // Get current FCM token to send to backend for cleanup
+            let fcmToken = null;
+            try {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    fcmToken = await requestFirebaseNotificationPermission();
+                }
+            } catch (err) {
+                console.warn("[MUNA Auth] Could not get FCM token for cleanup", err);
+            }
+
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fcmToken })
+            });
         } catch (err) {
             console.error("Logout failed on backend", err);
         }
         setUser(null);
         setToken(null);
         localStorage.removeItem('user');
-        // FCM token is kept on the device, but the user is logged out locally
     };
 
     return (

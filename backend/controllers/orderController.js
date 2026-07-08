@@ -5,85 +5,7 @@ const Product = require('../models/Product');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
 
-const Notification = require('../models/Notification');
-
-const adminApp = require('../firebaseAdmin');
-const { getMessaging } = require('firebase-admin/messaging');
-
-// Function to send Firebase Cloud Messaging push notification (Premium with Cleanup)
-const sendFCMNotification = async (userIds, heading, message, route = "/") => {
-    if (!adminApp) return console.log("[FCM] ❌ SKIPPED: Firebase Admin not initialized.");
-    if (!userIds || userIds.length === 0) return console.log("[FCM] ❌ SKIPPED: No valid User IDs!");
-
-    try {
-        const users = await User.find({ _id: { $in: userIds } });
-        let tokens = [];
-
-        users.forEach(user => {
-            if (user.fcmTokens && user.fcmTokens.length > 0) {
-                tokens = tokens.concat(user.fcmTokens);
-            }
-        });
-
-        tokens = [...new Set(tokens)]; // Remove duplicates
-        if (tokens.length === 0) return console.log(`[FCM] ❌ No FCM tokens found for users: ${userIds}`);
-
-        const messagePayload = {
-            notification: { title: heading, body: message },
-            data: { route: route }, // Frontend ko click karne par kis page par bhejna hai
-            tokens: tokens,
-        };
-
-        const response = await getMessaging(adminApp).sendEachForMulticast(messagePayload);
-        console.log(`[FCM] ✅ Push sent! Success: ${response.successCount}, Failed: ${response.failureCount}`);
-
-        // 🧹 GHOST TOKEN CLEANUP LOGIC (Premium Architecture)
-        if (response.failureCount > 0) {
-            const failedTokens = [];
-            response.responses.forEach((resp, idx) => {
-                if (!resp.success) {
-                    const errCode = resp.error?.code;
-                    // Agar token expire ho gaya hai ya invalid hai, list mein daalo
-                    if (errCode === 'messaging/invalid-registration-token' ||
-                        errCode === 'messaging/registration-token-not-registered') {
-                        failedTokens.push(tokens[idx]);
-                    }
-                }
-            });
-
-            if (failedTokens.length > 0) {
-                // Database se dead tokens hamesha ke liye remove kar do
-                await User.updateMany(
-                    { _id: { $in: userIds } },
-                    { $pull: { fcmTokens: { $in: failedTokens } } }
-                );
-                console.log(`[FCM] 🧹 Cleaned up ${failedTokens.length} dead tokens from DB.`);
-            }
-        }
-    } catch (error) {
-        console.error("[FCM] ❌ Error sending push:", error);
-    }
-};
-
-// Helper to send push and save to DB
-const sendAndSaveNotification = async (userIds, heading, message, actionUrl = "") => {
-    await sendFCMNotification(userIds, heading, message);
-
-    try {
-        const notificationsToInsert = userIds.map(id => ({
-            userId: id,
-            title: heading,
-            message: message,
-            actionUrl: actionUrl,
-            isRead: false
-        }));
-        await Notification.insertMany(notificationsToInsert);
-        console.log(`[DB] ✅ Saved ${notificationsToInsert.length} notifications to database.`);
-    } catch (error) {
-        console.error("[DB] ❌ Failed to save notification:", error);
-    }
-};
-
+const { sendAndSaveNotification } = require('../utils/notificationService');
 
 
 // 1. Place Order (Customer karega)
@@ -208,18 +130,14 @@ const placeOrder = async (req, res) => {
 
         const order = orderResult[0];
 
-        try {
-            const vendor = await User.findById(shop.vendorId);
-            if (vendor) {
-                await sendAndSaveNotification(
-                    [vendor._id],
-                    "📦 New Order Received!",
-                    `Amount: ₹${finalTotalAmount} (${items.length} items). Please review and accept.`,
-                    "/vendor-dashboard"
-                );
-            }
-        } catch (pushErr) {
-            console.error("Error sending push notification to vendor:", pushErr);
+        // Fire-and-forget: don't block API response for push notification
+        if (shop.vendorId) {
+            sendAndSaveNotification(
+                [shop.vendorId],
+                "📦 New Order Received!",
+                `Amount: ₹${finalTotalAmount} (${items.length} items). Please review and accept.`,
+                { actionUrl: "/vendor-dashboard", route: "/vendor/orders", type: "order" }
+            );
         }
 
         if (customerPhone) {
@@ -422,27 +340,20 @@ const updateOrderStatus = async (req, res) => {
         order.status = status;
         const updatedOrder = await order.save();
 
-        // 🔔 PUSH NOTIFICATION ALERT TO CUSTOMER
-        try {
-            const customer = await User.findById(order.customerId);
-            if (customer) {
-                let statusMessage = "Your order status has been updated.";
-                if (status === 'accepted') statusMessage = "Your order has been accepted by the store!";
-                else if (status === 'preparing') statusMessage = "Your order is being prepared!";
-                else if (status === 'out_for_delivery') statusMessage = "Your order is out for delivery! Please keep your Delivery PIN ready.";
-                else if (status === 'delivered') statusMessage = "Your order has been delivered. Thank you!";
-                else if (status === 'cancelled') statusMessage = "Your order was cancelled.";
+        // 🔔 Fire-and-forget: Push notification to customer
+        let statusMessage = "Your order status has been updated.";
+        if (status === 'accepted') statusMessage = "Your order has been accepted by the store!";
+        else if (status === 'preparing') statusMessage = "Your order is being prepared!";
+        else if (status === 'out_for_delivery') statusMessage = "Your order is out for delivery! Please keep your Delivery PIN ready.";
+        else if (status === 'delivered') statusMessage = "Your order has been delivered. Thank you!";
+        else if (status === 'cancelled') statusMessage = "Your order was cancelled.";
 
-                await sendAndSaveNotification(
-                    [customer._id],
-                    "Order Update 📦",
-                    statusMessage,
-                    "/profile"
-                );
-            }
-        } catch (pushErr) {
-            console.error("Error sending push notification to customer:", pushErr);
-        }
+        sendAndSaveNotification(
+            [order.customerId],
+            "Order Update 📦",
+            statusMessage,
+            { actionUrl: "/profile/orders", route: "/profile/orders", type: "order" }
+        );
 
         res.status(200).json(updatedOrder);
     } catch (error) {

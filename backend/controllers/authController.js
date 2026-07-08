@@ -285,6 +285,13 @@ const getWishlist = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
+        // Best-effort FCM token cleanup (req.user may be available if token is valid)
+        const { fcmToken } = req.body || {};
+        if (req.user && fcmToken) {
+            const { removeFcmToken } = require('../utils/notificationService');
+            await removeFcmToken(req.user._id, fcmToken);
+        }
+
         res.cookie('token', '', {
             httpOnly: true,
             expires: new Date(0),
@@ -294,7 +301,14 @@ const logout = async (req, res) => {
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
         console.error("Logout Error:", error);
-        res.status(500).json({ message: 'Server error during logout' });
+        // Still clear the cookie even if FCM cleanup fails
+        res.cookie('token', '', {
+            httpOnly: true,
+            expires: new Date(0),
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });
+        res.status(200).json({ message: 'Logged out successfully' });
     }
 };
 

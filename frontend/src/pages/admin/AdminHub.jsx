@@ -163,6 +163,12 @@ const AdminHub = () => {
                         onClick={() => navigate('/admin/approvals')}
                     />
                     <NavigationRow
+                        icon={<span className="text-xl">📢</span>}
+                        title="Broadcast Notification"
+                        subtitle="Send push to users"
+                        onClick={() => navigate('/admin/broadcast')}
+                    />
+                    <NavigationRow
                         icon={<IcoSettings />}
                         title="App Settings"
                         subtitle="Navbar message & config"

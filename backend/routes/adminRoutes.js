@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { onboardVendorAndShop } = require('../controllers/adminController');
+const { onboardVendorAndShop, broadcastNotification } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 // Route to onboard a new vendor and their shop
 // /api/admin/onboard
 router.post('/onboard', protect, authorize('super_admin'), onboardVendorAndShop);
+
+// Route to broadcast notification to users
+// /api/admin/broadcast
+router.post('/broadcast', protect, authorize('super_admin'), broadcastNotification);
 
 module.exports = router;

@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { requestFirebaseNotificationPermission } from '../firebase';
 import { toast } from 'react-toastify';
+import Modal from '../components/ui/Modal';
+import Button from '../components/ui/Button';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -193,102 +195,75 @@ const CustomerSettings = () => {
                 </div>
             </div>
 
-            {/* ─── FLOATING BOTTOM SHEET: EDIT PROFILE ─── */}
-            {isEditingProfile && (
-                <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl animate-in slide-in-from-bottom-full duration-300 ease-out">
-                        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Edit Profile</h3>
-                            <button onClick={() => setIsEditingProfile(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:scale-95 transition-transform">✕</button>
-                        </div>
-                        <form onSubmit={handleUpdateProfile} className="space-y-5">
-                            <div className="relative">
-                                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} required className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Name" />
-                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Full Name</label>
-                            </div>
-                            <div className="relative">
-                                <input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} required minLength={10} maxLength={15} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Phone" />
-                                <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Phone Number</label>
-                            </div>
-                            <button type="submit" disabled={isUpdating} className="w-full mt-2 p-4 bg-amber-400 text-slate-900 rounded-2xl font-black text-[15px] active:scale-[0.98] transition-transform shadow-[0_4px_14px_rgba(251,191,36,0.3)] disabled:opacity-70">
-                                {isUpdating ? 'Saving...' : 'Save Changes'}
-                            </button>
-                        </form>
+            {/* ─── MODAL: EDIT PROFILE ─── */}
+            <Modal isOpen={isEditingProfile} onClose={() => setIsEditingProfile(false)} title="Edit Profile">
+                <form onSubmit={handleUpdateProfile} className="space-y-5">
+                    <div className="relative">
+                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} required className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Name" />
+                        <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Full Name</label>
                     </div>
-                </div>
-            )}
+                    <div className="relative">
+                        <input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} required minLength={10} maxLength={15} className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Phone" />
+                        <label className="absolute left-4 top-4 text-[11px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Phone Number</label>
+                    </div>
+                    <Button type="submit" isLoading={isUpdating} fullWidth className="mt-2" size="lg">
+                        {isUpdating ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                </form>
+            </Modal>
 
-            {/* ─── FLOATING BOTTOM SHEET: ADDRESSES ─── */}
-            {isAddressesModalOpen && (
-                <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl max-h-[85vh] flex flex-col animate-in slide-in-from-bottom-full duration-300 ease-out">
-                        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 shrink-0"></div>
-                        <div className="flex items-center justify-between mb-6 shrink-0">
-                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Saved Addresses</h3>
-                            <button onClick={() => setIsAddressesModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:scale-95 transition-transform">✕</button>
-                        </div>
-                        <div className="space-y-3 overflow-y-auto [scrollbar-width:none] pb-4">
-                            {user?.savedLocations && user.savedLocations.length > 0 ? (
-                                user.savedLocations.map(loc => (
-                                    <div key={loc._id} className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 border border-slate-100 flex items-center justify-center flex-shrink-0">
-                                                <IconMapPin />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[14px] font-black text-slate-900 tracking-tight">{loc.name}</span>
-                                                <span className="text-[11px] font-semibold text-slate-500 mt-0.5 line-clamp-1">{loc.address || 'Saved Location'}</span>
-                                            </div>
-                                        </div>
-                                        <button onClick={() => handleDeleteLocation(loc._id)} className="px-3 py-2 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl text-[11px] font-black uppercase tracking-wider active:scale-95 transition-transform">
-                                            Delete
-                                        </button>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="text-center py-12 bg-slate-50 rounded-3xl border border-slate-100">
-                                    <div className="w-14 h-14 bg-white text-slate-300 border border-slate-100 shadow-sm rounded-full flex items-center justify-center mx-auto mb-4">
+            {/* ─── MODAL: ADDRESSES ─── */}
+            <Modal isOpen={isAddressesModalOpen} onClose={() => setIsAddressesModalOpen(false)} title="Saved Addresses">
+                <div className="space-y-3">
+                    {user?.savedLocations && user.savedLocations.length > 0 ? (
+                        user.savedLocations.map(loc => (
+                            <div key={loc._id} className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 border border-slate-100 flex items-center justify-center flex-shrink-0">
                                         <IconMapPin />
                                     </div>
-                                    <h4 className="text-[15px] font-black text-slate-900 tracking-tight">No saved addresses</h4>
-                                    <p className="text-[12px] font-semibold text-slate-500 mt-1">Addresses save automatically during checkout.</p>
+                                    <div className="flex flex-col">
+                                        <span className="text-[14px] font-black text-slate-900 tracking-tight">{loc.name}</span>
+                                        <span className="text-[11px] font-semibold text-slate-500 mt-0.5 line-clamp-1">{loc.address || 'Saved Location'}</span>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ─── FLOATING BOTTOM SHEET: DELETE ACCOUNT ─── */}
-            {isDeleteModalOpen && (
-                <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 pb-8 shadow-2xl animate-in slide-in-from-bottom-full duration-300 ease-out">
-                        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-xl font-black text-rose-600 tracking-tight">Delete Account</h3>
-                            <button onClick={() => setIsDeleteModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:scale-95 transition-transform">✕</button>
-                        </div>
-                        <div className="mb-6">
-                            <p className="text-[13px] font-medium text-slate-600 mb-2">
-                                This action is permanent and cannot be undone. All your orders, settings, and saved data will be erased.
-                            </p>
-                            <p className="text-[13px] font-black text-slate-800">
-                                Please type <span className="text-rose-600 bg-rose-50 px-1 py-0.5 rounded">DELETE</span> to confirm.
-                            </p>
-                        </div>
-                        <div className="space-y-5">
-                            <div className="relative">
-                                <input type="text" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} required className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-rose-400 focus:bg-white transition-all placeholder-transparent" placeholder="DELETE" />
-                                <label className="absolute left-4 top-4 text-[11px] font-black text-rose-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-rose-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Type DELETE</label>
+                                <Button size="sm" variant="danger" onClick={() => handleDeleteLocation(loc._id)} className="text-[11px] uppercase tracking-wider">
+                                    Delete
+                                </Button>
                             </div>
-                            <button onClick={confirmDeleteAccount} disabled={deleteConfirmText !== "DELETE"} className="w-full mt-2 p-4 bg-rose-50 text-rose-600 border border-rose-100 rounded-2xl font-black text-[15px] active:scale-[0.98] transition-transform shadow-[0_4px_14px_rgba(244,63,94,0.1)] disabled:opacity-50">
-                                Delete Account Permanently
-                            </button>
+                        ))
+                    ) : (
+                        <div className="text-center py-12 bg-slate-50 rounded-3xl border border-slate-100">
+                            <div className="w-14 h-14 bg-white text-slate-300 border border-slate-100 shadow-sm rounded-full flex items-center justify-center mx-auto mb-4">
+                                <IconMapPin />
+                            </div>
+                            <h4 className="text-[15px] font-black text-slate-900 tracking-tight">No saved addresses</h4>
+                            <p className="text-[12px] font-semibold text-slate-500 mt-1">Addresses save automatically during checkout.</p>
                         </div>
-                    </div>
+                    )}
                 </div>
-            )}
+            </Modal>
+
+            {/* ─── MODAL: DELETE ACCOUNT ─── */}
+            <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title={<span className="text-rose-600">Delete Account</span>}>
+                <div className="mb-6">
+                    <p className="text-[13px] font-medium text-slate-600 mb-2">
+                        This action is permanent and cannot be undone. All your orders, settings, and saved data will be erased.
+                    </p>
+                    <p className="text-[13px] font-black text-slate-800">
+                        Please type <span className="text-rose-600 bg-rose-50 px-1 py-0.5 rounded">DELETE</span> to confirm.
+                    </p>
+                </div>
+                <div className="space-y-5">
+                    <div className="relative">
+                        <input type="text" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} required className="peer w-full pt-6 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-rose-400 focus:bg-white transition-all placeholder-transparent" placeholder="DELETE" />
+                        <label className="absolute left-4 top-4 text-[11px] font-black text-rose-400 uppercase tracking-widest peer-focus:-translate-y-2 peer-focus:text-rose-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case">Type DELETE</label>
+                    </div>
+                    <Button variant="danger" disabled={deleteConfirmText !== "DELETE"} onClick={confirmDeleteAccount} fullWidth className="mt-2 text-[15px]" size="lg">
+                        Delete Account Permanently
+                    </Button>
+                </div>
+            </Modal>
         </div>
     );
 };

@@ -4,6 +4,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { optimizeImage } from '../utils/imageUtils';
 import ProductCard from '../components/ProductCard';
+import ShopHeader from '../components/shop/ShopHeader';
+import ShopHero from '../components/shop/ShopHero';
+import ShopSearch from '../components/shop/ShopSearch';
+import ShopCategoriesCards from '../components/shop/ShopCategoriesCards';
+import ShopProductList from '../components/shop/ShopProductList';
 import './ShopDetail.css';
 
 /* ─── Icon Components ─── */
@@ -141,24 +146,7 @@ const ShopDetail = () => {
         <div className="sd">
 
             {/* ════════ HEADER ════════ */}
-            <header className="sd-header">
-                <div className="sd-header-row">
-                    <button className="sd-back-btn" onClick={() => navigate(-1)}>
-                        <IcoBack />
-                    </button>
-                    <span className="sd-header-title">
-                        {shop?.name || 'Shop'}
-                    </span>
-                    <div className="sd-header-actions">
-                        <Link to="/cart" className="sd-hdr-btn" title="Cart">
-                            <IcoCart />
-                            {totalCartItems > 0 && (
-                                <span key={totalCartItems} className="sd-hdr-badge">{totalCartItems}</span>
-                            )}
-                        </Link>
-                    </div>
-                </div>
-            </header>
+            <ShopHeader shop={shop} totalCartItems={totalCartItems} navigate={navigate} />
 
             {/* ════════ SCROLLABLE BODY ════════ */}
             <div className="sd-body">
@@ -187,59 +175,10 @@ const ShopDetail = () => {
                 ) : (
                     <>
                         {/* ════════ HERO BANNER ════════ */}
-                        {shop && !showProducts && (
-                            <div className="sd-hero">
-                                {shop.image ? (
-                                    <img src={optimizeImage(shop.image)} alt={shop.name} className="sd-hero-img" />
-                                ) : (
-                                    <div className="sd-hero-placeholder">🏪</div>
-                                )}
-                                <div className="sd-hero-gradient" />
-                                <div className="sd-hero-content">
-                                    <span className={`sd-hero-status ${shop.isOpen ? 'sd-hero-status--open' : 'sd-hero-status--closed'}`}>
-                                        <span className="sd-hero-status-dot" />
-                                        {shop.isOpen ? 'Open Now' : 'Closed'}
-                                    </span>
-                                    <h1 className="sd-hero-name">{shop.name}</h1>
-                                    <div className="sd-hero-info">
-                                        <span className="sd-hero-info-item">📍 {shop.address}</span>
-                                        {shop.vendorId?.phone && (
-                                            <span className="sd-hero-info-item">📞 {shop.vendorId.phone}</span>
-                                        )}
-                                        {shop.location?.coordinates && (
-                                            <button
-                                                className="sd-hero-dir-btn"
-                                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.location.coordinates[1]},${shop.location.coordinates[0]}`, '_blank')}
-                                            >
-                                                🗺️ Directions
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        {shop && !showProducts && <ShopHero shop={shop} />}
 
                         {/* ════════ SEARCH ════════ */}
-                        <div className="sd-search">
-                            <div className="sd-search-wrap">
-                                <IcoSearch />
-                                <input
-                                    type="search"
-                                    name="q"
-                                    id="shop-search-input"
-                                    autoComplete="off"
-                                    autoCorrect="off"
-                                    spellCheck="false"
-                                    placeholder="Search items, categories..."
-                                    className="sd-search-input"
-                                    value={searchQuery}
-                                    onChange={e => setSearchQuery(e.target.value)}
-                                />
-                                {searchQuery && (
-                                    <button className="sd-search-clear" onClick={() => setSearchQuery('')}>✕</button>
-                                )}
-                            </div>
-                        </div>
+                        <ShopSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
                         {/* ════════ CATEGORY CHIPS ════════ */}
                         {showProducts && (
@@ -293,105 +232,24 @@ const ShopDetail = () => {
                             </div>
                         ) : !showProducts ? (
                             /* ═══════ VIEW 1: CATEGORY CARDS ═══════ */
-                            <>
-                                <div className="sd-sec-head">
-                                    <h2 className="sd-sec-title">Browse by Category</h2>
-                                    <span className="sd-sec-count">{categories.length + 1} categories</span>
-                                </div>
-                                <div className="sd-cat-grid">
-                                    {/* All Items card */}
-                                    <div
-                                        className="sd-cat-card sd-cat-card--all"
-                                        onClick={() => setSelectedCategory('All')}
-                                    >
-                                        <div className="sd-cat-content">
-                                            <div className="sd-cat-name">All Items</div>
-                                            <div className="sd-cat-count">{products.length} items</div>
-                                        </div>
-                                    </div>
-
-                                    {categories.map((cat, idx) => {
-                                        const count = products.filter(p => {
-                                            const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
-                                            return pCatName === cat;
-                                        }).length;
-                                        const customImg = getCatImage(cat);
-                                        return (
-                                            <div
-                                                key={cat}
-                                                className={`sd-cat-card ${customImg ? 'sd-cat-card--has-img' : ''}`}
-                                                onClick={() => setSelectedCategory(cat)}
-                                            >
-                                                {customImg ? (
-                                                    <>
-                                                        <img src={optimizeImage(customImg)} alt={cat} className="sd-cat-bg-img" />
-                                                        <div className="sd-cat-overlay"></div>
-                                                    </>
-                                                ) : (
-                                                    <span className="sd-cat-emoji" style={{ fontSize: '28px' }}>🏷</span>
-                                                )}
-                                                <div className="sd-cat-content">
-                                                    <div className="sd-cat-name">{cat}</div>
-                                                    <div className="sd-cat-count">{count} items</div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </>
+                            <ShopCategoriesCards 
+                                categories={categories} 
+                                products={products} 
+                                getCatImage={getCatImage} 
+                                setSelectedCategory={setSelectedCategory} 
+                            />
                         ) : (
                             /* ═══════ VIEW 2: PRODUCT GRID ═══════ */
-                            <>
-                                <div className="sd-sec-head">
-                                    <h2 className="sd-sec-title">
-                                        {searchQuery
-                                            ? `Results for "${searchQuery}"`
-                                            : selectedCategory === 'All'
-                                                ? 'All Items'
-                                                : selectedCategory}
-                                    </h2>
-                                    <span className="sd-sec-count">{filteredProducts.length} items</span>
-                                </div>
-
-                                {filteredProducts.length === 0 ? (
-                                    <div className="sd-empty">
-                                        <span className="sd-empty-emoji">🔍</span>
-                                        <div className="sd-empty-title">No items found</div>
-                                        <div className="sd-empty-sub">
-                                            {searchQuery ? 'Try a different search term' : 'No items in this category'}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="sd-prod-grid">
-                                        {filteredProducts.map((product, idx) => {
-                                            const inCart = cartItems.find(i => i.productId === product._id);
-                                            return (
-                                                <div key={product._id} style={{ animationDelay: `${idx * 40}ms` }} className="sd-prod-wrapper">
-                                                    <ProductCard 
-                                                        product={product}
-                                                        onClick={() => navigate(`/shop/${id}/product/${product._id}`)}
-                                                        onAddClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleAddClick(e, product);
-                                                        }}
-                                                        quantity={inCart?.quantity || 0}
-                                                        onIncrement={(e) => {
-                                                            e.stopPropagation();
-                                                            updateQuantity(product._id, inCart.quantity + 1);
-                                                        }}
-                                                        onDecrement={(e) => {
-                                                            e.stopPropagation();
-                                                            updateQuantity(product._id, inCart.quantity - 1);
-                                                        }}
-                                                        discount="15%"
-                                                        deliveryTime="10 MINS"
-                                                    />
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </>
+                            <ShopProductList 
+                                filteredProducts={filteredProducts}
+                                searchQuery={searchQuery}
+                                selectedCategory={selectedCategory}
+                                cartItems={cartItems}
+                                id={id}
+                                navigate={navigate}
+                                handleAddClick={handleAddClick}
+                                updateQuantity={updateQuantity}
+                            />
                         )}
                     </>
                 )}

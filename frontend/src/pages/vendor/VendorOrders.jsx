@@ -72,6 +72,7 @@ const VendorOrders = () => {
     const CONFIRM_CONFIG = {
         accepted: { emoji: '✅', title: 'Accept Order?', desc: 'Move to Accepted column.', color: 'bg-emerald-500 hover:bg-emerald-600' },
         cancelled: { emoji: '❌', title: 'Reject Order?', desc: 'Cancel and refund customer.', color: 'bg-rose-500 hover:bg-rose-600' },
+        preparing: { emoji: '👨‍🍳', title: 'Start Preparing?', desc: 'Mark this order as being prepared.', color: 'bg-violet-500 hover:bg-violet-600' },
         out_for_delivery: { emoji: '🚚', title: 'Dispatch?', desc: 'Mark as out for delivery.', color: 'bg-blue-500 hover:bg-blue-600' },
         delivered: { emoji: '🎉', title: 'Verify Delivery', desc: 'Enter 4-digit PIN from customer.', color: 'bg-emerald-500 hover:bg-emerald-600' },
     };
@@ -195,7 +196,13 @@ const VendorOrders = () => {
                                 <button className="flex-1 bg-rose-50 text-rose-600 py-3 rounded-xl text-[12px] font-black uppercase tracking-wider active:scale-95 transition-transform" onClick={() => requestConfirm(order._id, 'cancelled')}>Reject</button>
                             </>
                         )}
-                        {(order.status === 'accepted' || order.status === 'preparing') && (
+                        {order.status === 'accepted' && (
+                            <div className="flex gap-2 w-full">
+                                <button className="flex-1 bg-violet-500 text-white py-3 rounded-xl text-[12px] font-black uppercase tracking-wider shadow-sm active:scale-95 transition-transform" onClick={() => requestConfirm(order._id, 'preparing')}>Start Preparing</button>
+                                <button onClick={() => handleWhatsAppShare(order)} className="flex-1 bg-[#25D366] text-white py-3 rounded-xl text-[12px] font-black uppercase tracking-wider active:scale-95 transition-transform flex justify-center items-center">WhatsApp</button>
+                            </div>
+                        )}
+                        {order.status === 'preparing' && (
                             <div className="flex gap-2 w-full">
                                 <button className="flex-1 bg-amber-400 text-amber-950 py-3 rounded-xl text-[12px] font-black uppercase tracking-wider shadow-sm active:scale-95 transition-transform" onClick={() => requestConfirm(order._id, 'out_for_delivery')}>Dispatch</button>
                                 <button onClick={() => handleWhatsAppShare(order)} className="flex-1 bg-[#25D366] text-white py-3 rounded-xl text-[12px] font-black uppercase tracking-wider active:scale-95 transition-transform flex justify-center items-center">WhatsApp</button>

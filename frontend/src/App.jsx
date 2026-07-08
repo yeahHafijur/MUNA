@@ -85,6 +85,54 @@ const AppContent = () => {
 
   const queryClient = useQueryClient();
 
+  // Request Notification + Location permissions immediately on app open
+  useEffect(() => {
+    const requestPermissions = async () => {
+      // 1. Request Notification Permission & register FCM token
+      try {
+        const { requestFirebaseNotificationPermission } = await import('./firebase');
+        const token = await requestFirebaseNotificationPermission();
+        if (token) {
+          console.log('[App] FCM token acquired:', token.substring(0, 20) + '...');
+          // Save token to backend if user is logged in
+          const userStr = localStorage.getItem('user');
+          if (userStr) {
+            try {
+              const API = import.meta.env.VITE_API_URL || '';
+              await fetch(`${API}/api/auth/fcm-token`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fcmToken: token }),
+              });
+            } catch (err) {
+              console.warn('[App] Failed to save FCM token to backend:', err);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[App] Notification permission error:', err);
+      }
+
+      // 2. Request Location Permission
+      try {
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => console.log('[App] Location granted:', pos.coords.latitude, pos.coords.longitude),
+            (err) => console.warn('[App] Location denied:', err.message),
+            { enableHighAccuracy: true, timeout: 10000 }
+          );
+        }
+      } catch (err) {
+        console.warn('[App] Location permission error:', err);
+      }
+    };
+
+    requestPermissions();
+  }, []);
+
   useEffect(() => {
     // onMessageListener ab ek unsubscribe function return karta hai
     const unsubscribe = onMessageListener((payload) => {

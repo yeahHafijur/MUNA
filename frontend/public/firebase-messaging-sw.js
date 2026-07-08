@@ -23,14 +23,26 @@ messaging.onBackgroundMessage((payload) => {
   if (navigator.setAppBadge) {
     navigator.setAppBadge().catch(console.error);
   }
+
+  const notificationTitle = payload.notification?.title || 'MUNA Notification';
+  const notificationOptions = {
+    body: payload.notification?.body,
+    icon: '/muna-logo-new.png',
+    data: {
+      route: payload.data?.route || '/'
+    }
+  };
+
+  // Manually show the notification since we intercepted it
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 // Click-to-Navigate: When user taps a push notification, open the correct page
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  // Get the route from FCM data payload
-  const route = event.notification?.data?.FCM_MSG?.data?.route || '/';
+  // Get the route from our custom data payload
+  const route = event.notification.data?.route || '/';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {

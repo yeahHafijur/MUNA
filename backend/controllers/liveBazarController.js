@@ -55,7 +55,7 @@ const getNearbyItems = async (req, res) => {
 
         const items = await LiveBazarItem.find({
             status: 'active',
-            'location.coordinates': {
+            location: {
                 $nearSphere: {
                     $geometry: {
                         type: 'Point',
@@ -69,7 +69,7 @@ const getNearbyItems = async (req, res) => {
         res.status(200).json(items);
     } catch (error) {
         console.error("LiveBazar getNearbyItems Error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 

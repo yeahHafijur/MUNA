@@ -87,8 +87,8 @@ const AppContent = () => {
 
   // Request Notification + Location permissions immediately on app open
   useEffect(() => {
-    const requestPermissions = async () => {
-      // 1. Request Notification Permission & register FCM token
+    // 1. Request Notification Permission & register FCM token
+    const requestNotification = async () => {
       try {
         const { requestFirebaseNotificationPermission } = await import('./firebase');
         const token = await requestFirebaseNotificationPermission();
@@ -102,9 +102,7 @@ const AppContent = () => {
               await fetch(`${API}/api/auth/fcm-token`, {
                 method: 'POST',
                 credentials: 'include',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fcmToken: token }),
               });
             } catch (err) {
@@ -115,8 +113,10 @@ const AppContent = () => {
       } catch (err) {
         console.warn('[App] Notification permission error:', err);
       }
+    };
 
-      // 2. Request Location Permission
+    // 2. Request Location Permission
+    const requestLocation = () => {
       try {
         if ('geolocation' in navigator) {
           navigator.geolocation.getCurrentPosition(
@@ -130,7 +130,8 @@ const AppContent = () => {
       }
     };
 
-    requestPermissions();
+    requestNotification();
+    requestLocation();
   }, []);
 
   useEffect(() => {

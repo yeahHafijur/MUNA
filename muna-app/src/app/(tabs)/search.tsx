@@ -1,0 +1,167 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
+import { Search as SearchIcon, ArrowLeft, Store, Clock } from 'lucide-react-native';
+import { useCart } from '@/context/CartContext';
+import api from '@/api/api';
+import ProductCard from '@/components/ProductCard';
+
+export default function SearchScreen() {
+    const router = useRouter();
+    const params = useLocalSearchParams();
+    const { addToCart, overrideAndReplaceCart } = useCart();
+    const inputRef = useRef<TextInput>(null);
+
+    const [query, setQuery] = useState(params.q ? String(params.q) : '');
+    const [debouncedQuery, setDebouncedQuery] = useState(query);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedQuery(query);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [query]);
+
+    // Update query if passed from route params
+    useEffect(() => {
+        if (params.q) setQuery(String(params.q));
+    }, [params.q]);
+
+    const { data: searchResults, isLoading } = useQuery({
+        queryKey: ['search', debouncedQuery],
+        queryFn: async () => {
+            if (!debouncedQuery.trim()) return { products: [], shops: [] };
+            const res = await api.get(`/api/search?q=${encodeURIComponent(debouncedQuery)}`);
+            return res.data;
+        },
+        enabled: debouncedQuery.trim().length > 0
+    });
+
+    const handleAddToCart = (product: any, shopId: string) => {
+        const result = addToCart(product, shopId);
+        if (!result.success && result.error === 'DIFFERENT_SHOP_ERROR') {
+            Alert.alert(
+                'Replace cart item?',
+                'Your cart contains items from another shop. Do you want to discard the selection and add items from this shop?',
+                [
+                    { text: 'No', style: 'cancel' },
+                    { text: 'Replace', onPress: () => overrideAndReplaceCart(product, shopId) }
+                ]
+            );
+        }
+    };
+
+    return (
+        <View className="flex-1 bg-white">
+            {/* Header / Search Bar */}
+            <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-3 shadow-sm flex-row items-center gap-3">
+                <TouchableOpacity onPress={() => router.back()} className="p-1">
+                    <ArrowLeft size={24} color="#0f172a" />
+                </TouchableOpacity>
+                <View className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 h-11 flex-row items-center gap-2">
+                    <SearchIcon size={18} color="#94a3b8" />
+                    <TextInput
+                        ref={inputRef}
+                        className="flex-1 text-[15px] font-medium text-slate-900 h-full"
+                        placeholder="Search for groceries, veggies..."
+                        placeholderTextColor="#94a3b8"
+                        value={query}
+                        onChangeText={setQuery}
+                        autoFocus
+                    />
+                    {query.length > 0 && (
+                        <TouchableOpacity onPress={() => setQuery('')} className="p-1">
+                            <Text className="text-slate-400 font-bold text-xs">✕</Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </View>
+
+            {/* Main Content */}
+            <ScrollView 
+                className="flex-1 bg-slate-50" 
+                contentContainerStyle={{ padding: 16 }}
+                keyboardShouldPersistTaps="handled"
+            >
+                {!debouncedQuery ? (
+                    <View className="items-center justify-center pt-20">
+                        <Text className="text-5xl mb-4">🛒</Text>
+                        <Text className="text-[16px] font-black text-slate-400">What are you looking for?</Text>
+                        <Text className="text-[13px] font-medium text-slate-400 text-center mt-2 px-8">
+                            Search for products, categories, or specific stores near you
+                        </Text>
+                    </View>
+                ) : isLoading ? (
+                    <View className="items-center justify-center pt-12">
+                        <ActivityIndicator size="large" color="#fbbf24" />
+                    </View>
+                ) : (
+                    <View className="gap-6">
+                        {/* SHOPS SECTION */}
+                        {searchResults?.shops?.length > 0 && (
+                            <View>
+                                <Text className="text-[15px] font-black text-slate-900 mb-3">Stores</Text>
+                                <View className="gap-3">
+                                    {searchResults.shops.map((shop: any) => (
+                                        <TouchableOpacity
+                                            key={shop._id}
+                                            onPress={() => router.push(`/shop/${shop._id}`)}
+                                            className="bg-white p-3 rounded-xl border border-slate-100 flex-row items-center shadow-sm"
+                                        >
+                                            <View className="w-12 h-12 bg-amber-50 rounded-lg items-center justify-center mr-3">
+                                                <Store size={24} color="#d97706" />
+                                            </View>
+                                            <View className="flex-1">
+                                                <Text className="text-[15px] font-bold text-slate-900">{shop.name}</Text>
+                                                <Text className="text-[12px] text-slate-500">{shop.category || 'Grocery'}</Text>
+                                            </View>
+                                            <View className="bg-slate-50 px-2 py-1 rounded flex-row items-center">
+                                                <Clock size={12} color="#64748b" />
+                                                <Text className="text-[10px] font-bold text-slate-600 ml-1">15 min</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
+
+                        {/* PRODUCTS SECTION */}
+                        {searchResults?.products?.length > 0 && (
+                            <View>
+                                <Text className="text-[15px] font-black text-slate-900 mb-3">Products</Text>
+                                <View className="flex-row flex-wrap justify-between gap-y-4">
+                                    {searchResults.products.map((prod: any) => (
+                                        <View key={prod._id} className="w-[48%] h-[260px]">
+                                            <ProductCard
+                                                product={prod}
+                                                onClick={() => {
+                                                    const shopId = prod.shopId?._id || prod.shopId;
+                                                    router.push(`/shop/${shopId}/product/${prod._id}`);
+                                                }}
+                                                onAddClick={() => handleAddToCart(prod, prod.shopId?._id || prod.shopId)}
+                                                discount="15%"
+                                                deliveryTime="15 MINS"
+                                            />
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
+
+                        {/* NO RESULTS */}
+                        {searchResults?.products?.length === 0 && searchResults?.shops?.length === 0 && (
+                            <View className="items-center justify-center pt-16">
+                                <Text className="text-5xl mb-3">🔍</Text>
+                                <Text className="text-[15px] font-black text-slate-600">No results found</Text>
+                                <Text className="text-[13px] font-medium text-slate-400 text-center mt-1">
+                                    Try checking for typos or using more general terms
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                )}
+            </ScrollView>
+        </View>
+    );
+}

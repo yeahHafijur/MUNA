@@ -256,7 +256,7 @@ export default function ShopDetailScreen() {
                                         >
                                             {customImg ? (
                                                 <>
-                                                    <Image source={{ uri: customImg }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} contentFit="cover" />
+                                                    <Image source={{ uri: customImg }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} resizeMode="cover" />
                                                     <View className="absolute inset-0 bg-black/40" />
                                                     <Text className="text-white font-black text-[15px] text-center z-10 px-1 leading-tight tracking-tight" numberOfLines={2}>{cat}</Text>
                                                     <Text className="text-slate-200 font-bold text-xs mt-1 z-10">{count} items</Text>

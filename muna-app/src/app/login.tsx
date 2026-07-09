@@ -4,11 +4,13 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
 import api from '@/api/api';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
-WebBrowser.maybeCompleteAuthSession();
+GoogleSignin.configure({
+  webClientId: '739956516947-brhvingmj39r4ttur0rj1bvd354hmus9.apps.googleusercontent.com',
+  offlineAccess: false,
+});
 
 export default function LoginScreen() {
   const [error, setError] = useState('');
@@ -16,21 +18,7 @@ export default function LoginScreen() {
   const { login } = useAuth();
   const router = useRouter();
 
-  // Setup Google Auth Session for Expo Go
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    clientId: "739956516947-brhvingmj39r4ttur0rj1bvd354hmus9.apps.googleusercontent.com",
-    // We only need the web clientId for Expo Go
-  });
 
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const { id_token } = response.params;
-      handleGoogleBackendAuth(id_token);
-    } else if (response?.type === 'error') {
-      setError(response.error?.message || 'Google Login failed or was canceled');
-      setLoading(false);
-    }
-  }, [response]);
 
   const handleGoogleBackendAuth = async (idToken: string) => {
     if (!idToken) return;
@@ -65,10 +53,29 @@ export default function LoginScreen() {
     }
   };
 
-  const onGoogleButtonPress = () => {
+  const onGoogleButtonPress = async () => {
     setLoading(true);
     setError('');
-    promptAsync();
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      
+      const idToken = response.data?.idToken || (response as any).idToken;
+      
+      if (idToken) {
+        handleGoogleBackendAuth(idToken);
+      } else {
+        if (response.type === 'cancelled' || (response as any).code === 'CANCELLED') {
+          setLoading(false);
+          return;
+        }
+        throw new Error('No ID token received from Google');
+      }
+    } catch (error: any) {
+      console.error(error);
+      setError(error.message || 'Google Login failed or was canceled');
+      setLoading(false);
+    }
   };
 
   const handleMockLogin = async () => {
@@ -115,8 +122,8 @@ export default function LoginScreen() {
         <View className="space-y-4">
           <TouchableOpacity 
             onPress={onGoogleButtonPress}
-            disabled={!request || loading}
-            className={`w-full h-12 flex-row justify-center items-center border border-gray-300 rounded-lg bg-white ${(!request || loading) ? 'opacity-70' : ''}`}
+            disabled={loading}
+            className={`w-full h-12 flex-row justify-center items-center border border-gray-300 rounded-lg bg-white ${loading ? 'opacity-70' : ''}`}
           >
             {loading && !error ? (
               <ActivityIndicator color="#2563eb" />
@@ -130,7 +137,27 @@ export default function LoginScreen() {
             disabled={loading}
             className="w-full h-12 flex-row justify-center items-center border border-blue-300 rounded-lg bg-blue-50 mt-4"
           >
-            <Text className="text-blue-700 font-semibold">Mock Login (UI Testing Only)</Text>
+            <Text className="text-blue-700 font-semibold">Mock Login (Customer)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={async () => {
+              setLoading(true);
+              setTimeout(() => {
+                login({
+                  _id: '6a2d301d6295a2702f58981a',
+                  name: 'Demo Vendor',
+                  email: 'demo@munahut.in',
+                  role: 'vendor'
+                }, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMmQzMDFkNjI5NWEyNzAyZjU4OTgxYSIsImlhdCI6MTc4MzU4MDM5OCwiZXhwIjoxNzg2MTcyMzk4fQ.FZPFBWWsd8WcFRLQKXb_NY_-ZESC7lahG6dhF_AREYU');
+                setLoading(false);
+                router.replace('/(tabs)');
+              }, 1000);
+            }}
+            disabled={loading}
+            className="w-full h-12 flex-row justify-center items-center border border-emerald-300 rounded-lg bg-emerald-50 mt-2"
+          >
+            <Text className="text-emerald-700 font-semibold">Vendor Demo Login</Text>
           </TouchableOpacity>
         </View>
 

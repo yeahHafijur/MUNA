@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import api from '@/api/api';
+import { registerForPushNotificationsAsync } from '@/utils/notifications';
 
 interface AuthContextType {
   user: any | null;
@@ -33,6 +35,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (storedUser && storedToken) {
           setUser(JSON.parse(storedUser));
           setToken(storedToken);
+          // Set api header here to ensure it's available for the token call
+          api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+          
+          // Try fetching push token quietly in background
+          registerForPushNotificationsAsync().then((fcmToken) => {
+            if (fcmToken) {
+              api.post('/api/auth/fcm-token', { fcmToken }).catch(console.error);
+            }
+          });
         }
       } catch (err) {
         console.error('Failed to load user from SecureStore', err);
@@ -49,9 +60,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await SecureStore.setItemAsync('user', JSON.stringify(userData));
       await SecureStore.setItemAsync('token', userToken);
-      // NOTE: FCM logic will be implemented later via expo-notifications
+      
+      // Update axios default header so the fcm-token call works immediately
+      api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
+      
+      // Fetch FCM Token and send to backend
+      const fcmToken = await registerForPushNotificationsAsync();
+      if (fcmToken) {
+        await api.post('/api/auth/fcm-token', { fcmToken }).catch(console.error);
+      }
     } catch (err) {
-      console.error('Failed to save user data', err);
+      console.error('Failed to save user data or push token', err);
     }
   };
 

@@ -123,12 +123,21 @@ export default function ProfileScreen() {
                         onPress={() => router.push('/settings')}
                     />
                     
-                    <MenuRow 
-                        icon={<Store size={20} color="#10b981" />}
-                        title="Become a Vendor"
-                        subtitle="Sell your products on MUNA"
-                        onPress={() => router.push('/vendor-request')}
-                    />
+                    {user?.role === 'vendor' ? (
+                        <MenuRow 
+                            icon={<Store size={20} color="#10b981" />}
+                            title="Vendor Dashboard"
+                            subtitle="Manage your shop, orders & menu"
+                            onPress={() => router.push('/vendor')}
+                        />
+                    ) : (
+                        <MenuRow 
+                            icon={<Store size={20} color="#10b981" />}
+                            title="Become a Vendor"
+                            subtitle="Sell your products on MUNA"
+                            onPress={() => router.push('/vendor-request')}
+                        />
+                    )}
                     
                     <MenuRow 
                         icon={<LogOut size={20} color="#ef4444" />}

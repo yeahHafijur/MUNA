@@ -22,10 +22,10 @@ export default function CartScreen() {
 
     const locationReady = gpsLocation && deliveryFee !== null;
 
-    const handleLocationDetermined = async (lat: number, lng: number) => {
-        setGpsLocation({ lat, lng });
+    const handleLocationDetermined = async (addr: any) => {
+        setGpsLocation({ lat: addr.lat, lng: addr.lng, text: addr.address });
         try {
-            const res = await api.post(`/api/shops/${cartShopId}/calculate-delivery`, { lat, lng });
+            const res = await api.post(`/api/shops/${cartShopId}/calculate-delivery`, { lat: addr.lat, lng: addr.lng });
             setDeliveryFee(res.data.deliveryFee);
             setDistance(res.data.distance);
         } catch (err: any) {
@@ -61,8 +61,9 @@ export default function CartScreen() {
                 totalAmount: finalTotal,
                 deliveryFee,
                 deliveryLocation: {
-                    type: 'Point',
-                    coordinates: [gpsLocation.lng, gpsLocation.lat]
+                    address: gpsLocation.text || 'GPS Location',
+                    lat: gpsLocation.lat,
+                    lng: gpsLocation.lng
                 },
                 customerLocationLat: gpsLocation.lat,
                 customerLocationLng: gpsLocation.lng,

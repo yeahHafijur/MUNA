@@ -67,7 +67,7 @@ export default function VendorMenu() {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsEditing: true,
-            aspect: [1, 1],
+            aspect: [4, 3],
             quality: 0.7,
         });
         if (!result.canceled) {
@@ -140,7 +140,7 @@ export default function VendorMenu() {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsEditing: true,
-            aspect: [1, 1],
+            aspect: [4, 5],
             quality: 0.8,
         });
         if (!result.canceled) {

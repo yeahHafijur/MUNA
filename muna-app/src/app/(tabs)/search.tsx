@@ -132,12 +132,12 @@ export default function SearchScreen() {
                                 <Text className="text-[15px] font-black text-slate-900 mb-3">Products</Text>
                                 <View className="flex-row flex-wrap justify-between gap-y-4">
                                     {searchResults.products.map((prod: any) => (
-                                        <View key={prod._id} className="w-[48%] h-[260px]">
+                                        <View key={prod._id} className="w-[48%] mb-2">
                                             <ProductCard
                                                 product={prod}
                                                 onClick={() => {
                                                     const shopId = prod.shopId?._id || prod.shopId;
-                                                    router.push(`/shop/${shopId}/product/${prod._id}`);
+                                                    router.push(`/product/${shopId}/${prod._id}` as any);
                                                 }}
                                                 onAddClick={() => handleAddToCart(prod, prod.shopId?._id || prod.shopId)}
                                                 discount="15%"

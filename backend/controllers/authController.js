@@ -312,11 +312,28 @@ const logout = async (req, res) => {
     }
 };
 
+const getLocations = async (req, res) => {
+    try {
+        const userId = req.user.id || req.user._id;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json(user.savedLocations || []);
+    } catch (error) {
+        console.error("Error fetching locations:", error);
+        res.status(500).json({ message: 'Server error fetching locations' });
+    }
+};
+
 module.exports = {
     googleLogin,
     logout,
     saveLocation,
     deleteLocation,
+    getLocations,
     saveFcmToken,
     updateProfile,
     deleteAccount,

@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Dimensions, Platform, StatusBar, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Package, Heart, Settings, Store, LogOut, ChevronRight, User as UserIcon, Edit2 } from 'lucide-react-native';
+import { Package, Heart, Settings, Store, LogOut, ChevronRight, User as UserIcon, Edit2, MapPin, HeadphonesIcon, CreditCard } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+
+const { width } = Dimensions.get('window');
 
 interface MenuRowProps {
     icon: React.ReactNode;
@@ -11,24 +13,25 @@ interface MenuRowProps {
     onPress: () => void;
     isDanger?: boolean;
     isLast?: boolean;
+    iconBgColor: string;
 }
 
-const MenuRow: React.FC<MenuRowProps> = ({ icon, title, subtitle, onPress, isDanger, isLast }) => (
+const MenuRow: React.FC<MenuRowProps> = ({ icon, title, subtitle, onPress, isDanger, isLast, iconBgColor }) => (
     <TouchableOpacity
         onPress={onPress}
         activeOpacity={0.7}
-        className={`flex-row items-center justify-between p-4 bg-white ${!isLast ? 'border-b border-slate-100' : ''}`}
+        className={`flex-row items-center justify-between py-4 mx-4 ${!isLast ? 'border-b border-slate-100' : ''}`}
     >
         <View className="flex-row items-center gap-4 flex-1">
-            <View className={`w-10 h-10 rounded-xl items-center justify-center ${isDanger ? 'bg-rose-50' : 'bg-slate-50'}`}>
+            <View className="w-10 h-10 rounded-xl items-center justify-center shadow-sm" style={{ backgroundColor: iconBgColor }}>
                 {icon}
             </View>
             <View className="flex-1">
-                <Text className={`text-[15px] font-bold ${isDanger ? 'text-rose-600' : 'text-slate-900'}`}>{title}</Text>
+                <Text className={`text-[16px] font-bold ${isDanger ? 'text-rose-600' : 'text-slate-900'}`}>{title}</Text>
                 {subtitle && <Text className="text-[12px] font-medium text-slate-500 mt-0.5">{subtitle}</Text>}
             </View>
         </View>
-        {!isDanger && <ChevronRight size={16} color="#cbd5e1" />}
+        {!isDanger && <ChevronRight size={18} color="#cbd5e1" />}
     </TouchableOpacity>
 );
 
@@ -56,104 +59,150 @@ export default function ProfileScreen() {
 
     if (!user) {
         return (
-            <View className="flex-1 items-center justify-center bg-white">
-                <Text className="text-[16px] font-bold text-slate-800 mb-4">Please login to view your profile</Text>
+            <View className="flex-1 items-center justify-center bg-white px-6">
+                <View className="w-24 h-24 bg-amber-50 rounded-full items-center justify-center mb-6">
+                    <UserIcon size={40} color="#d97706" />
+                </View>
+                <Text className="text-[20px] font-black text-slate-900 mb-2 text-center">Your Profile</Text>
+                <Text className="text-[14px] font-medium text-slate-500 mb-8 text-center leading-relaxed">
+                    Login or create an account to view your orders, manage saved addresses, and access your wishlist.
+                </Text>
                 <TouchableOpacity 
                     onPress={() => router.push('/login')}
-                    className="bg-amber-400 px-6 py-3 rounded-xl shadow-sm"
+                    className="w-full bg-slate-900 py-4 rounded-xl shadow-sm items-center"
                 >
-                    <Text className="text-amber-950 font-black text-[15px]">Login / Signup</Text>
+                    <Text className="text-white font-black text-[15px]">Login / Signup</Text>
                 </TouchableOpacity>
             </View>
         );
     }
 
     return (
-        <View className="flex-1 bg-slate-50">
-            {/* Header */}
-            <View className="bg-white pt-12 px-5 pb-6 border-b border-slate-100 shadow-sm">
-                <View className="flex-row items-center justify-between">
-                    <Text className="text-[24px] font-black text-slate-900">Profile</Text>
-                    <TouchableOpacity onPress={() => router.push('/settings')} className="w-10 h-10 bg-slate-50 rounded-full items-center justify-center border border-slate-200">
-                        <Edit2 size={16} color="#64748b" />
-                    </TouchableOpacity>
-                </View>
-
-                {/* User Info */}
-                <View className="flex-row items-center mt-6">
-                    <View className="w-16 h-16 bg-amber-100 rounded-full items-center justify-center mr-4 border-2 border-white shadow-sm">
-                        <UserIcon size={32} color="#d97706" />
-                    </View>
-                    <View>
-                        <Text className="text-[20px] font-black text-slate-900 leading-tight">
-                            {user.name || 'MUNA User'}
-                        </Text>
-                        <Text className="text-[14px] font-bold text-slate-500 mt-1">
-                            {user.phone || user.email || '+91 ••••• •••••'}
-                        </Text>
-                    </View>
-                </View>
-            </View>
-
-            <ScrollView className="flex-1 pt-4 px-4" showsVerticalScrollIndicator={false}>
-                {/* Orders & Wishlist Quick Actions */}
-                <View className="flex-row gap-3 mb-4">
-                    <TouchableOpacity 
-                        onPress={() => router.push('/orders')}
-                        className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm items-center justify-center"
-                    >
-                        <Package size={24} color="#0284c7" className="mb-2" />
-                        <Text className="text-[13px] font-bold text-slate-700">Orders</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        onPress={() => router.push('/wishlist')}
-                        className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm items-center justify-center"
-                    >
-                        <Heart size={24} color="#ef4444" className="mb-2" />
-                        <Text className="text-[13px] font-bold text-slate-700">Wishlist</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Main Menu */}
-                <View className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden mb-6">
-                    <MenuRow 
-                        icon={<Settings size={20} color="#475569" />}
-                        title="Account Settings"
-                        subtitle="Addresses, Password, Privacy"
-                        onPress={() => router.push('/settings')}
-                    />
-                    
-                    {user?.role === 'vendor' ? (
-                        <MenuRow 
-                            icon={<Store size={20} color="#10b981" />}
-                            title="Vendor Dashboard"
-                            subtitle="Manage your shop, orders & menu"
-                            onPress={() => router.push('/vendor')}
-                        />
-                    ) : (
-                        <MenuRow 
-                            icon={<Store size={20} color="#10b981" />}
-                            title="Become a Vendor"
-                            subtitle="Sell your products on MUNA"
-                            onPress={() => router.push('/vendor-request')}
-                        />
-                    )}
-                    
-                    <MenuRow 
-                        icon={<LogOut size={20} color="#ef4444" />}
-                        title="Logout"
-                        isDanger={true}
-                        isLast={true}
-                        onPress={handleLogout}
-                    />
-                </View>
-
-                <View className="items-center mb-8">
-                    <Text className="text-[12px] font-bold text-slate-400">MUNA App v1.0.0</Text>
-                    <Text className="text-[10px] text-slate-300 mt-1">Made with ♥ in Assam</Text>
-                </View>
+        <View className="flex-1 bg-[#F8FAFC]">
+            <StatusBar barStyle="light-content" />
+            
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false} bounces={false}>
                 
-                <View className="h-20" />
+                {/* Hero Header Area */}
+                <View className="bg-slate-900 pt-16 pb-12 px-5 rounded-b-[40px] shadow-sm relative">
+                    <View className="flex-row items-center justify-between mb-8">
+                        <Text className="text-[24px] font-black text-white tracking-tight">My Profile</Text>
+                        <TouchableOpacity onPress={() => router.push('/settings')} className="w-10 h-10 bg-white/10 rounded-full items-center justify-center backdrop-blur-md">
+                            <Edit2 size={16} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View className="flex-row items-center">
+                        <View className="w-20 h-20 bg-amber-400 rounded-2xl items-center justify-center mr-5 border-4 border-white shadow-lg overflow-hidden relative">
+                            {/* In a real app, use the user's avatar image here */}
+                            <UserIcon size={36} color="#451a03" />
+                        </View>
+                        <View className="flex-1">
+                            <Text className="text-[22px] font-black text-white leading-tight mb-1" numberOfLines={1}>
+                                {user.name || 'MUNA User'}
+                            </Text>
+                            <View className="bg-white/20 self-start px-3 py-1 rounded-full backdrop-blur-sm">
+                                <Text className="text-[12px] font-bold text-slate-100">
+                                    {user.phone || user.email || '+91 ••••• •••••'}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+
+                <View className="px-5 -mt-6 z-10">
+                    {/* Quick Stats / Action Cards */}
+                    <View className="flex-row justify-between gap-3 mb-6">
+                        <TouchableOpacity 
+                            onPress={() => router.push('/orders')}
+                            className="flex-1 bg-white p-4 rounded-[20px] shadow-sm items-center justify-center border border-slate-50"
+                        >
+                            <View className="w-12 h-12 bg-blue-50 rounded-full items-center justify-center mb-3">
+                                <Package size={24} color="#3b82f6" />
+                            </View>
+                            <Text className="text-[14px] font-black text-slate-900">Orders</Text>
+                            <Text className="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-wider">Track & Reorder</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            onPress={() => router.push('/wishlist')}
+                            className="flex-1 bg-white p-4 rounded-[20px] shadow-sm items-center justify-center border border-slate-50"
+                        >
+                            <View className="w-12 h-12 bg-rose-50 rounded-full items-center justify-center mb-3">
+                                <Heart size={24} color="#ef4444" />
+                            </View>
+                            <Text className="text-[14px] font-black text-slate-900">Wishlist</Text>
+                            <Text className="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-wider">Saved Items</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* General Menu */}
+                    <View className="bg-white rounded-[24px] shadow-sm border border-slate-50 mb-6 py-2 overflow-hidden">
+                        <MenuRow 
+                            icon={<Settings size={20} color="#fff" />}
+                            iconBgColor="#64748b" // slate-500
+                            title="Account Settings"
+                            subtitle="Personal Details, Password"
+                            onPress={() => router.push('/settings')}
+                        />
+                        <MenuRow 
+                            icon={<MapPin size={20} color="#fff" />}
+                            iconBgColor="#f59e0b" // amber-500
+                            title="Saved Addresses"
+                            subtitle="Home, Office, Other"
+                            onPress={() => {}} // Placeholder
+                        />
+                        <MenuRow 
+                            icon={<CreditCard size={20} color="#fff" />}
+                            iconBgColor="#8b5cf6" // violet-500
+                            title="Payment Methods"
+                            subtitle="Cards, UPI, Wallets"
+                            onPress={() => {}} // Placeholder
+                        />
+                    </View>
+
+                    {/* Support & Vendor Menu */}
+                    <View className="bg-white rounded-[24px] shadow-sm border border-slate-50 mb-6 py-2 overflow-hidden">
+                        {user?.role === 'vendor' ? (
+                            <MenuRow 
+                                icon={<Store size={20} color="#fff" />}
+                                iconBgColor="#10b981" // emerald-500
+                                title="Vendor Dashboard"
+                                subtitle="Manage your shop & orders"
+                                onPress={() => router.push('/vendor')}
+                            />
+                        ) : (
+                            <MenuRow 
+                                icon={<Store size={20} color="#fff" />}
+                                iconBgColor="#10b981"
+                                title="Become a Seller"
+                                subtitle="Grow your business with us"
+                                onPress={() => router.push('/vendor-request')}
+                            />
+                        )}
+                        <MenuRow 
+                            icon={<HeadphonesIcon size={20} color="#fff" />}
+                            iconBgColor="#0ea5e9" // sky-500
+                            title="Help & Support"
+                            subtitle="ofassam@gmail.com"
+                            onPress={() => Linking.openURL('mailto:ofassam@gmail.com')}
+                        />
+                        <MenuRow 
+                            icon={<LogOut size={20} color="#ef4444" />}
+                            iconBgColor="#fff1f2" // rose-50
+                            title="Log Out"
+                            isDanger={true}
+                            isLast={true}
+                            onPress={handleLogout}
+                        />
+                    </View>
+
+                    {/* Footer / Version */}
+                    <View className="items-center mb-10 pt-2 opacity-50">
+                        <Text className="text-[13px] font-black text-slate-400">MUNA App v1.0.0</Text>
+                        <Text className="text-[11px] font-bold text-slate-400 mt-1 tracking-widest">MADE IN ASSAM</Text>
+                    </View>
+                </View>
             </ScrollView>
         </View>
     );

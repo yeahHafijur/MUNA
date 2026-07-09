@@ -32,17 +32,17 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
   if (Device.isDevice) {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
-    
+
     if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    
+
     if (finalStatus !== 'granted') {
       console.log('Failed to get push token for push notification!');
       return undefined;
     }
-    
+
     try {
       // Get the native Device Push Token (FCM token on Android, APNs on iOS)
       // For Android, this relies on google-services.json being present.

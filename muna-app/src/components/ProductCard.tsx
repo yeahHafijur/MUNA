@@ -78,6 +78,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <Text className="text-[11px] font-medium text-slate-500 mb-2" numberOfLines={1}>
         {product.shopId?.name
           ? `By ${product.shopId.name}`
+          : product.shopName
+          ? `By ${product.shopName}`
           : product.category?.name || product.category || '1 unit'}
       </Text>
 

@@ -115,7 +115,7 @@ export default function ProductDetailScreen() {
         : null;
 
     const similarProducts = Array.isArray(allShopProducts) 
-        ? allShopProducts.filter(p => p._id !== product._id && p.category === product.category).slice(0, 8)
+        ? allShopProducts.filter(p => p._id !== product._id).slice(0, 8)
         : [];
 
     return (
@@ -232,22 +232,32 @@ export default function ProductDetailScreen() {
                     </View>
                 </View>
 
-                {/* Similar Products */}
-                {similarProducts.length > 0 && (
-                    <View className="mt-2 bg-white pt-6 pb-8 border-t-8 border-slate-50">
-                        <View className="px-5 mb-4">
-                            <Text className="text-[16px] font-black text-slate-900">Similar Products</Text>
+                {/* More From This Store */}
+                <View className="mt-2 bg-white pt-6 pb-8 border-t-8 border-slate-50">
+                    <View className="px-5 mb-4 flex-row items-center justify-between">
+                        <View>
+                            <Text className="text-[16px] font-black text-slate-900">More from this store</Text>
+                            {shop && <Text className="text-[12px] font-medium text-slate-500 mt-0.5">{shop.name}</Text>}
                         </View>
+                        <TouchableOpacity 
+                            onPress={() => router.push(`/shop/${shopId}` as any)}
+                            className="bg-slate-100 px-3 py-1.5 rounded-full"
+                        >
+                            <Text className="text-[12px] font-bold text-slate-700">View All</Text>
+                        </TouchableOpacity>
+                    </View>
+                    
+                    {similarProducts.length > 0 ? (
                         <ScrollView 
                             horizontal 
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
                         >
                             {similarProducts.map(p => (
-                                <View key={p._id} className="w-[140px] h-[260px]">
+                                <View key={p._id} className="w-[140px] mb-2">
                                     <ProductCard 
                                         product={p}
-                                        onClick={() => router.push(`/shop/${shopId}/product/${p._id}`)}
+                                        onClick={() => router.push(`/product/${shopId}/${p._id}` as any)}
                                         onAddClick={() => addToCart(p, shopId as string)}
                                         quantity={cartItems.find(item => item.productId === p._id)?.quantity || 0}
                                         onIncrement={() => updateQuantity(p._id, (cartItems.find(item => item.productId === p._id)?.quantity || 0) + 1)}
@@ -256,8 +266,21 @@ export default function ProductDetailScreen() {
                                 </View>
                             ))}
                         </ScrollView>
+                    ) : (
+                        <View className="px-5 py-4 bg-slate-50 rounded-xl mx-5 items-center justify-center">
+                            <Text className="text-slate-500 font-medium text-[13px]">Explore the full catalog in the store.</Text>
+                        </View>
+                    )}
+                    
+                    <View className="px-5 mt-6">
+                        <TouchableOpacity 
+                            onPress={() => router.push(`/shop/${shopId}` as any)}
+                            className="w-full py-3.5 bg-slate-900 rounded-xl flex-row justify-center items-center"
+                        >
+                            <Text className="text-white font-black text-[14px]">Visit {shop?.name || 'Store'}</Text>
+                        </TouchableOpacity>
                     </View>
-                )}
+                </View>
 
                 <View className="h-10" />
             </ScrollView>

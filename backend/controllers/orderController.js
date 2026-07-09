@@ -394,11 +394,32 @@ const getAllOrdersForAdmin = async (req, res) => {
     }
 };
 
+// Get Active Order for Customer
+const getActiveOrder = async (req, res) => {
+    try {
+        const order = await Order.findOne({
+            customerId: req.user._id,
+            status: { $in: ['pending', 'accepted', 'preparing', 'out_for_delivery'] }
+        })
+        .sort({ createdAt: -1 })
+        .populate('shopId', 'name image address category isOpen');
+
+        if (!order) {
+            return res.status(200).json(null);
+        }
+        res.status(200).json(order);
+    } catch (error) {
+        console.error("getActiveOrder error:", error);
+        res.status(500).json({ message: "Failed to fetch active order." });
+    }
+};
+
 module.exports = {
     placeOrder,
     getCustomerOrders,
     getVendorOrders,
     updateOrderStatus,
     cancelOrder,
-    getAllOrdersForAdmin
+    getAllOrdersForAdmin,
+    getActiveOrder
 };

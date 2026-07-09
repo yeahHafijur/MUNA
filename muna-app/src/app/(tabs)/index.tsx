@@ -16,6 +16,16 @@ import QuickDeliveryStores from '@/components/home/QuickDeliveryStores';
 import BecomeSellerCTA from '@/components/home/BecomeSellerCTA';
 import HowItWorks from '@/components/home/HowItWorks';
 import HomeFooter from '@/components/home/HomeFooter';
+import CuratedCollections from '@/components/home/CuratedCollections';
+import { haversine } from '@/utils/homeUtils';
+import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'expo-router';
+import { Navigation, ArrowRight } from 'lucide-react-native';
+import QuickDeliveryStores from '@/components/home/QuickDeliveryStores';
+import BecomeSellerCTA from '@/components/home/BecomeSellerCTA';
+import HowItWorks from '@/components/home/HowItWorks';
+import HomeFooter from '@/components/home/HomeFooter';
 import { haversine } from '@/utils/homeUtils';
 
 type UserLocation = {
@@ -37,6 +47,9 @@ const defaultCategories = [
 import AllCategoriesModal from '@/components/home/AllCategoriesModal';
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const { cartItems, getTotal } = useCart();
+  const { user } = useAuth();
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [showAllCategories, setShowAllCategories] = useState(false);
@@ -106,14 +119,29 @@ export default function HomeScreen() {
     queryFn: async () => (await api.get('/api/banners')).data,
   });
 
+  const { data: activeOrder = null, refetch: refetchActiveOrder } = useQuery({
+    queryKey: ['activeOrder'],
+    queryFn: async () => {
+      if (!user) return null;
+      try {
+        const res = await api.get('/api/orders/active');
+        return res.data;
+      } catch {
+        return null;
+      }
+    },
+    enabled: !!user,
+    refetchInterval: 30000 // Poll every 30s
+  });
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([refetchShops(), refetchProducts(), refetchCategories(), refetchBanners()]);
+      await Promise.all([refetchShops(), refetchProducts(), refetchCategories(), refetchBanners(), refetchActiveOrder()]);
     } finally {
       setRefreshing(false);
     }
-  }, [refetchShops, refetchProducts, refetchCategories, refetchBanners]);
+  }, [refetchShops, refetchProducts, refetchCategories, refetchBanners, refetchActiveOrder]);
 
   const categoryList = useMemo(() => {
     if (!dbCategories.length) return defaultCategories;
@@ -156,9 +184,10 @@ export default function HomeScreen() {
       
       <ScrollView
         className="flex-1"
-        contentContainerClassName="pb-24"
+        contentContainerClassName="pb-24 w-full max-w-7xl mx-auto"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        stickyHeaderIndices={[activeOrder ? 2 : 1]} // The GlobalSearchBar view
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -169,22 +198,45 @@ export default function HomeScreen() {
           />
         }>
         
-        <View className="w-full max-w-7xl mx-auto">
-          {/* BANNER CAROUSEL */}
-          <View className="bg-white pb-4">
-            <PromoBanners banners={topBanners} />
-            <DailyMarketBanner />
+        {/* ACTIVE ORDER TRACKER */}
+        {activeOrder && (
+          <View className="bg-amber-100/80 px-4 py-3 border-b border-amber-200 flex-row items-center justify-between">
+            <View className="flex-row items-center flex-1">
+              <View className="w-8 h-8 bg-amber-500 rounded-full items-center justify-center mr-3 animate-pulse">
+                <Navigation size={16} color="#fff" />
+              </View>
+              <View>
+                <Text className="text-[14px] font-black text-amber-950">Your order is arriving!</Text>
+                <Text className="text-[11px] font-bold text-amber-700">Track delivery status 🛵</Text>
+              </View>
+            </View>
+            <TouchableOpacity 
+              onPress={() => router.push(`/orders`)}
+              className="bg-amber-500 px-3 py-1.5 rounded-full"
+            >
+              <Text className="text-white text-[11px] font-black">View</Text>
+            </TouchableOpacity>
           </View>
+        )}
 
-          {/* SEARCH */}
-          <View className="bg-slate-50/80 py-1">
-            <GlobalSearchBar />
-          </View>
+        {/* BANNER CAROUSEL */}
+        <View className="bg-white pb-4">
+          <PromoBanners banners={topBanners} />
+          <DailyMarketBanner />
+        </View>
+
+        {/* SEARCH (Sticky) */}
+        <View className="bg-white pt-1 pb-2 border-b border-slate-100 shadow-sm z-10">
+          <GlobalSearchBar />
+        </View>
 
           {/* BESTSELLERS */}
           <View className="mt-2">
             <Bestsellers featuredProducts={featuredProducts} />
           </View>
+
+          {/* CURATED COLLECTIONS */}
+          <CuratedCollections featuredProducts={featuredProducts} />
 
           {/* SHOP BY CATEGORY */}
           <View className="mt-2">
@@ -220,8 +272,32 @@ export default function HomeScreen() {
             <HowItWorks />
             <HomeFooter />
           </View>
-        </View>
       </ScrollView>
+
+      {/* ─── FLOATING VIEW CART STRIP ─── */}
+      {cartItems.length > 0 && (
+        <View className="absolute bottom-[20px] left-4 right-4 z-50">
+            <TouchableOpacity 
+                onPress={() => router.push('/cart')}
+                className="bg-emerald-600 rounded-[16px] h-14 flex-row items-center justify-between px-4 shadow-lg shadow-emerald-900/20"
+            >
+                <View className="flex-row items-center gap-3">
+                    <View className="bg-emerald-700/50 w-10 h-10 rounded-xl items-center justify-center">
+                        <Text className="text-white font-black text-[16px]">{cartItems.length}</Text>
+                        <Text className="text-emerald-100 font-bold text-[8px] -mt-1 uppercase">Items</Text>
+                    </View>
+                    <View>
+                        <Text className="text-white text-[15px] font-black">₹{getTotal()}</Text>
+                        <Text className="text-emerald-100 text-[11px] font-medium">Extra charges may apply</Text>
+                    </View>
+                </View>
+                <View className="flex-row items-center gap-2">
+                    <Text className="text-white text-[15px] font-black">View Cart</Text>
+                    <ArrowRight size={18} color="#fff" strokeWidth={3} />
+                </View>
+            </TouchableOpacity>
+        </View>
+      )}
 
       {/* ─── ALL CATEGORIES MODAL ─── */}
       {showAllCategories && (

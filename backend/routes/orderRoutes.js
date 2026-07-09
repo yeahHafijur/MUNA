@@ -5,11 +5,12 @@ const {
     getCustomerOrders,
     getVendorOrders,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    getActiveOrder
 } = require("../controllers/orderController");
 const { protect, authorize } = require("../middleware/authMiddleware");
 
-// 1. Customer Routes (customer aur vendor dono access kar sakte hain)
+router.get("/active", protect, getActiveOrder);
 router.post("/", protect, authorize("customer", "vendor"), placeOrder);
 router.get("/customer", protect, authorize("customer", "vendor"), getCustomerOrders);
 router.put("/:id/cancel", protect, authorize("customer", "vendor"), cancelOrder);

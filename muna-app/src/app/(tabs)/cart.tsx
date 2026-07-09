@@ -110,21 +110,25 @@ export default function CartScreen() {
                 <Text className="text-[18px] font-black text-slate-900">Checkout</Text>
             </View>
 
-            <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
+            <ScrollView 
+                className="flex-1 px-4 pt-4" 
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 120 }}
+            >
                 <CartItems 
                     cartItems={cartItems} 
                     updateQuantity={updateQuantity} 
                     removeFromCart={removeFromCart} 
                 />
 
-                <CartLocation 
-                    onLocationDetermined={handleLocationDetermined}
-                    locationReady={locationReady}
-                />
-
                 <CartSummary 
                     cartTotal={getTotal()}
                     deliveryFee={deliveryFee}
+                />
+
+                <CartLocation 
+                    onLocationDetermined={handleLocationDetermined}
+                    locationReady={locationReady}
                 />
             </ScrollView>
 

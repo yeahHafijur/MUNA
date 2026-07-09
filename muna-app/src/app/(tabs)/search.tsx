@@ -85,12 +85,53 @@ export default function SearchScreen() {
                 keyboardShouldPersistTaps="handled"
             >
                 {!debouncedQuery ? (
-                    <View className="items-center justify-center pt-20">
-                        <Text className="text-5xl mb-4">🛒</Text>
-                        <Text className="text-[16px] font-black text-slate-400">What are you looking for?</Text>
-                        <Text className="text-[13px] font-medium text-slate-400 text-center mt-2 px-8">
-                            Search for products, categories, or specific stores near you
-                        </Text>
+                    <View className="pt-2">
+                        {/* Trending Searches */}
+                        <View className="mb-6">
+                            <Text className="text-[14px] font-black text-slate-900 mb-3 px-1">Trending Searches</Text>
+                            <View className="flex-row flex-wrap gap-2">
+                                {['Milk & Bread', 'Fresh Vegetables', 'Maggi', 'Cold Drinks', 'Chicken', 'Eggs', 'Snacks'].map((item, idx) => (
+                                    <TouchableOpacity 
+                                        key={idx}
+                                        onPress={() => setQuery(item)}
+                                        className="bg-white border border-slate-200 px-4 py-2 rounded-full shadow-sm"
+                                    >
+                                        <Text className="text-[13px] font-bold text-slate-700">{item}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+
+                        {/* Popular Categories */}
+                        <View>
+                            <Text className="text-[14px] font-black text-slate-900 mb-3 px-1">Explore Categories</Text>
+                            <View className="flex-row flex-wrap justify-between gap-y-3">
+                                {[
+                                    { icon: '🥦', name: 'Vegetables' },
+                                    { icon: '🍎', name: 'Fruits' },
+                                    { icon: '🍗', name: 'Meat & Fish' },
+                                    { icon: '🥛', name: 'Dairy' },
+                                    { icon: '🍫', name: 'Sweets' },
+                                    { icon: '🧼', name: 'Cleaning' },
+                                ].map((cat, idx) => (
+                                    <TouchableOpacity 
+                                        key={idx}
+                                        onPress={() => setQuery(cat.name)}
+                                        className="w-[31%] bg-white border border-slate-100 rounded-2xl p-3 items-center shadow-sm"
+                                    >
+                                        <Text className="text-3xl mb-2">{cat.icon}</Text>
+                                        <Text className="text-[11px] font-bold text-slate-700 text-center">{cat.name}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+
+                        <View className="items-center justify-center pt-10 opacity-40">
+                            <Text className="text-4xl mb-2">🛒</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 text-center">
+                                Type to find products & stores
+                            </Text>
+                        </View>
                     </View>
                 ) : isLoading ? (
                     <View className="items-center justify-center pt-12">

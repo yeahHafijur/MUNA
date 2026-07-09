@@ -11,7 +11,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ cartTotal, deliveryFee }) => 
     const finalTotal = cartTotal + (deliveryFee || 0);
 
     return (
-        <View className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-20">
+        <View className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-4">
             <View className="flex-row items-center gap-2 mb-4 pb-3 border-b border-slate-100">
                 <Receipt size={18} color="#0f172a" />
                 <Text className="text-[16px] font-black text-slate-900">Bill Details</Text>

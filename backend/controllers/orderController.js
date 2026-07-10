@@ -189,6 +189,25 @@ const cancelOrder = async (req, res) => {
         order.status = "cancelled";
         await order.save();
 
+        // Notify the vendor that the customer cancelled the order
+        try {
+            const Shop = require('../models/Shop'); // Ensure Shop is loaded if not globally available, though it is imported at the top
+            const shop = await Shop.findById(order.shopId);
+            if (shop && shop.vendorId) {
+                sendAndSaveNotification(
+                    [shop.vendorId],
+                    "❌ Order Cancelled",
+                    `A pending order (₹${order.totalAmount || 0}) was just cancelled by the customer.`,
+                    { 
+                        route: "/vendor/orders",
+                        type: "order" 
+                    }
+                );
+            }
+        } catch (err) {
+            console.error("Failed to send cancel notification to vendor:", err);
+        }
+
         res.status(200).json({ message: "Order cancelled successfully", order });
     } catch (error) {
         console.error("Cancel order error:", error);

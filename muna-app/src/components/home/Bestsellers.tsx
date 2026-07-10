@@ -41,8 +41,6 @@ const Bestsellers: React.FC<BestsellersProps> = ({ featuredProducts }) => {
           <View key={prod._id} className="w-[140px] sm:w-[160px]">
             <ProductCard
               product={prod}
-              discount="15%"
-              deliveryTime="10 MINS"
               onClick={() => {
                 const shopId = prod.shopId?._id || prod.shopId || prod.shop;
                 if (shopId) {

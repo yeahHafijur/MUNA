@@ -61,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({
             <Text className="text-[11px] font-semibold text-slate-400" numberOfLines={1}>
                 {product.quantity}
             </Text>
-        ) : product.category?.name ? (
+        ) : (typeof product.category === 'object' && product.category?.name) ? (
             <Text className="text-[11px] font-semibold text-slate-400" numberOfLines={1}>
                 {product.category.name}
             </Text>

@@ -154,7 +154,7 @@ export default function CartScreen() {
                         <ActivityIndicator size="small" color="#ffffff" />
                     ) : (
                         <Text className={`text-[15px] font-black ${loading || !locationReady ? 'text-slate-400' : 'text-white'}`}>
-                            Place Order
+                            Place Order (COD)
                         </Text>
                     )}
                 </TouchableOpacity>

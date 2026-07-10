@@ -32,6 +32,13 @@ const CartSummary: React.FC<CartSummaryProps> = ({ cartTotal, deliveryFee }) => 
                     )}
                 </View>
 
+                <View className="flex-row justify-between items-center mt-2">
+                    <Text className="text-[13px] font-semibold text-slate-500">Payment Method</Text>
+                    <View className="bg-amber-50 px-2 py-1 rounded-md border border-amber-100">
+                        <Text className="text-[11px] font-black text-amber-700">CASH ON DELIVERY</Text>
+                    </View>
+                </View>
+
                 {/* Extra padding before total */}
                 <View className="h-2" />
 

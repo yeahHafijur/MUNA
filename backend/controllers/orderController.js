@@ -379,7 +379,7 @@ const updateOrderStatus = async (req, res) => {
             [order.customerId],
             "Order Update 📦",
             statusMessage,
-            { actionUrl: "/profile/orders", route: "/profile/orders", type: "order" }
+            { actionUrl: "/orders", route: "/orders", type: "order" }
         );
 
         res.status(200).json(updatedOrder);

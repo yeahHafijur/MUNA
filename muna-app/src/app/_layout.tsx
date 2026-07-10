@@ -70,8 +70,21 @@ function AuthHandler() {
 
 function RootLayoutNav() {
   const navigationState = useRootNavigationState();
+  const router = useRouter();
   
   useVendorAlarm();
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+      if (data?.route) {
+        // @ts-ignore - Expo router types
+        router.push(data.route);
+      }
+    });
+
+    return () => subscription.remove();
+  }, [router]);
 
   return (
     <>

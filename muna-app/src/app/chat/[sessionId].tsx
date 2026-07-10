@@ -114,7 +114,11 @@ export default function ChatDetailScreen() {
                     <View className="items-center mb-6">
                         <View className="bg-slate-200/50 px-3 py-1 rounded-full">
                             <Text className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                                {(() => {
+                                    const d = new Date();
+                                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                    return `${d.getDate()} ${months[d.getMonth()]}`;
+                                })()}
                             </Text>
                         </View>
                     </View>

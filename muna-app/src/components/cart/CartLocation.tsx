@@ -70,7 +70,7 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
         }
     };
 
-    const handleSaveNewAddress = async () => {
+    const handleSaveNewAddress = async (shouldSaveToDb: boolean) => {
         if (!newGps) return;
         if (!newAddressText.trim()) {
             Alert.alert("Missing Info", "Please enter your House No. / Landmark.");
@@ -79,30 +79,36 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
 
         setSaving(true);
         const payload = {
-            name: newName,
+            name: shouldSaveToDb ? newName : 'Current Location',
             address: newAddressText,
             lat: newGps.lat,
             lng: newGps.lng
         };
 
         try {
-            if (user) {
-                // Save to backend if user is logged in
+            if (user && shouldSaveToDb) {
+                // Save to backend
                 const res = await api.post('/api/user/locations', payload);
                 queryClient.invalidateQueries({ queryKey: ['savedLocations'] });
                 
-                // The backend returns the updated list, we can just use the last one
-                const updatedList = res.data.savedLocations;
-                const newlySaved = updatedList[updatedList.length - 1];
-                handleSelectSaved(newlySaved);
+                if (res.data && res.data.savedLocations) {
+                    const updatedList = res.data.savedLocations;
+                    const newlySaved = updatedList[updatedList.length - 1];
+                    handleSelectSaved(newlySaved || payload);
+                } else {
+                    onLocationDetermined(payload);
+                }
             } else {
-                // Guest user just uses it without saving to DB
+                // Just use without saving
                 onLocationDetermined(payload);
             }
             setShowModal(false);
             setNewAddressText('');
-        } catch (error) {
-            Alert.alert("Error", "Could not save address. Please try again.");
+        } catch (error: any) {
+            console.error("Save Location Error", error?.response?.data || error);
+            Alert.alert("Error", "Could not save address. Continuing without saving.");
+            onLocationDetermined(payload); // Fallback to just using it
+            setShowModal(false);
         } finally {
             setSaving(false);
         }
@@ -220,21 +226,28 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
                             ))}
                         </View>
 
-                        <View className="flex-row gap-3">
+                        <View className="flex-row gap-3 mt-4">
                             <TouchableOpacity 
-                                onPress={() => setShowModal(false)}
-                                className="flex-1 py-4 bg-slate-100 rounded-2xl items-center"
+                                onPress={() => handleSaveNewAddress(false)}
+                                disabled={saving || !newAddressText.trim()}
+                                className={`flex-1 py-4 bg-slate-100 rounded-2xl items-center ${saving || !newAddressText.trim() ? 'opacity-50' : ''}`}
                             >
-                                <Text className="text-slate-600 text-[15px] font-black">Cancel</Text>
+                                <Text className="text-slate-600 text-[14px] font-black">Use Once</Text>
                             </TouchableOpacity>
                             <TouchableOpacity 
-                                onPress={handleSaveNewAddress}
+                                onPress={() => handleSaveNewAddress(true)}
                                 disabled={saving || !newAddressText.trim()}
                                 className={`flex-1 py-4 bg-amber-400 rounded-2xl items-center ${saving || !newAddressText.trim() ? 'opacity-50' : ''}`}
                             >
-                                <Text className="text-amber-950 text-[15px] font-black">{saving ? 'Saving...' : 'Save & Use'}</Text>
+                                <Text className="text-amber-950 text-[14px] font-black">{saving ? 'Wait...' : 'Save & Use'}</Text>
                             </TouchableOpacity>
                         </View>
+                        <TouchableOpacity 
+                            onPress={() => setShowModal(false)}
+                            className="mt-4 py-2 items-center"
+                        >
+                            <Text className="text-slate-400 text-[13px] font-bold">Cancel</Text>
+                        </TouchableOpacity>
                     </View>
                 </KeyboardAvoidingView>
             </Modal>

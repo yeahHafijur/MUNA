@@ -1,123 +1,83 @@
-# 🧠 MUNA - Project Brain
+# 🧠 MUNA Project Brain (Context & Status)
 
-Welcome to the **MUNA** project! This document serves as the central knowledge base for the project architecture, features, and workflows.
-
-## 🚀 Overview
-**MUNA** is a multi-vendor e-commerce and delivery platform. It connects customers with local shops (Grocery, Kirana, Bakery, Pharmacy, etc.) for quick and easy delivery. The platform consists of a frontend Progressive Web App (PWA) built with React/Vite, and a backend REST API powered by Node.js, Express, and MongoDB.
+> **For any AI Assistant:** Read this file carefully to understand the exact context, architecture, history, and future goals of the MUNA app before making any changes. This project has a specific history regarding PWA vs Native apps.
 
 ---
 
-## 🏗️ Tech Stack
+## 1. 🏗️ Project Architecture & Context
 
-### Frontend (`/frontend`)
-- **Framework:** React 19 + Vite
-- **Styling:** Vanilla CSS + TailwindCSS (v4)
-- **State Management & Data Fetching:** React Query (`@tanstack/react-query`)
-- **Routing:** React Router v7
-- **PWA / Offline Support:** Vite PWA Plugin + Workbox
-- **Push Notifications:** Firebase Cloud Messaging (FCM)
-- **Authentication:** Google OAuth (`@react-oauth/google`)
+**MUNA** is a hyper-local quick-commerce delivery app (similar to Blinkit, Zepto, or Swiggy Instamart). 
 
-### Backend (`/backend`)
-- **Runtime:** Node.js
-- **Framework:** Express.js 5
-- **Database:** MongoDB (via Mongoose)
-- **Authentication:** JWT (JSON Web Tokens)
-- **Image Storage:** Cloudinary
-- **Notifications:** Firebase Admin SDK (FCM)
-- **Scheduling:** `node-cron` (used for shop auto-open/close states)
+- **Backend:** Node.js, Express, MongoDB (Currently hosted on Render at `https://www.munahut.in`).
+- **Web App (PWA):** A PWA wrapper (TWA) was originally launched on the Play Store (`app.vercel.muna_opal.twa`) but suffered from severe background Location and Push Notification issues.
+- **Native App (`muna-app`):** This is the ultimate replacement for the TWA. **CRITICAL CONTEXT:** This single React Native app houses both the **Customer App** and the **Vendor Dashboard** (`src/app/vendor/`).
+- **Admin Panel:** NOT BUILT YET. Currently, there is no Admin Panel to manage global operations. This is a future requirement.
+
+### 🤔 Why did we build a Native App if a PWA already exists?
+The PWA was wrapped as a TWA (Trusted Web Activity) and published to the Play Store (`app.vercel.muna_opal.twa`). However, the PWA faced severe limitations with **Push Notifications** and **Native GPS Location tracking**. 
+This React Native Expo app was built specifically to replace the TWA on the Play Store to provide a flawless, premium native experience with working notifications and location.
 
 ---
 
-## 👥 User Roles
+## 2. ✨ What Has Been Completed So Far (React Native App)
 
-1. **User (Customer):** Can browse shops, search for products, add items to cart, and place orders.
-2. **Vendor (Shop Owner):** Manages a specific shop. Can import items from the central Godown, create custom products, manage shop orders, and toggle shop open/close status.
-3. **Super Admin:** The platform owner. Can onboard new vendors, manage global categories, manage the Godown inventory, and oversee all platform activity.
+The `muna-app` has been heavily customized to feel like a premium, top-tier delivery app.
 
----
+*   **Auth & Profiles:**
+    *   Google Sign-In integrated.
+    *   Premium Dark-themed User Profile and Settings page.
+    *   Phone number and Name update flow.
+*   **Location & Cart (The core fix):**
+    *   Native GPS integration using `expo-location`.
+    *   Users can fetch GPS, add "House No.", and save addresses as Home/Office/Other.
+    *   Added fallback "Use Once" functionality for guests/quick orders.
+*   **Premium Homepage UI:**
+    *   **Sticky Search Bar:** Stays at the top while scrolling.
+    *   **Curated Collections:** Thematic product rows (e.g., "Breakfast Essentials 🍳", "Snacks 🍿").
+    *   **Active Order Tracker:** A pulsating banner at the top if the user has an ongoing order (`GET /api/orders/active`).
+    *   **Floating Cart Strip:** A sticky bottom strip showing items and price when cart is not empty.
+*   **Product Cards:**
+    *   Redesigned to be highly minimalist (removed bulky discount badges, cleaned up text, focused on product and price).
 
-## 🗄️ Core Database Models
-
-### 1. `User`
-Stores all registered users. Role field dictates permissions (`user`, `vendor`, `super_admin`). Auth is handled via Firebase/Google OAuth.
-
-### 2. `Shop`
-Represents a vendor's store.
-- Linked to a `vendorId` (User).
-- Belongs to a strict `shopCategoryId` (e.g., "Grocery", "Pharmacy").
-- Contains geolocation (`location`), schedule settings (`autoSchedule`), and current status (`isOpen`, `isActive`).
-
-### 3. Categories (Hybrid Taxonomy)
-The category system uses two tiers to maintain structure while allowing vendor flexibility:
-- **`ShopCategory`:** Strict global categories for classifying shops (Superadmin only). Used in the Vendor Onboarding flow.
-- **`ItemCategory`:** Hybrid categories for classifying products inside shops.
-  - **Global (`isGlobal: true`):** Created by Superadmin, visible to ALL vendors (e.g., "Beverages", "Dairy").
-  - **Custom (`isGlobal: false`):** Created by a Vendor, tied strictly to their `vendorId` and `shopId`.
-
-### 4. `Product`
-An item sold by a vendor.
-- Tied to a `shopId` and `vendorId`.
-- References an `ItemCategory`.
-- Tracks `inStock` status.
-
-### 5. `GodownItem`
-A centralized master inventory list managed by the Super Admin. Vendors can easily "import" items from the Godown directly into their shop's product list.
-
-### 6. `Order`
-Tracks customer purchases.
-- Tied to `userId` (customer) and `shopId` (vendor).
-- Tracks `status` (pending, accepted, rejected, completed).
+*   **Vendor Features & Stability:**
+    *   Vendor Dashboard UI improved (large Dashboard button added to Profile).
+    *   Fixed deep crashes related to NativeWind and React Navigation by removing dynamic classes that used CSS variables incorrectly.
+    *   Replaced native `toLocaleDateString` and `toLocaleTimeString` with robust manual formatters across the entire app to completely eliminate Hermes JS Engine crashes on Android.
+    *   Implemented a background background alarm (`useVendorAlarm`) for new incoming orders, even playing a loud ringtone.
+    *   Order History tab for Vendors is fully functional with date pickers.
 
 ---
 
-## 🛠️ Key Workflows
+## 3. 🚀 Pending Tasks (Road to Production)
 
-### Vendor Onboarding Flow
-1. Super Admin goes to `/admin` -> **Onboard Tab**.
-2. Admin enters vendor details (Name, Email, Phone) and Shop details (Name, Address, Lat/Lng).
-3. Admin selects a **Shop Category** from the strict list.
-4. Backend creates the `User` (with role `vendor`) and the `Shop` linked to that user.
+Since this app will act as an **update** to the existing TWA on the Play Store, the production steps are highly specific.
 
-### Item Categorization Flow
-1. Super Admin creates **Global Item Categories** (e.g., Snacks, Dairy).
-2. Vendor goes to their catalog. The category dropdown shows both Global categories (marked with 🌐) and any custom categories they've made.
-3. If a vendor needs a specific category not provided globally (e.g., "Diwali Special Offer"), they can create a **Custom Item Category**.
+*   [ ] **Login System Production Cleanup:** Remove any remaining "Demo Login" or mock vendor buttons from `login.tsx` before release.
+*   [ ] **Admin Panel Creation:** A global admin panel has not been built yet. It needs to be created (either as a web dashboard or a hidden super-admin route in the app) to manage users, vendors, and platform operations.
 
-### Push Notifications
-1. When a user logs in, the React app requests Notification permission from the browser.
-2. If granted, an FCM token is generated and sent to the backend (`/api/auth/save-fcm-token`).
-3. When an order is placed, the backend uses `firebase-admin` to send a push notification to the specific vendor's FCM tokens.
+### C. App Configuration & Keystore (Crucial)
+*   [ ] **Keystore Recovery:** The new Expo EAS build MUST be signed with the exact same `.jks` (Upload Key) used for the original PWA/TWA (`app.vercel.muna_opal.twa`). Without this, Google Play will reject the update.
+*   [ ] **Package Verification:** Ensure `app.json` package name (`app.vercel.muna_opal.twa`) and `versionCode` (currently `27`) are correctly incremented for the Play Store update.
+*   [ ] **Branding:** Set final App Icon and Splash screen images in `app.json`.
 
----
+### B. Push Notifications Validation
+*   [ ] FCM Tokens are currently being generated and saved to the backend via `saveFcmToken`.
+*   [ ] **Action Required:** Test a live push notification from the backend to the physical device to ensure background notifications work perfectly (this was the main reason for switching to Native).
 
-## 📁 Directory Structure Overview
-
-```text
-MUNA/
-├── backend/
-│   ├── config/          # DB connection
-│   ├── controllers/     # Business logic handlers
-│   ├── middleware/      # Auth, Cloudinary upload middlewares
-│   ├── models/          # Mongoose schemas
-│   ├── routes/          # Express route definitions
-│   ├── utils/           # Helper functions (Cloudinary, etc.)
-│   └── index.js         # Entry point
-│
-├── frontend/
-│   ├── public/          # Static assets, sw.js
-│   ├── src/
-│   │   ├── components/  # Reusable UI components (BottomNav, Splash, etc.)
-│   │   ├── context/     # React Context (Auth, Cart)
-│   │   ├── pages/       # Route views (Home, AdminDashboard, VendorMenu, etc.)
-│   │   ├── App.jsx      # Main application router
-│   │   └── firebase.js  # Firebase client configuration
-│   └── vite.config.js   # Vite + PWA configuration
-```
+### E. Build & Submission
+*   [ ] **EAS Build:** Run `eas build -p android --profile production` once the keystore is linked.
+*   [ ] **Privacy Policy:** Ensure the privacy policy link on the Play Store is updated to reflect the new Native App's background location usage.
 
 ---
 
-## 📝 Important Notes for Developers
-- **Environment Variables:** Both frontend and backend require `.env` files (MongoDB URI, JWT Secret, Cloudinary keys, Firebase keys).
-- **Security:** Do not allow vendors to pass `isGlobal: true` when creating item categories. The backend `categoryController` strictly enforces this.
-- **Data Deletion:** Deleting categories is restricted if there are shops or products still actively linked to them to prevent orphaned data.
+## 4. 🗂️ Key Files Guide for AI
+
+If you need to make changes, look here first:
+*   `src/app/(tabs)/index.tsx`: The main homepage (Sticky Search, Order Tracker, Banners, Collections).
+*   `src/components/cart/CartLocation.tsx`: Handles all GPS and Address saving logic.
+*   `src/app/vendor/`: The entire Vendor flow (Godown, Menu, Orders). *Needs finishing touches*.
+*   `src/api/api.js`: Axios instance pointing to the production backend (`https://www.munahut.in`).
+*   `src/components/ProductCard.tsx`: The universal minimalist product card.
+*   `backend/controllers/authController.js`: Handles Google Auth, saving locations, and FCM tokens. 
+
+> **Note to AI:** When continuing work, check section 3 (Pending Tasks). The immediate focus should be finishing the **Vendor Flow**, creating the **Admin Panel**, or doing the **Keystore/Production setup**. Ask the user what they want to tackle first.

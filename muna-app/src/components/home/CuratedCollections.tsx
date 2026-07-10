@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import ProductCard from '../ProductCard';
 import { useCart } from '@/context/CartContext';
@@ -31,7 +31,21 @@ const collections = [
 
 export default function CuratedCollections({ featuredProducts }: CuratedCollectionsProps) {
     const router = useRouter();
-    const { addToCart } = useCart();
+    const { addToCart, overrideAndReplaceCart } = useCart();
+
+    const handleAddToCart = (product: any, shopId: string) => {
+        const result = addToCart(product, shopId);
+        if (!result.success && result.error === 'DIFFERENT_SHOP_ERROR') {
+            Alert.alert(
+                'Replace cart item?',
+                'Your cart contains items from another shop. Do you want to discard the selection and add items from this shop?',
+                [
+                    { text: 'No', style: 'cancel' },
+                    { text: 'Replace', onPress: () => overrideAndReplaceCart(product, shopId) }
+                ]
+            );
+        }
+    };
 
     const renderCollection = (collection: any, idx: number) => {
         // Filter products that match any keyword in name or category
@@ -59,7 +73,7 @@ export default function CuratedCollections({ featuredProducts }: CuratedCollecti
                             <ProductCard 
                                 product={prod}
                                 onClick={() => router.push(`/product/${prod.shopId?._id || prod.shopId}/${prod._id}` as any)}
-                                onAddClick={() => addToCart(prod, prod.shopId?._id || prod.shopId)}
+                                onAddClick={() => handleAddToCart(prod, prod.shopId?._id || prod.shopId)}
                             />
                         </View>
                     ))}

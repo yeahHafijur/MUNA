@@ -1,21 +1,10 @@
-import React, { useEffect } from 'react';
-import { Stack, useRouter } from 'expo-router';
+import React from 'react';
+import { Stack, Redirect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { View, ActivityIndicator } from 'react-native';
 
 export default function VendorLayout() {
   const { user, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (!user) {
-        router.replace('/login');
-      } else if (user.role !== 'vendor') {
-        router.replace('/');
-      }
-    }
-  }, [user, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -25,8 +14,12 @@ export default function VendorLayout() {
     );
   }
 
-  if (!user || user.role !== 'vendor') {
-    return null;
+  if (!user) {
+    return <Redirect href="/login" />;
+  }
+
+  if (user.role !== 'vendor') {
+    return <Redirect href="/(tabs)" />;
   }
 
   return (

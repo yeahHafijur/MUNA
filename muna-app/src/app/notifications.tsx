@@ -86,7 +86,11 @@ export default function NotificationsScreen() {
                                     {notif.body}
                                 </Text>
                                 <Text className="text-[10px] font-bold text-slate-400">
-                                    {new Date(notif.createdAt).toLocaleDateString()}
+                                    {(() => {
+                                        const d = new Date(notif.createdAt);
+                                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+                                    })()}
                                 </Text>
                             </View>
                             {!notif.read && (

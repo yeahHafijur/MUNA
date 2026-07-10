@@ -112,6 +112,24 @@ export default function ProfileScreen() {
 
                 <View className="px-5 -mt-6 z-10">
                     {/* Quick Stats / Action Cards */}
+                    {user?.role === 'vendor' && (
+                        <TouchableOpacity 
+                            onPress={() => router.push('/vendor')}
+                            className="bg-emerald-500 p-5 rounded-[24px] shadow-md items-center justify-between flex-row mb-4 border border-emerald-400"
+                        >
+                            <View className="flex-row items-center gap-4">
+                                <View className="w-14 h-14 bg-white/20 rounded-full items-center justify-center">
+                                    <Store size={28} color="#ffffff" />
+                                </View>
+                                <View>
+                                    <Text className="text-[18px] font-black text-white mb-0.5">Vendor Dashboard</Text>
+                                    <Text className="text-[12px] font-bold text-emerald-100 uppercase tracking-widest">Manage your shop</Text>
+                                </View>
+                            </View>
+                            <ChevronRight size={24} color="#ffffff" className="opacity-80" />
+                        </TouchableOpacity>
+                    )}
+
                     <View className="flex-row justify-between gap-3 mb-6">
                         <TouchableOpacity 
                             onPress={() => router.push('/orders')}
@@ -163,15 +181,7 @@ export default function ProfileScreen() {
 
                     {/* Support & Vendor Menu */}
                     <View className="bg-white rounded-[24px] shadow-sm border border-slate-50 mb-6 py-2 overflow-hidden">
-                        {user?.role === 'vendor' ? (
-                            <MenuRow 
-                                icon={<Store size={20} color="#fff" />}
-                                iconBgColor="#10b981" // emerald-500
-                                title="Vendor Dashboard"
-                                subtitle="Manage your shop & orders"
-                                onPress={() => router.push('/vendor')}
-                            />
-                        ) : (
+                        {user?.role !== 'vendor' && (
                             <MenuRow 
                                 icon={<Store size={20} color="#fff" />}
                                 iconBgColor="#10b981"

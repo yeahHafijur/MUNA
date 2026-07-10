@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, Linking, ActivityIndicator } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -20,12 +21,30 @@ export default function VendorOrders() {
     const [liveTab, setLiveTab] = useState<'pending' | 'preparing' | 'transit'>('pending');
     
     // History Tab
-    const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+    const [selectedDateObj, setSelectedDateObj] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const selectedDate = selectedDateObj.toISOString().split('T')[0];
+    const [expandedHistoryId, setExpandedHistoryId] = useState<string | null>(null);
 
     // Modal state
     const [confirmAction, setConfirmAction] = useState<{orderId: string, newStatus: string} | null>(null);
     const [deliveryOtp, setDeliveryOtp] = useState('');
     const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+
+    const formatSafeDate = (d: Date) => {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    };
+
+    const formatSafeTime = (dateStr: string) => {
+        const d = new Date(dateStr);
+        let h = d.getHours();
+        const m = d.getMinutes();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12;
+        h = h ? h : 12;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
+    };
 
     const prevLiveRef = useRef(0);
 
@@ -37,9 +56,7 @@ export default function VendorOrders() {
             if (!Array.isArray(all)) return [];
             
             const live = all.filter((o: any) => !['delivered', 'cancelled'].includes(o.status));
-            if (live.length > prevLiveRef.current) {
-                // Could play sound here in RN using expo-av if configured
-            }
+            
             prevLiveRef.current = live.length;
             return all;
         },
@@ -238,10 +255,11 @@ export default function VendorOrders() {
                 <View className="px-4">
                     <View className="flex-row bg-slate-100/80 p-1.5 rounded-[16px]">
                         <TouchableOpacity
-                            className={`flex-1 py-2 rounded-[12px] flex-row items-center justify-center gap-2 ${activeView === 'live' ? 'bg-white shadow-sm' : ''}`}
+                            style={activeView === 'live' ? { backgroundColor: 'white', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 } : undefined}
+                            className="flex-1 py-2 rounded-[12px] flex-row items-center justify-center gap-2"
                             onPress={() => setActiveView('live')}
                         >
-                            <Text className={`text-[13px] font-black ${activeView === 'live' ? 'text-slate-900' : 'text-slate-500'}`}>Live</Text>
+                            <Text className="text-[13px] font-black" style={{ color: activeView === 'live' ? '#0f172a' : '#64748b' }}>Live</Text>
                             {liveOrders.length > 0 && (
                                 <View className="bg-rose-500 px-1.5 py-0.5 rounded-md">
                                     <Text className="text-white text-[10px] font-black">{liveOrders.length}</Text>
@@ -249,10 +267,11 @@ export default function VendorOrders() {
                             )}
                         </TouchableOpacity>
                         <TouchableOpacity
-                            className={`flex-1 py-2 rounded-[12px] items-center justify-center ${activeView === 'history' ? 'bg-white shadow-sm' : ''}`}
+                            style={activeView === 'history' ? { backgroundColor: 'white', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 } : undefined}
+                            className="flex-1 py-2 rounded-[12px] items-center justify-center"
                             onPress={() => setActiveView('history')}
                         >
-                            <Text className={`text-[13px] font-black ${activeView === 'history' ? 'text-slate-900' : 'text-slate-500'}`}>History</Text>
+                            <Text className="text-[13px] font-black" style={{ color: activeView === 'history' ? '#0f172a' : '#64748b' }}>History</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -266,34 +285,37 @@ export default function VendorOrders() {
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                             <TouchableOpacity
                                 onPress={() => setLiveTab('pending')}
-                                className={`px-5 py-2.5 rounded-[14px] flex-row items-center gap-2 border ${liveTab === 'pending' ? 'bg-orange-500 border-orange-500' : 'bg-white border-slate-200'}`}
+                                style={liveTab === 'pending' ? { backgroundColor: '#f97316', borderColor: '#f97316' } : { backgroundColor: 'white', borderColor: '#e2e8f0' }}
+                                className="px-5 py-2.5 rounded-[14px] flex-row items-center gap-2 border"
                             >
-                                <Text className={`text-[13px] font-black ${liveTab === 'pending' ? 'text-white' : 'text-slate-600'}`}>New</Text>
+                                <Text className="text-[13px] font-black" style={{ color: liveTab === 'pending' ? 'white' : '#475569' }}>New</Text>
                                 {pendingOrders.length > 0 && (
-                                    <View className={`px-2 py-0.5 rounded-md ${liveTab === 'pending' ? 'bg-white' : 'bg-orange-100'}`}>
-                                        <Text className={`text-[10px] font-bold ${liveTab === 'pending' ? 'text-orange-600' : 'text-orange-800'}`}>{pendingOrders.length}</Text>
+                                    <View className="px-2 py-0.5 rounded-md" style={{ backgroundColor: liveTab === 'pending' ? 'white' : '#ffedd5' }}>
+                                        <Text className="text-[10px] font-bold" style={{ color: liveTab === 'pending' ? '#ea580c' : '#9a3412' }}>{pendingOrders.length}</Text>
                                     </View>
                                 )}
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => setLiveTab('preparing')}
-                                className={`px-5 py-2.5 rounded-[14px] flex-row items-center gap-2 border ${liveTab === 'preparing' ? 'bg-blue-500 border-blue-500' : 'bg-white border-slate-200'}`}
+                                style={liveTab === 'preparing' ? { backgroundColor: '#3b82f6', borderColor: '#3b82f6' } : { backgroundColor: 'white', borderColor: '#e2e8f0' }}
+                                className="px-5 py-2.5 rounded-[14px] flex-row items-center gap-2 border"
                             >
-                                <Text className={`text-[13px] font-black ${liveTab === 'preparing' ? 'text-white' : 'text-slate-600'}`}>Preparing</Text>
+                                <Text className="text-[13px] font-black" style={{ color: liveTab === 'preparing' ? 'white' : '#475569' }}>Preparing</Text>
                                 {acceptedOrders.length > 0 && (
-                                    <View className={`px-2 py-0.5 rounded-md ${liveTab === 'preparing' ? 'bg-white' : 'bg-blue-100'}`}>
-                                        <Text className={`text-[10px] font-bold ${liveTab === 'preparing' ? 'text-blue-600' : 'text-blue-800'}`}>{acceptedOrders.length}</Text>
+                                    <View className="px-2 py-0.5 rounded-md" style={{ backgroundColor: liveTab === 'preparing' ? 'white' : '#dbeafe' }}>
+                                        <Text className="text-[10px] font-bold" style={{ color: liveTab === 'preparing' ? '#2563eb' : '#1e40af' }}>{acceptedOrders.length}</Text>
                                     </View>
                                 )}
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => setLiveTab('transit')}
-                                className={`px-5 py-2.5 rounded-[14px] flex-row items-center gap-2 border ${liveTab === 'transit' ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-slate-200'}`}
+                                style={liveTab === 'transit' ? { backgroundColor: '#10b981', borderColor: '#10b981' } : { backgroundColor: 'white', borderColor: '#e2e8f0' }}
+                                className="px-5 py-2.5 rounded-[14px] flex-row items-center gap-2 border"
                             >
-                                <Text className={`text-[13px] font-black ${liveTab === 'transit' ? 'text-white' : 'text-slate-600'}`}>In Transit</Text>
+                                <Text className="text-[13px] font-black" style={{ color: liveTab === 'transit' ? 'white' : '#475569' }}>In Transit</Text>
                                 {transitOrders.length > 0 && (
-                                    <View className={`px-2 py-0.5 rounded-md ${liveTab === 'transit' ? 'bg-white' : 'bg-emerald-100'}`}>
-                                        <Text className={`text-[10px] font-bold ${liveTab === 'transit' ? 'text-emerald-600' : 'text-emerald-800'}`}>{transitOrders.length}</Text>
+                                    <View className="px-2 py-0.5 rounded-md" style={{ backgroundColor: liveTab === 'transit' ? 'white' : '#d1fae5' }}>
+                                        <Text className="text-[10px] font-bold" style={{ color: liveTab === 'transit' ? '#059669' : '#065f46' }}>{transitOrders.length}</Text>
                                     </View>
                                 )}
                             </TouchableOpacity>
@@ -336,15 +358,30 @@ export default function VendorOrders() {
                     <View className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-4 flex-col">
                         <View className="flex-row items-center gap-2 mb-2 text-slate-700">
                             <Calendar size={16} color="#334155" />
-                            <Text className="text-sm font-bold">Filter by Date (YYYY-MM-DD):</Text>
+                            <Text className="text-sm font-bold">Filter by Date:</Text>
                         </View>
-                        {/* Note: In RN, a standard text input is used since date picker requires native modules, simplified for now */}
-                        <TextInput 
-                            value={selectedDate}
-                            onChangeText={setSelectedDate}
-                            placeholder="YYYY-MM-DD"
-                            className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-[15px] font-semibold text-slate-800"
-                        />
+                        
+                        <TouchableOpacity 
+                            onPress={() => setShowDatePicker(true)}
+                            className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 flex-row justify-between items-center"
+                        >
+                            <Text className="text-[15px] font-semibold text-slate-800">
+                                {formatSafeDate(selectedDateObj)}
+                            </Text>
+                            <Text className="text-slate-400 font-bold">Change</Text>
+                        </TouchableOpacity>
+
+                        {showDatePicker && (
+                            <DateTimePicker
+                                value={selectedDateObj}
+                                mode="date"
+                                display="default"
+                                onChange={(event, date) => {
+                                    setShowDatePicker(false);
+                                    if (date) setSelectedDateObj(date);
+                                }}
+                            />
+                        )}
                     </View>
 
                     <View className="flex-row gap-2 mb-4">
@@ -375,29 +412,79 @@ export default function VendorOrders() {
                                 <Text className="text-slate-500 font-bold text-sm">No orders found.</Text>
                             </View>
                         ) : (
-                            historyOrders.map((order: any) => (
-                                <View key={order._id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-3 flex-col relative overflow-hidden">
-                                    <View className="flex-row justify-between items-start mb-3 pl-2">
-                                        <View>
-                                            <Text className="text-xs font-black text-slate-400 mb-0.5">ORDER #{order._id.slice(-6).toUpperCase()}</Text>
-                                            <Text className="font-bold text-slate-800 text-[15px]">{order.customerId?.name || 'Guest'}</Text>
+                            historyOrders.map((order: any) => {
+                                const isExpanded = expandedHistoryId === order._id;
+                                return (
+                                    <TouchableOpacity 
+                                        key={order._id} 
+                                        onPress={() => setExpandedHistoryId(isExpanded ? null : order._id)}
+                                        className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-3 flex-col relative overflow-hidden active:opacity-80"
+                                    >
+                                        <View className="flex-row justify-between items-start mb-3">
+                                            <View>
+                                                <Text className="text-xs font-black text-slate-400 mb-0.5">ORDER #{order._id.slice(-6).toUpperCase()}</Text>
+                                                <Text className="font-bold text-slate-800 text-[15px]">{order.customerId?.name || 'Guest'}</Text>
+                                            </View>
+                                            <View className="px-2.5 py-1 rounded-md border" style={{
+                                                backgroundColor: order.status === 'delivered' ? '#ecfdf5' : order.status === 'cancelled' ? '#fff1f2' : '#f1f5f9',
+                                                borderColor: order.status === 'delivered' ? '#d1fae5' : order.status === 'cancelled' ? '#ffe4e6' : '#e2e8f0'
+                                            }}>
+                                                <Text className="text-[10px] font-black uppercase" style={{
+                                                    color: order.status === 'delivered' ? '#047857' : order.status === 'cancelled' ? '#be123c' : '#334155'
+                                                }}>
+                                                    {STATUS_LABELS[order.status] || order.status}
+                                                </Text>
+                                            </View>
                                         </View>
-                                        <View className="px-2.5 py-1 rounded-md border bg-slate-100 border-slate-200">
-                                            <Text className="text-[10px] font-black uppercase text-slate-700">{STATUS_LABELS[order.status] || order.status}</Text>
+                                        <View className="flex-row justify-between items-end">
+                                            <View className="flex-col gap-1">
+                                                <Text className="text-slate-600 font-semibold text-[13px]">📞 {order.customerId?.phone || 'No Phone'}</Text>
+                                                <Text className="text-slate-500 font-medium text-[13px]">⏱️ {formatSafeTime(order.createdAt)}</Text>
+                                            </View>
+                                            <View className="items-end">
+                                                <Text className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Amount</Text>
+                                                <Text className="font-black text-slate-900 text-lg">₹{order.totalAmount}</Text>
+                                            </View>
                                         </View>
-                                    </View>
-                                    <View className="pl-2 flex-row justify-between items-end">
-                                        <View className="flex-col gap-1">
-                                            <Text className="text-slate-600 font-semibold text-[13px]">📞 {order.customerId?.phone || 'No Phone'}</Text>
-                                            <Text className="text-slate-500 font-medium text-[13px]">⏱️ {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
-                                        </View>
-                                        <View className="items-end">
-                                            <Text className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Amount</Text>
-                                            <Text className="font-black text-slate-900 text-lg">₹{order.totalAmount}</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            ))
+
+                                        {/* EXPANDABLE DETAILS */}
+                                        {isExpanded && (
+                                            <View className="mt-4 pt-4 border-t border-slate-100">
+                                                <Text className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-2">Order Items</Text>
+                                                <View className="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3">
+                                                    {order.items?.map((i: any, index: number) => (
+                                                        <View key={index} className="flex-row items-center py-1 flex-1">
+                                                            <Text className="font-black text-slate-400 mr-2">{i.quantity}×</Text>
+                                                            <Text className="text-[12px] font-semibold text-slate-600 flex-1">{i.name}</Text>
+                                                            <Text className="text-[12px] font-bold text-slate-800">₹{i.price * i.quantity}</Text>
+                                                        </View>
+                                                    ))}
+                                                </View>
+
+                                                {order.deliveryLocation?.address && (
+                                                    <View className="mb-2">
+                                                        <Text className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-1">Delivery Address</Text>
+                                                        <Text className="text-[12px] font-semibold text-slate-700">📍 {order.deliveryLocation.address}</Text>
+                                                    </View>
+                                                )}
+                                                
+                                                {order.instructions && order.instructions.trim() !== '' && (
+                                                    <View className="mt-2">
+                                                        <Text className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-1">Instructions</Text>
+                                                        <Text className="text-[12px] font-semibold text-amber-600">{order.instructions}</Text>
+                                                    </View>
+                                                )}
+                                            </View>
+                                        )}
+                                        
+                                        {!isExpanded && (
+                                            <View className="mt-3 items-center">
+                                                <Text className="text-[10px] font-bold text-slate-300">Tap to view details</Text>
+                                            </View>
+                                        )}
+                                    </TouchableOpacity>
+                                );
+                            })
                         )}
                         <View className="h-10" />
                     </ScrollView>
@@ -413,7 +500,7 @@ export default function VendorOrders() {
             >
                 <KeyboardAvoidingView 
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    className="flex-1 justify-center items-center bg-slate-900/40 px-4"
+                    style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(15, 23, 42, 0.4)', paddingHorizontal: 16 }}
                 >
                     <View className="bg-white rounded-[32px] p-6 max-w-sm w-full items-center shadow-2xl">
                         {confirmAction?.newStatus === 'delivered' && (

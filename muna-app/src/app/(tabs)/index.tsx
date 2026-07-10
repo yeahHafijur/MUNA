@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View, TouchableOpacity, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 import { useQuery } from '@tanstack/react-query';
@@ -22,11 +22,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
 import { Navigation, ArrowRight } from 'lucide-react-native';
-import QuickDeliveryStores from '@/components/home/QuickDeliveryStores';
-import BecomeSellerCTA from '@/components/home/BecomeSellerCTA';
-import HowItWorks from '@/components/home/HowItWorks';
-import HomeFooter from '@/components/home/HomeFooter';
-import { haversine } from '@/utils/homeUtils';
+
 
 type UserLocation = {
   lat: number;

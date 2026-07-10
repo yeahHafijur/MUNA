@@ -14,7 +14,8 @@ const formatTime = (dateString: string) => {
     
     if (hours < 1) return 'Just now';
     if (hours < 24) return `${hours}h ago`;
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${d.getDate()} ${months[d.getMonth()]}`;
 };
 
 export default function DailyMarketListScreen() {

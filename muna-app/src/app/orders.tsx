@@ -43,7 +43,8 @@ const formatTime = (dateString: string) => {
     h = h % 12;
     h = h ? h : 12;
     m = m < 10 ? '0' + m : m;
-    const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const dateStr = `${d.getDate()} ${months[d.getMonth()]}`;
     return `${dateStr} • ${h}:${m} ${ampm}`;
 };
 

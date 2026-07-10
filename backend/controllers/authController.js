@@ -163,32 +163,28 @@ const saveFcmToken = async (req, res) => {
     }
 };
 
-// Update user profile (Name & Phone)
+// Update user profile (Name & Email)
 const updateProfile = async (req, res) => {
     try {
-        const { name, phone } = req.body;
+        const { name, email } = req.body;
         
         if (!name || !name.trim()) {
             return res.status(400).json({ message: "Name is required" });
         }
         
-        if (!phone || !phone.trim() || phone.length < 10) {
-            return res.status(400).json({ message: "Valid phone number is required" });
-        }
-
         const user = await User.findById(req.user._id);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        const trimmedPhone = phone.trim();
-        if (trimmedPhone !== user.phone) {
-            const existing = await User.findOne({ phone: trimmedPhone });
+        if (email && email.trim() !== user.email) {
+            const trimmedEmail = email.trim();
+            const existing = await User.findOne({ email: trimmedEmail });
             if (existing && existing._id.toString() !== user._id.toString()) {
-                return res.status(400).json({ message: "This phone number is already registered" });
+                return res.status(400).json({ message: "This email is already registered" });
             }
+            user.email = trimmedEmail;
         }
 
         user.name = name.trim();
-        user.phone = trimmedPhone;
         
         await user.save();
 

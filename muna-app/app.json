@@ -56,7 +56,13 @@
         }
       ],
       "@react-native-community/datetimepicker",
-      "@sentry/react-native"
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "muna",
+          "project": "muna"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -68,7 +74,7 @@
         "projectId": "b38365a4-7f9c-4afb-9b6d-84c98110740b"
       },
       "apiUrl": "https://www.munahut.in",
-      "googleWebClientId": "739956516947-brhvingmj39r4ttur0rj1bvd354hmus9.apps.googleusercontent.com"
+      "googleWebClientId": "333375340687-b09r1c3s190vi1nk34lir6huklup0d4e.apps.googleusercontent.com"
     },
     "owner": "yeahhafijurs-team"
   }

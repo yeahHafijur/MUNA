@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Alert, Dimensions, Platform, 
 import { useRouter } from 'expo-router';
 import { Package, Heart, Settings, Store, LogOut, ChevronRight, User as UserIcon, Edit2, MapPin, HeadphonesIcon, CreditCard } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import Constants from 'expo-constants';
 
 const { width } = Dimensions.get('window');
 
@@ -207,9 +208,8 @@ export default function ProfileScreen() {
                         />
                     </View>
 
-                    {/* Footer / Version */}
                     <View className="items-center mb-10 pt-2 opacity-50">
-                        <Text className="text-[13px] font-black text-slate-400">MUNA App v1.0.0</Text>
+                        <Text className="text-[13px] font-black text-slate-400">MUNA App v{Constants.expoConfig?.version || '1.0.0'}</Text>
                         <Text className="text-[11px] font-bold text-slate-400 mt-1 tracking-widest">MADE IN ASSAM</Text>
                     </View>
                 </View>

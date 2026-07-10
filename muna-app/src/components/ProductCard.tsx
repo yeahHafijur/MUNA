@@ -2,16 +2,16 @@ import React, { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Clock } from 'lucide-react-native';
+import { getImageUrl } from '@/utils/helpers';
+import { Product } from '@/types';
 
 interface ProductCardProps {
-  product: any;
+  product: Product;
   onClick?: () => void;
   onAddClick?: (e: any) => void;
   quantity?: number;
   onIncrement?: () => void;
   onDecrement?: () => void;
-  discount?: string;
-  deliveryTime?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = memo(({
@@ -21,8 +21,6 @@ const ProductCard: React.FC<ProductCardProps> = memo(({
   quantity = 0,
   onIncrement,
   onDecrement,
-  discount = '15%',
-  deliveryTime = '10 MINS',
 }) => {
   const currentPrice = product.price || 0;
   const originalPrice = Math.floor(currentPrice * 1.15); // 15% more
@@ -37,7 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({
       {/* ── IMAGE WRAPPER ── */}
       <View className="w-full aspect-[4/5] rounded-[12px] bg-slate-50 mb-2.5 p-2 flex-col relative overflow-hidden items-center justify-center">
         {product.image ? (
-          <Image source={{ uri: product.image }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
+          <Image source={{ uri: getImageUrl(product.image) as string }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
         ) : (
           <Text className="text-4xl opacity-50">📦</Text>
         )}

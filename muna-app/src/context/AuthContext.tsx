@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import api from '@/api/api';
 import { registerForPushNotificationsAsync } from '@/utils/notifications';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 interface AuthContextType {
   user: any | null;
@@ -80,6 +81,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await SecureStore.deleteItemAsync('user');
       await SecureStore.deleteItemAsync('token');
+      
+      // Force Google to forget the session so it asks for the account again next time
+      try {
+        await GoogleSignin.signOut();
+      } catch (e) {
+        // Ignore errors if the user wasn't signed in via Google
+      }
     } catch (err) {
       console.error('Failed to delete user data', err);
     }

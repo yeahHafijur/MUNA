@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert, FlatList } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Search as SearchIcon, ArrowLeft, Store, Clock } from 'lucide-react-native';
@@ -51,34 +51,6 @@ export default function SearchScreen() {
             );
         }
     };
-
-    return (
-        <View className="flex-1 bg-white">
-            {/* Header / Search Bar */}
-            <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-3 shadow-sm flex-row items-center gap-3">
-                <TouchableOpacity onPress={() => router.back()} className="p-1">
-                    <ArrowLeft size={24} color="#0f172a" />
-                </TouchableOpacity>
-                <View className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 h-11 flex-row items-center gap-2">
-                    <SearchIcon size={18} color="#94a3b8" />
-                    <TextInput
-                        ref={inputRef}
-                        className="flex-1 text-[15px] font-medium text-slate-900 h-full"
-                        placeholder="Search for groceries, veggies..."
-                        placeholderTextColor="#94a3b8"
-                        value={query}
-                        onChangeText={setQuery}
-                        autoFocus
-                    />
-                    {query.length > 0 && (
-                        <TouchableOpacity onPress={() => setQuery('')} className="p-1">
-                            <Text className="text-slate-400 font-bold text-xs">✕</Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
-            </View>
-
-import { FlatList } from 'react-native';
 
     const renderHeader = () => (
         <View className="px-4 pt-4">
@@ -235,8 +207,6 @@ import { FlatList } from 'react-native';
                                 router.push(`/product/${shopId}/${prod._id}` as any);
                             }}
                             onAddClick={() => handleAddToCart(prod, prod.shopId?._id || prod.shopId)}
-                            discount="15%"
-                            deliveryTime="15 MINS"
                         />
                     </View>
                 )}

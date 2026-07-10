@@ -284,7 +284,7 @@ export default function ShopDetailScreen() {
                         ) : (
                             <View className="flex-row flex-wrap justify-between gap-y-4">
                                 {filteredProducts.map(prod => (
-                                    <View key={prod._id} className="w-[48%] h-[260px]">
+                                    <View key={prod._id} className="w-[48%] mb-4">
                                         <ProductCard 
                                             product={prod}
                                             onClick={() => router.push(`/product/${id}/${prod._id}` as any)}

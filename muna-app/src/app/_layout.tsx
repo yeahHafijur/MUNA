@@ -40,9 +40,20 @@ const queryClient = new QueryClient({
   },
 });
 
+import * as SplashScreen from 'expo-splash-screen';
+
+// Prevent splash screen from auto-hiding until auth check is complete
+SplashScreen.preventAutoHideAsync();
+
 function AuthHandler() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
+
+  useEffect(() => {
+    if (!isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
 
   if (isLoading) return null;
 

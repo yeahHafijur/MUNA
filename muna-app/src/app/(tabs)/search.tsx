@@ -198,18 +198,37 @@ export default function SearchScreen() {
                 contentContainerStyle={{ paddingBottom: 24 }}
                 ListHeaderComponent={renderHeader}
                 ListEmptyComponent={renderEmpty}
-                renderItem={({ item: prod }) => (
-                    <View className="w-[48%]">
-                        <ProductCard
-                            product={prod}
-                            onClick={() => {
-                                const shopId = prod.shopId?._id || prod.shopId;
-                                router.push(`/product/${shopId}/${prod._id}` as any);
-                            }}
-                            onAddClick={() => handleAddToCart(prod, prod.shopId?._id || prod.shopId)}
-                        />
-                    </View>
-                )}
+                renderItem={({ item: prod }) => {
+                    const cartItem = cartItems.find((item: any) => item.productId === prod._id);
+                    const quantity = cartItem ? cartItem.quantity : 0;
+                    const shopId = prod.shopId?._id || prod.shopId;
+                    return (
+                        <View className="w-[48%]">
+                            <ProductCard
+                                product={prod}
+                                quantity={quantity}
+                                onIncrement={() => updateQuantity(prod._id, quantity + 1)}
+                                onDecrement={() => {
+                                    if (quantity === 1) {
+                                        removeFromCart(prod._id);
+                                    } else {
+                                        updateQuantity(prod._id, quantity - 1);
+                                    }
+                                }}
+                                onClick={() => {
+                                    if (shopId) {
+                                        router.push(`/product/${shopId}/${prod._id}` as any);
+                                    }
+                                }}
+                                onAddClick={() => {
+                                    if (shopId) {
+                                        handleAddToCart(prod, shopId);
+                                    }
+                                }}
+                            />
+                        </View>
+                    );
+                }}
             />
         </View>
     );

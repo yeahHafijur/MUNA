@@ -31,7 +31,7 @@ const collections = [
 
 export default function CuratedCollections({ featuredProducts }: CuratedCollectionsProps) {
     const router = useRouter();
-    const { addToCart, overrideAndReplaceCart } = useCart();
+    const { cartItems, addToCart, overrideAndReplaceCart, updateQuantity, removeFromCart } = useCart();
 
     const handleAddToCart = (product: any, shopId: string) => {
         const result = addToCart(product, shopId);
@@ -68,15 +68,30 @@ export default function CuratedCollections({ featuredProducts }: CuratedCollecti
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ paddingHorizontal: 12, gap: 12 }}
                 >
-                    {matchedProducts.map(prod => (
-                        <View key={prod._id} className="w-[140px]">
-                            <ProductCard 
-                                product={prod}
-                                onClick={() => router.push(`/product/${prod.shopId?._id || prod.shopId}/${prod._id}` as any)}
-                                onAddClick={() => handleAddToCart(prod, prod.shopId?._id || prod.shopId)}
-                            />
-                        </View>
-                    ))}
+                    {matchedProducts.map(prod => {
+                        const cartItem = cartItems.find((item: any) => item.productId === prod._id);
+                        const quantity = cartItem ? cartItem.quantity : 0;
+                        const shopId = prod.shopId?._id || prod.shopId;
+                        
+                        return (
+                            <View key={prod._id} className="w-[140px]">
+                                <ProductCard 
+                                    product={prod}
+                                    quantity={quantity}
+                                    onIncrement={() => updateQuantity(prod._id, quantity + 1)}
+                                    onDecrement={() => {
+                                        if (quantity === 1) {
+                                            removeFromCart(prod._id);
+                                        } else {
+                                            updateQuantity(prod._id, quantity - 1);
+                                        }
+                                    }}
+                                    onClick={() => router.push(`/product/${shopId}/${prod._id}` as any)}
+                                    onAddClick={() => handleAddToCart(prod, shopId)}
+                                />
+                            </View>
+                        );
+                    })}
                 </ScrollView>
             </View>
         );

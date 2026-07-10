@@ -55,7 +55,8 @@
           ]
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "@sentry/react-native"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -65,7 +66,9 @@
       "router": {},
       "eas": {
         "projectId": "b38365a4-7f9c-4afb-9b6d-84c98110740b"
-      }
+      },
+      "apiUrl": "https://www.munahut.in",
+      "googleWebClientId": "739956516947-brhvingmj39r4ttur0rj1bvd354hmus9.apps.googleusercontent.com"
     },
     "owner": "yeahhafijurs-team"
   }

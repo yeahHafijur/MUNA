@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -6,9 +6,12 @@ import { useAuth } from '@/context/AuthContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '@/api/api';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import Constants from 'expo-constants';
+
+const GOOGLE_WEB_CLIENT_ID = Constants.expoConfig?.extra?.googleWebClientId;
 
 GoogleSignin.configure({
-  webClientId: '739956516947-brhvingmj39r4ttur0rj1bvd354hmus9.apps.googleusercontent.com',
+  webClientId: GOOGLE_WEB_CLIENT_ID,
   offlineAccess: false,
 });
 
@@ -17,8 +20,6 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
-
-
 
   const handleGoogleBackendAuth = async (idToken: string) => {
     if (!idToken) return;
@@ -46,8 +47,7 @@ export default function LoginScreen() {
         throw new Error('No token received from backend');
       }
     } catch (err: any) {
-      console.error('Backend Auth Error:', err);
-      setError(err.response?.data?.message || err.message || 'Login failed on backend');
+      setError(err.response?.data?.message || err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -63,7 +63,7 @@ export default function LoginScreen() {
       const idToken = response.data?.idToken || (response as any).idToken;
       
       if (idToken) {
-        handleGoogleBackendAuth(idToken);
+        await handleGoogleBackendAuth(idToken);
       } else {
         if (response.type === 'cancelled' || (response as any).code === 'CANCELLED') {
           setLoading(false);
@@ -72,26 +72,9 @@ export default function LoginScreen() {
         throw new Error('No ID token received from Google');
       }
     } catch (error: any) {
-      console.error(error);
       setError(error.message || 'Google Login failed or was canceled');
       setLoading(false);
     }
-  };
-
-  const handleMockLogin = async () => {
-    setLoading(true);
-    setTimeout(() => {
-      login({
-        _id: 'test_user_123',
-        name: 'Test Customer',
-        email: 'test@munahut.in',
-        phone: '1234567890',
-        role: 'customer',
-        profilePic: ''
-      }, 'mock_token_for_testing');
-      setLoading(false);
-      router.replace('/(tabs)');
-    }, 1000);
   };
 
   return (
@@ -118,7 +101,7 @@ export default function LoginScreen() {
           </View>
         ) : null}
 
-        {/* Login Buttons */}
+        {/* Login Button */}
         <View className="space-y-4">
           <TouchableOpacity 
             onPress={onGoogleButtonPress}
@@ -130,34 +113,6 @@ export default function LoginScreen() {
             ) : (
               <Text className="text-gray-700 font-semibold ml-2">Continue with Google</Text>
             )}
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            onPress={handleMockLogin}
-            disabled={loading}
-            className="w-full h-12 flex-row justify-center items-center border border-blue-300 rounded-lg bg-blue-50 mt-4"
-          >
-            <Text className="text-blue-700 font-semibold">Mock Login (Customer)</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            onPress={async () => {
-              setLoading(true);
-              setTimeout(() => {
-                login({
-                  _id: '6a2d301d6295a2702f58981a',
-                  name: 'Demo Vendor',
-                  email: 'demo@munahut.in',
-                  role: 'vendor'
-                }, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMmQzMDFkNjI5NWEyNzAyZjU4OTgxYSIsImlhdCI6MTc4MzU4MDM5OCwiZXhwIjoxNzg2MTcyMzk4fQ.FZPFBWWsd8WcFRLQKXb_NY_-ZESC7lahG6dhF_AREYU');
-                setLoading(false);
-                router.replace('/(tabs)');
-              }, 1000);
-            }}
-            disabled={loading}
-            className="w-full h-12 flex-row justify-center items-center border border-emerald-300 rounded-lg bg-emerald-50 mt-2"
-          >
-            <Text className="text-emerald-700 font-semibold">Vendor Demo Login</Text>
           </TouchableOpacity>
         </View>
 

@@ -67,6 +67,7 @@ Since this app will act as an **update** to the existing TWA on the Play Store, 
 ### E. Build & Submission
 *   [ ] **EAS Build:** Run `eas build -p android --profile production` once the keystore is linked.
 *   [ ] **Privacy Policy:** Ensure the privacy policy link on the Play Store is updated to reflect the new Native App's background location usage.
+*   [ ] **Crash Reporting (Sentry):** To fully activate Sentry for production, you need a DSN from a Sentry.io project. Sentry is configured to look for `EXPO_PUBLIC_SENTRY_DSN`. Either add a `.env` file containing `EXPO_PUBLIC_SENTRY_DSN="your-sentry-dsn-here"`, or pass it as an environment variable in EAS before building!
 
 ---
 

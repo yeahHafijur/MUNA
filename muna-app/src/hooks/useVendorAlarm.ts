@@ -1,16 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useQuery } from '@tanstack/react-query';
 import { Audio } from 'expo-av';
-import api from '@/api/api';
+import { useVendorOrders } from './useVendorOrders';
 
 export function useVendorAlarm() {
   const { user } = useAuth();
   const soundRef = useRef<Audio.Sound | null>(null);
-  const prevLiveRef = useRef(0);
+  
+  const { data: orders = [] } = useVendorOrders();
 
   useEffect(() => {
-    // Only configure audio if user is a vendor
     if (user?.role === 'vendor') {
       Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
@@ -47,27 +46,16 @@ export function useVendorAlarm() {
     }
   };
 
-  useQuery({
-    queryKey: ['global-vendor-alarm'],
-    queryFn: async () => {
-      if (!user || user.role !== 'vendor') return [];
-      const res = await api.get('/api/orders/vendor?limit=100');
-      const all = res.data.orders || res.data || [];
-      if (!Array.isArray(all)) return [];
-      
-      const live = all.filter((o: any) => !['delivered', 'cancelled'].includes(o.status));
-      const pending = live.filter((o: any) => o.status === 'pending');
-      
-      if (pending.length > 0) {
-        if (!soundRef.current) playSound();
-      } else {
-        stopSound();
-      }
-      
-      prevLiveRef.current = live.length;
-      return all;
-    },
-    refetchInterval: 12000,
-    enabled: !!user && user.role === 'vendor',
-  });
+  useEffect(() => {
+    if (user?.role !== 'vendor') return;
+
+    const live = orders.filter((o: any) => !['delivered', 'cancelled'].includes(o.status));
+    const pending = live.filter((o: any) => o.status === 'pending');
+    
+    if (pending.length > 0) {
+      if (!soundRef.current) playSound();
+    } else {
+      stopSound();
+    }
+  }, [orders, user?.role]);
 }

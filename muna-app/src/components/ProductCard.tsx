@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Clock } from 'lucide-react-native';
@@ -14,7 +14,7 @@ interface ProductCardProps {
   deliveryTime?: string;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({
+const ProductCard: React.FC<ProductCardProps> = memo(({
   product,
   onClick,
   onAddClick,
@@ -113,6 +113,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
       </View>
     </Pressable>
   );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

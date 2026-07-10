@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, ShoppingBag } from 'lucide-react-native';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/api/api';
@@ -86,15 +86,19 @@ export default function CartScreen() {
 
     if (cartItems.length === 0) {
         return (
-            <View className="flex-1 bg-white items-center justify-center">
-                <Text className="text-6xl mb-4">🛒</Text>
-                <Text className="text-[18px] font-black text-slate-900 mb-2">Your cart is empty</Text>
-                <Text className="text-[13px] font-medium text-slate-500 mb-6">Looks like you haven't added anything yet.</Text>
+            <View className="flex-1 bg-slate-50 items-center justify-center px-6">
+                <View className="w-32 h-32 bg-emerald-50 rounded-full items-center justify-center mb-6 border-8 border-emerald-100/50">
+                    <ShoppingBag size={48} color="#10b981" strokeWidth={1.5} />
+                </View>
+                <Text className="text-[22px] font-black text-slate-900 mb-2 text-center tracking-tight">Your cart is empty</Text>
+                <Text className="text-[14px] font-semibold text-slate-500 mb-8 text-center leading-relaxed max-w-[250px]">
+                    Looks like you haven't added anything to your cart yet.
+                </Text>
                 <TouchableOpacity 
                     onPress={() => router.push('/')}
-                    className="bg-amber-400 px-6 py-3 rounded-xl shadow-sm"
+                    className="w-full bg-emerald-600 px-6 py-4 rounded-2xl shadow-sm flex-row justify-center items-center active:bg-emerald-700"
                 >
-                    <Text className="text-amber-950 font-black text-[15px]">Start Shopping</Text>
+                    <Text className="text-white font-black text-[15px] uppercase tracking-widest">Start Shopping</Text>
                 </TouchableOpacity>
             </View>
         );

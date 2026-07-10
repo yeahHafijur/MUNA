@@ -1,15 +1,44 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, StatusBar, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, StatusBar, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, User, Phone, Mail, Lock, Shield, CheckCircle2 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import api from '@/api/api';
+import * as SecureStore from 'expo-secure-store';
 
 export default function SettingsScreen() {
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, login } = useAuth();
+    
+    const [name, setName] = useState(user?.name || '');
+    const [email, setEmail] = useState(user?.email || '');
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-    const handleSave = () => {
-        Alert.alert("Success", "Profile information updated successfully!");
+    const handleSave = async () => {
+        if (!name.trim()) {
+            Alert.alert("Error", "Name cannot be empty");
+            return;
+        }
+        
+        setIsSaving(true);
+        try {
+            const res = await api.put('/api/user/profile', { name, email });
+            
+            // Update auth context
+            if (res.data && res.data.user) {
+                const token = await SecureStore.getItemAsync('token');
+                if (token) {
+                    await login(res.data.user, token);
+                }
+            }
+            
+            Alert.alert("Success", "Profile information updated successfully!");
+        } catch (error: any) {
+            Alert.alert("Error", error.response?.data?.message || "Failed to update profile");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleDelete = () => {
@@ -21,8 +50,18 @@ export default function SettingsScreen() {
                 { 
                     text: 'Delete', 
                     style: 'destructive', 
-                    onPress: () => {
-                        // Handle deletion
+                    onPress: async () => {
+                        setIsDeleting(true);
+                        try {
+                            await api.delete('/api/user/account');
+                            // Clear auth
+                            await SecureStore.deleteItemAsync('token');
+                            await SecureStore.deleteItemAsync('user');
+                            router.replace('/login');
+                        } catch (error: any) {
+                            Alert.alert("Error", error.response?.data?.message || "Failed to delete account");
+                            setIsDeleting(false);
+                        }
                     }
                 }
             ]
@@ -61,7 +100,8 @@ export default function SettingsScreen() {
                                 <User size={18} color="#64748b" />
                                 <TextInput 
                                     className="flex-1 text-[15px] font-bold text-slate-900 h-full"
-                                    defaultValue={user?.name || ''}
+                                    value={name}
+                                    onChangeText={setName}
                                     placeholder="Enter your name"
                                     placeholderTextColor="#cbd5e1"
                                 />
@@ -90,7 +130,8 @@ export default function SettingsScreen() {
                                 <Mail size={18} color="#64748b" />
                                 <TextInput 
                                     className="flex-1 text-[15px] font-bold text-slate-900 h-full"
-                                    defaultValue={user?.email || ''}
+                                    value={email}
+                                    onChangeText={setEmail}
                                     placeholder="Enter your email"
                                     placeholderTextColor="#cbd5e1"
                                     keyboardType="email-address"
@@ -101,10 +142,17 @@ export default function SettingsScreen() {
 
                         <TouchableOpacity 
                             onPress={handleSave}
-                            className="bg-slate-900 h-14 rounded-2xl flex-row items-center justify-center shadow-sm gap-2"
+                            disabled={isSaving}
+                            className={`h-14 rounded-2xl flex-row items-center justify-center shadow-sm gap-2 ${isSaving ? 'bg-slate-700' : 'bg-slate-900'}`}
                         >
-                            <CheckCircle2 size={18} color="#fff" />
-                            <Text className="text-white font-black text-[15px]">Save Changes</Text>
+                            {isSaving ? (
+                                <ActivityIndicator size="small" color="#fff" />
+                            ) : (
+                                <>
+                                    <CheckCircle2 size={18} color="#fff" />
+                                    <Text className="text-white font-black text-[15px]">Save Changes</Text>
+                                </>
+                            )}
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -119,10 +167,17 @@ export default function SettingsScreen() {
                         </Text>
                         <TouchableOpacity 
                             onPress={handleDelete}
-                            className="bg-rose-50 border border-rose-100 h-14 rounded-2xl flex-row items-center justify-center gap-2"
+                            disabled={isDeleting}
+                            className={`border h-14 rounded-2xl flex-row items-center justify-center gap-2 ${isDeleting ? 'bg-rose-100 border-rose-200' : 'bg-rose-50 border-rose-100'}`}
                         >
-                            <Lock size={18} color="#e11d48" />
-                            <Text className="text-rose-600 font-black text-[15px]">Delete Account</Text>
+                            {isDeleting ? (
+                                <ActivityIndicator size="small" color="#e11d48" />
+                            ) : (
+                                <>
+                                    <Lock size={18} color="#e11d48" />
+                                    <Text className="text-rose-600 font-black text-[15px]">Delete Account</Text>
+                                </>
+                            )}
                         </TouchableOpacity>
                     </View>
                 </View>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Search as SearchIcon, MapPin, Clock, Star } from 'lucide-react-native';
@@ -118,7 +119,7 @@ export default function ShopDetailScreen() {
                             </View>
                             <View className="w-full aspect-[4/3] bg-slate-100 relative">
                                 {shopImageUrl ? (
-                                    <Image source={{ uri: shopImageUrl }} className="w-full h-full" resizeMode="cover" />
+                                    <Image source={{ uri: shopImageUrl }} className="w-full h-full" contentFit="cover" />
                                 ) : (
                                     <View className="flex-1 items-center justify-center bg-amber-50">
                                         <Text className="text-6xl">🏪</Text>
@@ -256,7 +257,7 @@ export default function ShopDetailScreen() {
                                         >
                                             {customImg ? (
                                                 <>
-                                                    <Image source={{ uri: customImg }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} resizeMode="cover" />
+                                                    <Image source={{ uri: customImg }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} contentFit="cover" />
                                                     <View className="absolute inset-0 bg-black/40" />
                                                     <Text className="text-white font-black text-[15px] text-center z-10 px-1 leading-tight tracking-tight" numberOfLines={2}>{cat}</Text>
                                                     <Text className="text-slate-200 font-bold text-xs mt-1 z-10">{count} items</Text>

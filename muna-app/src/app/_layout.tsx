@@ -29,7 +29,16 @@ if (Platform.OS === 'android') {
 import { CartProvider } from '@/context/CartContext';
 import { useVendorAlarm } from '@/hooks/useVendorAlarm';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,      // 5 min before data becomes stale
+      gcTime: 1000 * 60 * 30,        // 30 min garbage collection cache
+      retry: 2,
+      refetchOnWindowFocus: false,   // Not needed for mobile
+    },
+  },
+});
 
 function AuthHandler() {
   const { user, isLoading } = useAuth();
@@ -64,14 +73,26 @@ function RootLayoutNav() {
   );
 }
 
-export default function RootLayout() {
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || '',
+  tracesSampleRate: 1.0,
+});
+
+function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <RootLayoutNav />
-        </CartProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <CartProvider>
+            <RootLayoutNav />
+          </CartProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
+
+export default Sentry.wrap(RootLayout);

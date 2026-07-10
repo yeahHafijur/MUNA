@@ -134,9 +134,17 @@ const placeOrder = async (req, res) => {
         if (shop.vendorId) {
             sendAndSaveNotification(
                 [shop.vendorId],
-                "📦 New Order Received!",
+                "🚨 New Order Received!",
                 `Amount: ₹${finalTotalAmount} (${items.length} items). Please review and accept.`,
-                { actionUrl: "/vendor-dashboard", route: "/vendor/orders", type: "order" }
+                { 
+                    actionUrl: "/vendor-dashboard", 
+                    route: "/vendor/orders", 
+                    type: "order",
+                    androidOptions: {
+                        channelId: "new-orders-v2",
+                        sound: "ringtone" // Without extension for FCM
+                    }
+                }
             );
         }
 

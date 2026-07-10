@@ -19,8 +19,9 @@ try {
  * @param {string} heading - Notification title
  * @param {string} message - Notification body
  * @param {string} route - Frontend route to open on click (default "/")
+ * @param {Object} androidOptions - Android specific notification options (channelId, sound, etc)
  */
-const sendFCMNotification = async (userIds, heading, message, route = "/") => {
+const sendFCMNotification = async (userIds, heading, message, route = "/", androidOptions = null) => {
     if (!adminApp || !getMessagingFn) return console.log("[FCM] ❌ SKIPPED: Firebase Admin not initialized.");
     if (!userIds || userIds.length === 0) return console.log("[FCM] ❌ SKIPPED: No valid User IDs!");
 
@@ -54,6 +55,10 @@ const sendFCMNotification = async (userIds, heading, message, route = "/") => {
                 data: { route: route }, // Frontend ko click karne par kis page par bhejna hai
                 tokens: batch,
             };
+
+            if (androidOptions) {
+                messagePayload.android = { notification: androidOptions };
+            }
 
             const response = await getMessagingFn(adminApp).sendEachForMulticast(messagePayload);
             totalSuccess += response.successCount;
@@ -99,12 +104,13 @@ const sendFCMNotification = async (userIds, heading, message, route = "/") => {
  * @param {string} options.actionUrl - URL to navigate on click (saved in DB)
  * @param {string} options.route - Route for FCM data payload (for service worker click)
  * @param {string} options.type - Notification type: 'order' | 'chat' | 'promo' | 'system' | 'broadcast'
+ * @param {Object} options.androidOptions - Android specific push options (channelId, sound)
  */
 const sendAndSaveNotification = async (userIds, heading, message, options = {}) => {
-    const { actionUrl = "", route = "/", type = "system" } = options;
+    const { actionUrl = "", route = "/", type = "system", androidOptions = null } = options;
 
     // Fire push notification (don't await — let it run in background)
-    sendFCMNotification(userIds, heading, message, route).catch(err => {
+    sendFCMNotification(userIds, heading, message, route, androidOptions).catch(err => {
         console.error("[NotificationService] FCM push error (background):", err);
     });
 

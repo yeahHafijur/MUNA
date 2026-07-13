@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Clock, Package, CheckCircle2, Truck, XCircle } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/api/api';
+import { formatDateTime } from '@/utils/format';
 
 const STATUS_LABELS: any = {
     pending: 'Pending', accepted: 'Accepted', preparing: 'Preparing',
@@ -35,18 +36,7 @@ const getStatusIcon = (status: string) => {
     }
 };
 
-const formatTime = (dateString: string) => {
-    const d = new Date(dateString);
-    let h = d.getHours();
-    let m: string | number = d.getMinutes();
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12;
-    h = h ? h : 12;
-    m = m < 10 ? '0' + m : m;
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const dateStr = `${d.getDate()} ${months[d.getMonth()]}`;
-    return `${dateStr} • ${h}:${m} ${ampm}`;
-};
+
 
 export default function OrdersScreen() {
     const router = useRouter();
@@ -136,7 +126,7 @@ export default function OrdersScreen() {
                                             {order.shopId?.name || 'MUNA Store'}
                                         </Text>
                                         <Text className="text-[11px] font-bold text-slate-400">
-                                            {formatTime(order.createdAt)}
+                                            {formatDateTime(order.createdAt)}
                                         </Text>
                                     </View>
                                     <View className={`px-2.5 py-1 rounded-lg border ${bgColor} ${borderColor} flex-row items-center gap-1.5 shadow-sm`}>

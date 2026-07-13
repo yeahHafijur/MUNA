@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Star, Clock } from 'lucide-react-native';
 import api from '@/api/api';
+import { getImageUrl } from '@/utils/format';
 
 export default function AllStoresScreen() {
     const router = useRouter();
@@ -38,9 +39,7 @@ export default function AllStoresScreen() {
                 ) : (
                     <View className="gap-3 pb-10">
                         {shops.map((shop: any) => {
-                            const imageUrl = shop.image 
-                              ? (shop.image.startsWith('http') ? shop.image : `https://www.munahut.in${shop.image}`)
-                              : null;
+                            const imageUrl = getImageUrl(shop.image);
 
                             return (
                                 <TouchableOpacity

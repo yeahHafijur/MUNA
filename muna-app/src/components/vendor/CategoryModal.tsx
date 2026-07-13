@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { ImageIcon } from 'lucide-react-native';
+import { getImageUrl } from '@/utils/format';
 
 interface CategoryModalProps {
     catModal: any;
@@ -45,8 +46,8 @@ export default function CategoryModal({
                         </TouchableOpacity>
                         {(catImage?.uri || (catModal && catModal !== 'add' && catModal?.image)) && (
                             <Image 
-                                source={{ uri: catImage?.uri || (catModal?.image?.startsWith('http') ? catModal.image : `https://www.munahut.in${catModal.image}`) }} 
-                                style={{ width: 80, height: 80, borderRadius: 16, marginBottom: 16, alignSelf: 'center' }} 
+                                source={{ uri: catImage?.uri || getImageUrl(catModal?.image) }} 
+                                style={{ width: 100, height: 100, borderRadius: 16, marginBottom: 16, alignSelf: 'center' }} 
                                 contentFit="cover" 
                             />
                         )}

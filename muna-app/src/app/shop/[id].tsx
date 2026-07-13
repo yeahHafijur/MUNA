@@ -7,6 +7,7 @@ import { ArrowLeft, Search as SearchIcon, MapPin, Clock, Star } from 'lucide-rea
 import { useCart } from '@/context/CartContext';
 import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
+import { getImageUrl } from '@/utils/format';
 
 export default function ShopDetailScreen() {
     const { id } = useLocalSearchParams();
@@ -97,9 +98,7 @@ export default function ShopDetailScreen() {
         );
     }
 
-    const shopImageUrl = shop.image 
-        ? (shop.image.startsWith('http') ? shop.image : `https://www.munahut.in${shop.image}`)
-        : null;
+    const shopImageUrl = getImageUrl(shop.image);
 
     return (
         <View className="flex-1 bg-white">

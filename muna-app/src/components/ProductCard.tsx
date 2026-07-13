@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Clock } from 'lucide-react-native';
-import { getImageUrl } from '@/utils/helpers';
+import { getImageUrl } from '@/utils/format';
 import { Product } from '@/types';
 
 interface ProductCardProps {

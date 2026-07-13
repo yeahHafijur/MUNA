@@ -10,7 +10,7 @@ import ProductCard from '@/components/ProductCard';
 export default function SearchScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
-    const { addToCart, overrideAndReplaceCart } = useCart();
+    const { cartItems, addToCart, overrideAndReplaceCart, updateQuantity, removeFromCart } = useCart();
     const inputRef = useRef<TextInput>(null);
 
     const [query, setQuery] = useState(params.q ? String(params.q) : '');

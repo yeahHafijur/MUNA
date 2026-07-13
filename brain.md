@@ -42,7 +42,7 @@ The `muna-app` has been heavily customized to feel like a premium, top-tier deli
 *   **Vendor Features & Stability:**
     *   Vendor Dashboard UI improved (large Dashboard button added to Profile).
     *   Fixed deep crashes related to NativeWind and React Navigation by removing dynamic classes that used CSS variables incorrectly.
-    *   Replaced native `toLocaleDateString` and `toLocaleTimeString` with robust manual formatters across the entire app to completely eliminate Hermes JS Engine crashes on Android.
+    *   Replaced native `toLocaleDateString` and `toLocaleTimeString` with robust manual formatters across the entire app (`utils/format.ts`) to completely eliminate Hermes JS Engine crashes on Android. Eliminated all inline URL formatting duplicates.
     *   Implemented a background background alarm (`useVendorAlarm`) for new incoming orders, even playing a loud ringtone.
     *   Order History tab for Vendors is fully functional with date pickers.
 
@@ -52,8 +52,12 @@ The `muna-app` has been heavily customized to feel like a premium, top-tier deli
 
 Since this app will act as an **update** to the existing TWA on the Play Store, the production steps are highly specific.
 
-*   [ ] **Login System Production Cleanup:** Remove any remaining "Demo Login" or mock vendor buttons from `login.tsx` before release.
+*   [x] **Login System Production Cleanup:** Removed any remaining "Demo Login" or mock vendor buttons from `login.tsx` before release (Verified clean).
 *   [ ] **Admin Panel Creation:** A global admin panel has not been built yet. It needs to be created (either as a web dashboard or a hidden super-admin route in the app) to manage users, vendors, and platform operations.
+
+### Recommended Features (Post-Audit Additions)
+*   [ ] **Address Manager:** Currently, "Saved Addresses" in the profile is just a placeholder. Need a dedicated screen (`/settings/addresses`) to manage saved locations.
+*   [ ] **Payment Gateway Integration:** (Optional) The app is currently Cash On Delivery (COD) only. If Razorpay is needed, it must be integrated via `react-native-razorpay` and backend order verification.
 
 ### C. App Configuration & Keystore (Crucial)
 *   [ ] **Keystore Recovery:** The new Expo EAS build MUST be signed with the exact same `.jks` (Upload Key) used for the original PWA/TWA (`app.vercel.muna_opal.twa`). Without this, Google Play will reject the update.

@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Plus, MapPin, Clock } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/api/api';
+import { getImageUrl } from '@/utils/format';
 
 const formatTime = (dateString: string) => {
     const d = new Date(dateString);
@@ -110,9 +111,7 @@ export default function DailyMarketListScreen() {
                 ) : (
                     <View className="flex-row flex-wrap justify-between gap-y-4 pb-10">
                         {items.map((item: any) => {
-                            const imageUrl = item.images && item.images[0] 
-                              ? (item.images[0].startsWith('http') ? item.images[0] : `https://www.munahut.in${item.images[0]}`)
-                              : null;
+                            const imageUrl = getImageUrl(item.images?.[0]);
 
                             return (
                                 <TouchableOpacity

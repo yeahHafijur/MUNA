@@ -9,6 +9,7 @@ import api from '@/api/api';
 import { useVendorOrders } from '@/hooks/useVendorOrders';
 import VendorOrderCard from '@/components/vendor/VendorOrderCard';
 import VendorConfirmationModal from '@/components/vendor/VendorConfirmationModal';
+import { formatDate, formatTime } from '@/utils/format';
 
 const STATUS_LABELS: Record<string, string> = {
     pending: 'Pending', accepted: 'Accepted', preparing: 'Preparing',
@@ -34,20 +35,7 @@ export default function VendorOrders() {
     const [deliveryOtp, setDeliveryOtp] = useState('');
     const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
-    const formatSafeDate = (d: Date) => {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
-    };
 
-    const formatSafeTime = (dateStr: string) => {
-        const d = new Date(dateStr);
-        let h = d.getHours();
-        const m = d.getMinutes();
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12;
-        h = h ? h : 12;
-        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
-    };
 
     const prevLiveRef = useRef(0);
 
@@ -243,7 +231,7 @@ export default function VendorOrders() {
                             className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 flex-row justify-between items-center"
                         >
                             <Text className="text-[15px] font-semibold text-slate-800">
-                                {formatSafeDate(selectedDateObj)}
+                                {formatDate(selectedDateObj)}
                             </Text>
                             <Text className="text-slate-400 font-bold">Change</Text>
                         </TouchableOpacity>
@@ -316,7 +304,7 @@ export default function VendorOrders() {
                                         <View className="flex-row justify-between items-end">
                                             <View className="flex-col gap-1">
                                                 <Text className="text-slate-600 font-semibold text-[13px]">📞 {order.customerId?.phone || 'No Phone'}</Text>
-                                                <Text className="text-slate-500 font-medium text-[13px]">⏱️ {formatSafeTime(order.createdAt)}</Text>
+                                                <Text className="text-slate-500 font-medium text-[13px]">⏱️ {formatTime(order.createdAt)}</Text>
                                             </View>
                                             <View className="items-end">
                                                 <Text className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Amount</Text>

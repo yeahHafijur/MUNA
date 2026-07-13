@@ -9,6 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 import api from '@/api/api';
 import CategoryModal from '@/components/vendor/CategoryModal';
 import ProductModal from '@/components/vendor/ProductModal';
+import { getImageUrl } from '@/utils/format';
 
 export default function VendorMenu() {
     const { user } = useAuth();
@@ -316,7 +317,7 @@ export default function VendorMenu() {
                         <View className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden w-[48%]">
                             <View className="h-32 bg-slate-50 p-2 items-center justify-center relative">
                                 {p.image ? (
-                                    <Image source={{ uri: p.image.startsWith('http') ? p.image : `https://www.munahut.in${p.image}` }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
+                                    <Image source={{ uri: getImageUrl(p.image) }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
                                 ) : (
                                     <Text className="text-3xl opacity-20">📷</Text>
                                 )}

@@ -41,7 +41,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           
           <TouchableOpacity 
             onPress={this.handleReset}
-            style={{ backgroundColor: '#0f172a', paddingHorizontal: 32, paddingVertical: 16, rounded: 12, borderRadius: 12 }}
+            style={{ backgroundColor: '#0f172a', paddingHorizontal: 32, paddingVertical: 16, borderRadius: 12 }}
           >
             <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Try Again</Text>
           </TouchableOpacity>

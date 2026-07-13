@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
+import { getImageUrl } from '@/utils/format';
 
 const { width } = Dimensions.get('window');
 
@@ -110,9 +111,7 @@ export default function ProductDetailScreen() {
     const originalPrice = Math.floor(currentPrice * 1.15); // 15% more
     const isOutOfStock = product.inStock === false || (shop && shop.isOpen === false);
 
-    const imageUrl = product.image 
-        ? (product.image.startsWith('http') ? product.image : `https://www.munahut.in${product.image}`)
-        : null;
+    const imageUrl = getImageUrl(product.image);
 
     const similarProducts = Array.isArray(allShopProducts) 
         ? allShopProducts.filter(p => p._id !== product._id).slice(0, 8)

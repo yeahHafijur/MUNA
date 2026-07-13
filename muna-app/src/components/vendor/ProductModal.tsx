@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, ScrollView, Switch } from 'react-native';
 import { Image } from 'expo-image';
+import { getImageUrl } from '@/utils/format';
 import { ImageIcon } from 'lucide-react-native';
 
 interface ProductModalProps {
@@ -90,7 +91,7 @@ export default function ProductModal({
                         </TouchableOpacity>
                         {(prodImage?.uri || (prodModal && prodModal !== 'add' && prodModal.image)) && (
                             <Image 
-                                source={{ uri: prodImage?.uri || (prodModal.image.startsWith('http') ? prodModal.image : `https://www.munahut.in${prodModal.image}`) }} 
+                                source={{ uri: prodImage?.uri || getImageUrl(prodModal.image) }} 
                                 style={{ width: 100, height: 100, borderRadius: 16, marginBottom: 16, alignSelf: 'center' }} 
                                 contentFit="contain" 
                             />

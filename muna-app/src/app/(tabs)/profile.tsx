@@ -164,20 +164,7 @@ export default function ProfileScreen() {
                             subtitle="Personal Details, Password"
                             onPress={() => router.push('/settings')}
                         />
-                        <MenuRow 
-                            icon={<MapPin size={20} color="#fff" />}
-                            iconBgColor="#f59e0b" // amber-500
-                            title="Saved Addresses"
-                            subtitle="Home, Office, Other"
-                            onPress={() => {}} // Placeholder
-                        />
-                        <MenuRow 
-                            icon={<CreditCard size={20} color="#fff" />}
-                            iconBgColor="#8b5cf6" // violet-500
-                            title="Payment Methods"
-                            subtitle="Cards, UPI, Wallets"
-                            onPress={() => {}} // Placeholder
-                        />
+
                     </View>
 
                     {/* Support & Vendor Menu */}

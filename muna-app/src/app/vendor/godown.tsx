@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Search, Box } from 'lucide-react-native';
 import { Image } from 'expo-image';
+import { getImageUrl } from '@/utils/format';
 import api from '@/api/api';
 
 export default function GodownBrowser() {
@@ -158,7 +159,7 @@ export default function GodownBrowser() {
                                     <View key={item._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden w-[48%] mb-2">
                                         <View className="h-32 bg-slate-50 p-2 items-center justify-center relative border-b border-slate-50">
                                             {item.image ? (
-                                                <Image source={{ uri: item.image.startsWith('http') ? item.image : `https://www.munahut.in${item.image}` }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
+                                                <Image source={{ uri: getImageUrl(item.image) }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
                                             ) : (
                                                 <Text className="text-4xl opacity-30">📷</Text>
                                             )}

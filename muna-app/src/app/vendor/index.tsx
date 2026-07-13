@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Package, Menu as MenuIcon, Archive, Settings, Bell, User, ChevronRight, ArrowLeft } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import api from '@/api/api';
+import { getImageUrl } from '@/utils/format';
 
 // Reusing NavigationRow pattern
 const NavigationRow = ({ icon, title, subtitle, badge = 0, onPress, isLast = false, iconBgClass = "bg-slate-100" }) => (
@@ -136,7 +137,7 @@ export default function VendorHub() {
         );
     }
 
-    const imageUrl = shop.image ? (shop.image.startsWith('http') ? shop.image : `https://www.munahut.in${shop.image}`) : null;
+    const imageUrl = getImageUrl(shop.image);
 
     return (
         <View className="flex-1 bg-slate-50">

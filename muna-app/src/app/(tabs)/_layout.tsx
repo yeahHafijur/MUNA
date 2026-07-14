@@ -3,9 +3,11 @@ import { Tabs } from 'expo-router';
 import { Home, Search, ShoppingBag, UserRound } from 'lucide-react-native';
 
 import { useCart } from '@/context/CartContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { cartItems } = useCart();
+  const insets = useSafeAreaInsets();
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
@@ -15,7 +17,13 @@ export default function TabLayout() {
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: '#f59e0b', // amber-500
         tabBarInactiveTintColor: '#94a3b8',
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            height: (Platform.OS === 'ios' ? 86 : 65) + insets.bottom,
+            paddingBottom: (Platform.OS === 'ios' ? 23 : 8) + insets.bottom,
+          }
+        ],
         tabBarItemStyle: styles.tabItem,
         tabBarLabelStyle: styles.tabLabel,
         tabBarBadgeStyle: styles.badge,
@@ -71,9 +79,7 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: Platform.OS === 'ios' ? 86 : 70,
     paddingTop: 7,
-    paddingBottom: Platform.OS === 'ios' ? 23 : 8,
     paddingHorizontal: 8,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,

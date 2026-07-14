@@ -54,6 +54,7 @@ export default function LoginScreen() {
   };
 
   const onGoogleButtonPress = async () => {
+    if (loading) return; // Prevent double-tap
     setLoading(true);
     setError('');
     try {

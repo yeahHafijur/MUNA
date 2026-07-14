@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Audio } from 'expo-av';
 import { useVendorOrders } from './useVendorOrders';
@@ -39,9 +39,13 @@ export function useVendorAlarm() {
   };
 
   const stopSound = async () => {
-    if (soundRef.current) {
-      await soundRef.current.stopAsync();
-      await soundRef.current.unloadAsync();
+    try {
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+    } catch {
       soundRef.current = null;
     }
   };

@@ -65,8 +65,8 @@ Since this app will act as an **update** to the existing TWA on the Play Store, 
 *   [ ] **Branding:** Set final App Icon and Splash screen images in `app.json`.
 
 ### B. Push Notifications Validation
-*   [ ] FCM Tokens are currently being generated and saved to the backend via `saveFcmToken`.
-*   [ ] **Action Required:** Test a live push notification from the backend to the physical device to ensure background notifications work perfectly (this was the main reason for switching to Native).
+*   [x] FCM Tokens are currently being generated and saved to the backend via `saveFcmToken`.
+*   [x] **Action Required:** Test a live push notification from the backend to the physical device to ensure background notifications work perfectly (this was the main reason for switching to Native). **(Verified by User via USB Debugging)**
 
 ### E. Build & Submission
 *   [ ] **EAS Build:** Run `eas build -p android --profile production` once the keystore is linked.

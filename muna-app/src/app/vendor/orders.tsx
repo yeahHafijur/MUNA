@@ -69,7 +69,7 @@ export default function VendorOrders() {
 
         // Optimistic update
         if (newStatus !== 'delivered') {
-            queryClient.setQueryData(['vendor-live-orders'], (prev: any) => {
+            queryClient.setQueryData(['vendor-orders'], (prev: any) => {
                 if (!prev) return [];
                 return prev.map((order: any) => order._id === orderId ? { ...order, status: newStatus } : order);
             });
@@ -80,10 +80,10 @@ export default function VendorOrders() {
             if (newStatus === 'delivered') body.deliveryOtp = deliveryOtp;
 
             await api.put(`/api/orders/${orderId}/status`, body);
-            queryClient.invalidateQueries({ queryKey: ['vendor-live-orders'] });
+            queryClient.invalidateQueries({ queryKey: ['vendor-orders'] });
         } catch (error: any) {
             Alert.alert("Error", error.response?.data?.message || "Network error");
-            queryClient.invalidateQueries({ queryKey: ['vendor-live-orders'] });
+            queryClient.invalidateQueries({ queryKey: ['vendor-orders'] });
         } finally {
             setUpdatingStatusId(null);
         }

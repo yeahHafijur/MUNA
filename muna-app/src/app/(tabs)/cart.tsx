@@ -35,6 +35,7 @@ export default function CartScreen() {
     };
 
     const handleCheckout = async () => {
+        if (loading) return; // Prevent double-tap
         if (!user) {
             Alert.alert('Login Required', 'Please login to place an order.', [
                 { text: 'Login', onPress: () => router.push('/login') },

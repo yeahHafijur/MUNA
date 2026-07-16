@@ -220,13 +220,28 @@ const getCustomerOrders = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
-        const orders = await Order.find({ customerId: req.user._id })
+        
+        const filter = { customerId: req.user._id };
+        const total = await Order.countDocuments(filter);
+        
+        const orders = await Order.find(filter)
             .populate('shopId', 'name address image')
             .sort('-createdAt')
             .skip((page - 1) * limit)
-            .limit(limit);
-        res.status(200).json(orders);
+            .limit(limit)
+            .lean();
+            
+        res.status(200).json({
+            orders,
+            pagination: {
+                total,
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
+            }
+        });
     } catch (error) {
+        console.error("getCustomerOrders error:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
@@ -288,7 +303,7 @@ const getVendorOrders = async (req, res) => {
         const total = await Order.countDocuments(filter);
         const skip = (Number(page) - 1) * Number(limit);
 
-        const orders = await query.skip(skip).limit(Number(limit));
+        const orders = await query.skip(skip).limit(Number(limit)).lean();
 
         res.status(200).json({
             orders: orders,
@@ -352,15 +367,19 @@ const updateOrderStatus = async (req, res) => {
 
             // Increment salesCount for each product in the order
             try {
-                const bulkOps = order.items.map(item => ({
-                    updateOne: {
-                        filter: { _id: item.productId },
-                        update: { $inc: { salesCount: item.quantity } }
-                    }
-                }));
-                await Product.bulkWrite(bulkOps);
+                if (order.items && order.items.length > 0) {
+                    const bulkOps = order.items.map(item => ({
+                        updateOne: {
+                            filter: { _id: item.productId },
+                            update: { $inc: { salesCount: item.quantity } }
+                        }
+                    }));
+                    const bulkResult = await Product.bulkWrite(bulkOps);
+                    console.log(`[Order ${order._id}] Successfully updated sales counts for ${bulkResult.modifiedCount} products.`);
+                }
             } catch (err) {
-                console.error("Failed to increment salesCount:", err);
+                console.error(`[Order ${order._id}] Failed to increment salesCount in bulkWrite:`, err);
+                // Non-fatal error, continue
             }
         }
 
@@ -412,7 +431,8 @@ const getAllOrdersForAdmin = async (req, res) => {
         const orders = await Order.find(filter)
             .populate('shopId', 'name vendorId address isActive')
             .populate('customerId', 'name phone')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .lean();
 
         res.status(200).json(orders);
     } catch (error) {
@@ -429,7 +449,8 @@ const getActiveOrder = async (req, res) => {
             status: { $in: ['pending', 'accepted', 'preparing', 'out_for_delivery'] }
         })
         .sort({ createdAt: -1 })
-        .populate('shopId', 'name image address category isOpen');
+        .populate('shopId', 'name image address category isOpen')
+        .lean();
 
         if (!order) {
             return res.status(200).json(null);

@@ -94,33 +94,33 @@ export default function HomeScreen() {
     refetch: refetchShops,
   } = useQuery({
     queryKey: ['shops'],
-    queryFn: async () => (await api.get('/api/shops')).data,
+    queryFn: async ({ signal }) => (await api.get('/api/shops', { signal })).data,
   });
 
   const { data: featuredProducts = [], refetch: refetchProducts } = useQuery({
     queryKey: ['featured-products', userLocation?.lat, userLocation?.lng],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const params = userLocation ? { lat: userLocation.lat, lng: userLocation.lng } : undefined;
-      return (await api.get('/api/products/bestsellers', { params })).data;
+      return (await api.get('/api/products/bestsellers', { params, signal })).data;
     },
   });
 
   const { data: dbCategories = [], refetch: refetchCategories } = useQuery({
     queryKey: ['shop-categories'],
-    queryFn: async () => (await api.get('/api/shop-categories')).data,
+    queryFn: async ({ signal }) => (await api.get('/api/shop-categories', { signal })).data,
   });
 
   const { data: banners = [], refetch: refetchBanners } = useQuery({
     queryKey: ['banners'],
-    queryFn: async () => (await api.get('/api/banners')).data,
+    queryFn: async ({ signal }) => (await api.get('/api/banners', { signal })).data,
   });
 
   const { data: activeOrder = null, refetch: refetchActiveOrder } = useQuery({
     queryKey: ['activeOrder'],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!user) return null;
       try {
-        const res = await api.get('/api/orders/active');
+        const res = await api.get('/api/orders/active', { signal });
         return res.data;
       } catch {
         return null;

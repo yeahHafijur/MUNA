@@ -41,7 +41,7 @@ const getShopById = async (req, res) => {
 
 const getMyShop = async (req, res) => {
     try {
-        const shop = await Shop.findOne({ vendorId: req.user._id });
+        const shop = await Shop.findOne({ vendorId: req.user._id }).lean();
         if (!shop) {
             return res.status(404).json({ message: "You don't have any shop" });
         }
@@ -199,7 +199,7 @@ const calculateDelivery = async (req, res) => {
             return res.status(400).json({ message: "Latitude and Longitude are required" });
         }
 
-        const shop = await Shop.findById(req.params.id);
+        const shop = await Shop.findById(req.params.id).select('location deliverySettings').lean();
         if (!shop) {
             return res.status(404).json({ message: "Shop not found" });
         }

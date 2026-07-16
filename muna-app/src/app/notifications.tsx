@@ -1,14 +1,16 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Bell, CheckCircle2 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/api/api';
+import { FlatList } from 'react-native';
 
 export default function NotificationsScreen() {
     const router = useRouter();
     const { token } = useAuth();
+    const queryClient = useQueryClient();
 
     const { data: notifications = [], isLoading } = useQuery({
         queryKey: ['notifications'],
@@ -22,10 +24,16 @@ export default function NotificationsScreen() {
 
     const markAllRead = async () => {
         try {
+            // Optimistic update
+            queryClient.setQueryData(['notifications'], (old: any) => {
+                if (!old) return [];
+                return old.map((n: any) => ({ ...n, read: true }));
+            });
             await api.put('/api/notifications/mark-all-read');
-            // Optimistic update would go here
         } catch (err) {
             console.error('Failed to mark notifications as read', err);
+            // Revert on error
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
         }
     };
 
@@ -61,14 +69,14 @@ export default function NotificationsScreen() {
                     </Text>
                 </View>
             ) : (
-                <ScrollView 
-                    className="flex-1 px-4 pt-4" 
+                <FlatList
+                    className="flex-1 px-4 pt-4"
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: 40, gap: 12 }}
-                >
-                    {notifications.map((notif: any) => (
+                    data={notifications}
+                    keyExtractor={(item) => item._id.toString()}
+                    renderItem={({ item: notif }) => (
                         <View 
-                            key={notif._id} 
                             className={`bg-white rounded-2xl p-4 border ${notif.read ? 'border-slate-100' : 'border-amber-200'} shadow-sm flex-row items-start gap-4`}
                         >
                             <View className={`w-10 h-10 rounded-full items-center justify-center ${notif.read ? 'bg-slate-50' : 'bg-amber-50'}`}>
@@ -97,8 +105,8 @@ export default function NotificationsScreen() {
                                 <View className="w-2 h-2 rounded-full bg-amber-500 mt-2" />
                             )}
                         </View>
-                    ))}
-                </ScrollView>
+                    )}
+                />
             )}
         </View>
     );

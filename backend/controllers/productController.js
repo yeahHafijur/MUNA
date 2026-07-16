@@ -27,7 +27,7 @@ const getBestsellers = async (req, res) => {
                     $maxDistance: parseFloat(radius) * 1000
                 }
             }
-        }).select('_id');
+        }).select('_id').lean();
 
         const shopIds = nearbyShops.map(s => s._id);
 
@@ -57,7 +57,7 @@ const getProductsByShop = async (req, res) => {
         const { shopId } = req.params;
         const products = await Product.find({
             shopId: shopId
-        });
+        }).lean();
         if (!products || products.length === 0) {
             return res.status(404).json({ message: "no products found" })
         }
@@ -73,11 +73,10 @@ const getProductsByShop = async (req, res) => {
         const catMap = new Map(categories.map(c => [c._id.toString(), c]));
 
         const populatedProducts = products.map(p => {
-            const prodObj = p.toObject();
-            if (prodObj.category && catMap.has(prodObj.category.toString())) {
-                prodObj.category = catMap.get(prodObj.category.toString());
+            if (p.category && catMap.has(p.category.toString())) {
+                p.category = catMap.get(p.category.toString());
             }
-            return prodObj;
+            return p;
         });
 
         res.status(200).json(populatedProducts);

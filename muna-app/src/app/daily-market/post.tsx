@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { ArrowLeft, Camera, X } from 'lucide-react-native';
@@ -145,7 +146,7 @@ export default function PostAdScreen() {
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
                         {images.map((uri, index) => (
                             <View key={index} className="w-24 h-24 rounded-xl overflow-hidden mr-3 relative">
-                                <Image source={{ uri }} className="w-full h-full" resizeMode="cover" />
+                                <Image source={{ uri }} style={{ width: '100%', height: '100%' }} contentFit="cover" transition={200} cachePolicy="memory-disk" />
                                 <TouchableOpacity 
                                     onPress={() => removeImage(index)}
                                     className="absolute top-1 right-1 bg-white/80 rounded-full w-6 h-6 items-center justify-center"

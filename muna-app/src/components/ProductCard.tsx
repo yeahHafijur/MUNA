@@ -35,7 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({
       {/* ── IMAGE WRAPPER ── */}
       <View className="w-full aspect-[4/5] rounded-[12px] bg-slate-50 mb-2.5 p-2 flex-col relative overflow-hidden items-center justify-center">
         {product.image ? (
-          <Image source={{ uri: getImageUrl(product.image) as string }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
+          <Image source={{ uri: getImageUrl(product.image) as string }} style={{ width: '100%', height: '100%' }} contentFit="contain" transition={200} cachePolicy="memory-disk" />
         ) : (
           <Text className="text-4xl opacity-50">📦</Text>
         )}

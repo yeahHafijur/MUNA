@@ -23,6 +23,15 @@ export default function ChatDetailScreen() {
     const { user, token } = useAuth();
     const queryClient = useQueryClient();
     const scrollViewRef = useRef<ScrollView>(null);
+    const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    
+    useEffect(() => {
+        return () => {
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+        };
+    }, []);
     
     const [newMessage, setNewMessage] = useState('');
 
@@ -48,7 +57,8 @@ export default function ChatDetailScreen() {
                     messages: [...(oldData.messages || []), newMsg]
                 };
             });
-            setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
+            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+            scrollTimeoutRef.current = setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
         }
     });
 

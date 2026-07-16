@@ -9,6 +9,21 @@ import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
 import { getImageUrl } from '@/utils/format';
 
+const MemoizedShopProductItem = React.memo(({ prod, quantity, shopId, updateQuantity, handleAddToCart, router }: any) => {
+    return (
+        <View className="w-[48%] mb-4">
+            <ProductCard 
+                product={prod}
+                onClick={() => router.push(`/product/${shopId}/${prod._id}` as any)}
+                onAddClick={() => handleAddToCart(prod, shopId)}
+                quantity={quantity}
+                onIncrement={() => updateQuantity(prod._id, quantity + 1)}
+                onDecrement={() => updateQuantity(prod._id, quantity - 1)}
+            />
+        </View>
+    );
+});
+
 export default function ShopDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
@@ -22,16 +37,16 @@ export default function ShopDetailScreen() {
 
     const { data: shop, isLoading: shopLoading } = useQuery({
         queryKey: ['shop', id],
-        queryFn: async () => {
-            const res = await api.get(`/api/shops/${id}`);
+        queryFn: async ({ signal }) => {
+            const res = await api.get(`/api/shops/${id}`, { signal });
             return res.data;
         },
     });
 
     const { data: productsData = [], isLoading: productsLoading } = useQuery({
         queryKey: ['products', id],
-        queryFn: async () => {
-            const res = await api.get(`/api/products/${id}`);
+        queryFn: async ({ signal }) => {
+            const res = await api.get(`/api/products/${id}`, { signal });
             return res.data;
         },
     });
@@ -39,14 +54,23 @@ export default function ShopDetailScreen() {
 
     const { data: categoriesData = [], isLoading: categoriesLoading } = useQuery({
         queryKey: ['categories', id],
-        queryFn: async () => {
-            const res = await api.get(`/api/categories/${id}`);
+        queryFn: async ({ signal }) => {
+            const res = await api.get(`/api/categories/${id}`, { signal });
             return res.data;
         },
     });
     const categoriesList = Array.isArray(categoriesData) ? categoriesData : [];
 
     const loading = shopLoading || productsLoading || categoriesLoading;
+
+    const categoryCounts = useMemo(() => {
+        const counts: Record<string, number> = { 'All': products.length };
+        products.forEach(p => {
+            const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
+            counts[pCatName] = (counts[pCatName] || 0) + 1;
+        });
+        return counts;
+    }, [products]);
 
     const categories = useMemo(() => {
         const prodCatNames = new Set(products.map(p => {
@@ -68,7 +92,7 @@ export default function ShopDetailScreen() {
         });
     }, [products, selectedCategory, searchQuery]);
 
-    const handleAddToCart = (product: any, shopId: string) => {
+    const handleAddToCart = React.useCallback((product: any, shopId: string) => {
         const result = addToCart(product, shopId);
         if (!result.success && result.error === 'DIFFERENT_SHOP_ERROR') {
             Alert.alert(
@@ -80,7 +104,7 @@ export default function ShopDetailScreen() {
                 ]
             );
         }
-    };
+    }, [addToCart, overrideAndReplaceCart]);
 
     if (loading) {
         return (
@@ -202,10 +226,7 @@ export default function ShopDetailScreen() {
                                 </Text>
                             </TouchableOpacity>
                             {categories.map((cat: any) => {
-                                const count = products.filter(p => {
-                                    const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
-                                    return pCatName === cat;
-                                }).length;
+                                const count = categoryCounts[cat] || 0;
                                 return (
                                     <TouchableOpacity 
                                         key={cat}
@@ -243,10 +264,7 @@ export default function ShopDetailScreen() {
 
                                 {/* Category Cards */}
                                 {categories.map((cat: any) => {
-                                    const count = products.filter(p => {
-                                        const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
-                                        return pCatName === cat;
-                                    }).length;
+                                    const count = categoryCounts[cat] || 0;
                                     
                                     const catObj = categoriesList.find((c: any) => c.name === cat);
                                     const customImg = catObj ? catObj.image : null;
@@ -286,22 +304,15 @@ export default function ShopDetailScreen() {
                         ) : (
                             <View className="flex-row flex-wrap justify-between gap-y-4">
                                 {filteredProducts.map(prod => (
-                                    <View key={prod._id} className="w-[48%] mb-4">
-                                        <ProductCard 
-                                            product={prod}
-                                            onClick={() => router.push(`/product/${id}/${prod._id}` as any)}
-                                            onAddClick={() => handleAddToCart(prod, id as string)}
-                                            quantity={cartItems.find(item => item.productId === prod._id)?.quantity || 0}
-                                            onIncrement={() => {
-                                                const q = cartItems.find(item => item.productId === prod._id)?.quantity || 0;
-                                                updateQuantity(prod._id, q + 1);
-                                            }}
-                                            onDecrement={() => {
-                                                const q = cartItems.find(item => item.productId === prod._id)?.quantity || 0;
-                                                updateQuantity(prod._id, q - 1);
-                                            }}
-                                        />
-                                    </View>
+                                    <MemoizedShopProductItem
+                                        key={prod._id}
+                                        prod={prod}
+                                        shopId={id}
+                                        quantity={cartItems.find(item => item.productId === prod._id)?.quantity || 0}
+                                        updateQuantity={updateQuantity}
+                                        handleAddToCart={handleAddToCart}
+                                        router={router}
+                                    />
                                 ))}
                             </View>
                         )

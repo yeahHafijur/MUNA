@@ -7,6 +7,35 @@ import { useCart } from '@/context/CartContext';
 import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
 
+const MemoizedSearchProductItem = React.memo(({ prod, quantity, shopId, updateQuantity, removeFromCart, handleAddToCart, router }: any) => {
+    return (
+        <View className="w-[48%]">
+            <ProductCard
+                product={prod}
+                quantity={quantity}
+                onIncrement={() => updateQuantity(prod._id, quantity + 1)}
+                onDecrement={() => {
+                    if (quantity === 1) {
+                        removeFromCart(prod._id);
+                    } else {
+                        updateQuantity(prod._id, quantity - 1);
+                    }
+                }}
+                onClick={() => {
+                    if (shopId) {
+                        router.push(`/product/${shopId}/${prod._id}` as any);
+                    }
+                }}
+                onAddClick={() => {
+                    if (shopId) {
+                        handleAddToCart(prod, shopId);
+                    }
+                }}
+            />
+        </View>
+    );
+});
+
 export default function SearchScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
@@ -30,15 +59,15 @@ export default function SearchScreen() {
 
     const { data: searchResults, isLoading } = useQuery({
         queryKey: ['search', debouncedQuery],
-        queryFn: async () => {
+        queryFn: async ({ signal }) => {
             if (!debouncedQuery.trim()) return { products: [], shops: [] };
-            const res = await api.get(`/api/search?q=${encodeURIComponent(debouncedQuery)}`);
+            const res = await api.get(`/api/search?q=${encodeURIComponent(debouncedQuery)}`, { signal });
             return res.data;
         },
         enabled: debouncedQuery.trim().length > 0
     });
 
-    const handleAddToCart = (product: any, shopId: string) => {
+    const handleAddToCart = React.useCallback((product: any, shopId: string) => {
         const result = addToCart(product, shopId);
         if (!result.success && result.error === 'DIFFERENT_SHOP_ERROR') {
             Alert.alert(
@@ -50,7 +79,7 @@ export default function SearchScreen() {
                 ]
             );
         }
-    };
+    }, [addToCart, overrideAndReplaceCart]);
 
     const renderHeader = () => (
         <View className="px-4 pt-4">
@@ -203,30 +232,16 @@ export default function SearchScreen() {
                     const quantity = cartItem ? cartItem.quantity : 0;
                     const shopId = prod.shopId?._id || prod.shopId;
                     return (
-                        <View className="w-[48%]">
-                            <ProductCard
-                                product={prod}
-                                quantity={quantity}
-                                onIncrement={() => updateQuantity(prod._id, quantity + 1)}
-                                onDecrement={() => {
-                                    if (quantity === 1) {
-                                        removeFromCart(prod._id);
-                                    } else {
-                                        updateQuantity(prod._id, quantity - 1);
-                                    }
-                                }}
-                                onClick={() => {
-                                    if (shopId) {
-                                        router.push(`/product/${shopId}/${prod._id}` as any);
-                                    }
-                                }}
-                                onAddClick={() => {
-                                    if (shopId) {
-                                        handleAddToCart(prod, shopId);
-                                    }
-                                }}
-                            />
-                        </View>
+                        <MemoizedSearchProductItem
+                            key={prod._id}
+                            prod={prod}
+                            quantity={quantity}
+                            shopId={shopId}
+                            updateQuantity={updateQuantity}
+                            removeFromCart={removeFromCart}
+                            handleAddToCart={handleAddToCart}
+                            router={router}
+                        />
                     );
                 }}
             />

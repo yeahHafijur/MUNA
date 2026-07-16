@@ -7,9 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "munaapp",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon"
-    },
+    "ios": {},
     "android": {
       "package": "app.vercel.muna_opal.twa",
       "versionCode": 27,
@@ -24,7 +22,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
@@ -32,7 +30,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 76
         }
       ],
@@ -55,7 +53,12 @@
           ]
         }
       ],
-      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "MUNA needs your location to show you nearby stores and daily market listings."
+        }
+      ],
       [
         "@sentry/react-native/expo",
         {

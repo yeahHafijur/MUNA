@@ -18,7 +18,7 @@ export default function GodownBrowser() {
     const [importingId, setImportingId] = useState<string | null>(null);
 
     const { data: shop, isLoading: isShopLoading } = useQuery({
-        queryKey: ['my-shop', user?._id],
+        queryKey: ['my-shop'],
         queryFn: async () => {
             const res = await api.get('/api/shops/my-shop');
             return res.data;
@@ -159,7 +159,7 @@ export default function GodownBrowser() {
                                     <View key={item._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden w-[48%] mb-2">
                                         <View className="h-32 bg-slate-50 p-2 items-center justify-center relative border-b border-slate-50">
                                             {item.image ? (
-                                                <Image source={{ uri: getImageUrl(item.image) }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
+                                                <Image source={{ uri: getImageUrl(item.image) as string }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
                                             ) : (
                                                 <Text className="text-4xl opacity-30">📷</Text>
                                             )}

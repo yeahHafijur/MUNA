@@ -41,8 +41,8 @@ export default function VendorOrders() {
 
     const { data: historyOrders = [], isLoading: isHistoryLoading } = useQuery({
         queryKey: ['vendor-history-orders', selectedDate],
-        queryFn: async () => {
-            const res = await api.get(`/api/orders/vendor?date=${selectedDate}&limit=200`);
+        queryFn: async ({ signal }) => {
+            const res = await api.get(`/api/orders/vendor?date=${selectedDate}&limit=200`, { signal });
             return res.data.orders || [];
         },
         enabled: activeView === 'history'

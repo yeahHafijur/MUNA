@@ -39,7 +39,7 @@ const globalSearch = async (req, res) => {
                     { name: { $regex: sanitizedQuery, $options: 'i' } },
                     { category: { $regex: sanitizedQuery, $options: 'i' } }
                 ]
-            }).limit(10);
+            }).limit(10).lean();
         }
 
         // 2. Search Products using Atlas Search + Lookup Shop details

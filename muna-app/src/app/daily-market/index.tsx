@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Plus, MapPin, Clock } from 'lucide-react-native';
@@ -124,8 +125,10 @@ export default function DailyMarketListScreen() {
                                         {imageUrl ? (
                                             <Image 
                                                 source={{ uri: imageUrl }} 
-                                                className="w-full h-full"
-                                                resizeMode="cover"
+                                                style={{ width: '100%', height: '100%' }}
+                                                contentFit="cover"
+                                                transition={200}
+                                                cachePolicy="memory-disk"
                                             />
                                         ) : (
                                             <View className="w-full h-full items-center justify-center bg-slate-100">

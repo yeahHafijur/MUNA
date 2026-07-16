@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, Share, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Share, ActivityIndicator, Dimensions } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Heart, Share as ShareIcon, Minus, Plus } from 'lucide-react-native';
@@ -147,7 +148,7 @@ export default function ProductDetailScreen() {
                 {/* Product Image */}
                 <View className="w-full h-80 bg-[#F8F9FA] relative items-center justify-center pt-8">
                     {imageUrl ? (
-                        <Image source={{ uri: imageUrl }} className="w-full h-full" resizeMode="contain" />
+                        <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="contain" transition={200} cachePolicy="memory-disk" />
                     ) : (
                         <Text className="text-6xl opacity-30">📦</Text>
                     )}

@@ -6,8 +6,18 @@ import { useVendorOrders } from './useVendorOrders';
 export function useVendorAlarm() {
   const { user } = useAuth();
   const soundRef = useRef<Audio.Sound | null>(null);
+  const isMounted = useRef(true);
   
   const { data: orders = [] } = useVendorOrders();
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      if (soundRef.current) {
+        soundRef.current.unloadAsync().catch(() => {});
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (user?.role === 'vendor') {
@@ -18,10 +28,6 @@ export function useVendorAlarm() {
         playThroughEarpieceAndroid: false,
       });
     }
-
-    return () => {
-      if (soundRef.current) soundRef.current.unloadAsync();
-    };
   }, [user]);
 
   const playSound = async () => {
@@ -31,10 +37,14 @@ export function useVendorAlarm() {
         require('../../assets/sounds/ringtone.wav'),
         { isLooping: true, volume: 1.0 }
       );
+      if (!isMounted.current) {
+        await sound.unloadAsync();
+        return;
+      }
       soundRef.current = sound;
       await sound.playAsync();
     } catch (error) {
-      console.log("Audio play error", error);
+      console.error("Audio play error", error);
     }
   };
 

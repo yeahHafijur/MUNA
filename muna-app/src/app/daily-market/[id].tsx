@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator, Share, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, MapPin, Clock, Share2, MessageCircle, AlertTriangle } from 'lucide-react-native';
@@ -129,7 +130,7 @@ export default function DailyMarketDetailScreen() {
                 {/* Image Gallery (Just first image for now) */}
                 <View className="w-full aspect-[4/3] bg-slate-100 relative">
                     {imageUrl ? (
-                        <Image source={{ uri: imageUrl }} className="w-full h-full" resizeMode="cover" />
+                        <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" transition={200} cachePolicy="memory-disk" />
                     ) : (
                         <View className="flex-1 items-center justify-center bg-amber-50">
                             <Text className="text-6xl">📦</Text>

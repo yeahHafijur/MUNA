@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Modal, TextInput, Platform, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Modal, TextInput, Platform, Alert, ActivityIndicator, AppState, AppStateStatus } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +9,16 @@ import api from '@/api/api';
 import { getImageUrl } from '@/utils/format';
 
 // Reusing NavigationRow pattern matching professional Profile design
-const NavigationRow = ({ icon, title, subtitle, badge = 0, onPress, isLast = false }) => (
+interface NavigationRowProps {
+    icon: React.ReactNode;
+    title: string;
+    subtitle?: string;
+    badge?: number;
+    onPress: () => void;
+    isLast?: boolean;
+}
+
+const NavigationRow = ({ icon, title, subtitle, badge = 0, onPress, isLast = false }: NavigationRowProps) => (
     <TouchableOpacity
         onPress={onPress}
         activeOpacity={0.7}
@@ -42,6 +51,14 @@ export default function VendorHub() {
 
     const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
+
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', nextAppState => {
+            setAppState(nextAppState);
+        });
+        return () => subscription.remove();
+    }, []);
     
     // Delivery Rules Form
     const [minOrder, setMinOrder] = useState('');
@@ -75,14 +92,14 @@ export default function VendorHub() {
                     const prodRes = await api.get(`/api/products/${shop._id}`);
                     productCount = Array.isArray(prodRes.data) ? prodRes.data.length : 0;
                 } catch (e) {
-                    console.log('Error fetching products for stats', e);
+                    console.error('Error fetching products for stats', e);
                 }
             }
 
             return { liveOrders: liveOrders.length, todayRevenue, totalProducts: productCount };
         },
         enabled: !!shop,
-        refetchInterval: 15000
+        refetchInterval: appState === 'active' ? 15000 : false
     });
 
     const handleOpenDeliveryModal = () => {

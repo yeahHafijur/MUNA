@@ -149,7 +149,10 @@ export default function ShopDetailScreen() {
                 </View>
 
                 {/* 2. Sticky Header & Search Bar */}
-                <View className="bg-white shadow-sm z-40 border-b border-slate-100">
+                <View 
+                  className="bg-white shadow-sm z-40 border-b border-slate-100"
+                  style={{ elevation: 40, zIndex: 40 }}
+                >
                     
                     {/* Small Header (Only visible when Hero is hidden) */}
                     {(selectedCategory !== null || !!searchQuery) && (

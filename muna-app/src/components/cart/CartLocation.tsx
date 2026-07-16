@@ -31,6 +31,7 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
     const [newGps, setNewGps] = useState<{lat: number, lng: number} | null>(null);
     const [newAddressText, setNewAddressText] = useState('');
     const [newName, setNewName] = useState('Home'); // Home, Office, Other
+    const [shouldSave, setShouldSave] = useState(false); // Optional saving
     const [saving, setSaving] = useState(false);
 
     // Fetch saved locations
@@ -61,7 +62,6 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
 
             const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
             setNewGps({ lat: location.coords.latitude, lng: location.coords.longitude });
-            setShowModal(true); // Open modal to ask for house number and save
         } catch (error) {
             console.error('Location error', error);
             Alert.alert('Location Error', 'Could not fetch location. Please try again.');
@@ -70,8 +70,11 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
         }
     };
 
-    const handleSaveNewAddress = async (shouldSaveToDb: boolean) => {
-        if (!newGps) return;
+    const handleSaveNewAddress = async () => {
+        if (!newGps) {
+            Alert.alert("Location Required", "Please click 'Get Current Location' first.");
+            return;
+        }
         if (!newAddressText.trim()) {
             Alert.alert("Missing Info", "Please enter your House No. / Landmark.");
             return;
@@ -79,36 +82,35 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
 
         setSaving(true);
         const payload = {
-            name: shouldSaveToDb ? newName : 'Current Location',
+            name: newName,
             address: newAddressText,
             lat: newGps.lat,
             lng: newGps.lng
         };
 
         try {
-            if (user && shouldSaveToDb) {
+            if (user && shouldSave) {
                 // Save to backend
-                const res = await api.post('/api/user/locations', payload);
+                await api.post('/api/user/locations', payload);
                 queryClient.invalidateQueries({ queryKey: ['savedLocations'] });
-                
-                if (res.data && res.data.savedLocations) {
-                    const updatedList = res.data.savedLocations;
-                    const newlySaved = updatedList[updatedList.length - 1];
-                    handleSelectSaved(newlySaved || payload);
-                } else {
-                    onLocationDetermined(payload);
-                }
+                // We just proceed with the payload instead of trying to extract the ID, 
+                // the cart only needs lat/lng/address
+                onLocationDetermined(payload);
             } else {
-                // Just use without saving
+                // Use without saving
                 onLocationDetermined(payload);
             }
             setShowModal(false);
             setNewAddressText('');
+            setNewGps(null); // Reset for next time
+            setShouldSave(false);
         } catch (error: any) {
             console.error("Save Location Error", error?.response?.data || error);
             Alert.alert("Error", "Could not save address. Continuing without saving.");
             onLocationDetermined(payload); // Fallback to just using it
             setShowModal(false);
+            setNewGps(null);
+            setShouldSave(false);
         } finally {
             setSaving(false);
         }
@@ -169,79 +171,104 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
                         </View>
                     )}
 
-                    {/* Add New Address / Current Location Button */}
+                    {/* Add New Address Button */}
                     <TouchableOpacity 
-                        onPress={handleGetLocation}
-                        disabled={locating}
+                        onPress={() => {
+                            setNewGps(null);
+                            setNewAddressText('');
+                            setShowModal(true);
+                        }}
                         className="bg-slate-900 h-14 rounded-2xl flex-row items-center justify-center shadow-sm"
                     >
-                        {locating ? (
-                            <ActivityIndicator size="small" color="#ffffff" />
-                        ) : (
-                            <>
-                                <Plus size={18} color="#ffffff" className="mr-2" />
-                                <Text className="text-white font-black text-[15px]">Add New Address (GPS)</Text>
-                            </>
-                        )}
+                        <Plus size={18} color="#ffffff" className="mr-2" />
+                        <Text className="text-white font-black text-[15px]">Add New Address</Text>
                     </TouchableOpacity>
                 </View>
             )}
 
             {/* New Address Modal */}
-            <Modal visible={showModal} transparent animationType="slide">
-                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 justify-end bg-slate-900/40">
+            <Modal visible={showModal} transparent animationType="slide" onRequestClose={() => setShowModal(false)}>
+                <View className="flex-1 justify-end bg-slate-900/40">
                     <View className="bg-white rounded-t-[32px] p-6 pb-10">
                         <View className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6" />
                         
-                        <View className="flex-row items-center gap-3 mb-6">
-                            <View className="w-10 h-10 bg-emerald-50 rounded-full items-center justify-center">
-                                <Navigation size={18} color="#10b981" />
-                            </View>
-                            <View>
-                                <Text className="text-[18px] font-black text-slate-900">GPS Location Fetched</Text>
-                                <Text className="text-[12px] font-bold text-slate-500">Please provide house/building details</Text>
-                            </View>
+                        <View className="mb-6">
+                            <Text className="text-[20px] font-black text-slate-900 mb-1">Add Delivery Address</Text>
+                            <Text className="text-[13px] font-medium text-slate-500">We need your location for fast delivery</Text>
                         </View>
+
+                        {/* GPS Fetch Button */}
+                        <TouchableOpacity 
+                            onPress={handleGetLocation}
+                            disabled={locating}
+                            className={`flex-row items-center justify-center p-4 rounded-2xl mb-6 border ${
+                                newGps ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
+                            }`}
+                        >
+                            {locating ? (
+                                <ActivityIndicator size="small" color="#10b981" />
+                            ) : (
+                                <>
+                                    <Navigation size={18} color={newGps ? "#10b981" : "#3b82f6"} className="mr-2" />
+                                    <Text className={`font-black text-[15px] ${newGps ? 'text-emerald-700' : 'text-blue-600'}`}>
+                                        {newGps ? 'Location Fetched Successfully ✅' : '📍 Get Current GPS Location'}
+                                    </Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
 
                         <Text className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Complete Address</Text>
                         <TextInput 
                             value={newAddressText}
                             onChangeText={setNewAddressText}
                             placeholder="House No., Building Name, Landmark"
-                            className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[15px] font-medium text-slate-900 mb-5"
+                            className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[15px] font-medium text-slate-900 mb-4"
                             multiline
                             style={{ height: 80, textAlignVertical: 'top' }}
                         />
 
-                        <Text className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Save As</Text>
-                        <View className="flex-row gap-3 mb-8">
-                            {['Home', 'Office', 'Other'].map(type => (
-                                <TouchableOpacity 
-                                    key={type}
-                                    onPress={() => setNewName(type)}
-                                    className={`flex-1 py-3 rounded-xl border items-center ${newName === type ? 'bg-amber-100 border-amber-400' : 'bg-white border-slate-200'}`}
-                                >
-                                    <Text className={`text-[13px] font-black ${newName === type ? 'text-amber-900' : 'text-slate-600'}`}>{type}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                        {/* Save Address Option */}
+                        <TouchableOpacity 
+                            onPress={() => setShouldSave(!shouldSave)}
+                            className="flex-row items-center mb-4 pl-1"
+                        >
+                            <View className={`w-5 h-5 rounded border items-center justify-center mr-3 ${shouldSave ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-slate-300'}`}>
+                                {shouldSave && <Text className="text-white text-[12px]">✓</Text>}
+                            </View>
+                            <Text className="text-slate-700 text-[14px] font-medium">Save this address for next time</Text>
+                        </TouchableOpacity>
 
-                        <View className="flex-row gap-3 mt-4">
-                            <TouchableOpacity 
-                                onPress={() => handleSaveNewAddress(false)}
-                                disabled={saving || !newAddressText.trim()}
-                                className={`flex-1 py-4 bg-slate-100 rounded-2xl items-center ${saving || !newAddressText.trim() ? 'opacity-50' : ''}`}
+                        {shouldSave && (
+                            <View>
+                                <Text className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Save As</Text>
+                                <View className="flex-row gap-3 mb-6">
+                                    {['Home', 'Office', 'Other'].map(type => (
+                                        <TouchableOpacity 
+                                            key={type}
+                                            onPress={() => setNewName(type)}
+                                            className={`flex-1 py-3 rounded-xl border items-center ${newName === type ? 'bg-amber-100 border-amber-400' : 'bg-white border-slate-200'}`}
+                                        >
+                                            <Text className={`text-[13px] font-black ${newName === type ? 'text-amber-900' : 'text-slate-600'}`}>{type}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+                        )}
+
+                        <TouchableOpacity 
+                            onPress={handleSaveNewAddress}
+                            disabled={saving || !newAddressText.trim() || !newGps}
+                            className="w-full py-4 rounded-2xl items-center shadow-sm"
+                            style={{ backgroundColor: (saving || !newAddressText.trim() || !newGps) ? '#e2e8f0' : '#0f172a' }}
+                        >
+                            <Text 
+                                className="text-[15px] font-black"
+                                style={{ color: (saving || !newAddressText.trim() || !newGps) ? '#94a3b8' : '#ffffff' }}
                             >
-                                <Text className="text-slate-600 text-[14px] font-black">Use Once</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity 
-                                onPress={() => handleSaveNewAddress(true)}
-                                disabled={saving || !newAddressText.trim()}
-                                className={`flex-1 py-4 bg-amber-400 rounded-2xl items-center ${saving || !newAddressText.trim() ? 'opacity-50' : ''}`}
-                            >
-                                <Text className="text-amber-950 text-[14px] font-black">{saving ? 'Wait...' : 'Save & Use'}</Text>
-                            </TouchableOpacity>
-                        </View>
+                                {saving ? 'Processing...' : 'Proceed to Checkout'}
+                            </Text>
+                        </TouchableOpacity>
+                        
                         <TouchableOpacity 
                             onPress={() => setShowModal(false)}
                             className="mt-4 py-2 items-center"
@@ -249,7 +276,7 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
                             <Text className="text-slate-400 text-[13px] font-bold">Cancel</Text>
                         </TouchableOpacity>
                     </View>
-                </KeyboardAvoidingView>
+                </View>
             </Modal>
         </View>
     );

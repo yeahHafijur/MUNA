@@ -1,36 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Modal, TextInput, Platform, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Package, Menu as MenuIcon, Archive, Settings, Bell, User, ChevronRight, ArrowLeft } from 'lucide-react-native';
+import { Package, Menu as MenuIcon, Archive, Settings, Bell, User, ChevronRight, ArrowLeft, LogOut } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import api from '@/api/api';
 import { getImageUrl } from '@/utils/format';
 
-// Reusing NavigationRow pattern
-const NavigationRow = ({ icon, title, subtitle, badge = 0, onPress, isLast = false, iconBgClass = "bg-slate-100" }) => (
+// Reusing NavigationRow pattern matching professional Profile design
+const NavigationRow = ({ icon, title, subtitle, badge = 0, onPress, isLast = false }) => (
     <TouchableOpacity
         onPress={onPress}
         activeOpacity={0.7}
-        className={`flex-row items-center justify-between p-4 bg-white ${!isLast ? 'border-b border-slate-50' : ''}`}
+        className={`flex-row items-center justify-between p-4 bg-white ${!isLast ? 'border-b border-slate-100' : ''}`}
     >
         <View className="flex-row items-center gap-4 flex-1">
-            <View className={`w-12 h-12 rounded-2xl items-center justify-center ${iconBgClass}`}>
+            <View className="w-10 h-10 rounded-full bg-slate-50 items-center justify-center">
                 {icon}
             </View>
             <View className="flex-1">
-                <Text className="text-[15px] font-black text-slate-900 tracking-tight">{title}</Text>
-                {subtitle && <Text className="text-[12px] font-semibold text-slate-400 mt-0.5">{subtitle}</Text>}
+                <Text className="text-[15px] font-semibold text-slate-900">{title}</Text>
+                {subtitle && <Text className="text-[12px] font-medium text-slate-500 mt-0.5">{subtitle}</Text>}
             </View>
         </View>
         <View className="flex-row items-center gap-3">
             {badge > 0 && (
                 <View className="bg-rose-500 px-2 py-1 rounded-md">
-                    <Text className="text-white text-[10px] font-black">{badge} NEW</Text>
+                    <Text className="text-white text-[10px] font-bold">{badge} NEW</Text>
                 </View>
             )}
-            <ChevronRight size={20} color="#cbd5e1" />
+            <ChevronRight size={18} color="#cbd5e1" />
         </View>
     </TouchableOpacity>
 );
@@ -131,8 +131,8 @@ export default function VendorHub() {
     if (isShopLoading || !shop) {
         return (
             <View className="flex-1 items-center justify-center bg-slate-50">
-                <ActivityIndicator size="large" color="#fbbf24" />
-                <Text className="text-sm font-black tracking-widest uppercase text-slate-400 mt-4">Loading Store...</Text>
+                <ActivityIndicator size="large" color="#475569" />
+                <Text className="text-[13px] font-bold tracking-widest uppercase text-slate-400 mt-4">Loading Store...</Text>
             </View>
         );
     }
@@ -141,105 +141,112 @@ export default function VendorHub() {
 
     return (
         <View className="flex-1 bg-slate-50">
-            {/* Header */}
-            <View className="bg-white pt-12 px-4 pb-4 border-b border-slate-100 shadow-sm flex-row items-center justify-between">
+            {/* Professional Header */}
+            <View className="bg-white pt-12 px-5 pb-4 border-b border-slate-200 flex-row items-center justify-between">
                 <View className="flex-row items-center gap-3">
-                    <TouchableOpacity onPress={() => router.push('/')} className="w-10 h-10 bg-slate-50 rounded-full items-center justify-center active:scale-95">
-                        <ArrowLeft size={20} color="#334155" />
+                    <TouchableOpacity onPress={() => router.push('/')} className="w-10 h-10 bg-slate-50 rounded-full items-center justify-center border border-slate-100">
+                        <ArrowLeft size={18} color="#475569" />
                     </TouchableOpacity>
-                    <Text className="text-[18px] font-extrabold text-slate-900 tracking-tight">Merchant Hub</Text>
+                    <Text className="text-[18px] font-bold text-slate-900 tracking-tight">Merchant Hub</Text>
                 </View>
                 
                 <TouchableOpacity 
                     onPress={handleToggleShopStatus}
-                    className={`flex-row items-center gap-2 px-3 py-1.5 rounded-lg border ${shop.isOpen ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-100 border-slate-200'}`}
+                    className={`flex-row items-center gap-2 px-3 py-1.5 rounded-full border ${shop.isOpen ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-100 border-slate-200'}`}
                 >
                     <View className={`w-2 h-2 rounded-full ${shop.isOpen ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                    <Text className={`text-[10px] font-black uppercase tracking-widest ${shop.isOpen ? 'text-emerald-700' : 'text-slate-500'}`}>
+                    <Text className={`text-[11px] font-bold uppercase tracking-wider ${shop.isOpen ? 'text-emerald-700' : 'text-slate-600'}`}>
                         {shop.isOpen ? 'Open' : 'Closed'}
                     </Text>
                 </TouchableOpacity>
             </View>
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-                {/* Shop Profile Card */}
-                <View className="bg-white p-5 border-b border-slate-100 mb-4">
+                {/* Shop Profile Section */}
+                <View className="bg-white p-5 border-b border-slate-200 mb-5">
                     <View className="flex-row items-center gap-4">
-                        <View className="w-16 h-16 rounded-full bg-amber-100 border-2 border-slate-100 items-center justify-center overflow-hidden">
+                        <View className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 items-center justify-center overflow-hidden">
                             {imageUrl ? (
                                 <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                             ) : (
-                                <Text className="text-2xl">🏪</Text>
+                                <Text className="text-[20px]">🏪</Text>
                             )}
                         </View>
                         <View className="flex-1">
-                            <Text className="text-[18px] font-extrabold text-slate-900 tracking-tight mb-0.5">{shop.name}</Text>
-                            <Text className="text-[12px] font-medium text-slate-500 mb-2">{shop.address || 'Vendor Store'}</Text>
-                            <View className="bg-amber-50 px-2 py-0.5 rounded border border-amber-100 self-start">
-                                <Text className="text-[10px] font-black text-amber-700 uppercase tracking-wider">⭐ {shop.rating || 'New Shop'}</Text>
+                            <Text className="text-[18px] font-bold text-slate-900 tracking-tight mb-0.5">{shop.name}</Text>
+                            <Text className="text-[13px] font-medium text-slate-500 mb-2">{shop.address || 'Vendor Store'}</Text>
+                            <View className="bg-amber-50 px-2 py-1 rounded border border-amber-100 self-start">
+                                <Text className="text-[11px] font-bold text-amber-700">⭐ {shop.rating || 'New Shop'}</Text>
                             </View>
                         </View>
                     </View>
                 </View>
 
                 {/* Quick Metrics */}
-                <View className="flex-row gap-3 px-4 mb-4">
-                    <View className="flex-1 bg-white p-4 rounded-3xl border border-slate-100 items-center">
-                        <Text className="text-[28px] font-black text-slate-800 mb-1">{stats.liveOrders}</Text>
-                        <Text className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Orders</Text>
+                <View className="flex-row gap-3 px-5 mb-6">
+                    <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm items-center">
+                        <Text className="text-[24px] font-bold text-slate-900 mb-1">{stats.liveOrders}</Text>
+                        <Text className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Active Orders</Text>
                     </View>
-                    <View className="flex-1 bg-white p-4 rounded-3xl border border-slate-100 items-center">
-                        <Text className="text-[28px] font-black text-emerald-500 mb-1">₹{stats.todayRevenue}</Text>
-                        <Text className="text-[10px] font-black text-emerald-600/60 uppercase tracking-widest">Today's Sales</Text>
+                    <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm items-center">
+                        <Text className="text-[24px] font-bold text-emerald-600 mb-1">₹{stats.todayRevenue}</Text>
+                        <Text className="text-[11px] font-semibold text-emerald-600/70 uppercase tracking-wider">Today's Sales</Text>
                     </View>
                 </View>
 
                 {/* Menus */}
-                <View className="px-4 gap-4 pb-10">
-                    <View className="bg-white rounded-[24px] border border-slate-100 overflow-hidden">
+                <View className="px-5 pb-10">
+                    <Text className="text-[13px] font-bold text-slate-500 mb-2 ml-1">STORE MANAGEMENT</Text>
+                    <View className="bg-white rounded-2xl border border-slate-100 mb-6 overflow-hidden">
                         <NavigationRow 
-                            icon={<Package size={24} color="#2563eb" />} iconBgClass="bg-blue-50"
+                            icon={<Package size={20} color="#475569" />}
                             title="Manage Orders" subtitle="Accept, dispatch & verify" badge={stats.liveOrders}
                             onPress={() => router.push('/vendor/orders')}
                         />
                         <NavigationRow 
-                            icon={<MenuIcon size={24} color="#9333ea" />} iconBgClass="bg-purple-50"
+                            icon={<MenuIcon size={20} color="#475569" />}
                             title="Catalog & Menu" subtitle={`${stats.totalProducts} Items in your store`}
                             onPress={() => router.push('/vendor/menu')}
                         />
                         <NavigationRow 
-                            icon={<Archive size={24} color="#d97706" />} iconBgClass="bg-amber-50"
+                            icon={<Archive size={20} color="#475569" />}
                             title="Master Godown" subtitle="Import bulk items instantly"
                             onPress={() => router.push('/vendor/godown')}
                         />
                         <NavigationRow 
-                            icon={<Settings size={24} color="#334155" />} iconBgClass="bg-slate-50"
+                            icon={<Settings size={20} color="#475569" />}
                             title="Delivery Rules" subtitle={`Max ${shop.deliverySettings?.maxRange || 5}km • Min ₹${shop.deliverySettings?.minOrderAmount || 0}`}
                             onPress={handleOpenDeliveryModal}
                         />
                         <NavigationRow 
-                            icon={<Bell size={24} color="#f43f5e" />} iconBgClass="bg-rose-50"
+                            icon={<Bell size={20} color="#475569" />}
                             title="Notifications" subtitle="New order alerts"
                             onPress={() => Alert.alert("Notifications", "Push notifications are active!")} isLast
                         />
                     </View>
 
-                    <View className="bg-white rounded-[24px] border border-slate-100 overflow-hidden">
+                    <Text className="text-[13px] font-bold text-slate-500 mb-2 ml-1">ACCOUNT</Text>
+                    <View className="bg-white rounded-2xl border border-slate-100 mb-6 overflow-hidden">
                         <NavigationRow 
-                            icon={<User size={24} color="#059669" />} iconBgClass="bg-emerald-50"
+                            icon={<User size={20} color="#475569" />}
                             title="My Profile" subtitle="Customer account settings"
                             onPress={() => router.push('/profile')} isLast
                         />
                     </View>
 
-                    <TouchableOpacity 
-                        onPress={() => { logout(); router.replace('/'); }}
-                        className="bg-white rounded-[24px] border border-slate-100 p-4 items-center justify-center active:bg-slate-50"
-                    >
-                        <Text className="text-[15px] font-bold text-rose-600">Sign Out</Text>
-                    </TouchableOpacity>
+                    <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-6">
+                        <TouchableOpacity 
+                            onPress={() => { logout(); router.replace('/'); }}
+                            className="p-4 items-center justify-center flex-row gap-2 active:bg-slate-50"
+                        >
+                            <LogOut size={18} color="#ef4444" />
+                            <Text className="text-[15px] font-bold text-rose-600">Sign Out</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                    <Text className="text-center text-[10px] font-black text-slate-300 uppercase tracking-widest mt-4">MUNA Merchant App v2.0</Text>
+                    <View className="items-center opacity-50 mb-4">
+                        <Text className="text-[12px] font-semibold text-slate-400">MUNA Merchant App v2.0</Text>
+                    </View>
                 </View>
             </ScrollView>
 
@@ -250,15 +257,12 @@ export default function VendorHub() {
                 animationType="slide"
                 onRequestClose={() => setIsDeliveryModalOpen(false)}
             >
-                <KeyboardAvoidingView 
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    className="flex-1 justify-end bg-slate-900/40"
-                >
+                <View className="flex-1 justify-end bg-slate-900/40">
                     <View className="bg-white rounded-t-[32px] p-6 pb-10 max-h-[85%]">
                         <View className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6" />
                         <View className="flex-row items-center justify-between mb-8">
-                            <Text className="text-[20px] font-extrabold text-slate-900">Delivery Rules</Text>
-                            <TouchableOpacity onPress={() => setIsDeliveryModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full items-center justify-center">
+                            <Text className="text-[20px] font-bold text-slate-900">Delivery Rules</Text>
+                            <TouchableOpacity onPress={() => setIsDeliveryModalOpen(false)} className="w-8 h-8 bg-slate-50 rounded-full items-center justify-center border border-slate-100">
                                 <Text className="text-slate-500 font-bold">✕</Text>
                             </TouchableOpacity>
                         </View>
@@ -266,41 +270,41 @@ export default function VendorHub() {
                         <ScrollView showsVerticalScrollIndicator={false} className="mb-4">
                             <View className="space-y-4">
                                 <View>
-                                    <Text className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Minimum Order (₹)</Text>
+                                    <Text className="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Minimum Order (₹)</Text>
                                     <TextInput
                                         keyboardType="numeric"
                                         value={minOrder}
                                         onChangeText={setMinOrder}
-                                        className="bg-slate-50 p-4 rounded-2xl text-[16px] font-bold text-slate-900 border border-slate-100 focus:border-amber-400"
+                                        className="bg-slate-50 p-4 rounded-xl text-[15px] font-semibold text-slate-900 border border-slate-200 focus:border-slate-400"
                                     />
                                 </View>
                                 <View className="flex-row gap-3">
                                     <View className="flex-1">
-                                        <Text className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Base Charge (₹)</Text>
+                                        <Text className="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Base Charge (₹)</Text>
                                         <TextInput
                                             keyboardType="numeric"
                                             value={minimumCharge}
                                             onChangeText={setMinimumCharge}
-                                            className="bg-slate-50 p-4 rounded-2xl text-[16px] font-bold text-slate-900 border border-slate-100 focus:border-amber-400"
+                                            className="bg-slate-50 p-4 rounded-xl text-[15px] font-semibold text-slate-900 border border-slate-200 focus:border-slate-400"
                                         />
                                     </View>
                                     <View className="flex-1">
-                                        <Text className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Charge/KM (₹)</Text>
+                                        <Text className="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Charge/KM (₹)</Text>
                                         <TextInput
                                             keyboardType="numeric"
                                             value={chargePerKm}
                                             onChangeText={setChargePerKm}
-                                            className="bg-slate-50 p-4 rounded-2xl text-[16px] font-bold text-slate-900 border border-slate-100 focus:border-amber-400"
+                                            className="bg-slate-50 p-4 rounded-xl text-[15px] font-semibold text-slate-900 border border-slate-200 focus:border-slate-400"
                                         />
                                     </View>
                                 </View>
                                 <View>
-                                    <Text className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Max Range (KM)</Text>
+                                    <Text className="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Max Range (KM)</Text>
                                     <TextInput
                                         keyboardType="numeric"
                                         value={maxDeliveryRange}
                                         onChangeText={setMaxDeliveryRange}
-                                        className="bg-slate-50 p-4 rounded-2xl text-[16px] font-bold text-slate-900 border border-slate-100 focus:border-amber-400"
+                                        className="bg-slate-50 p-4 rounded-xl text-[15px] font-semibold text-slate-900 border border-slate-200 focus:border-slate-400"
                                     />
                                 </View>
                             </View>
@@ -309,12 +313,12 @@ export default function VendorHub() {
                         <TouchableOpacity 
                             onPress={handleSaveDeliveryRules}
                             disabled={isSaving}
-                            className={`bg-amber-400 p-4 rounded-2xl items-center ${isSaving ? 'opacity-70' : ''}`}
+                            className={`bg-slate-900 p-4 rounded-xl items-center shadow-sm ${isSaving ? 'opacity-70' : ''}`}
                         >
-                            <Text className="text-[16px] font-black text-amber-950">{isSaving ? 'Saving...' : 'Save Rules'}</Text>
+                            <Text className="text-[15px] font-bold text-white">{isSaving ? 'Saving...' : 'Save Rules'}</Text>
                         </TouchableOpacity>
                     </View>
-                </KeyboardAvoidingView>
+                </View>
             </Modal>
         </View>
     );

@@ -222,7 +222,10 @@ export default function HomeScreen() {
         </View>
 
         {/* SEARCH (Sticky) */}
-        <View className="bg-white pt-1 pb-2 border-b border-slate-100 shadow-sm z-10">
+        <View 
+          className="bg-white pt-1 pb-2 border-b border-slate-100 shadow-sm z-10"
+          style={{ elevation: 10, zIndex: 10 }}
+        >
           <GlobalSearchBar />
         </View>
 

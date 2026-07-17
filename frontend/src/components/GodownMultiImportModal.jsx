@@ -8,6 +8,7 @@ export default function GodownMultiImportModal({ isOpen, onClose, onSuccess, sho
     const [selectedIds, setSelectedIds] = useState(new Set());
     const [isImporting, setIsImporting] = useState(false);
     const [search, setSearch] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     const { data: godownItems, isLoading } = useQuery({
         queryKey: ['godown-items-multi', search],
@@ -30,14 +31,24 @@ export default function GodownMultiImportModal({ isOpen, onClose, onSuccess, sho
     };
 
     const selectAll = () => {
-        if (!godownItems?.products) return;
-        const newSet = new Set(godownItems.products.map(p => p._id));
+        if (!displayedItems) return;
+        const newSet = new Set(selectedIds);
+        displayedItems.forEach(p => newSet.add(p._id));
         setSelectedIds(newSet);
     };
 
     const deselectAll = () => {
         setSelectedIds(new Set());
     };
+
+    const categories = godownItems?.products 
+        ? [...new Set(godownItems.products.map(p => p.category).filter(Boolean))] 
+        : [];
+
+    const displayedItems = godownItems?.products?.filter(p => {
+        if (selectedCategory && p.category !== selectedCategory) return false;
+        return true;
+    });
 
     const handleImport = async () => {
         if (selectedIds.size === 0) return toast.info('Please select at least one item');
@@ -101,34 +112,59 @@ export default function GodownMultiImportModal({ isOpen, onClose, onSuccess, sho
                     </div>
                 </div>
 
-                {/* List */}
-                <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-2">
+                {/* Categories */}
+                {categories.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto px-4 py-3 bg-white border-b border-gray-100 [scrollbar-width:none]">
+                        <button 
+                            className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${!selectedCategory ? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200 text-slate-600'}`}
+                            onClick={() => setSelectedCategory(null)}
+                        >
+                            All
+                        </button>
+                        {categories.map(cat => (
+                            <button 
+                                key={cat}
+                                className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${selectedCategory === cat ? 'bg-amber-400 text-amber-950 border-amber-400' : 'bg-white border-slate-200 text-slate-600'}`}
+                                onClick={() => setSelectedCategory(cat)}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {/* Grid */}
+                <div className="flex-1 overflow-y-auto bg-gray-100 p-[1px] [scrollbar-width:none]">
                     {isLoading ? (
-                        <div className="flex flex-col items-center justify-center h-40 text-gray-400">
+                        <div className="flex flex-col items-center justify-center h-40 text-gray-400 bg-white m-4 rounded-2xl">
                             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-3"></div>
                             Loading godown items...
                         </div>
-                    ) : godownItems?.products?.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-40 text-gray-400">
-                            No items found matching "{search}"
+                    ) : displayedItems?.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-40 text-gray-400 bg-white m-4 rounded-2xl">
+                            No items found.
                         </div>
                     ) : (
-                        godownItems?.products?.map(item => (
-                            <div 
-                                key={item._id} 
-                                onClick={() => toggleSelection(item._id)}
-                                className={`flex items-center gap-4 p-3 rounded-2xl cursor-pointer transition-all border ${selectedIds.has(item._id) ? 'bg-green-50 border-green-200 shadow-sm' : 'bg-white border-transparent hover:border-gray-200 hover:shadow-sm'}`}
-                            >
-                                <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 border-2 transition-colors ${selectedIds.has(item._id) ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 bg-white'}`}>
-                                    {selectedIds.has(item._id) && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-[1px]">
+                            {displayedItems?.map(item => (
+                                <div 
+                                    key={item._id} 
+                                    onClick={() => toggleSelection(item._id)}
+                                    className={`bg-white p-3 pb-4 flex flex-col items-center text-center cursor-pointer transition-all relative group ${selectedIds.has(item._id) ? 'bg-green-50/40' : 'hover:bg-gray-50'}`}
+                                >
+                                    {/* Selection Checkmark Overlay */}
+                                    <div className={`absolute top-2 right-2 w-5 h-5 rounded-md flex items-center justify-center border-2 z-10 transition-colors ${selectedIds.has(item._id) ? 'bg-green-500 border-green-500 text-white shadow-sm' : 'border-gray-200 bg-white/80 group-hover:border-gray-300'}`}>
+                                        {selectedIds.has(item._id) && <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                                    </div>
+
+                                    <div className="w-16 h-16 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center p-1 mb-2">
+                                        {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-gray-300 font-black text-2xl">M</span>}
+                                    </div>
+                                    <div className="text-[11px] font-bold text-gray-900 line-clamp-2 leading-tight mb-0.5 px-1">{item.name}</div>
+                                    {item.category && <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider line-clamp-1">{item.category}</div>}
                                 </div>
-                                <img src={item.image || 'https://via.placeholder.com/150'} alt={item.name} className="w-12 h-12 rounded-xl object-cover bg-gray-100" />
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-semibold text-gray-900 truncate">{item.name}</h3>
-                                    <p className="text-xs text-gray-500">{item.category}</p>
-                                </div>
-                            </div>
-                        ))
+                            ))}
+                        </div>
                     )}
                 </div>
 

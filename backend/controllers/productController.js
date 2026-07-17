@@ -124,6 +124,11 @@ const createProduct = async (req, res) => {
         // Resolve category: prefer categoryId (ObjectId), fallback to string
         const resolvedCategory = categoryId || category;
 
+        // Check if item already exists in Godown (case-insensitive)
+        const MasterProduct = require('../models/MasterProduct');
+        const godownItem = await MasterProduct.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } }).lean();
+        const status = godownItem ? 'approved' : 'pending';
+
         const product = await Product.create({
             name,
             price,
@@ -133,7 +138,7 @@ const createProduct = async (req, res) => {
             gallery: galleryUrls,
             stock,
             shopId: shop._id,
-            approvalStatus: 'pending'
+            approvalStatus: status
         });
         res.status(200).json(product);
     } catch (error) {

@@ -54,9 +54,10 @@ const globalSearch = async (req, res) => {
                             path: ["name", "category"],
                             fuzzy: { maxEdits: 1 }
                         }
-                    }
                 },
                 { $limit: 20 },
+                // Filter by approved status
+                { $match: { approvalStatus: 'approved' } },
                 // Match with shop to ensure shop exists and is active
                 {
                     $lookup: {
@@ -89,6 +90,7 @@ const globalSearch = async (req, res) => {
             products = await Product.aggregate([
                 {
                     $match: {
+                        approvalStatus: 'approved',
                         $or: [
                             { name: { $regex: sanitizedQuery, $options: 'i' } },
                             {

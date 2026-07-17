@@ -280,11 +280,15 @@ const getProductDetail = async (req, res) => {
     try {
         const { id } = req.params;
         
-        // Use .lean() for faster execution since we only need to read the data
         const product = await Product.findById(id).lean();
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Only allow viewing if approved (or if the requester is the vendor, but customer app doesn't send token, so we restrict to approved)
+        if (product.approvalStatus && product.approvalStatus !== 'approved') {
+            return res.status(404).json({ message: 'Product not found or pending approval' });
         }
 
         // Populate category manually if needed since we use mixed schema types for legacy

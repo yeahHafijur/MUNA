@@ -161,6 +161,11 @@ export default function HomeScreen() {
 
     return list
       .filter((shop: any) => {
+        // HIDE SHOPS THAT ARE MORE THAN 25 KM AWAY
+        if (shop.distance !== Infinity && shop.distance > 25) {
+          return false;
+        }
+
         if (activeCategory === 'All') return true;
         const shopCatName = typeof shop.category === 'object' ? (shop.category?.name || 'General') : (shop.category || 'General');
         return shopCatName === activeCategory;
@@ -248,6 +253,7 @@ export default function HomeScreen() {
               setActiveCategory={setActiveCategory}
               showAllCategories={showAllCategories}
               setShowAllCategories={setShowAllCategories}
+              userLocation={userLocation}
             />
           </View>
 
@@ -265,6 +271,7 @@ export default function HomeScreen() {
               setActiveCategory={setActiveCategory}
               limit={6}
               showViewAll={true}
+              userLocation={userLocation}
             />
           </View>
           

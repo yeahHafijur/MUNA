@@ -1,14 +1,16 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Star, Clock } from 'lucide-react-native';
 import api from '@/api/api';
 import { getImageUrl } from '@/utils/format';
+import { haversine } from '@/utils/homeUtils';
 
 export default function AllStoresScreen() {
     const router = useRouter();
+    const { category, lat, lng } = useLocalSearchParams();
 
     const { data: shops = [], isLoading } = useQuery({
         queryKey: ['shops'],
@@ -18,6 +20,23 @@ export default function AllStoresScreen() {
         },
     });
 
+    const filteredShops = React.useMemo(() => {
+        return shops.filter((shop: any) => {
+            // Distance Filter (Max 25km)
+            if (lat && lng && shop.location?.coordinates) {
+                const shopLat = shop.location.coordinates[1];
+                const shopLng = shop.location.coordinates[0];
+                const dist = haversine(Number(lat), Number(lng), shopLat, shopLng);
+                if (dist > 25) return false;
+            }
+
+            // Category Filter
+            if (!category) return true;
+            const shopCat = typeof shop.category === 'object' ? shop.category?.name : shop.category;
+            return shopCat === category;
+        });
+    }, [shops, category, lat, lng]);
+
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
@@ -26,8 +45,10 @@ export default function AllStoresScreen() {
                     <ArrowLeft size={24} color="#0f172a" />
                 </TouchableOpacity>
                 <View>
-                    <Text className="text-[18px] font-black text-slate-900 leading-tight">All Stores</Text>
-                    <Text className="text-[11px] font-bold text-slate-400 mt-0.5">{shops.length} stores available</Text>
+                    <Text className="text-[18px] font-black text-slate-900 leading-tight">
+                        {category ? `${category} Stores` : 'All Stores'}
+                    </Text>
+                    <Text className="text-[11px] font-bold text-slate-400 mt-0.5">{filteredShops.length} stores available</Text>
                 </View>
             </View>
 
@@ -36,9 +57,29 @@ export default function AllStoresScreen() {
                     <View className="flex-1 items-center justify-center pt-20">
                         <ActivityIndicator size="large" color="#fbbf24" />
                     </View>
+                ) : filteredShops.length === 0 ? (
+                    <View className="items-center px-5 py-12 bg-white rounded-[32px] border border-amber-100/50 shadow-sm mt-4">
+                        <View className="w-20 h-20 bg-amber-50 rounded-full items-center justify-center mb-5 border border-amber-100">
+                            <Text className="text-4xl">🚀</Text>
+                        </View>
+                        <Text className="text-[20px] font-black text-slate-900 text-center mb-2 tracking-tight">
+                            No {category ? category : ''} stores found
+                        </Text>
+                        <Text className="text-[13px] font-semibold text-slate-500 text-center leading-relaxed mb-8 px-4">
+                            We don't have any stores for this category in your area yet. Help us grow by referring a local vendor!
+                        </Text>
+                        
+                        <TouchableOpacity 
+                            onPress={() => router.push('/vendor-request')}
+                            className="bg-slate-900 w-full py-4 rounded-2xl flex-row items-center justify-center shadow-sm active:bg-slate-800 gap-2"
+                        >
+                            <Text className="text-white font-black text-[15px]">Refer a Vendor</Text>
+                            <Text className="text-amber-400 text-lg leading-none mt-[-2px]">→</Text>
+                        </TouchableOpacity>
+                    </View>
                 ) : (
                     <View className="gap-3 pb-10">
-                        {shops.map((shop: any) => {
+                        {filteredShops.map((shop: any) => {
                             const imageUrl = getImageUrl(shop.image);
 
                             return (

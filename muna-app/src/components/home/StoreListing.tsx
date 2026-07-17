@@ -11,6 +11,7 @@ interface StoreListingProps {
   setActiveCategory: (category: string) => void;
   limit?: number;
   showViewAll?: boolean;
+  userLocation?: { lat: number; lng: number } | null;
 }
 
 const StoreListing: React.FC<StoreListingProps> = ({
@@ -20,6 +21,7 @@ const StoreListing: React.FC<StoreListingProps> = ({
   setActiveCategory,
   limit,
   showViewAll,
+  userLocation,
 }) => {
   const router = useRouter();
   const displayShops = limit ? sortedShops.slice(0, limit) : sortedShops;
@@ -65,10 +67,24 @@ const StoreListing: React.FC<StoreListingProps> = ({
             </View>
           ))
         ) : sortedShops.length === 0 ? (
-          <View className="items-center py-16 bg-white rounded-[24px] border border-slate-100 border-dashed mx-1 shadow-sm">
-            <Text className="text-5xl mb-3">🔍</Text>
-            <Text className="text-[14px] font-black text-slate-400">No stores found</Text>
-            <Text className="text-[11px] font-semibold text-slate-300 mt-1">Try a different category</Text>
+          <View className="items-center px-5 py-10 bg-white rounded-[32px] border border-amber-100/50 shadow-sm mx-1">
+            <View className="w-20 h-20 bg-amber-50 rounded-full items-center justify-center mb-5 border border-amber-100">
+              <Text className="text-4xl">🚀</Text>
+            </View>
+            <Text className="text-[20px] font-black text-slate-900 text-center mb-2 tracking-tight">
+              We aren't here... yet!
+            </Text>
+            <Text className="text-[13px] font-semibold text-slate-500 text-center leading-relaxed mb-8 px-4">
+              MUNA hasn't reached your exact location. Want to be a hero? Help us launch here by referring a local grocery or pharmacy vendor!
+            </Text>
+            
+            <Pressable 
+              onPress={() => router.push('/vendor-request')}
+              className="bg-slate-900 w-full py-4 rounded-2xl flex-row items-center justify-center shadow-sm active:bg-slate-800 gap-2"
+            >
+              <Text className="text-white font-black text-[15px]">Refer a Vendor</Text>
+              <Text className="text-amber-400 text-lg leading-none mt-[-2px]">→</Text>
+            </Pressable>
           </View>
         ) : (
           displayShops.map((shop) => {
@@ -161,7 +177,10 @@ const StoreListing: React.FC<StoreListingProps> = ({
       {showViewAll && limit && sortedShops.length > limit && (
         <View className="mt-6 items-center">
           <Pressable
-            onPress={() => router.push('/all-stores')}
+            onPress={() => {
+              const locParams = userLocation ? `?lat=${userLocation.lat}&lng=${userLocation.lng}` : '';
+              router.push(`/all-stores${locParams}`);
+            }}
             className="flex-row items-center justify-center gap-2 px-7 py-3.5 bg-slate-900 rounded-2xl active:opacity-80 shadow-sm"
           >
             <Text className="text-white font-black text-[13px]">

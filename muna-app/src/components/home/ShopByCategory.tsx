@@ -1,22 +1,26 @@
 import React, { memo } from 'react';
-import { Pressable, ScrollView, Text, View, TouchableOpacity } from 'react-native';
+import { Pressable, Text, View, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
 import { getCategoryIcon } from '@/utils/homeUtils';
 
 interface ShopByCategoryProps {
   categoryList: any[];
-  activeCategory: string;
-  setActiveCategory: (cat: string) => void;
   showAllCategories: boolean;
   setShowAllCategories: (show: boolean) => void;
+  // Kept for backward compatibility with HomeScreen
+  activeCategory?: string;
+  setActiveCategory?: (cat: string) => void;
+  userLocation?: { lat: number; lng: number } | null;
 }
 
 const ShopByCategory: React.FC<ShopByCategoryProps> = ({
   categoryList,
-  activeCategory,
-  setActiveCategory,
   setShowAllCategories,
+  userLocation,
 }) => {
+  const router = useRouter();
+
   return (
     <View className="bg-white px-4 py-6 border-y border-slate-100 mb-2 shadow-sm md:rounded-2xl md:mx-4">
       <View className="flex-row items-center justify-between mb-4">
@@ -26,45 +30,43 @@ const ShopByCategory: React.FC<ShopByCategoryProps> = ({
         </Pressable>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-4 pb-2">
-        {categoryList.map((catObj) => {
+      <View className="flex-row flex-wrap items-start justify-start gap-y-5 gap-x-[4%] pt-2 pb-1">
+        {categoryList.slice(0, 8).map((catObj) => {
           const catName = catObj.name;
-          const isActive = activeCategory === catName;
           const { emoji, bg } = getCategoryIcon(catName);
 
           return (
             <TouchableOpacity
               key={catName}
-              onPress={() => setActiveCategory(catName)}
-              className="flex-col items-center gap-2 w-[72px]"
+              onPress={() => {
+                const locParams = userLocation ? `&lat=${userLocation.lat}&lng=${userLocation.lng}` : '';
+                if (catName === 'All') {
+                  router.push(`/all-stores?${locParams.replace('&', '')}`);
+                } else {
+                  router.push(`/all-stores?category=${encodeURIComponent(catName)}${locParams}`);
+                }
+              }}
+              className="flex-col items-center gap-2 w-[22%]"
               activeOpacity={0.7}
             >
               <View
-                className="w-[72px] h-[72px] rounded-2xl flex items-center justify-center overflow-hidden"
-                style={
-                  isActive
-                    ? { borderWidth: 2, borderColor: '#0f172a', backgroundColor: '#f8fafc' }
-                    : { backgroundColor: bg }
-                }>
+                className="w-16 h-16 rounded-[18px] flex items-center justify-center overflow-hidden shadow-sm relative"
+                style={{ backgroundColor: bg }}>
                 {catObj.image ? (
                   <Image source={{ uri: catObj.image }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                 ) : (
-                  <Text className="text-[32px]">{emoji}</Text>
+                  <Text className="text-[28px]">{emoji}</Text>
                 )}
               </View>
               <Text
-                className={`text-[11px] text-center leading-tight px-1 ${
-                  isActive ? 'font-black text-slate-900' : 'font-bold text-slate-600'
-                }`}>
+                numberOfLines={2}
+                className="text-[11px] text-center leading-tight font-bold text-slate-600">
                 {catName === 'All' ? 'All' : catName}
               </Text>
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </View>
     </View>
   );
 };

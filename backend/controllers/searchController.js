@@ -52,8 +52,8 @@ const globalSearch = async (req, res) => {
                         text: {
                             query: safeQuery,
                             path: ["name", "category"],
-                            fuzzy: { maxEdits: 1 }
                         }
+                    }
                 },
                 { $limit: 20 },
                 // Filter by approved status

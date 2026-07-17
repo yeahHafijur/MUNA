@@ -69,7 +69,7 @@ const VendorMenu = () => {
 
     const fetchProducts = useCallback(() => {
         if (!shop?._id) return;
-        fetch(`/api/products/${shop._id}`, { credentials: 'include' }).then(r => r.json()).then(data => {
+        fetch(`/api/products/vendor/catalog`, { credentials: 'include' }).then(r => r.json()).then(data => {
             if (Array.isArray(data)) setProducts(data);
         });
     }, [shop]);
@@ -297,10 +297,12 @@ const VendorMenu = () => {
                         {/* Product Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                             {filteredProducts.map(p => (
-                                <div key={p._id} className="bg-white rounded-[24px] border border-slate-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] overflow-hidden flex flex-col group">
+                                <div key={p._id} className="bg-white rounded-[24px] border border-slate-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] overflow-hidden flex flex-col group relative">
                                     <div className="h-32 bg-slate-50 relative p-2 flex items-center justify-center">
-                                        {p.image ? <img src={p.image} className="w-full h-full object-contain mix-blend-multiply transition-transform group-hover:scale-105" /> : <span className="text-3xl opacity-20">📷</span>}
-                                        {!p.inStock && <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center"><span className="bg-slate-900 text-white text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest shadow-lg">Out of Stock</span></div>}
+                                        {p.approvalStatus === 'pending' && <div className="absolute top-2 left-2 z-10 bg-amber-400 text-amber-900 text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest shadow-sm">Pending Approval</div>}
+                                        {p.approvalStatus === 'rejected' && <div className="absolute top-2 left-2 z-10 bg-rose-500 text-white text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest shadow-sm">Rejected</div>}
+                                        {p.image ? <img src={p.image} className={`w-full h-full object-contain mix-blend-multiply transition-transform group-hover:scale-105 ${p.approvalStatus !== 'approved' ? 'opacity-50 grayscale' : ''}`} /> : <span className="text-3xl opacity-20">📷</span>}
+                                        {!p.inStock && p.approvalStatus === 'approved' && <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center"><span className="bg-slate-900 text-white text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest shadow-lg">Out of Stock</span></div>}
                                     </div>
                                     <div className="p-3.5 flex flex-col flex-1 border-t border-slate-50">
                                         <h4 className="text-[13px] font-black text-slate-900 line-clamp-2 leading-snug mb-1">

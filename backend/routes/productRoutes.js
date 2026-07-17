@@ -6,7 +6,8 @@ const {
     importMultipleProducts,
     updateProduct,
     deleteProduct,
-    getProductDetail
+    getProductDetail,
+    getVendorCatalog
 } = require('../controllers/productController');
 const { protect, authorize } = require("../middleware/authMiddleware");
 const upload = require('../middleware/uploadMiddleware');
@@ -23,6 +24,7 @@ router.get("/:shopId", getProductsByShop);
 // 2. Protected Routes: Vendor apne products ko manage kare
 const productUploadFields = upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery', maxCount: 4 }]);
 
+router.get("/vendor/catalog", protect, authorize("vendor"), getVendorCatalog);
 router.post("/", protect, authorize("vendor"), productUploadFields, createProduct);
 router.post("/import-multiple", protect, authorize("vendor"), importMultipleProducts);
 

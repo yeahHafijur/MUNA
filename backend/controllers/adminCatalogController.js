@@ -470,6 +470,86 @@ const getAuditLogs = async (req, res) => {
     }
 };
 
+// ══════════════════════════════════════
+//  PRODUCT APPROVALS (PENDING VENDOR UPLOADS)
+// ══════════════════════════════════════
+
+// GET /api/admin/catalog/products/pending
+const getPendingProducts = async (req, res) => {
+    try {
+        const pendingProducts = await Product.find({ approvalStatus: 'pending' })
+            .populate('shopId', 'name vendorId location')
+            .sort({ createdAt: -1 })
+            .lean();
+        res.status(200).json(pendingProducts);
+    } catch (error) {
+        console.error('[AdminCatalog] getPendingProducts error:', error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// PUT /api/admin/catalog/products/:id/approve
+const approveProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ message: "Product not found" });
+
+        product.approvalStatus = 'approved';
+        await product.save();
+
+        // Check if it exists in Godown, if not, add it automatically
+        const MasterProduct = require('../models/MasterProduct');
+        const existingMaster = await MasterProduct.findOne({ name: product.name });
+        
+        // Ensure category resolves to a string for Godown
+        let catName = 'General';
+        if (product.category) {
+            if (typeof product.category === 'string') {
+                catName = product.category;
+            } else if (product.category.name) {
+                catName = product.category.name; // In case it's populated
+            } else {
+                const ItemCategory = require('../models/ItemCategory');
+                const catDoc = await ItemCategory.findById(product.category);
+                if (catDoc) catName = catDoc.name;
+            }
+        }
+
+        if (!existingMaster) {
+            await MasterProduct.create({
+                name: product.name,
+                category: catName,
+                price: product.price || 0,
+                quantity: product.quantity || '',
+                image: product.image,
+                gallery: product.gallery || [],
+                status: 'approved'
+            });
+        }
+
+        res.status(200).json({ message: "Product approved and added to godown", product });
+    } catch (error) {
+        console.error('[AdminCatalog] approveProduct error:', error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// PUT /api/admin/catalog/products/:id/reject
+const rejectProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ message: "Product not found" });
+
+        product.approvalStatus = 'rejected';
+        await product.save();
+
+        res.status(200).json({ message: "Product rejected", product });
+    } catch (error) {
+        console.error('[AdminCatalog] rejectProduct error:', error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 module.exports = {
     getShopProducts,
     createProduct,
@@ -482,6 +562,8 @@ module.exports = {
     createCategory,
     updateCategory,
     deleteCategory,
-    reorderCategories,
-    getAuditLogs
+    getAuditLogs,
+    getPendingProducts,
+    approveProduct,
+    rejectProduct
 };

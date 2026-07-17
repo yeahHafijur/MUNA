@@ -7,8 +7,7 @@ const getBestsellers = async (req, res) => {
         const { lat, lng, radius = 100 } = req.query;
 
         if (!lat || !lng) {
-            // Return top global products if no location provided (Fallback)
-            const globalBest = await Product.find({ inStock: true })
+            const globalBest = await Product.find({ inStock: true, approvalStatus: 'approved' })
                 .sort({ salesCount: -1, isFeatured: -1 })
                 .limit(12)
                 .populate('shopId', 'name')
@@ -38,7 +37,8 @@ const getBestsellers = async (req, res) => {
         // 2. Fetch products from these shops, sorted by salesCount
         const bestsellers = await Product.find({
             shopId: { $in: shopIds },
-            inStock: true
+            inStock: true,
+            approvalStatus: 'approved'
         })
         .sort({ salesCount: -1, isFeatured: -1 })
         .limit(12)
@@ -56,7 +56,8 @@ const getProductsByShop = async (req, res) => {
     try {
         const { shopId } = req.params;
         const products = await Product.find({
-            shopId: shopId
+            shopId: shopId,
+            approvalStatus: 'approved'
         }).lean();
         if (!products || products.length === 0) {
             return res.status(404).json({ message: "no products found" })
@@ -123,23 +124,6 @@ const createProduct = async (req, res) => {
         // Resolve category: prefer categoryId (ObjectId), fallback to string
         const resolvedCategory = categoryId || category;
 
-        // --- MASTER GODOWN LOGIC ---
-        try {
-            const catName = typeof resolvedCategory === 'string' ? resolvedCategory : (category || 'General');
-            await MasterProduct.create({
-                name,
-                category: catName,
-                price: price || 0,
-                quantity: quantity || '',
-                image,
-                gallery: galleryUrls
-            });
-            console.log(`[Godown] New item pushed to approvals: ${name}`);
-        } catch (err) {
-            console.error("Master Godown error:", err);
-        }
-        // ---------------------------
-
         const product = await Product.create({
             name,
             price,
@@ -148,9 +132,22 @@ const createProduct = async (req, res) => {
             image,
             gallery: galleryUrls,
             stock,
-            shopId: shop._id
+            shopId: shop._id,
+            approvalStatus: 'pending'
         });
-        res.status(201).json(product);
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+const getVendorCatalog = async (req, res) => {
+    try {
+        const shop = await Shop.findOne({ vendorId: req.user._id });
+        if (!shop) return res.status(404).json({ message: 'Shop not found' });
+        
+        const products = await Product.find({ shopId: shop._id }).lean();
+        res.status(200).json(products);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
@@ -185,7 +182,8 @@ const importMultipleProducts = async (req, res) => {
             gallery: mp.gallery || [],
             stock: mp.stock || 0,
             shopId: shop._id,
-            inStock: true
+            inStock: true,
+            approvalStatus: 'approved'
         }));
 
         const inserted = await Product.insertMany(newProducts);
@@ -315,5 +313,6 @@ module.exports = {
     importMultipleProducts,
     updateProduct,
     deleteProduct,
-    getProductDetail
+    getProductDetail,
+    getVendorCatalog
 };

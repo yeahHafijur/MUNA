@@ -48,6 +48,11 @@ const productSchema = new mongoose.Schema({
         ref: 'Shop',
         required: true,
         index: true
+    },
+    approvalStatus: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'approved'
     }
 }, { timestamps: true });
 

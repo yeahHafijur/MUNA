@@ -21,7 +21,7 @@ const AdminGodown = () => {
 
     const [godownSearchQuery, setGodownSearchQuery] = useState('');
     const [editingGodownItem, setEditingGodownItem] = useState(null);
-    const [godownFormData, setGodownFormData] = useState({ name: '', category: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] });
+    const [godownFormData, setGodownFormData] = useState({ name: '', category: '', price: '', quantity: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] });
     const [isGodownModalOpen, setIsGodownModalOpen] = useState(false);
 
     // Crop Modal States
@@ -95,6 +95,8 @@ const AdminGodown = () => {
         const fd = new FormData();
         fd.append('name', godownFormData.name);
         fd.append('category', godownFormData.category);
+        fd.append('price', godownFormData.price || 0);
+        fd.append('quantity', godownFormData.quantity || '');
         if (godownFormData.image instanceof Blob || godownFormData.image instanceof File) {
             fd.append('image', godownFormData.image, 'image.jpg');
         }
@@ -107,7 +109,7 @@ const AdminGodown = () => {
             const url = editingGodownItem ? `/api/master-products/${editingGodownItem._id}` : '/api/master-products';
             const res = await fetch(url, { credentials: 'include',  method: editingGodownItem ? 'PUT' : 'POST', body: fd });
             if (res.ok) {
-                setGodownFormData({ name: '', category: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] });
+                setGodownFormData({ name: '', category: '', price: '', quantity: '', image: null, imagePreview: '', gallery: [], galleryPreviews: [] });
                 setEditingGodownItem(null);
                 queryClient.invalidateQueries({ queryKey: ['master-products'] });
                 setIsGodownModalOpen(false);
@@ -118,7 +120,7 @@ const AdminGodown = () => {
 
     const handleGodownEditClick = (item) => {
         setEditingGodownItem(item);
-        setGodownFormData({ name: item.name, category: item.category || '', image: null, imagePreview: item.image || '', gallery: [], galleryPreviews: item.gallery || [] });
+        setGodownFormData({ name: item.name, category: item.category || '', price: item.price || '', quantity: item.quantity || '', image: null, imagePreview: item.image || '', gallery: [], galleryPreviews: item.gallery || [] });
         setIsGodownModalOpen(true);
     };
 
@@ -169,6 +171,7 @@ const AdminGodown = () => {
                                     {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-gray-300 font-black text-2xl">M</span>}
                                 </div>
                                 <div className="text-xs font-bold text-gray-900 line-clamp-2 leading-tight mb-1">{item.name}</div>
+                                <div className="text-[11px] font-extrabold text-green-600 mb-0.5">₹{item.price || 0} {item.quantity ? <span className="text-gray-400 font-normal">/ {item.quantity}</span> : null}</div>
                                 {item.category && <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{item.category}</div>}
 
                                 {/* Actions (Always visible for mobile) */}
@@ -219,6 +222,16 @@ const AdminGodown = () => {
                             <div>
                                 <label className={labelClasses}>Category</label>
                                 <input type="text" name="category" className={inputClasses} value={godownFormData.category} onChange={handleGodownFormChange} placeholder="e.g. Grocery" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className={labelClasses}>Price (₹)</label>
+                                    <input type="number" name="price" className={inputClasses} value={godownFormData.price} onChange={handleGodownFormChange} placeholder="e.g. 199" />
+                                </div>
+                                <div>
+                                    <label className={labelClasses}>Quantity/Unit</label>
+                                    <input type="text" name="quantity" className={inputClasses} value={godownFormData.quantity} onChange={handleGodownFormChange} placeholder="e.g. 1 kg" />
+                                </div>
                             </div>
                             <div className="pt-2">
                                 <button type="submit" className={`${btnPrimaryClasses} w-full py-3`}>{editingGodownItem ? 'Update Item' : 'Add to Godown'}</button>

@@ -129,6 +129,8 @@ const createProduct = async (req, res) => {
             await MasterProduct.create({
                 name,
                 category: catName,
+                price: price || 0,
+                quantity: quantity || '',
                 image,
                 gallery: galleryUrls
             });
@@ -176,7 +178,7 @@ const importMultipleProducts = async (req, res) => {
 
         const newProducts = masterProducts.map(mp => ({
             name: mp.name,
-            price: 0,
+            price: mp.price || 0,
             category: mp.category,
             quantity: mp.quantity || '',
             image: mp.image,

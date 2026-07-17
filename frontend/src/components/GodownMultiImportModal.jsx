@@ -161,6 +161,7 @@ export default function GodownMultiImportModal({ isOpen, onClose, onSuccess, sho
                                         {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" /> : <span className="text-gray-300 font-black text-2xl">M</span>}
                                     </div>
                                     <div className="text-[11px] font-bold text-gray-900 line-clamp-2 leading-tight mb-0.5 px-1">{item.name}</div>
+                                    <div className="text-[10px] font-extrabold text-green-600 mb-0.5">₹{item.price || 0} {item.quantity ? <span className="text-gray-400 font-normal">/ {item.quantity}</span> : null}</div>
                                     {item.category && <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider line-clamp-1">{item.category}</div>}
                                 </div>
                             ))}

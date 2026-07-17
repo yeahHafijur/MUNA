@@ -23,7 +23,7 @@ const getAllMasterProducts = async (req, res) => {
 // Create a new master product (Super Admin only)
 const createMasterProduct = async (req, res) => {
     try {
-        const { name, category } = req.body;
+        const { name, category, price, quantity } = req.body;
         let image = req.body.image || '';
         if (req.files && req.files['image']) {
             image = `data:${req.files['image'][0].mimetype};base64,${req.files['image'][0].buffer.toString('base64')}`;
@@ -39,6 +39,8 @@ const createMasterProduct = async (req, res) => {
         const newProduct = await MasterProduct.create({
             name,
             category,
+            price: price || 0,
+            quantity: quantity || '',
             image,
             gallery
         });
@@ -53,7 +55,7 @@ const createMasterProduct = async (req, res) => {
 const updateMasterProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, category } = req.body;
+        const { name, category, price, quantity } = req.body;
         
         const product = await MasterProduct.findById(id);
         if (!product) {
@@ -62,6 +64,8 @@ const updateMasterProduct = async (req, res) => {
 
         product.name = name || product.name;
         product.category = category || product.category;
+        if (price !== undefined) product.price = price;
+        if (quantity !== undefined) product.quantity = quantity;
 
         if (req.files && req.files['image']) {
             product.image = `data:${req.files['image'][0].mimetype};base64,${req.files['image'][0].buffer.toString('base64')}`;

@@ -10,6 +10,14 @@ const masterProductSchema = new mongoose.Schema({
         required: true,
         default: 'General'
     },
+    price: {
+        type: Number,
+        default: 0
+    },
+    quantity: {
+        type: String,
+        default: ''
+    },
     image: {
         type: String, // Global image link
         default: ''

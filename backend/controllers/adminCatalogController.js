@@ -139,7 +139,7 @@ const importMultipleProducts = async (req, res) => {
 
         const newProducts = masterProducts.map(mp => ({
             name: mp.name,
-            price: 0, // Admin needs to set price later or it inherits 0
+            price: mp.price || 0,
             category: mp.category,
             quantity: mp.quantity || '',
             image: mp.image,

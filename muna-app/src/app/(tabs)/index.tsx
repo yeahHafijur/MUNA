@@ -21,7 +21,7 @@ import { haversine } from '@/utils/homeUtils';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
-import { Navigation, ArrowRight } from 'lucide-react-native';
+import { Navigation, ShoppingCart } from 'lucide-react-native';
 
 
 type UserLocation = {
@@ -276,29 +276,18 @@ export default function HomeScreen() {
           </View>
       </ScrollView>
 
-      {/* ─── FLOATING VIEW CART STRIP ─── */}
+      {/* ─── FLOATING VIEW CART FAB ─── */}
       {cartItems.length > 0 && (
-        <View className="absolute bottom-[20px] left-4 right-4 z-50">
-            <TouchableOpacity 
-                onPress={() => router.push('/cart')}
-                className="bg-emerald-600 rounded-[16px] h-14 flex-row items-center justify-between px-4 shadow-lg shadow-emerald-900/20"
-            >
-                <View className="flex-row items-center gap-3">
-                    <View className="bg-emerald-700/50 w-10 h-10 rounded-xl items-center justify-center">
-                        <Text className="text-white font-black text-[16px]">{cartItems.length}</Text>
-                        <Text className="text-emerald-100 font-bold text-[8px] -mt-1 uppercase">Items</Text>
-                    </View>
-                    <View>
-                        <Text className="text-white text-[15px] font-black">₹{getTotal()}</Text>
-                        <Text className="text-emerald-100 text-[11px] font-medium">Extra charges may apply</Text>
-                    </View>
-                </View>
-                <View className="flex-row items-center gap-2">
-                    <Text className="text-white text-[15px] font-black">View Cart</Text>
-                    <ArrowRight size={18} color="#fff" strokeWidth={3} />
-                </View>
-            </TouchableOpacity>
-        </View>
+        <TouchableOpacity 
+            onPress={() => router.push('/cart')}
+            className="absolute bottom-[24px] right-[24px] z-50 bg-amber-500 w-16 h-16 rounded-full items-center justify-center shadow-lg shadow-amber-900/30"
+            style={{ elevation: 10 }}
+        >
+            <ShoppingCart size={24} color="#0f172a" />
+            <View className="absolute top-0 right-0 bg-red-600 w-6 h-6 rounded-full items-center justify-center border-2 border-white">
+                <Text className="text-white text-[10px] font-black">{cartItems.length}</Text>
+            </View>
+        </TouchableOpacity>
       )}
 
       {/* ─── ALL CATEGORIES MODAL ─── */}

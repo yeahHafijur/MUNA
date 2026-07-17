@@ -1,13 +1,32 @@
 import React, { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { ChevronDown } from 'lucide-react-native';
+import { ChevronDown, Bell } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
+import api from '@/api/api';
 
 interface HomeHeaderProps {
   userLocation: { lat: number; lng: number; label?: string } | null;
 }
 
 const HomeHeader: React.FC<HomeHeaderProps> = ({ userLocation }) => {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  const { data: unreadData } = useQuery({
+    queryKey: ['unread-notifications'],
+    queryFn: async () => {
+      const res = await api.get('/api/notifications/unread-count');
+      return res.data;
+    },
+    enabled: !!user,
+    refetchInterval: 30000 // Poll every 30 seconds
+  });
+
+  const unreadCount = unreadData?.count || 0;
+
   return (
     <View className="shrink-0 bg-amber-400 pt-[60px] px-4 pb-4 z-50 shadow-md relative overflow-hidden rounded-b-[20px]">
       {/* Decorative Delivery Element */}
@@ -43,6 +62,19 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ userLocation }) => {
               <ChevronDown size={16} color="#0f172a" strokeWidth={3} />
             </View>
           </View>
+        </Pressable>
+
+        {/* Right: Notifications */}
+        <Pressable 
+            onPress={() => router.push('/notifications' as any)}
+            className="w-11 h-11 bg-white/20 rounded-full flex items-center justify-center relative shadow-sm"
+        >
+            <Bell size={22} color="#451a03" strokeWidth={2.5} />
+            {unreadCount > 0 && (
+                <View className="absolute top-0 right-0 bg-red-500 min-w-[20px] h-[20px] rounded-full flex items-center justify-center border-2 border-amber-400 px-1">
+                    <Text className="text-white text-[9px] font-black">{unreadCount > 99 ? '99+' : unreadCount}</Text>
+                </View>
+            )}
         </Pressable>
       </View>
     </View>

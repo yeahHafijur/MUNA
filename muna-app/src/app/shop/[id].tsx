@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet 
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Search as SearchIcon, MapPin, Clock, Star } from 'lucide-react-native';
+import { ArrowLeft, Search as SearchIcon, MapPin, Clock, Star, ShoppingCart } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
     useSharedValue, 
@@ -409,18 +409,21 @@ export default function ShopDetailScreen() {
                 <View className="h-28" />
             </Animated.ScrollView>
 
-            {/* View Cart Floating Bar */}
+            {/* View Cart Floating FAB */}
             {totalCartItems > 0 && (
                 <Animated.View 
                     style={cartAnimatedStyle}
-                    className="absolute bottom-6 left-4 right-4 bg-amber-500 rounded-2xl p-4 flex-row items-center justify-between shadow-xl"
+                    className="absolute bottom-[24px] right-[24px] z-50"
                 >
-                    <View>
-                        <Text className="text-slate-900 font-black text-[15px]">{totalCartItems} item{totalCartItems > 1 ? 's' : ''}</Text>
-                        <Text className="text-amber-900 font-bold text-[12px]">₹{cartTotal}</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => router.push('/cart' as any)} className="bg-slate-900 px-4 py-2 rounded-xl">
-                        <Text className="text-white font-black text-[13px]">View Cart</Text>
+                    <TouchableOpacity 
+                        onPress={() => router.push('/cart' as any)}
+                        className="bg-amber-500 w-16 h-16 rounded-full items-center justify-center shadow-lg shadow-amber-900/30"
+                        style={{ elevation: 10 }}
+                    >
+                        <ShoppingCart size={24} color="#0f172a" />
+                        <View className="absolute top-0 right-0 bg-red-600 w-6 h-6 rounded-full items-center justify-center border-2 border-white">
+                            <Text className="text-white text-[10px] font-black">{totalCartItems}</Text>
+                        </View>
                     </TouchableOpacity>
                 </Animated.View>
             )}

@@ -193,9 +193,9 @@ export default function ProfileScreen() {
                     </View>
 
                     {/* Footer / Version */}
-                    <View className="items-center mb-10 pt-4 opacity-50">
-                        <Text className="text-[12px] font-semibold text-slate-400">MUNA App v{Constants.expoConfig?.version || '1.0.0'}</Text>
-                        <Text className="text-[11px] font-medium text-slate-400 mt-1">MADE IN ASSAM</Text>
+                    <View className="items-center mb-10 pt-4">
+                        <Text className="text-[14px] font-black text-slate-300 tracking-widest mb-1">M U N A</Text>
+                        <Text className="text-[11px] font-semibold text-slate-400">Proudly made in Assam ❤️</Text>
                     </View>
                 </View>
             </ScrollView>

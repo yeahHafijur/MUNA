@@ -100,6 +100,11 @@ export default function NotificationsScreen() {
             if (notification.type === 'order') targetUrl = '/orders';
             else if (notification.type === 'chat') targetUrl = '/(tabs)/chat';
         }
+        
+        // Normalize deprecated URLs from the database
+        if (targetUrl === '/profile/orders') {
+            targetUrl = '/orders';
+        }
 
         if (targetUrl) {
             router.push(targetUrl as any);

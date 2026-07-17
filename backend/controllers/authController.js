@@ -166,7 +166,7 @@ const saveFcmToken = async (req, res) => {
 // Update user profile (Name & Email)
 const updateProfile = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { name, email, phone } = req.body;
         
         if (!name || !name.trim()) {
             return res.status(400).json({ message: "Name is required" });
@@ -182,6 +182,15 @@ const updateProfile = async (req, res) => {
                 return res.status(400).json({ message: "This email is already registered" });
             }
             user.email = trimmedEmail;
+        }
+
+        if (phone && phone.trim() !== user.phone) {
+            const trimmedPhone = phone.trim();
+            const existing = await User.findOne({ phone: trimmedPhone });
+            if (existing && existing._id.toString() !== user._id.toString()) {
+                return res.status(400).json({ message: "This phone number is already registered" });
+            }
+            user.phone = trimmedPhone;
         }
 
         user.name = name.trim();

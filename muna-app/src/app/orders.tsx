@@ -44,12 +44,13 @@ export default function OrdersScreen() {
     const queryClient = useQueryClient();
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
     const [cancellingId, setCancellingId] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
 
     const { data: orders = [], isLoading } = useQuery({
         queryKey: ['customer-orders'],
         queryFn: async () => {
             const res = await api.get('/api/orders/customer');
-            return Array.isArray(res.data) ? res.data : [];
+            return res.data?.orders || [];
         },
     });
 
@@ -81,6 +82,19 @@ export default function OrdersScreen() {
         );
     };
 
+    const filteredOrders = orders.filter((order: any) => {
+        if (activeTab === 'active') {
+            return ['pending', 'accepted', 'preparing', 'out_for_delivery'].includes(order.status);
+        } else {
+            return ['delivered', 'cancelled'].includes(order.status);
+        }
+    });
+
+    // History Stats Calculation
+    const deliveredOrders = orders.filter((o: any) => o.status === 'delivered');
+    const cancelledCount = orders.filter((o: any) => o.status === 'cancelled').length;
+    const totalSpent = deliveredOrders.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0);
+
     return (
         <View className="flex-1 bg-slate-50">
             {/* Header */}
@@ -91,21 +105,72 @@ export default function OrdersScreen() {
                 <Text className="text-[18px] font-black text-slate-900">Your Orders</Text>
             </View>
 
+            {/* Tabs */}
+            <View className="flex-row items-center px-4 pt-4 pb-2 gap-3">
+                <TouchableOpacity 
+                    onPress={() => setActiveTab('active')}
+                    className={`flex-1 py-2.5 rounded-xl items-center justify-center ${activeTab === 'active' ? 'bg-amber-500' : 'bg-slate-200/60'}`}
+                >
+                    <Text className={`text-[14px] font-black ${activeTab === 'active' ? 'text-amber-950' : 'text-slate-500'}`}>Active</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    onPress={() => setActiveTab('history')}
+                    className={`flex-1 py-2.5 rounded-xl items-center justify-center ${activeTab === 'history' ? 'bg-amber-500' : 'bg-slate-200/60'}`}
+                >
+                    <Text className={`text-[14px] font-black ${activeTab === 'history' ? 'text-amber-950' : 'text-slate-500'}`}>History</Text>
+                </TouchableOpacity>
+            </View>
+
             {isLoading ? (
                 <View className="flex-1 items-center justify-center">
                     <ActivityIndicator size="large" color="#fbbf24" />
                 </View>
-            ) : orders.length === 0 ? (
+            ) : filteredOrders.length === 0 ? (
                 <View className="flex-1 items-center justify-center p-4">
-                    <Text className="text-6xl mb-4">📦</Text>
-                    <Text className="text-[18px] font-black text-slate-900 mb-2">No orders yet</Text>
+                    <Text className="text-6xl mb-4">{activeTab === 'active' ? '🛵' : '📦'}</Text>
+                    <Text className="text-[18px] font-black text-slate-900 mb-2">
+                        {activeTab === 'active' ? 'No active orders' : 'No order history'}
+                    </Text>
                     <Text className="text-[13px] font-medium text-slate-500 text-center">
-                        You haven't placed any orders yet. Start shopping to see your orders here.
+                        {activeTab === 'active' 
+                            ? "You don't have any ongoing deliveries right now." 
+                            : "Your delivered and cancelled orders will appear here."}
                     </Text>
                 </View>
             ) : (
-                <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
-                    {orders.map((order: any) => {
+                <ScrollView className="flex-1 px-4 pt-2" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+                    
+                    {/* Hisab (History Dashboard) */}
+                    {activeTab === 'history' && filteredOrders.length > 0 && (
+                        <View className="bg-slate-900 rounded-3xl p-5 mb-5 shadow-sm">
+                            <Text className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-1">Your Summary</Text>
+                            <Text className="text-[28px] font-black text-white mb-4 tracking-tight">₹{totalSpent}</Text>
+                            
+                            <View className="flex-row items-center border-t border-slate-800 pt-4 mt-2">
+                                <View className="flex-1 flex-row items-center gap-2">
+                                    <View className="w-8 h-8 rounded-full bg-emerald-500/20 items-center justify-center">
+                                        <CheckCircle2 size={14} color="#34d399" />
+                                    </View>
+                                    <View>
+                                        <Text className="text-white font-bold text-[14px]">{deliveredOrders.length}</Text>
+                                        <Text className="text-slate-400 font-medium text-[11px]">Delivered</Text>
+                                    </View>
+                                </View>
+                                <View className="w-[1px] h-full bg-slate-800 mx-2" />
+                                <View className="flex-1 flex-row items-center gap-2">
+                                    <View className="w-8 h-8 rounded-full bg-rose-500/20 items-center justify-center">
+                                        <XCircle size={14} color="#fb7185" />
+                                    </View>
+                                    <View>
+                                        <Text className="text-white font-bold text-[14px]">{cancelledCount}</Text>
+                                        <Text className="text-slate-400 font-medium text-[11px]">Cancelled</Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    )}
+
+                    {filteredOrders.map((order: any) => {
                         const isExpanded = expandedOrderId === order._id;
                         const statusColors = getStatusColor(order.status).split(' ');
                         const bgColor = statusColors.find(c => c.startsWith('bg-'));

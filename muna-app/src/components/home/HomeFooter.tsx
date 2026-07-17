@@ -50,8 +50,8 @@ const HomeFooter = () => {
 
       {/* Bottom */}
       <View className="items-center mb-8">
-        <Text className="text-[11px] font-bold text-slate-600 mb-1">Made with ❤️ in Assam</Text>
-        <Text className="text-[10px] font-semibold text-slate-700">© {new Date().getFullYear()} MUNA. All rights reserved.</Text>
+        <Text className="text-[14px] font-black text-slate-300 tracking-widest mb-1">M U N A</Text>
+        <Text className="text-[11px] font-semibold text-slate-400">Proudly made in Assam ❤️</Text>
       </View>
 
       {/* App Download - Optional placeholder since this IS the app */}

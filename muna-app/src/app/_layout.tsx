@@ -1,10 +1,11 @@
 import '../global.css';
 import { Stack, useRouter, useSegments, useRootNavigationState, Redirect } from 'expo-router';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Set up background notification handling
 Notifications.setNotificationHandler({
@@ -90,6 +91,7 @@ function RootLayoutNav() {
     <>
       {navigationState?.key && <AuthHandler />}
       <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
       </Stack>

@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Notifications from 'expo-notifications';
 import api from '@/api/api';
 
 interface HomeHeaderProps {
@@ -51,6 +52,13 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ userLocation, onPressLocation }
     enabled: !!user,
     refetchInterval: 30000,
   });
+
+  // Sync app icon badge with unread count
+  useEffect(() => {
+    if (unreadData?.count !== undefined) {
+      Notifications.setBadgeCountAsync(unreadData.count);
+    }
+  }, [unreadData?.count]);
 
   useEffect(() => {
     if (userLocation?.lat && userLocation?.lng) {

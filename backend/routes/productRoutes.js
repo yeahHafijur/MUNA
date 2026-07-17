@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     getProductsByShop,
     createProduct,
+    importMultipleProducts,
     updateProduct,
     deleteProduct,
     getProductDetail
@@ -23,6 +24,7 @@ router.get("/:shopId", getProductsByShop);
 const productUploadFields = upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery', maxCount: 4 }]);
 
 router.post("/", protect, authorize("vendor"), productUploadFields, createProduct);
+router.post("/import-multiple", protect, authorize("vendor"), importMultipleProducts);
 
 // Yahan galti se deleteProduct likh diya tha, isey updateProduct karna hai
 router.put("/:id", protect, authorize("vendor"), productUploadFields, updateProduct);

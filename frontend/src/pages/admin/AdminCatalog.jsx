@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/cropImage';
+import GodownMultiImportModal from '../../components/GodownMultiImportModal';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -37,6 +38,7 @@ const AdminCatalog = () => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [page, setPage] = useState(1);
     const [showAuditLog, setShowAuditLog] = useState(false);
+    const [showMultiImportModal, setShowMultiImportModal] = useState(false);
 
     // Category modal
     const [catModal, setCatModal] = useState(null); // null | 'add' | category object
@@ -375,6 +377,9 @@ const AdminCatalog = () => {
                     >
                         📋 Logs
                     </button>
+                    <button className="px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all" onClick={() => setShowMultiImportModal(true)}>
+                        ⬇️ Import Multiple
+                    </button>
                     <button className="px-4 py-2 bg-amber-400 text-amber-950 rounded-xl text-[12px] font-black shadow-[0_4px_14px_rgba(251,191,36,0.3)] active:scale-95 transition-transform" onClick={openAddProd}>
                         + Add Item
                     </button>
@@ -704,6 +709,16 @@ const AdminCatalog = () => {
                     </div>
                 </div>
             )}
+
+            <GodownMultiImportModal 
+                isOpen={showMultiImportModal} 
+                onClose={() => setShowMultiImportModal(false)} 
+                onSuccess={() => {
+                    queryClient.invalidateQueries(['admin-catalog-products']);
+                    queryClient.invalidateQueries(['admin-catalog-stats']);
+                }} 
+                shopId={shopId} 
+            />
         </div>
     );
 };

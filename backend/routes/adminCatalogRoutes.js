@@ -5,6 +5,7 @@ const upload = require('../middleware/uploadMiddleware');
 const {
     getShopProducts,
     createProduct,
+    importMultipleProducts,
     updateProduct,
     deleteProduct,
     toggleStock,
@@ -24,6 +25,7 @@ const productUploadFields = upload.fields([{ name: 'image', maxCount: 1 }, { nam
 // ── Products ──
 router.get('/:shopId/products', ...auth, getShopProducts);
 router.post('/:shopId/products', ...auth, productUploadFields, createProduct);
+router.post('/:shopId/products/import-multiple', ...auth, importMultipleProducts);
 router.put('/products/:id', ...auth, productUploadFields, updateProduct);
 router.delete('/products/:id', ...auth, deleteProduct);
 router.patch('/products/:id/stock', ...auth, toggleStock);

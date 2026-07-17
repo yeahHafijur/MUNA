@@ -117,6 +117,48 @@ const createProduct = async (req, res) => {
     }
 };
 
+// POST /api/admin/catalog/:shopId/products/import-multiple
+const importMultipleProducts = async (req, res) => {
+    try {
+        const { shopId } = req.params;
+        const { masterProductIds } = req.body;
+
+        if (!masterProductIds || !Array.isArray(masterProductIds) || masterProductIds.length === 0) {
+            return res.status(400).json({ message: "No items selected for import" });
+        }
+
+        const shop = await Shop.findById(shopId).lean();
+        if (!shop) return res.status(404).json({ message: "Shop not found" });
+
+        const MasterProduct = require('../models/MasterProduct');
+        const masterProducts = await MasterProduct.find({ _id: { $in: masterProductIds } }).lean();
+
+        if (masterProducts.length === 0) {
+            return res.status(404).json({ message: "Selected godown items not found" });
+        }
+
+        const newProducts = masterProducts.map(mp => ({
+            name: mp.name,
+            price: 0, // Admin needs to set price later or it inherits 0
+            category: mp.category,
+            quantity: mp.quantity || '',
+            image: mp.image,
+            gallery: mp.gallery || [],
+            stock: mp.stock || 0,
+            shopId: shop._id,
+            inStock: true
+        }));
+
+        const inserted = await Product.insertMany(newProducts);
+        await logAction(req.user._id, shop._id, 'multiple_products_imported', null, `${inserted.length} items from godown`);
+
+        res.status(201).json({ message: `Successfully imported ${inserted.length} items`, products: inserted });
+    } catch (error) {
+        console.error('[AdminCatalog] importMultipleProducts error:', error);
+        res.status(500).json({ message: "Server error during multiple import" });
+    }
+};
+
 // PUT /api/admin/catalog/products/:id
 const updateProduct = async (req, res) => {
     try {
@@ -431,6 +473,7 @@ const getAuditLogs = async (req, res) => {
 module.exports = {
     getShopProducts,
     createProduct,
+    importMultipleProducts,
     updateProduct,
     deleteProduct,
     toggleStock,

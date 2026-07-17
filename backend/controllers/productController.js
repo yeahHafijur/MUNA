@@ -153,6 +153,48 @@ const createProduct = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+const importMultipleProducts = async (req, res) => {
+    try {
+        const { masterProductIds } = req.body;
+
+        if (!masterProductIds || !Array.isArray(masterProductIds) || masterProductIds.length === 0) {
+            return res.status(400).json({ message: "No items selected for import" });
+        }
+
+        const shop = await Shop.findOne({ vendorId: req.user._id });
+        if (!shop) {
+            return res.status(400).json({ message: "You must create a shop first" });
+        }
+
+        const MasterProduct = require('../models/MasterProduct');
+        const masterProducts = await MasterProduct.find({ _id: { $in: masterProductIds } }).lean();
+
+        if (masterProducts.length === 0) {
+            return res.status(404).json({ message: "Selected godown items not found" });
+        }
+
+        const newProducts = masterProducts.map(mp => ({
+            name: mp.name,
+            price: 0,
+            category: mp.category,
+            quantity: mp.quantity || '',
+            image: mp.image,
+            gallery: mp.gallery || [],
+            stock: mp.stock || 0,
+            shopId: shop._id,
+            inStock: true
+        }));
+
+        const inserted = await Product.insertMany(newProducts);
+
+        res.status(201).json({ message: `Successfully imported ${inserted.length} items`, products: inserted });
+    } catch (error) {
+        console.error("Vendor importMultipleProducts error:", error);
+        res.status(500).json({ message: "Server error during multiple import" });
+    }
+};
+
 const updateProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -268,6 +310,7 @@ module.exports = {
     getBestsellers,
     getProductsByShop,
     createProduct,
+    importMultipleProducts,
     updateProduct,
     deleteProduct,
     getProductDetail

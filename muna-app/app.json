@@ -10,7 +10,7 @@
     "ios": {},
     "android": {
       "package": "app.vercel.muna_opal.twa",
-      "versionCode": 27,
+      "versionCode": 28,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

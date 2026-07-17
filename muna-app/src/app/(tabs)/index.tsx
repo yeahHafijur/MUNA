@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, View, TouchableOpacity, Text } from 'react-
 import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 import { useQuery } from '@tanstack/react-query';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import api from '@/api/api';
 import HomeHeader from '@/components/home/HomeHeader';
@@ -52,6 +53,7 @@ export default function HomeScreen() {
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const fetchGPSLocation = useCallback(async () => {
     try {
@@ -179,46 +181,51 @@ export default function HomeScreen() {
   }, [banners]);
 
   return (
-    <View className="flex-1 bg-slate-50/50">
-      <StatusBar style="light" />
-      <HomeHeader 
-        userLocation={userLocation} 
-        onPressLocation={() => setShowLocationModal(true)}
-      />
+    <View className="flex-1 bg-amber-400">
+      <StatusBar style="dark" backgroundColor="#f59e0b" />
       
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="pb-24 w-full max-w-7xl mx-auto"
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        stickyHeaderIndices={[activeOrder ? 2 : 1]} // The GlobalSearchBar view
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#f59e0b']}
-            tintColor="#f59e0b"
-            progressBackgroundColor="#FFFFFF"
-          />
-        }>
-        
+      <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+        <ScrollView
+          className="flex-1"
+          contentContainerClassName="pb-4 w-full max-w-7xl mx-auto"
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          stickyHeaderIndices={[activeOrder ? 3 : 2]} // 0: Header, 1: Order(opt), 2: Banners, 3: Search
+          bounces={false}
+          overScrollMode="never"
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#f59e0b']}
+              tintColor="#f59e0b"
+              progressBackgroundColor="#FFFFFF"
+            />
+          }>
+          
+          {/* HEADER (Scrolls away natively) */}
+        <HomeHeader 
+          userLocation={userLocation} 
+          onPressLocation={() => setShowLocationModal(true)}
+        />
+
         {/* ACTIVE ORDER TRACKER */}
         {activeOrder && (
-          <View className="bg-amber-100/80 px-4 py-3 border-b border-amber-200 flex-row items-center justify-between">
-            <View className="flex-row items-center flex-1">
-              <View className="w-8 h-8 bg-amber-500 rounded-full items-center justify-center mr-3 animate-pulse">
-                <Navigation size={16} color="#fff" />
+          <View className="bg-amber-100/80 px-4 py-2 border-b border-amber-200/50 flex-row items-center justify-between">
+            <View className="flex-row items-center gap-2.5">
+              <View className="w-7 h-7 bg-amber-500 rounded-full items-center justify-center shadow-sm">
+                <Navigation size={14} color="white" />
               </View>
               <View>
-                <Text className="text-[14px] font-black text-amber-950">Your order is arriving!</Text>
-                <Text className="text-[11px] font-bold text-amber-700">Track delivery status 🛵</Text>
+                <Text className="text-[12px] font-black text-amber-950">Order is arriving!</Text>
+                <Text className="text-[9px] font-bold text-amber-700/80 uppercase tracking-widest">Track delivery 🛵</Text>
               </View>
             </View>
             <TouchableOpacity 
               onPress={() => router.push(`/orders`)}
-              className="bg-amber-500 px-3 py-1.5 rounded-full"
+              className="bg-amber-500 px-3 py-1.5 rounded-full shadow-sm"
             >
-              <Text className="text-white text-[11px] font-black">View</Text>
+              <Text className="text-white text-[10px] font-black tracking-wide">VIEW</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -226,14 +233,10 @@ export default function HomeScreen() {
         {/* BANNER CAROUSEL */}
         <View className="bg-white pb-4">
           <PromoBanners banners={topBanners} />
-          <DailyMarketBanner />
         </View>
 
         {/* SEARCH (Sticky) */}
-        <View 
-          className="bg-white pt-1 pb-2 border-b border-slate-100 shadow-sm z-10"
-          style={{ elevation: 10, zIndex: 10 }}
-        >
+        <View className="bg-white pt-1 pb-2 border-b border-slate-100 shadow-sm z-50" style={{ elevation: 50 }}>
           <GlobalSearchBar />
         </View>
 
@@ -258,12 +261,12 @@ export default function HomeScreen() {
           </View>
 
           {/* QUICK DELIVERY */}
-          <View className="mt-2 bg-white border-y border-slate-100/80 shadow-sm">
+          <View className="mt-2 bg-white">
             <QuickDeliveryStores shops={sortedShops} />
           </View>
 
           {/* ALL STORES */}
-          <View className="mt-4 bg-white border-t border-slate-100 pt-4">
+          <View className="mt-2 bg-white pt-4">
             <StoreListing
               sortedShops={sortedShops}
               loading={loadingShops}
@@ -276,12 +279,13 @@ export default function HomeScreen() {
           </View>
           
           {/* CTA & FOOTER */}
-          <View className="mt-6 bg-slate-50 border-t border-slate-100">
+          <View className="mt-2 bg-slate-50">
             <BecomeSellerCTA />
             <HowItWorks />
             <HomeFooter />
           </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       {/* ─── FLOATING VIEW CART FAB ─── */}
       {cartItems.length > 0 && (

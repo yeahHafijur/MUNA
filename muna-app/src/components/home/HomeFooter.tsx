@@ -7,7 +7,7 @@ const HomeFooter = () => {
   const router = useRouter();
 
   return (
-    <View className="bg-slate-900 rounded-t-[32px] px-6 pt-8 pb-8 mt-2">
+    <View className="bg-slate-900 rounded-t-[32px] px-6 pt-8 pb-10 mt-2">
       {/* Brand */}
       <View className="flex-row items-center gap-3 mb-6">
         <View className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center shadow-md overflow-hidden">

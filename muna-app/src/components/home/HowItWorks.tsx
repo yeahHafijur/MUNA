@@ -17,7 +17,7 @@ const HowItWorks = () => {
         
         {/* Step 1 */}
         <View className="flex-col items-center gap-2 flex-1">
-          <View className="w-16 h-16 rounded-2xl bg-white shadow-sm border border-slate-50 flex items-center justify-center relative z-10">
+          <View className="w-16 h-16 rounded-2xl bg-white shadow-sm border border-slate-50 flex items-center justify-center">
             <Text className="text-[28px]">📱</Text>
           </View>
           <View className="items-center mt-1">
@@ -28,7 +28,7 @@ const HowItWorks = () => {
         
         {/* Step 2 */}
         <View className="flex-col items-center gap-2 flex-1">
-          <View className="w-16 h-16 rounded-2xl bg-white shadow-sm border border-slate-50 flex items-center justify-center relative z-10">
+          <View className="w-16 h-16 rounded-2xl bg-white shadow-sm border border-slate-50 flex items-center justify-center">
             <Text className="text-[28px]">📦</Text>
           </View>
           <View className="items-center mt-1">
@@ -39,7 +39,7 @@ const HowItWorks = () => {
         
         {/* Step 3 */}
         <View className="flex-col items-center gap-2 flex-1">
-          <View className="w-16 h-16 rounded-2xl bg-white shadow-sm border border-slate-50 flex items-center justify-center relative z-10">
+          <View className="w-16 h-16 rounded-2xl bg-white shadow-sm border border-slate-50 flex items-center justify-center">
             <Text className="text-[28px]">🛵</Text>
           </View>
           <View className="items-center mt-1">

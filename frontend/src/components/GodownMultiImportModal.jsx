@@ -41,14 +41,14 @@ export default function GodownMultiImportModal({ isOpen, onClose, onSuccess, sho
         setSelectedIds(new Set());
     };
 
-    const categories = godownItems?.products 
-        ? [...new Set(godownItems.products.map(p => p.category).filter(Boolean))] 
+    const categories = Array.isArray(godownItems) 
+        ? [...new Set(godownItems.map(p => p.category).filter(Boolean))] 
         : [];
 
-    const displayedItems = godownItems?.products?.filter(p => {
+    const displayedItems = Array.isArray(godownItems) ? godownItems.filter(p => {
         if (selectedCategory && p.category !== selectedCategory) return false;
         return true;
-    });
+    }) : [];
 
     const handleImport = async () => {
         if (selectedIds.size === 0) return toast.info('Please select at least one item');

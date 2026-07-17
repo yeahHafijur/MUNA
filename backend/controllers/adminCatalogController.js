@@ -562,6 +562,7 @@ module.exports = {
     createCategory,
     updateCategory,
     deleteCategory,
+    reorderCategories,
     getAuditLogs,
     getPendingProducts,
     approveProduct,

@@ -1,9 +1,21 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Search as SearchIcon, MapPin, Clock, Star } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { 
+    useSharedValue, 
+    useAnimatedStyle, 
+    useAnimatedScrollHandler,
+    interpolate,
+    Extrapolation,
+    withSpring,
+    withSequence,
+    withRepeat,
+    withTiming
+} from 'react-native-reanimated';
 import { useCart } from '@/context/CartContext';
 import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
@@ -23,6 +35,32 @@ const MemoizedShopProductItem = React.memo(({ prod, quantity, shopId, updateQuan
         </View>
     );
 });
+
+const SkeletonBlock = ({ className, style }: any) => {
+    const opacity = useSharedValue(0.4);
+    useEffect(() => {
+        opacity.value = withRepeat(withTiming(1, { duration: 800 }), -1, true);
+    }, []);
+    const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+    return <Animated.View className={`bg-slate-200 ${className}`} style={[style, animatedStyle]} />;
+};
+
+const ShopSkeleton = () => (
+    <View className="flex-1 bg-white">
+        <SkeletonBlock className="w-full aspect-[4/3]" />
+        <View className="px-4 py-6">
+            <View className="flex-row items-center justify-between mb-4">
+                <SkeletonBlock className="w-40 h-6 rounded-md" />
+                <SkeletonBlock className="w-16 h-4 rounded-md" />
+            </View>
+            <View className="flex-row flex-wrap justify-between gap-y-4">
+                {[1, 2, 3, 4].map(i => (
+                    <SkeletonBlock key={i} className="w-[48%] aspect-[4/3] rounded-[20px]" />
+                ))}
+            </View>
+        </View>
+    </View>
+);
 
 export default function ShopDetailScreen() {
     const { id } = useLocalSearchParams();
@@ -83,10 +121,13 @@ export default function ShopDetailScreen() {
 
     const filteredProducts = useMemo(() => {
         return products.filter(p => {
-            const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : (p.category || 'General');
+            if (!p) return false;
+            const pCatName = typeof p.category === 'object' ? (p.category?.name || 'General') : String(p.category || 'General');
             if (selectedCategory && selectedCategory !== 'All' && pCatName !== selectedCategory) return false;
             if (searchQuery) {
-                return p.name.toLowerCase().includes(searchQuery.toLowerCase());
+                const searchLower = String(searchQuery).toLowerCase();
+                const nameLower = String(p.name || '').toLowerCase();
+                return nameLower.includes(searchLower);
             }
             return true;
         });
@@ -106,12 +147,40 @@ export default function ShopDetailScreen() {
         }
     }, [addToCart, overrideAndReplaceCart]);
 
+    const scrollY = useSharedValue(0);
+    const scrollHandler = useAnimatedScrollHandler((event) => {
+        scrollY.value = event.contentOffset.y;
+    });
+
+    const headerAnimatedStyle = useAnimatedStyle(() => {
+        const opacity = interpolate(scrollY.value, [100, 150], [0, 1], Extrapolation.CLAMP);
+        return { opacity, pointerEvents: opacity === 0 ? 'none' : 'auto' };
+    });
+
+    const heroAnimatedStyle = useAnimatedStyle(() => {
+        const scale = interpolate(scrollY.value, [-100, 0], [1.5, 1], {
+            extrapolateLeft: Extrapolation.EXTEND,
+            extrapolateRight: Extrapolation.CLAMP,
+        });
+        const translateY = interpolate(scrollY.value, [0, 200], [0, 100], Extrapolation.CLAMP);
+        return { transform: [{ scale }, { translateY }] };
+    });
+
+    const cartScale = useSharedValue(1);
+    useEffect(() => {
+        if (totalCartItems > 0) {
+            cartScale.value = withSequence(
+                withSpring(1.15, { damping: 5, stiffness: 300 }),
+                withSpring(1, { damping: 5, stiffness: 300 })
+            );
+        }
+    }, [totalCartItems]);
+    const cartAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: cartScale.value }]
+    }));
+
     if (loading) {
-        return (
-            <View className="flex-1 items-center justify-center bg-white">
-                <ActivityIndicator size="large" color="#fbbf24" />
-            </View>
-        );
+        return <ShopSkeleton />;
     }
 
     if (!shop) {
@@ -126,72 +195,84 @@ export default function ShopDetailScreen() {
 
     return (
         <View className="flex-1 bg-white">
-            <ScrollView className="flex-1" stickyHeaderIndices={[1]}>
+            <Animated.ScrollView 
+                className="flex-1" 
+                stickyHeaderIndices={[1]}
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
+            >
                 
-                {/* 1. Hero Image Section (Scrolls away, hidden in category view) */}
-                <View>
+                {/* 1. Hero Image Section */}
+                <View className="overflow-hidden">
                     {(selectedCategory === null && !searchQuery) && (
                         <>
-                            <View className="absolute top-10 left-4 z-50">
+                            <View className="absolute top-12 left-4 z-50">
                                 <TouchableOpacity 
                                     onPress={() => router.back()}
-                                    className="w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow-sm"
+                                    className="w-10 h-10 rounded-full bg-black/30 items-center justify-center"
                                 >
-                                    <ArrowLeft size={20} color="#0f172a" />
+                                    <ArrowLeft size={20} color="#ffffff" />
                                 </TouchableOpacity>
                             </View>
-                            <View className="w-full aspect-[4/3] bg-slate-100 relative">
+                            <Animated.View className="w-full aspect-[4/3] bg-slate-100 relative" style={heroAnimatedStyle}>
                                 {shopImageUrl ? (
-                                    <Image source={{ uri: shopImageUrl }} className="w-full h-full" contentFit="cover" />
+                                    <Image source={{ uri: shopImageUrl }} style={StyleSheet.absoluteFill} contentFit="cover" />
                                 ) : (
                                     <View className="flex-1 items-center justify-center bg-amber-50">
                                         <Text className="text-6xl">🏪</Text>
                                     </View>
                                 )}
-                                <View className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900 to-transparent" />
+                                <LinearGradient colors={['transparent', 'rgba(15, 23, 42, 0.95)']} className="absolute inset-x-0 bottom-0 h-40" />
                                 
                                 <View className="absolute bottom-4 left-4 right-4">
-                                    <Text className="text-2xl font-black text-white mb-1" numberOfLines={1}>{shop.name}</Text>
-                                    <View className="flex-row items-center gap-4">
-                                        <View className="flex-row items-center gap-1 bg-white/20 px-2 py-1 rounded-md backdrop-blur-sm">
+                                    <Text className="text-3xl font-black text-white mb-2" numberOfLines={1}>{shop.name}</Text>
+                                    <View className="flex-row items-center gap-3">
+                                        <View className="flex-row items-center gap-1 bg-black/40 px-2 py-1 rounded-full">
                                             <Star size={12} color="#fbbf24" fill="#fbbf24" />
-                                            <Text className="text-white text-xs font-bold">{shop.rating || '4.5'}</Text>
+                                            <Text className="text-white text-[11px] font-bold">{shop.rating || '4.5'}</Text>
                                         </View>
-                                        <View className="flex-row items-center gap-1 bg-white/20 px-2 py-1 rounded-md backdrop-blur-sm">
+                                        <View className="flex-row items-center gap-1 bg-black/40 px-2 py-1 rounded-full">
                                             <Clock size={12} color="#fff" />
-                                            <Text className="text-white text-xs font-bold">15 min</Text>
+                                            <Text className="text-white text-[11px] font-bold">15 min</Text>
                                         </View>
-                                        <View className="flex-row items-center gap-1 bg-white/20 px-2 py-1 rounded-md backdrop-blur-sm">
+                                        <View className="flex-row items-center gap-1 bg-black/40 px-2 py-1 rounded-full">
                                             <MapPin size={12} color="#fff" />
-                                            <Text className="text-white text-xs font-bold">{shop.distance ? shop.distance.toFixed(1) + 'km' : 'Nearby'}</Text>
+                                            <Text className="text-white text-[11px] font-bold">{shop.distance ? shop.distance.toFixed(1) + 'km' : 'Nearby'}</Text>
                                         </View>
                                     </View>
                                 </View>
-                            </View>
+                            </Animated.View>
                         </>
                     )}
                 </View>
 
                 {/* 2. Sticky Header & Search Bar */}
                 <View 
-                  className="bg-white shadow-sm z-40 border-b border-slate-100"
+                  className="bg-white shadow-sm z-40 border-b border-slate-100 relative"
                   style={{ elevation: 40, zIndex: 40 }}
                 >
-                    
-                    {/* Small Header (Only visible when Hero is hidden) */}
-                    {(selectedCategory !== null || !!searchQuery) && (
-                        <View className="pt-[52px] pb-2 px-4 flex-row items-center gap-3">
-                            <TouchableOpacity 
-                                onPress={() => { setSelectedCategory(null); setSearchQuery(''); }}
-                                className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
-                            >
-                                <ArrowLeft size={20} color="#0f172a" />
-                            </TouchableOpacity>
-                            <Text className="flex-1 text-[18px] font-black text-slate-900 tracking-tight" numberOfLines={1}>{shop.name}</Text>
-                        </View>
-                    )}
+                    {/* Animated Solid Header (Always mounted to prevent reanimated crashes) */}
+                    <Animated.View 
+                        style={[StyleSheet.absoluteFill, { backgroundColor: 'white', zIndex: 10 }, (selectedCategory === null && !searchQuery) ? headerAnimatedStyle : { opacity: 1, pointerEvents: 'auto' }]} 
+                        className="pt-12 pb-2 px-4 flex-row items-center gap-3 shadow-sm border-b border-slate-100"
+                    >
+                        <TouchableOpacity 
+                            onPress={() => {
+                                if (selectedCategory !== null || !!searchQuery) {
+                                    setSelectedCategory(null);
+                                    setSearchQuery('');
+                                } else {
+                                    router.back();
+                                }
+                            }}
+                            className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
+                        >
+                            <ArrowLeft size={20} color="#0f172a" />
+                        </TouchableOpacity>
+                        <Text className="flex-1 text-[18px] font-black text-slate-900 tracking-tight" numberOfLines={1}>{shop.name}</Text>
+                    </Animated.View>
 
-                    <View className="px-4 py-3">
+                    <View className="px-4 py-3 pt-[64px]" style={{ zIndex: 5 }}>
                         <View className="flex-row items-center bg-slate-50 border border-slate-200 rounded-xl px-3 h-10 gap-2">
                             <SearchIcon size={16} color="#94a3b8" />
                             <TextInput
@@ -256,10 +337,14 @@ export default function ShopDetailScreen() {
                                 {/* All Items Card */}
                                 <TouchableOpacity 
                                     onPress={() => setSelectedCategory('All')}
-                                    className="w-[48%] aspect-[4/3] rounded-[20px] bg-slate-900 overflow-hidden relative justify-center items-center p-4 shadow-sm"
+                                    className="w-[48%] aspect-[4/3] rounded-[20px] overflow-hidden relative shadow-sm"
                                 >
-                                    <Text className="text-white font-black text-lg text-center tracking-tight leading-tight">All Items</Text>
-                                    <Text className="text-slate-400 font-bold text-xs mt-1">{products.length} items</Text>
+                                    <LinearGradient colors={['#1e293b', '#0f172a']} className="absolute inset-0" />
+                                    <View className="flex-1 justify-center items-center p-4 z-10">
+                                        <Text className="text-3xl mb-2">📦</Text>
+                                        <Text className="text-white font-black text-[16px] text-center tracking-tight leading-tight">All Items</Text>
+                                        <Text className="text-slate-400 font-bold text-xs mt-1">{products.length} items</Text>
+                                    </View>
                                 </TouchableOpacity>
 
                                 {/* Category Cards */}
@@ -267,27 +352,29 @@ export default function ShopDetailScreen() {
                                     const count = categoryCounts[cat] || 0;
                                     
                                     const catObj = categoriesList.find((c: any) => c.name === cat);
-                                    const customImg = catObj ? catObj.image : null;
+                                    const customImg = catObj && catObj.image ? getImageUrl(catObj.image) : null;
 
                                     return (
                                         <TouchableOpacity 
                                             key={cat}
                                             onPress={() => setSelectedCategory(cat)}
-                                            className="w-[48%] aspect-[4/3] rounded-[20px] bg-slate-50 border border-slate-100 overflow-hidden relative justify-center items-center shadow-sm p-3"
+                                            className="w-[48%] aspect-[4/3] rounded-[20px] bg-slate-50 border border-slate-100 overflow-hidden relative shadow-sm"
                                         >
                                             {customImg ? (
                                                 <>
-                                                    <Image source={{ uri: customImg }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} contentFit="cover" />
-                                                    <View className="absolute inset-0 bg-black/40" />
-                                                    <Text className="text-white font-black text-[15px] text-center z-10 px-1 leading-tight tracking-tight" numberOfLines={2}>{cat}</Text>
-                                                    <Text className="text-slate-200 font-bold text-xs mt-1 z-10">{count} items</Text>
+                                                    <Image source={{ uri: customImg }} style={StyleSheet.absoluteFill} contentFit="cover" />
+                                                    <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} className="absolute inset-0" />
+                                                    <View className="absolute inset-0 p-3 justify-end items-start">
+                                                        <Text className="text-white font-black text-[15px] leading-tight tracking-tight" numberOfLines={2}>{cat}</Text>
+                                                        <Text className="text-slate-300 font-bold text-xs mt-1">{count} items</Text>
+                                                    </View>
                                                 </>
                                             ) : (
-                                                <>
+                                                <View className="flex-1 justify-center items-center p-3">
                                                     <Text className="text-3xl mb-1.5 opacity-80">🏷</Text>
                                                     <Text className="text-slate-900 font-black text-[14px] text-center leading-tight tracking-tight" numberOfLines={2}>{cat}</Text>
                                                     <Text className="text-slate-500 font-bold text-[10px] uppercase tracking-wider mt-1">{count} items</Text>
-                                                </>
+                                                </View>
                                             )}
                                         </TouchableOpacity>
                                     );
@@ -319,20 +406,23 @@ export default function ShopDetailScreen() {
                     )}
                 </View>
                 
-                <View className="h-24" />
-            </ScrollView>
+                <View className="h-28" />
+            </Animated.ScrollView>
 
             {/* View Cart Floating Bar */}
             {totalCartItems > 0 && (
-                <View className="absolute bottom-4 left-4 right-4 bg-emerald-600 rounded-2xl p-4 flex-row items-center justify-between shadow-lg">
+                <Animated.View 
+                    style={cartAnimatedStyle}
+                    className="absolute bottom-6 left-4 right-4 bg-amber-500 rounded-2xl p-4 flex-row items-center justify-between shadow-xl"
+                >
                     <View>
-                        <Text className="text-white font-black text-[15px]">{totalCartItems} item{totalCartItems > 1 ? 's' : ''}</Text>
-                        <Text className="text-emerald-100 font-bold text-[12px]">₹{cartTotal}</Text>
+                        <Text className="text-slate-900 font-black text-[15px]">{totalCartItems} item{totalCartItems > 1 ? 's' : ''}</Text>
+                        <Text className="text-amber-900 font-bold text-[12px]">₹{cartTotal}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => router.push('/cart' as any)} className="bg-white px-4 py-2 rounded-xl">
-                        <Text className="text-emerald-700 font-black text-[13px]">View Cart</Text>
+                    <TouchableOpacity onPress={() => router.push('/cart' as any)} className="bg-slate-900 px-4 py-2 rounded-xl">
+                        <Text className="text-white font-black text-[13px]">View Cart</Text>
                     </TouchableOpacity>
-                </View>
+                </Animated.View>
             )}
         </View>
     );

@@ -56,7 +56,10 @@ export default function HomeScreen() {
 
     const loadGrantedLocation = async () => {
       try {
-        const permission = await Location.getForegroundPermissionsAsync();
+        let permission = await Location.getForegroundPermissionsAsync();
+        if (permission.status !== 'granted') {
+          permission = await Location.requestForegroundPermissionsAsync();
+        }
         if (permission.status !== 'granted') return;
 
         const position =

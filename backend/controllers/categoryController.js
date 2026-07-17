@@ -8,7 +8,7 @@ const getCategoriesByShop = async (req, res) => {
     try {
         const categories = await ItemCategory.find({
             shopId: req.params.shopId
-        }).sort({ sortOrder: 1, name: 1 });
+        }).sort({ sortOrder: 1, name: 1 }).lean();
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
@@ -18,7 +18,7 @@ const getCategoriesByShop = async (req, res) => {
 // Get only global item categories (Public)
 const getGlobalCategories = async (req, res) => {
     try {
-        const categories = await ItemCategory.find({ isGlobal: true }).sort({ sortOrder: 1, name: 1 });
+        const categories = await ItemCategory.find({ isGlobal: true }).sort({ sortOrder: 1, name: 1 }).lean();
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: "Server error" });

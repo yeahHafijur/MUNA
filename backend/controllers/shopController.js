@@ -27,7 +27,7 @@ const getAllShopsForAdmin = async (req, res) => {
 
 const getShopById = async (req, res) => {
     try {
-        const shop = await Shop.findById(req.params.id).populate('vendorId', 'name email phone');
+        const shop = await Shop.findById(req.params.id).populate('vendorId', 'name email phone').lean();
         if (!shop) {
             return res.status(404).json({ message: "Shop not found" });
         }

@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'rea
 import { Image } from 'expo-image';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Star, Clock } from 'lucide-react-native';
+import { ArrowLeft, Star, Clock, MapPinOff } from 'lucide-react-native';
 import api from '@/api/api';
 import { getImageUrl } from '@/utils/format';
 import { haversine } from '@/utils/homeUtils';
@@ -60,7 +60,7 @@ export default function AllStoresScreen() {
                 ) : filteredShops.length === 0 ? (
                     <View className="items-center px-5 py-12 bg-white rounded-[32px] border border-amber-100/50 shadow-sm mt-4">
                         <View className="w-20 h-20 bg-amber-50 rounded-full items-center justify-center mb-5 border border-amber-100">
-                            <Text className="text-4xl">🚀</Text>
+                            <MapPinOff size={32} color="#b45309" strokeWidth={1.5} />
                         </View>
                         <Text className="text-[20px] font-black text-slate-900 text-center mb-2 tracking-tight">
                             No {category ? category : ''} stores found

@@ -9,9 +9,10 @@ import api from '@/api/api';
 
 interface HomeHeaderProps {
   userLocation: { lat: number; lng: number; label?: string } | null;
+  onPressLocation?: () => void;
 }
 
-const HomeHeader: React.FC<HomeHeaderProps> = ({ userLocation }) => {
+const HomeHeader: React.FC<HomeHeaderProps> = ({ userLocation, onPressLocation }) => {
   const router = useRouter();
   const { user } = useAuth();
 
@@ -38,7 +39,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ userLocation }) => {
 
       <View className="flex-row items-center justify-between relative z-10 w-full max-w-7xl mx-auto">
         {/* Left: Logo & Location */}
-        <Pressable className="flex-row items-center gap-3 flex-1 min-w-0 pr-4">
+        <Pressable onPress={onPressLocation} className="flex-row items-center gap-3 flex-1 min-w-0 pr-4 active:opacity-70">
           {/* MUNA Logo */}
           <View className="w-11 h-11 bg-white rounded-[12px] shadow-sm flex items-center justify-center p-1 shrink-0">
             <Image
@@ -57,7 +58,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ userLocation }) => {
             </View>
             <View className="flex-row items-center gap-1">
               <Text className="text-[16px] font-black text-slate-900" numberOfLines={1}>
-                {userLocation?.label || 'Bhalukmari, Assam'}
+                {userLocation?.label || 'Select Location'}
               </Text>
               <ChevronDown size={16} color="#0f172a" strokeWidth={3} />
             </View>

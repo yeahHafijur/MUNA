@@ -40,6 +40,7 @@ const defaultCategories = [
   { name: 'Daily Market' },
 ];
 
+import LocationPickerModal from '@/components/home/LocationPickerModal';
 import AllCategoriesModal from '@/components/home/AllCategoriesModal';
 
 export default function HomeScreen() {
@@ -49,47 +50,43 @@ export default function HomeScreen() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    let mounted = true;
-
-    const loadGrantedLocation = async () => {
-      try {
-        let permission = await Location.getForegroundPermissionsAsync();
-        if (permission.status !== 'granted') {
-          permission = await Location.requestForegroundPermissionsAsync();
-        }
-        if (permission.status !== 'granted') return;
-
-        const position =
-          (await Location.getLastKnownPositionAsync({ maxAge: 5 * 60 * 1000 })) ||
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
-        if (!mounted || !position) return;
-
-        const baseLocation: UserLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-
-        const addresses = await Location.reverseGeocodeAsync({
-          latitude: baseLocation.lat,
-          longitude: baseLocation.lng,
-        });
-        const address = addresses[0];
-        const label = [address?.district || address?.city, address?.region].filter(Boolean).join(', ');
-
-        if (mounted) setUserLocation({ ...baseLocation, label: label || 'Current location' });
-      } catch {
-        // The home remains fully usable when location is unavailable.
+  const fetchGPSLocation = useCallback(async () => {
+    try {
+      let permission = await Location.getForegroundPermissionsAsync();
+      if (permission.status !== 'granted') {
+        permission = await Location.requestForegroundPermissionsAsync();
       }
-    };
+      if (permission.status !== 'granted') return;
 
-    loadGrantedLocation();
-    return () => {
-      mounted = false;
-    };
+      const position =
+        (await Location.getLastKnownPositionAsync({ maxAge: 5 * 60 * 1000 })) ||
+        (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
+      if (!position) return;
+
+      const baseLocation: UserLocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+
+      const addresses = await Location.reverseGeocodeAsync({
+        latitude: baseLocation.lat,
+        longitude: baseLocation.lng,
+      });
+      const address = addresses[0];
+      const label = [address?.district || address?.city, address?.region].filter(Boolean).join(', ');
+
+      setUserLocation({ ...baseLocation, label: label || 'Current location' });
+    } catch {
+      // The home remains fully usable when location is unavailable.
+    }
   }, []);
+
+  useEffect(() => {
+    fetchGPSLocation();
+  }, [fetchGPSLocation]);
 
   const {
     data: shops = [],
@@ -184,7 +181,10 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 bg-slate-50/50">
       <StatusBar style="light" />
-      <HomeHeader userLocation={userLocation} />
+      <HomeHeader 
+        userLocation={userLocation} 
+        onPressLocation={() => setShowLocationModal(true)}
+      />
       
       <ScrollView
         className="flex-1"
@@ -305,6 +305,22 @@ export default function HomeScreen() {
             categoryList={categoryList}
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
+        />
+      )}
+
+      {/* ─── LOCATION PICKER MODAL ─── */}
+      {showLocationModal && (
+        <LocationPickerModal
+          visible={showLocationModal}
+          onClose={() => setShowLocationModal(false)}
+          onSelectGPS={() => {
+            setUserLocation(null);
+            fetchGPSLocation();
+          }}
+          onSelectLocation={(loc) => {
+            setUserLocation(loc);
+          }}
+          shops={shops}
         />
       )}
     </View>

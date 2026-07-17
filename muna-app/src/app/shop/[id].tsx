@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet 
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Search as SearchIcon, MapPin, Clock, Star, ShoppingCart } from 'lucide-react-native';
+import { ArrowLeft, Search as SearchIcon, MapPin, Clock, Star, ShoppingCart, X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
     useSharedValue, 
@@ -273,14 +273,20 @@ export default function ShopDetailScreen() {
                     </Animated.View>
 
                     <View className="px-4 py-3 pt-[64px]" style={{ zIndex: 5 }}>
-                        <View className="flex-row items-center bg-slate-50 border border-slate-200 rounded-xl px-3 h-10 gap-2">
-                            <SearchIcon size={16} color="#94a3b8" />
+                        <View className="flex-row items-center bg-slate-100 rounded-[16px] px-4 h-12 gap-3 border border-slate-200/60 shadow-sm">
+                            <SearchIcon size={18} color="#64748b" />
                             <TextInput
-                                className="flex-1 text-[13px] font-medium text-slate-900 h-full"
+                                className="flex-1 text-[14px] font-bold text-slate-900 h-full"
                                 placeholder={`Search in ${shop.name}...`}
+                                placeholderTextColor="#94a3b8"
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
                             />
+                            {searchQuery.length > 0 && (
+                                <TouchableOpacity onPress={() => setSearchQuery('')} className="p-1 bg-slate-200 rounded-full">
+                                    <X size={14} color="#64748b" />
+                                </TouchableOpacity>
+                            )}
                         </View>
                     </View>
                     

@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Clock3, MapPin, Star, X } from 'lucide-react-native';
+import { Clock3, MapPin, MapPinOff, Star, X } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
 interface StoreListingProps {
@@ -69,7 +69,7 @@ const StoreListing: React.FC<StoreListingProps> = ({
         ) : sortedShops.length === 0 ? (
           <View className="items-center px-5 py-10 bg-white rounded-[32px] border border-amber-100/50 shadow-sm mx-1">
             <View className="w-20 h-20 bg-amber-50 rounded-full items-center justify-center mb-5 border border-amber-100">
-              <Text className="text-4xl">🚀</Text>
+              <MapPinOff size={32} color="#b45309" strokeWidth={1.5} />
             </View>
             <Text className="text-[20px] font-black text-slate-900 text-center mb-2 tracking-tight">
               We aren't here... yet!

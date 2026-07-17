@@ -12,6 +12,7 @@
   "dependencies": {
     "@capacitor/cli": "^8.4.0",
     "@capacitor/core": "^8.4.0",
+    "@heroicons/react": "^2.2.0",
     "@react-oauth/google": "^0.13.5",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/query-sync-storage-persister": "^5.101.2",

@@ -66,7 +66,7 @@ export default function WishlistScreen() {
                                     product={item}
                                     onClick={() => {
                                         const shopId = item.shopId?._id || item.shopId;
-                                        router.push(`/shop/${shopId}/product/${item._id}`);
+                                        router.push(`/product/${shopId}/${item._id}`);
                                     }}
                                     onAddClick={() => addToCart(item, item.shopId?._id || item.shopId)}
                                 />

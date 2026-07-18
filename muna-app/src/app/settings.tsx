@@ -52,6 +52,11 @@ export default function SettingsScreen() {
             Alert.alert("Error", "Name cannot be empty");
             return;
         }
+
+        if (phone && phone.replace(/\D/g, '').length < 10) {
+            Alert.alert("Invalid Phone", "Please enter a valid 10-digit phone number.");
+            return;
+        }
         
         setIsSaving(true);
         try {

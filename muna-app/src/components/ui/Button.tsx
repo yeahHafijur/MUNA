@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { useTheme } from '@/context/ThemeContext';
 
 interface ButtonProps {
     children: React.ReactNode;
@@ -24,23 +25,38 @@ const Button: React.FC<ButtonProps> = ({
     textClassName = '',
     fullWidth = false,
 }) => {
+    const { colors, isDark } = useTheme();
     
     const baseStyles = "relative flex-row items-center justify-center rounded-xl";
     
-    const variants = {
-        primary: "bg-amber-400 border border-transparent shadow-sm",
-        secondary: "bg-white border-2 border-slate-200",
-        danger: "bg-rose-500 border border-transparent shadow-sm",
-        ghost: "bg-transparent border border-transparent",
-        dark: "bg-slate-900 border border-transparent shadow-sm"
+    const getBgColor = () => {
+        switch (variant) {
+            case 'primary': return colors.accent;
+            case 'secondary': return colors.surface;
+            case 'danger': return colors.danger;
+            case 'ghost': return 'transparent';
+            case 'dark': return isDark ? colors.elevated : '#0f172a';
+            default: return colors.accent;
+        }
     };
 
-    const textVariants = {
-        primary: "text-amber-950",
-        secondary: "text-slate-800",
-        danger: "text-white",
-        ghost: "text-slate-600",
-        dark: "text-white"
+    const getBorderColor = () => {
+        switch (variant) {
+            case 'secondary': return colors.borderStrong;
+            case 'ghost': return 'transparent';
+            default: return 'transparent';
+        }
+    };
+
+    const getTextColor = () => {
+        switch (variant) {
+            case 'primary': return colors.accentText;
+            case 'secondary': return colors.primaryText;
+            case 'danger': return '#ffffff';
+            case 'ghost': return colors.secondaryText;
+            case 'dark': return '#ffffff';
+            default: return colors.primaryText;
+        }
     };
 
     const sizes = {
@@ -64,27 +80,30 @@ const Button: React.FC<ButtonProps> = ({
             activeOpacity={0.8}
             className={`
                 ${baseStyles} 
-                ${variants[variant]} 
                 ${sizes[size]} 
                 ${fullWidth ? 'w-full' : ''} 
                 ${disabled ? 'opacity-70' : ''}
                 ${className}
             `}
+            style={{
+                backgroundColor: getBgColor(),
+                borderColor: getBorderColor(),
+                borderWidth: variant === 'secondary' ? 2 : 0,
+            }}
         >
             {isLoading && (
                 <ActivityIndicator 
-                  color={variant === 'primary' || variant === 'secondary' || variant === 'ghost' ? '#334155' : '#ffffff'} 
+                  color={variant === 'primary' || variant === 'secondary' || variant === 'ghost' ? (isDark ? '#FFFFFF' : '#334155') : '#ffffff'} 
                   size="small" 
                   className="mr-2"
                 />
             )}
             
             {typeof children === 'string' ? (
-                <Text className={`
-                    ${textVariants[variant]} 
-                    ${textSizes[size]} 
-                    ${textClassName}
-                `}>
+                <Text 
+                    className={`${textSizes[size]} ${textClassName}`}
+                    style={{ color: getTextColor() }}
+                >
                     {children}
                 </Text>
             ) : (

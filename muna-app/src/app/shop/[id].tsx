@@ -18,6 +18,7 @@ import Animated, {
     withTiming
 } from 'react-native-reanimated';
 import { useCart } from '@/context/CartContext';
+import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
 import { getImageUrl } from '@/utils/format';
@@ -37,35 +38,39 @@ const MemoizedShopProductItem = React.memo(({ prod, quantity, shopId, updateQuan
     );
 });
 
-const SkeletonBlock = ({ className, style }: any) => {
+const SkeletonBlock = ({ className, style, isDark }: any) => {
     const opacity = useSharedValue(0.4);
     useEffect(() => {
         opacity.value = withRepeat(withTiming(1, { duration: 800 }), -1, true);
     }, []);
     const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
-    return <Animated.View className={`bg-slate-200 ${className}`} style={[style, animatedStyle]} />;
+    return <Animated.View className={`${className}`} style={[{ backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }, style, animatedStyle]} />;
 };
 
-const ShopSkeleton = () => (
-    <View className="flex-1 bg-white">
-        <SkeletonBlock className="w-full aspect-[4/3]" />
-        <View className="px-4 py-6">
-            <View className="flex-row items-center justify-between mb-4">
-                <SkeletonBlock className="w-40 h-6 rounded-md" />
-                <SkeletonBlock className="w-16 h-4 rounded-md" />
-            </View>
-            <View className="flex-row flex-wrap justify-between gap-y-4">
-                {[1, 2, 3, 4].map(i => (
-                    <SkeletonBlock key={i} className="w-[48%] aspect-[4/3] rounded-[20px]" />
-                ))}
+const ShopSkeleton = () => {
+    const { colors, isDark } = useTheme();
+    return (
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+            <SkeletonBlock isDark={isDark} className="w-full aspect-[4/3]" />
+            <View className="px-4 py-6">
+                <View className="flex-row items-center justify-between mb-4">
+                    <SkeletonBlock isDark={isDark} className="w-40 h-6 rounded-md" />
+                    <SkeletonBlock isDark={isDark} className="w-16 h-4 rounded-md" />
+                </View>
+                <View className="flex-row flex-wrap justify-between gap-y-4">
+                    {[1, 2, 3, 4].map(i => (
+                        <SkeletonBlock isDark={isDark} key={i} className="w-[48%] aspect-[4/3] rounded-[20px]" />
+                    ))}
+                </View>
             </View>
         </View>
-    </View>
-);
+    );
+};
 
 export default function ShopDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
+    const { colors, isDark } = useTheme();
     const { addToCart, overrideAndReplaceCart, cartItems, getTotal, updateQuantity } = useCart();
 
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -186,8 +191,8 @@ export default function ShopDetailScreen() {
 
     if (!shop) {
         return (
-            <View className="flex-1 items-center justify-center bg-white">
-                <Text>Shop not found.</Text>
+            <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
+                <Text style={{ color: colors.primaryText }}>Shop not found.</Text>
             </View>
         );
     }
@@ -195,7 +200,7 @@ export default function ShopDetailScreen() {
     const shopImageUrl = getImageUrl(shop.image);
 
     return (
-        <View className="flex-1 bg-white">
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
             <Animated.ScrollView 
                 className="flex-1" 
                 stickyHeaderIndices={[1]}
@@ -249,13 +254,13 @@ export default function ShopDetailScreen() {
 
                 {/* 2. Sticky Header & Search Bar */}
                 <View 
-                  className="bg-white shadow-sm z-40 border-b border-slate-100 relative"
-                  style={{ elevation: 40, zIndex: 40 }}
+                  className="shadow-sm z-40 border-b relative"
+                  style={{ backgroundColor: colors.surface, borderBottomColor: colors.border, elevation: 40, zIndex: 40 }}
                 >
                     {/* Animated Solid Header (Always mounted to prevent reanimated crashes) */}
                     <Animated.View 
-                        style={[StyleSheet.absoluteFill, { backgroundColor: 'white', zIndex: 10 }, (selectedCategory === null && !searchQuery) ? headerAnimatedStyle : { opacity: 1, pointerEvents: 'auto' }]} 
-                        className="pt-12 pb-2 px-4 flex-row items-center gap-3 shadow-sm border-b border-slate-100"
+                        style={[StyleSheet.absoluteFill, { backgroundColor: colors.surface, zIndex: 10, borderBottomColor: colors.border }, (selectedCategory === null && !searchQuery) ? headerAnimatedStyle : { opacity: 1, pointerEvents: 'auto' }]} 
+                        className="pt-12 pb-2 px-4 flex-row items-center gap-3 shadow-sm border-b"
                     >
                         <TouchableOpacity 
                             onPress={() => {
@@ -266,26 +271,28 @@ export default function ShopDetailScreen() {
                                     router.back();
                                 }
                             }}
-                            className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
+                            className="w-10 h-10 rounded-full items-center justify-center border"
+                            style={{ backgroundColor: isDark ? colors.elevated : '#f1f5f9', borderColor: colors.border }}
                         >
-                            <ArrowLeft size={20} color="#0f172a" />
+                            <ArrowLeft size={20} color={colors.icon} />
                         </TouchableOpacity>
-                        <Text className="flex-1 text-[18px] font-black text-slate-900 tracking-tight" numberOfLines={1}>{shop.name}</Text>
+                        <Text style={{ color: colors.primaryText }} className="flex-1 text-[18px] font-black tracking-tight" numberOfLines={1}>{shop.name}</Text>
                     </Animated.View>
 
                     <View className="px-4 py-3 pt-[64px]" style={{ zIndex: 5 }}>
-                        <View className="flex-row items-center bg-slate-100 rounded-[16px] px-4 h-12 gap-3 border border-slate-200/60 shadow-sm">
-                            <SearchIcon size={18} color="#64748b" />
+                        <View className="flex-row items-center rounded-[16px] px-4 h-12 gap-3 border shadow-sm" style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }}>
+                            <SearchIcon size={18} color={colors.iconMuted} />
                             <TextInput
-                                className="flex-1 text-[14px] font-bold text-slate-900 h-full"
+                                className="flex-1 text-[14px] font-bold h-full"
+                                style={{ color: colors.inputText }}
                                 placeholder={`Search in ${shop.name}...`}
-                                placeholderTextColor="#94a3b8"
+                                placeholderTextColor={colors.placeholder}
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
                             />
                             {searchQuery.length > 0 && (
-                                <TouchableOpacity onPress={() => setSearchQuery('')} className="p-1 bg-slate-200 rounded-full">
-                                    <X size={14} color="#64748b" />
+                                <TouchableOpacity onPress={() => setSearchQuery('')} className="p-1 rounded-full border" style={{ backgroundColor: isDark ? colors.elevated : '#e2e8f0', borderColor: colors.border }}>
+                                    <X size={14} color={colors.icon} />
                                 </TouchableOpacity>
                             )}
                         </View>
@@ -299,29 +306,39 @@ export default function ShopDetailScreen() {
                         >
                             <TouchableOpacity 
                                 onPress={() => { setSelectedCategory(null); setSearchQuery(''); }}
-                                className="px-4 py-1.5 rounded-full border bg-white border-slate-200"
+                                className="px-4 py-1.5 rounded-full border"
+                                style={{ backgroundColor: colors.surface, borderColor: colors.border }}
                             >
-                                <Text className="text-[13px] font-bold text-slate-600">
+                                <Text className="text-[13px] font-bold" style={{ color: colors.secondaryText }}>
                                     ← Categories
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity 
                                 onPress={() => setSelectedCategory('All')}
-                                className={`px-4 py-1.5 rounded-full border ${selectedCategory === 'All' ? 'bg-slate-900 border-slate-900' : 'bg-white border-slate-200'}`}
+                                className={`px-4 py-1.5 rounded-full border`}
+                                style={{
+                                    backgroundColor: selectedCategory === 'All' ? (isDark ? colors.elevated : colors.primaryText) : colors.surface,
+                                    borderColor: selectedCategory === 'All' ? 'transparent' : colors.border
+                                }}
                             >
-                                <Text className={`text-[13px] font-bold ${selectedCategory === 'All' ? 'text-white' : 'text-slate-600'}`}>
+                                <Text className={`text-[13px] font-bold`} style={{ color: selectedCategory === 'All' ? colors.invertedText : colors.secondaryText }}>
                                     📦 All ({products.length})
                                 </Text>
                             </TouchableOpacity>
                             {categories.map((cat: any) => {
                                 const count = categoryCounts[cat] || 0;
+                                const isSelected = selectedCategory === cat;
                                 return (
                                     <TouchableOpacity 
                                         key={cat}
                                         onPress={() => setSelectedCategory(cat)}
-                                        className={`px-4 py-1.5 rounded-full border ${selectedCategory === cat ? 'bg-slate-900 border-slate-900' : 'bg-white border-slate-200'}`}
+                                        className={`px-4 py-1.5 rounded-full border`}
+                                        style={{
+                                            backgroundColor: isSelected ? (isDark ? colors.elevated : colors.primaryText) : colors.surface,
+                                            borderColor: isSelected ? 'transparent' : colors.border
+                                        }}
                                     >
-                                        <Text className={`text-[13px] font-bold ${selectedCategory === cat ? 'text-white' : 'text-slate-600'}`}>
+                                        <Text className={`text-[13px] font-bold`} style={{ color: isSelected ? colors.invertedText : colors.secondaryText }}>
                                             {cat} ({count})
                                         </Text>
                                     </TouchableOpacity>
@@ -336,8 +353,8 @@ export default function ShopDetailScreen() {
                     {(selectedCategory === null && !searchQuery) ? (
                         <View>
                             <View className="flex-row items-center justify-between mb-4 px-1">
-                                <Text className="text-[17px] font-black text-slate-900 tracking-tight">Browse by Category</Text>
-                                <Text className="text-[12px] font-bold text-slate-500">{categories.length + 1} categories</Text>
+                                <Text style={{ color: colors.primaryText }} className="text-[17px] font-black tracking-tight">Browse by Category</Text>
+                                <Text style={{ color: colors.tertiaryText }} className="text-[12px] font-bold">{categories.length + 1} categories</Text>
                             </View>
                             
                             <View className="flex-row flex-wrap justify-between gap-y-4">
@@ -365,7 +382,8 @@ export default function ShopDetailScreen() {
                                         <TouchableOpacity 
                                             key={cat}
                                             onPress={() => setSelectedCategory(cat)}
-                                            className="w-[48%] aspect-[4/3] rounded-[20px] bg-slate-50 border border-slate-100 overflow-hidden relative shadow-sm"
+                                            className="w-[48%] aspect-[4/3] rounded-[20px] border overflow-hidden relative shadow-sm"
+                                            style={{ backgroundColor: colors.surface, borderColor: colors.border }}
                                         >
                                             {customImg ? (
                                                 <>
@@ -379,8 +397,8 @@ export default function ShopDetailScreen() {
                                             ) : (
                                                 <View className="flex-1 justify-center items-center p-3">
                                                     <Text className="text-3xl mb-1.5 opacity-80">🏷</Text>
-                                                    <Text className="text-slate-900 font-black text-[14px] text-center leading-tight tracking-tight" numberOfLines={2}>{cat}</Text>
-                                                    <Text className="text-slate-500 font-bold text-[10px] uppercase tracking-wider mt-1">{count} items</Text>
+                                                    <Text style={{ color: colors.primaryText }} className="font-black text-[14px] text-center leading-tight tracking-tight" numberOfLines={2}>{cat}</Text>
+                                                    <Text style={{ color: colors.tertiaryText }} className="font-bold text-[10px] uppercase tracking-wider mt-1">{count} items</Text>
                                                 </View>
                                             )}
                                         </TouchableOpacity>
@@ -392,8 +410,8 @@ export default function ShopDetailScreen() {
                         filteredProducts.length === 0 ? (
                             <View className="items-center justify-center py-12">
                                 <Text className="text-5xl mb-3">🔍</Text>
-                                <Text className="text-slate-900 font-black text-lg">No products found</Text>
-                                <Text className="text-slate-500 font-medium text-sm mt-1">Try a different category or search term</Text>
+                                <Text style={{ color: colors.primaryText }} className="font-black text-lg">No products found</Text>
+                                <Text style={{ color: colors.secondaryText }} className="font-medium text-sm mt-1">Try a different category or search term</Text>
                             </View>
                         ) : (
                             <View className="flex-row flex-wrap justify-between gap-y-4">

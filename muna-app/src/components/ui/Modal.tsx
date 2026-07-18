@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal as RNModal, View, Text, TouchableOpacity, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { X } from 'lucide-react-native';
+import { useTheme } from '@/context/ThemeContext';
 
 interface ModalProps {
     isOpen: boolean;
@@ -10,6 +11,8 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+    const { colors, isDark } = useTheme();
+
     return (
         <RNModal
             visible={isOpen}
@@ -17,28 +20,30 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
             animationType="slide"
             onRequestClose={onClose}
         >
-            <View className="flex-1 justify-end bg-slate-900/40">
+            <View className="flex-1 justify-end" style={{ backgroundColor: colors.overlayStrong }}>
                 <TouchableWithoutFeedback onPress={onClose}>
                     <View className="absolute inset-0" />
                 </TouchableWithoutFeedback>
 
                 <KeyboardAvoidingView 
                     behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                    className="w-full bg-white rounded-t-3xl shadow-2xl overflow-hidden max-h-[85%]"
+                    className="w-full rounded-t-3xl shadow-2xl overflow-hidden max-h-[85%]"
+                    style={{ backgroundColor: colors.surface }}
                 >
                     {/* Drag Handle */}
                     <View className="w-full items-center pt-3 pb-1">
-                        <View className="w-12 h-1.5 bg-slate-200 rounded-full" />
+                        <View className="w-12 h-1.5 rounded-full" style={{ backgroundColor: colors.borderStrong }} />
                     </View>
 
                     {/* Header */}
-                    <View className="px-6 py-4 border-b border-slate-100 flex-row items-center justify-between">
-                        <Text className="text-xl font-black text-slate-800 tracking-tight">{title}</Text>
+                    <View className="px-6 py-4 border-b flex-row items-center justify-between" style={{ borderBottomColor: colors.border }}>
+                        <Text className="text-xl font-black tracking-tight" style={{ color: colors.primaryText }}>{title}</Text>
                         <TouchableOpacity 
                             onPress={onClose}
-                            className="w-8 h-8 rounded-full bg-slate-100 items-center justify-center"
+                            className="w-8 h-8 rounded-full items-center justify-center"
+                            style={{ backgroundColor: isDark ? colors.elevated : colors.background }}
                         >
-                            <X size={18} color="#64748b" />
+                            <X size={18} color={colors.icon} />
                         </TouchableOpacity>
                     </View>
 

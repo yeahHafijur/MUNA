@@ -5,11 +5,13 @@ import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react
 import { useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Bell, Package, MessageSquare, Megaphone, Info, CheckCheck } from 'lucide-react-native';
+import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 
 export default function NotificationsScreen() {
     const router = useRouter();
     const queryClient = useQueryClient();
+    const { colors, isDark } = useTheme();
 
     const { data: notifications = [], isLoading } = useQuery({
         queryKey: ['notifications'],
@@ -65,11 +67,11 @@ export default function NotificationsScreen() {
 
     const getBgColor = (type: string) => {
         switch (type) {
-            case 'order': return 'bg-sky-100';
-            case 'chat': return 'bg-emerald-100';
-            case 'promo': return 'bg-amber-100';
-            case 'system': return 'bg-slate-100';
-            default: return 'bg-purple-100';
+            case 'order': return isDark ? 'rgba(14,165,233,0.15)' : '#e0f2fe';
+            case 'chat': return isDark ? 'rgba(16,185,129,0.15)' : '#d1fae5';
+            case 'promo': return isDark ? 'rgba(245,158,11,0.15)' : '#fef3c7';
+            case 'system': return isDark ? 'rgba(100,116,139,0.15)' : '#f1f5f9';
+            default: return isDark ? 'rgba(139,92,246,0.15)' : '#f3e8ff';
         }
     };
 
@@ -116,52 +118,55 @@ export default function NotificationsScreen() {
     const renderItem = ({ item }: { item: any }) => (
         <TouchableOpacity 
             onPress={() => handlePress(item)}
-            className={`flex-row p-4 border-b border-slate-100 ${!item.isRead ? 'bg-amber-50/30' : 'bg-white'}`}
+            className={`flex-row p-4 border-b`}
+            style={{ backgroundColor: !item.isRead ? (isDark ? 'rgba(245,158,11,0.05)' : 'rgba(254,243,199,0.5)') : colors.background, borderBottomColor: colors.border }}
         >
-            <View className={`w-12 h-12 rounded-full items-center justify-center mr-4 ${getBgColor(item.type)}`}>
+            <View className={`w-12 h-12 rounded-full items-center justify-center mr-4`} style={{ backgroundColor: getBgColor(item.type) }}>
                 {getIcon(item.type)}
             </View>
             <View className="flex-1">
                 <View className="flex-row items-start justify-between mb-1">
-                    <Text className={`flex-1 text-[15px] mr-2 ${!item.isRead ? 'font-black text-slate-900' : 'font-bold text-slate-800'}`}>
+                    <Text className={`flex-1 text-[15px] mr-2 ${!item.isRead ? 'font-black' : 'font-bold'}`} style={{ color: !item.isRead ? colors.primaryText : colors.secondaryText }}>
                         {item.title}
                     </Text>
-                    <Text className="text-[11px] font-medium text-slate-400 mt-0.5">
+                    <Text className="text-[11px] font-medium mt-0.5" style={{ color: colors.tertiaryText }}>
                         {timeAgo(item.createdAt)}
                     </Text>
                 </View>
-                <Text className={`text-[13px] leading-5 ${!item.isRead ? 'font-medium text-slate-700' : 'text-slate-500'}`}>
+                <Text className={`text-[13px] leading-5 ${!item.isRead ? 'font-medium' : ''}`} style={{ color: !item.isRead ? colors.secondaryText : colors.tertiaryText }}>
                     {item.message}
                 </Text>
             </View>
             {!item.isRead && (
-                <View className="w-2.5 h-2.5 bg-red-500 rounded-full ml-3 mt-2" />
+                <View className="w-2.5 h-2.5 rounded-full ml-3 mt-2" style={{ backgroundColor: colors.danger }} />
             )}
         </TouchableOpacity>
     );
 
     return (
-        <View className="flex-1 bg-white">
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
             {/* Header */}
-            <View className="pt-[52px] pb-4 px-4 flex-row items-center justify-between border-b border-slate-100 bg-white">
+            <View className="pt-[52px] pb-4 px-4 flex-row items-center justify-between border-b" style={{ backgroundColor: colors.surface, borderBottomColor: colors.border }}>
                 <View className="flex-row items-center gap-3">
                     <TouchableOpacity 
                         onPress={() => router.back()}
-                        className="w-10 h-10 rounded-full bg-slate-50 items-center justify-center border border-slate-100"
+                        className="w-10 h-10 rounded-full items-center justify-center border"
+                        style={{ backgroundColor: isDark ? colors.elevated : '#f8fafc', borderColor: colors.border }}
                     >
-                        <ArrowLeft size={20} color="#0f172a" />
+                        <ArrowLeft size={20} color={colors.icon} />
                     </TouchableOpacity>
-                    <Text className="text-[20px] font-black text-slate-900 tracking-tight">Notifications</Text>
+                    <Text style={{ color: colors.primaryText }} className="text-[20px] font-black tracking-tight">Notifications</Text>
                 </View>
                 
                 {notifications.some((n: any) => !n.isRead) && (
                     <TouchableOpacity 
                         onPress={() => markAllAsReadMutation.mutate()}
                         disabled={markAllAsReadMutation.isPending}
-                        className="flex-row items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200"
+                        className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border"
+                        style={{ backgroundColor: isDark ? colors.elevated : '#f8fafc', borderColor: colors.border }}
                     >
-                        <CheckCheck size={14} color="#64748b" />
-                        <Text className="text-[12px] font-bold text-slate-600">Read All</Text>
+                        <CheckCheck size={14} color={colors.icon} />
+                        <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold">Read All</Text>
                     </TouchableOpacity>
                 )}
             </View>
@@ -169,15 +174,15 @@ export default function NotificationsScreen() {
             {/* Content */}
             {isLoading ? (
                 <View className="flex-1 items-center justify-center">
-                    <ActivityIndicator size="large" color="#f59e0b" />
+                    <ActivityIndicator size="large" color={colors.accent} />
                 </View>
             ) : notifications.length === 0 ? (
                 <View className="flex-1 items-center justify-center px-8">
-                    <View className="w-24 h-24 bg-slate-50 rounded-full items-center justify-center mb-6">
-                        <Bell size={40} color="#cbd5e1" />
+                    <View className="w-24 h-24 rounded-full items-center justify-center mb-6" style={{ backgroundColor: isDark ? colors.elevated : '#f8fafc' }}>
+                        <Bell size={40} color={colors.iconMuted} />
                     </View>
-                    <Text className="text-xl font-black text-slate-900 mb-2">All Caught Up!</Text>
-                    <Text className="text-center text-slate-500 font-medium">
+                    <Text style={{ color: colors.primaryText }} className="text-xl font-black mb-2">All Caught Up!</Text>
+                    <Text style={{ color: colors.secondaryText }} className="text-center font-medium">
                         You don't have any new notifications at the moment.
                     </Text>
                 </View>

@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Send } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 
 const formatTime = (dateString: string) => {
@@ -21,6 +22,7 @@ export default function ChatDetailScreen() {
     const { sessionId } = useLocalSearchParams();
     const router = useRouter();
     const { user, token } = useAuth();
+    const { colors, isDark } = useTheme();
     const queryClient = useQueryClient();
     const scrollViewRef = useRef<ScrollView>(null);
     const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -69,16 +71,16 @@ export default function ChatDetailScreen() {
 
     if (isLoading) {
         return (
-            <View className="flex-1 items-center justify-center bg-white">
-                <ActivityIndicator size="large" color="#fbbf24" />
+            <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
+                <ActivityIndicator size="large" color={colors.accent} />
             </View>
         );
     }
 
     if (!session) {
         return (
-            <View className="flex-1 items-center justify-center bg-white">
-                <Text>Chat not found.</Text>
+            <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
+                <Text style={{ color: colors.primaryText }}>Chat not found.</Text>
             </View>
         );
     }
@@ -92,20 +94,20 @@ export default function ChatDetailScreen() {
             style={{ flex: 1 }} 
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            <View className="flex-1 bg-slate-50">
+            <View className="flex-1" style={{ backgroundColor: colors.background }}>
                 {/* Header */}
-                <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-3 shadow-sm flex-row items-center gap-3 z-10">
+                <View className="pt-12 px-4 pb-3 shadow-sm flex-row items-center gap-3 z-10 border-b" style={{ backgroundColor: colors.surface, borderBottomColor: colors.border }}>
                     <TouchableOpacity onPress={() => router.back()} className="p-1">
-                        <ArrowLeft size={24} color="#0f172a" />
+                        <ArrowLeft size={24} color={colors.icon} />
                     </TouchableOpacity>
                     <View className="flex-row items-center gap-3">
-                        <View className="w-10 h-10 bg-amber-100 rounded-full items-center justify-center border border-amber-200">
+                        <View className="w-10 h-10 rounded-full items-center justify-center border" style={{ backgroundColor: isDark ? 'rgba(217,119,6,0.15)' : '#fef3c7', borderColor: isDark ? 'rgba(217,119,6,0.3)' : '#fde68a' }}>
                             <Text className="text-[16px]">👤</Text>
                         </View>
                         <View>
-                            <Text className="text-[16px] font-black text-slate-900">{otherName}</Text>
+                            <Text style={{ color: colors.primaryText }} className="text-[16px] font-black">{otherName}</Text>
                             {session.item && (
-                                <Text className="text-[11px] font-bold text-slate-500">
+                                <Text style={{ color: colors.secondaryText }} className="text-[11px] font-bold">
                                     Re: {session.item.title}
                                 </Text>
                             )}
@@ -122,8 +124,8 @@ export default function ChatDetailScreen() {
                     onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
                 >
                     <View className="items-center mb-6">
-                        <View className="bg-slate-200/50 px-3 py-1 rounded-full">
-                            <Text className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        <View className="px-3 py-1 rounded-full" style={{ backgroundColor: isDark ? colors.elevated : 'rgba(226, 232, 240, 0.5)' }}>
+                            <Text style={{ color: colors.secondaryText }} className="text-[10px] font-bold uppercase tracking-wider">
                                 {(() => {
                                     const d = new Date();
                                     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -143,13 +145,15 @@ export default function ChatDetailScreen() {
                             >
                                 <View className={`max-w-[80%] px-4 py-3 rounded-2xl ${
                                     isMe 
-                                    ? 'bg-emerald-600 rounded-tr-sm shadow-sm' 
-                                    : 'bg-white border border-slate-100 rounded-tl-sm shadow-sm'
-                                }`}>
-                                    <Text className={`text-[14px] leading-relaxed ${isMe ? 'text-white' : 'text-slate-800'}`}>
+                                    ? 'rounded-tr-sm shadow-sm' 
+                                    : 'border rounded-tl-sm shadow-sm'
+                                }`}
+                                style={isMe ? { backgroundColor: colors.primary } : { backgroundColor: colors.surface, borderColor: colors.border }}
+                                >
+                                    <Text className={`text-[14px] leading-relaxed`} style={{ color: isMe ? colors.invertedText : colors.primaryText }}>
                                         {msg.content}
                                     </Text>
-                                    <Text className={`text-[10px] font-bold mt-1 text-right ${isMe ? 'text-emerald-200' : 'text-slate-400'}`}>
+                                    <Text className={`text-[10px] font-bold mt-1 text-right`} style={{ color: isMe ? 'rgba(255,255,255,0.7)' : colors.tertiaryText }}>
                                         {formatTime(msg.createdAt)}
                                     </Text>
                                 </View>
@@ -159,28 +163,28 @@ export default function ChatDetailScreen() {
                 </ScrollView>
 
                 {/* Input Area */}
-                <View className="bg-white border-t border-slate-100 p-4 pb-8 flex-row items-end gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                    <View className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl min-h-[48px] max-h-[120px] px-4 py-3 justify-center">
+                <View className="border-t p-4 pb-8 flex-row items-end gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]" style={{ backgroundColor: colors.surface, borderTopColor: colors.border }}>
+                    <View className="flex-1 border rounded-2xl min-h-[48px] max-h-[120px] px-4 py-3 justify-center" style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }}>
                         <TextInput 
-                            className="text-[15px] text-slate-900"
+                            className="text-[15px]"
+                            style={{ color: colors.inputText, maxHeight: 100 }}
                             placeholder="Type a message..."
-                            placeholderTextColor="#94a3b8"
+                            placeholderTextColor={colors.placeholder}
                             multiline
                             value={newMessage}
                             onChangeText={setNewMessage}
-                            style={{ maxHeight: 100 }}
                         />
                     </View>
                     <TouchableOpacity 
                         onPress={handleSend}
                         disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                        className={`w-12 h-12 rounded-full items-center justify-center shadow-sm
-                        ${!newMessage.trim() ? 'bg-slate-200' : 'bg-amber-400'}`}
+                        className={`w-12 h-12 rounded-full items-center justify-center shadow-sm`}
+                        style={{ backgroundColor: !newMessage.trim() ? (isDark ? '#334155' : '#e2e8f0') : colors.accent }}
                     >
                         {sendMessageMutation.isPending ? (
-                            <ActivityIndicator size="small" color="#451a03" />
+                            <ActivityIndicator size="small" color={!newMessage.trim() ? colors.iconMuted : colors.primaryText} />
                         ) : (
-                            <Send size={20} color={!newMessage.trim() ? '#94a3b8' : '#451a03'} style={{ marginLeft: 2 }} />
+                            <Send size={20} color={!newMessage.trim() ? colors.iconMuted : '#451a03'} style={{ marginLeft: 2 }} />
                         )}
                     </TouchableOpacity>
                 </View>

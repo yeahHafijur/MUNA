@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft, ShoppingBag, MessageSquare } from 'lucide-react-native';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 
 import CartItems from '@/components/cart/CartItems';
@@ -14,6 +15,7 @@ export default function CartScreen() {
     const router = useRouter();
     const { cartItems, cartShopId, getTotal, clearCart, updateQuantity, removeFromCart } = useCart();
     const { user, token, login } = useAuth();
+    const { colors, isDark } = useTheme();
 
     const [gpsLocation, setGpsLocation] = useState<any>(null);
     const [deliveryFee, setDeliveryFee] = useState<number | null>(null);
@@ -121,12 +123,12 @@ export default function CartScreen() {
 
     if (cartItems.length === 0) {
         return (
-            <View className="flex-1 bg-slate-50 items-center justify-center px-6">
-                <View className="w-32 h-32 bg-emerald-50 rounded-full items-center justify-center mb-6 border-8 border-emerald-100/50">
+            <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: colors.background }}>
+                <View style={{ backgroundColor: isDark ? 'rgba(16,185,129,0.15)' : '#ecfdf5', borderColor: isDark ? 'rgba(16,185,129,0.3)' : '#d1fae5' }} className="w-32 h-32 rounded-full items-center justify-center mb-6 border-8">
                     <ShoppingBag size={48} color="#10b981" strokeWidth={1.5} />
                 </View>
-                <Text className="text-[22px] font-black text-slate-900 mb-2 text-center tracking-tight">Your cart is empty</Text>
-                <Text className="text-[14px] font-semibold text-slate-500 mb-8 text-center leading-relaxed max-w-[250px]">
+                <Text style={{ color: colors.primaryText }} className="text-[22px] font-black mb-2 text-center tracking-tight">Your cart is empty</Text>
+                <Text style={{ color: colors.secondaryText }} className="text-[14px] font-semibold mb-8 text-center leading-relaxed max-w-[250px]">
                     Looks like you haven't added anything to your cart yet.
                 </Text>
                 <TouchableOpacity 
@@ -140,17 +142,18 @@ export default function CartScreen() {
     }
 
     return (
-        <View className="flex-1 bg-slate-50">
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
             {/* Header */}
-            <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-4 shadow-sm flex-row items-center gap-3">
+            <View className="pt-12 px-4 pb-4 shadow-sm flex-row items-center gap-3" style={{ backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }}>
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
-                    <ArrowLeft size={24} color="#0f172a" />
+                    <ArrowLeft size={24} color={colors.icon} />
                 </TouchableOpacity>
-                <Text className="text-[18px] font-black text-slate-900">Checkout</Text>
+                <Text style={{ color: colors.primaryText }} className="text-[18px] font-black">Checkout</Text>
             </View>
 
             <ScrollView 
                 className="flex-1 px-4 pt-4" 
+                style={{ backgroundColor: colors.background }}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 120 }}
             >
@@ -171,15 +174,16 @@ export default function CartScreen() {
                 />
 
                 {/* Instructions Input */}
-                <View className="bg-white rounded-3xl p-5 mb-5 shadow-sm border border-slate-100">
+                <View className="rounded-3xl p-5 mb-5 shadow-sm border" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
                     <View className="flex-row items-center gap-2 mb-3">
-                        <MessageSquare size={18} color="#0f172a" />
-                        <Text className="text-[15px] font-black text-slate-900">Add Instructions</Text>
+                        <MessageSquare size={18} color={colors.icon} />
+                        <Text style={{ color: colors.primaryText }} className="text-[15px] font-black">Add Instructions</Text>
                     </View>
                     <TextInput
-                        className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-[14px] text-slate-900 font-medium"
+                        className="rounded-xl p-4 text-[14px] font-medium border"
+                        style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
                         placeholder="Any special request for the shop? (Optional)"
-                        placeholderTextColor="#94a3b8"
+                        placeholderTextColor={colors.placeholder}
                         multiline
                         numberOfLines={3}
                         textAlignVertical="top"
@@ -190,10 +194,10 @@ export default function CartScreen() {
             </ScrollView>
 
             {/* Bottom Checkout Bar */}
-            <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 shadow-lg flex-row items-center justify-between pb-8">
+            <View className="absolute bottom-0 left-0 right-0 p-4 shadow-lg flex-row items-center justify-between pb-8 border-t" style={{ backgroundColor: colors.surface, borderTopColor: colors.border }}>
                 <View>
-                    <Text className="text-[12px] font-semibold text-slate-500 mb-0.5">Total to pay</Text>
-                    <Text className="text-[20px] font-black text-slate-900 leading-none">
+                    <Text style={{ color: colors.secondaryText }} className="text-[12px] font-semibold mb-0.5">Total to pay</Text>
+                    <Text style={{ color: colors.primaryText }} className="text-[20px] font-black leading-none">
                         ₹{getTotal() + (deliveryFee || 0)}
                     </Text>
                 </View>
@@ -215,24 +219,25 @@ export default function CartScreen() {
             
             {/* Phone Number Modal */}
             <Modal visible={showPhoneModal} transparent animationType="fade">
-                <View className="flex-1 bg-black/60 items-center justify-center px-4">
-                    <View className="bg-white w-full rounded-3xl p-6 shadow-xl">
+                <View className="flex-1 items-center justify-center px-4" style={{ backgroundColor: colors.overlayStrong }}>
+                    <View className="w-full rounded-3xl p-6 shadow-xl" style={{ backgroundColor: colors.surface }}>
                         <View className="items-center mb-6">
                             <View className="w-16 h-16 bg-amber-50 rounded-full items-center justify-center mb-3">
                                 <Text className="text-2xl">📱</Text>
                             </View>
-                            <Text className="text-[20px] font-black text-slate-900 text-center">Add Phone Number</Text>
-                            <Text className="text-[14px] text-slate-500 text-center mt-2 font-medium">
+                            <Text style={{ color: colors.primaryText }} className="text-[20px] font-black text-center">Add Phone Number</Text>
+                            <Text style={{ color: colors.secondaryText }} className="text-[14px] text-center mt-2 font-medium">
                                 We need your phone number to coordinate the delivery for your first order.
                             </Text>
                         </View>
                         
                         <View className="mb-6">
-                            <Text className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Mobile Number</Text>
+                            <Text style={{ color: colors.tertiaryText }} className="text-[12px] font-bold uppercase tracking-widest mb-2 ml-1">Mobile Number</Text>
                             <TextInput 
-                                className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-[16px] text-slate-900 font-bold tracking-wider"
+                                className="border rounded-xl p-4 text-[16px] font-bold tracking-wider"
+                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
                                 placeholder="10-digit mobile number"
-                                placeholderTextColor="#94a3b8"
+                                placeholderTextColor={colors.placeholder}
                                 keyboardType="number-pad"
                                 maxLength={10}
                                 value={phoneNumber}
@@ -245,9 +250,10 @@ export default function CartScreen() {
                             <TouchableOpacity 
                                 onPress={() => setShowPhoneModal(false)}
                                 disabled={savingPhone}
-                                className="flex-1 py-4 bg-slate-100 rounded-xl items-center"
+                                style={{ backgroundColor: colors.elevated }}
+                                className="flex-1 py-4 rounded-xl items-center"
                             >
-                                <Text className="text-slate-600 font-bold text-[15px]">Cancel</Text>
+                                <Text style={{ color: colors.primaryText }} className="font-bold text-[15px]">Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity 
                                 onPress={handleSavePhone}

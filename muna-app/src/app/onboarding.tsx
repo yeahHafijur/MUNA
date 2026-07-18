@@ -6,6 +6,7 @@ import { Image } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -24,9 +25,7 @@ const SLIDES = [
     id: 2,
     logo: false,
     title: 'MUNA Daily Market',
-    titleColor: '#1e293b',
     subtitle: 'Bechein Apne Paas,\nKamaiye Aasaan!',
-    subtitleColor: '#16a34a',
     description: 'Aap bhi bina vendor bane apne location ke aas paas saman bech sakte hain. Jo bechna ho, post karo aur buyers se connect karo.',
     image: require('../../assets/images/onboarding2.png'),
   },
@@ -34,9 +33,7 @@ const SLIDES = [
     id: 3,
     logo: false,
     title: 'Vendor Banna Hai?',
-    titleColor: '#1e293b',
     subtitle: 'Profile Se Apply Karein!',
-    subtitleColor: '#16a34a',
     description: 'Agar aap regular seller hain, toh apni shop ko vendor bana kar MUNA par grow karein. Profile page par \'Become Vendor\' se apply karein.',
     image: require('../../assets/images/onboarding3.png'),
   },
@@ -47,6 +44,7 @@ export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const { colors, isDark } = useTheme();
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
@@ -74,8 +72,8 @@ export default function OnboardingScreen() {
   const isLastSlide = activeIndex === SLIDES.length - 1;
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
-      <StatusBar style="dark" />
+    <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: colors.background }}>
+      <StatusBar style={isDark ? "light" : "dark"} />
 
       {/* Slides */}
       <ScrollView
@@ -104,12 +102,12 @@ export default function OnboardingScreen() {
                       />
                     </View>
                     <View>
-                      <Text className="text-[24px] font-black text-slate-900 tracking-tight">MUNA</Text>
-                      <Text className="text-[10px] font-bold text-green-700 uppercase tracking-[2px]">Delivery in minutes</Text>
+                      <Text style={{ color: colors.primaryText }} className="text-[24px] font-black tracking-tight">MUNA</Text>
+                      <Text className="text-[10px] font-bold uppercase tracking-[2px]" style={{ color: colors.primary }}>Delivery in minutes</Text>
                     </View>
                   </View>
-                  <Text className="text-[18px] font-bold text-green-700 mb-1">Your Local Shops. Online.</Text>
-                  <Text className="text-[15px] text-center font-medium text-slate-500 leading-[22px] px-4">
+                  <Text className="text-[18px] font-bold mb-1" style={{ color: colors.primary }}>Your Local Shops. Online.</Text>
+                  <Text style={{ color: colors.secondaryText }} className="text-[15px] text-center font-medium leading-[22px] px-4">
                     Order from trusted local shops and get fast delivery at your doorstep.
                   </Text>
                 </View>
@@ -118,19 +116,19 @@ export default function OnboardingScreen() {
               {/* Title (for slide 2 & 3, or customized slide 1) */}
               {!slide.logo && (
                 <>
-                  <Text className="text-[26px] font-black text-center leading-[32px] mb-1" style={{ color: slide.titleColor }}>
+                  <Text className="text-[26px] font-black text-center leading-[32px] mb-1" style={{ color: colors.primaryText }}>
                     {slide.title}
                   </Text>
 
                   {/* Accent Subtitle */}
                   {slide.subtitle ? (
-                    <Text className="text-[22px] font-bold text-center leading-[28px] mb-4" style={{ color: slide.subtitleColor }}>
+                    <Text className="text-[22px] font-bold text-center leading-[28px] mb-4" style={{ color: colors.primary }}>
                       {slide.subtitle}
                     </Text>
                   ) : null}
 
                   {/* Description */}
-                  <Text className="text-[15px] font-medium text-center text-slate-500 leading-[22px] px-2">
+                  <Text style={{ color: colors.secondaryText }} className="text-[15px] font-medium text-center leading-[22px] px-2">
                     {slide.description}
                   </Text>
                 </>
@@ -164,7 +162,7 @@ export default function OnboardingScreen() {
                 className="h-2.5 rounded-full"
                 style={{
                   width: activeIndex === i ? 24 : 10,
-                  backgroundColor: activeIndex === i ? '#16a34a' : '#d1d5db',
+                  backgroundColor: activeIndex === i ? colors.primary : colors.border,
                 }}
               />
             ))}
@@ -174,9 +172,9 @@ export default function OnboardingScreen() {
           <Pressable
             onPress={handleNext}
             className="px-7 py-3 rounded-full items-center justify-center active:opacity-80"
-            style={{ backgroundColor: '#16a34a', elevation: 3 }}
+            style={{ backgroundColor: colors.primary, elevation: 3 }}
           >
-            <Text className="text-[13px] font-black text-white tracking-wider uppercase">
+            <Text className="text-[13px] font-black tracking-wider uppercase" style={{ color: colors.invertedText }}>
               {isLastSlide ? 'Get Started' : 'Next'}
             </Text>
           </Pressable>
@@ -185,7 +183,7 @@ export default function OnboardingScreen() {
         {/* Skip text */}
         {!isLastSlide && (
           <Pressable onPress={handleSkip} className="mt-4 items-center active:opacity-60">
-            <Text className="text-[12px] font-bold text-slate-400 tracking-wider uppercase">Skip</Text>
+            <Text style={{ color: colors.tertiaryText }} className="text-[12px] font-bold tracking-wider uppercase">Skip</Text>
           </Pressable>
         )}
       </View>

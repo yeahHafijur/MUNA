@@ -21,6 +21,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
@@ -34,6 +35,7 @@ export default function ProductDetailScreen() {
     const router = useRouter();
     const { cartItems, addToCart, updateQuantity } = useCart();
     const { token } = useAuth();
+    const { colors, isDark } = useTheme();
     const insets = useSafeAreaInsets();
 
     const [liked, setLiked] = useState(false);
@@ -161,10 +163,10 @@ export default function ProductDetailScreen() {
 
     if (!product) {
         return (
-            <View className="flex-1 items-center justify-center bg-white">
+            <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
                 <Text className="text-5xl mb-3">📦</Text>
-                <Text className="text-slate-900 font-black text-lg">Product not found</Text>
-                <Text className="text-slate-500 font-medium text-sm mt-1">It may have been removed</Text>
+                <Text style={{ color: colors.primaryText }} className="font-black text-lg">Product not found</Text>
+                <Text style={{ color: colors.secondaryText }} className="font-medium text-sm mt-1">It may have been removed</Text>
             </View>
         );
     }
@@ -180,13 +182,13 @@ export default function ProductDetailScreen() {
         : [];
 
     return (
-        <View className="flex-1 bg-[#F8FAFB]">
-            <StatusBar style="light" />
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+            <StatusBar style={isDark ? "light" : "dark"} />
 
             {/* ── FLOATING HEADER ── */}
             <View className="absolute top-0 left-0 right-0 z-50" style={{ paddingTop: insets.top }}>
                 {/* Solid background that appears on scroll */}
-                <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }, headerBgStyle]} />
+                <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }, headerBgStyle]} />
 
                 <View className="flex-row items-center justify-between px-4 py-3">
                     <TouchableOpacity
@@ -223,7 +225,7 @@ export default function ProductDetailScreen() {
                 bounces={true}
             >
                 {/* ── HERO IMAGE ── */}
-                <View className="overflow-hidden bg-white border-b border-slate-200" style={{ height: IMAGE_HEIGHT }}>
+                <View className="overflow-hidden border-b" style={{ height: IMAGE_HEIGHT, backgroundColor: colors.surface, borderBottomColor: colors.border }}>
                     <Animated.View style={[{ width: '100%', height: '100%', padding: 40, paddingTop: 80 }, imageAnimStyle]}>
                         {imageUrl ? (
                             <Image
@@ -234,7 +236,7 @@ export default function ProductDetailScreen() {
                                 cachePolicy="memory-disk"
                             />
                         ) : (
-                            <View className="flex-1 items-center justify-center bg-slate-100">
+                            <View className="flex-1 items-center justify-center" style={{ backgroundColor: isDark ? colors.elevated : '#f1f5f9' }}>
                                 <Text className="text-7xl opacity-30">📦</Text>
                             </View>
                         )}
@@ -242,7 +244,7 @@ export default function ProductDetailScreen() {
 
                     {/* Gradient overlay */}
                     <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.05)', 'rgba(248,250,251,1)']}
+                        colors={['transparent', isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)', colors.background]}
                         locations={[0.4, 0.75, 1]}
                         style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 120 }}
                     />
@@ -256,8 +258,8 @@ export default function ProductDetailScreen() {
 
                     {/* Out of stock overlay */}
                     {isOutOfStock && (
-                        <View className="absolute inset-0 bg-white/60 items-center justify-center">
-                            <View className="bg-slate-900 px-5 py-2 rounded-xl shadow-lg">
+                        <View className="absolute inset-0 items-center justify-center" style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)' }}>
+                            <View className="px-5 py-2 rounded-xl shadow-lg" style={{ backgroundColor: colors.danger }}>
                                 <Text className="text-white text-sm font-black uppercase tracking-wider">
                                     {shop && !shop.isOpen ? 'Shop Closed' : 'Out of Stock'}
                                 </Text>
@@ -267,14 +269,14 @@ export default function ProductDetailScreen() {
                 </View>
 
                 {/* ── MAIN CONTENT CARD ── */}
-                <Animated.View entering={FadeInDown.duration(400).delay(100)} className="bg-white rounded-t-[28px] -mt-6 pt-6 px-5 pb-4 shadow-sm border-t border-slate-100/50">
+                <Animated.View entering={FadeInDown.duration(400).delay(100)} className="rounded-t-[28px] -mt-6 pt-6 px-5 pb-4 shadow-sm border-t" style={{ backgroundColor: colors.surface, borderTopColor: colors.border }}>
                     {/* Product Name */}
-                    <Text className="text-[22px] font-black text-slate-900 leading-tight tracking-tight mb-1.5">
+                    <Text style={{ color: colors.primaryText }} className="text-[22px] font-black leading-tight tracking-tight mb-1.5">
                         {product.name}
                     </Text>
 
                     {/* Unit/Weight */}
-                    <Text className="text-[13px] font-semibold text-slate-400 mb-4">
+                    <Text style={{ color: colors.secondaryText }} className="text-[13px] font-semibold mb-4">
                         {product.quantity || '1 unit'}
                     </Text>
 
@@ -282,10 +284,10 @@ export default function ProductDetailScreen() {
                     <View className="flex-row items-end justify-between mb-5">
                         <View>
                             <View className="flex-row items-end gap-2">
-                                <Text className="text-[28px] font-black text-slate-900 leading-none">₹{currentPrice}</Text>
-                                <Text className="text-[15px] font-bold text-slate-400 line-through leading-none pb-1">₹{originalPrice}</Text>
+                                <Text style={{ color: colors.primaryText }} className="text-[28px] font-black leading-none">₹{currentPrice}</Text>
+                                <Text style={{ color: colors.tertiaryText }} className="text-[15px] font-bold line-through leading-none pb-1">₹{originalPrice}</Text>
                             </View>
-                            <Text className="text-[11px] font-bold text-emerald-600 mt-1">You save ₹{originalPrice - currentPrice}</Text>
+                            <Text style={{ color: colors.success }} className="text-[11px] font-bold mt-1">You save ₹{originalPrice - currentPrice}</Text>
                         </View>
 
                         <View>
@@ -324,11 +326,11 @@ export default function ProductDetailScreen() {
 
                     {/* Delivery Info Chips */}
                     <View className="flex-row gap-2 mb-5">
-                        <View className="flex-row items-center gap-1.5 bg-amber-50 px-3 py-2 rounded-xl border border-amber-100">
+                        <View className="flex-row items-center gap-1.5 px-3 py-2 rounded-xl border" style={{ backgroundColor: isDark ? 'rgba(217,119,6,0.15)' : '#fffbeb', borderColor: isDark ? 'rgba(217,119,6,0.3)' : '#fef3c7' }}>
                             <Clock size={14} color="#d97706" />
                             <Text className="text-amber-700 text-[12px] font-bold">15 min delivery</Text>
                         </View>
-                        <View className="flex-row items-center gap-1.5 bg-blue-50 px-3 py-2 rounded-xl border border-blue-100">
+                        <View className="flex-row items-center gap-1.5 px-3 py-2 rounded-xl border" style={{ backgroundColor: isDark ? 'rgba(37,99,235,0.15)' : '#eff6ff', borderColor: isDark ? 'rgba(37,99,235,0.3)' : '#dbeafe' }}>
                             <Shield size={14} color="#2563eb" />
                             <Text className="text-blue-700 text-[12px] font-bold">Quality</Text>
                         </View>
@@ -336,29 +338,29 @@ export default function ProductDetailScreen() {
                 </Animated.View>
 
                 {/* ── PRODUCT DETAILS SECTION ── */}
-                <View className="bg-white mt-2 px-5 py-5">
-                    <Text className="text-[16px] font-black text-slate-900 mb-3 tracking-tight">Product Details</Text>
-                    <Text className="text-[14px] text-slate-600 leading-[22px]">
+                <View className="mt-2 px-5 py-5" style={{ backgroundColor: colors.surface }}>
+                    <Text style={{ color: colors.primaryText }} className="text-[16px] font-black mb-3 tracking-tight">Product Details</Text>
+                    <Text style={{ color: colors.secondaryText }} className="text-[14px] leading-[22px]">
                         {product.description || 'Premium quality product sourced from trusted suppliers. Delivered fresh to your door in 15 minutes with our quick delivery promise.'}
                     </Text>
 
                     {/* Info grid */}
-                    <View className="flex-row mt-4 pt-4 border-t border-slate-100">
+                    <View className="flex-row mt-4 pt-4 border-t" style={{ borderTopColor: colors.border }}>
                         <View className="flex-1 items-center py-2">
-                            <Text className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Category</Text>
-                            <Text className="text-[13px] font-bold text-slate-700">
+                            <Text style={{ color: colors.tertiaryText }} className="text-[11px] font-bold uppercase tracking-wider mb-1">Category</Text>
+                            <Text style={{ color: colors.primaryText }} className="text-[13px] font-bold">
                                 {typeof product.category === 'object' ? product.category?.name : product.category || 'General'}
                             </Text>
                         </View>
-                        <View className="w-[1px] bg-slate-100" />
+                        <View className="w-[1px]" style={{ backgroundColor: colors.border }} />
                         <View className="flex-1 items-center py-2">
-                            <Text className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Unit</Text>
-                            <Text className="text-[13px] font-bold text-slate-700">{product.quantity || '1 unit'}</Text>
+                            <Text style={{ color: colors.tertiaryText }} className="text-[11px] font-bold uppercase tracking-wider mb-1">Unit</Text>
+                            <Text style={{ color: colors.primaryText }} className="text-[13px] font-bold">{product.quantity || '1 unit'}</Text>
                         </View>
-                        <View className="w-[1px] bg-slate-100" />
+                        <View className="w-[1px]" style={{ backgroundColor: colors.border }} />
                         <View className="flex-1 items-center py-2">
-                            <Text className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</Text>
-                            <Text className={`text-[13px] font-bold ${isOutOfStock ? 'text-red-500' : 'text-emerald-600'}`}>
+                            <Text style={{ color: colors.tertiaryText }} className="text-[11px] font-bold uppercase tracking-wider mb-1">Status</Text>
+                            <Text className={`text-[13px] font-bold`} style={{ color: isOutOfStock ? colors.danger : colors.success }}>
                                 {isOutOfStock ? 'Unavailable' : 'In Stock'}
                             </Text>
                         </View>
@@ -369,53 +371,55 @@ export default function ProductDetailScreen() {
                 {shop && (
                     <TouchableOpacity
                         onPress={() => router.push(`/shop/${shopId}` as any)}
-                        className="bg-white mt-2 mx-0 px-5 py-4 flex-row items-center"
+                        className="mt-2 mx-0 px-5 py-4 flex-row items-center"
+                        style={{ backgroundColor: colors.surface }}
                         activeOpacity={0.7}
                     >
-                        <View className="w-12 h-12 rounded-2xl bg-slate-100 items-center justify-center mr-3 overflow-hidden">
+                        <View className="w-12 h-12 rounded-2xl items-center justify-center mr-3 overflow-hidden" style={{ backgroundColor: isDark ? colors.elevated : '#f1f5f9' }}>
                             {shop.image ? (
                                 <Image source={{ uri: getImageUrl(shop.image) }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                             ) : (
-                                <Store size={22} color="#64748b" />
+                                <Store size={22} color={colors.iconMuted} />
                             )}
                         </View>
                         <View className="flex-1">
-                            <Text className="text-[15px] font-black text-slate-900 tracking-tight">{shop.name}</Text>
+                            <Text style={{ color: colors.primaryText }} className="text-[15px] font-black tracking-tight">{shop.name}</Text>
                             <View className="flex-row items-center gap-2 mt-0.5">
                                 <View className={`w-1.5 h-1.5 rounded-full ${shop.isOpen !== false ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                                <Text className="text-[12px] font-semibold text-slate-500">
+                                <Text style={{ color: colors.secondaryText }} className="text-[12px] font-semibold">
                                     {shop.isOpen !== false ? 'Open now' : 'Closed'}
                                 </Text>
                                 {shop.rating && (
                                     <>
-                                        <Text className="text-slate-300">•</Text>
+                                        <Text style={{ color: colors.tertiaryText }}>•</Text>
                                         <View className="flex-row items-center gap-0.5">
                                             <Star size={11} color="#fbbf24" fill="#fbbf24" />
-                                            <Text className="text-[12px] font-bold text-slate-600">{shop.rating}</Text>
+                                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold">{shop.rating}</Text>
                                         </View>
                                     </>
                                 )}
                             </View>
                         </View>
-                        <View className="bg-slate-100 w-8 h-8 rounded-full items-center justify-center">
-                            <ChevronRight size={16} color="#64748b" />
+                        <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: isDark ? colors.elevated : '#f1f5f9' }}>
+                            <ChevronRight size={16} color={colors.icon} />
                         </View>
                     </TouchableOpacity>
                 )}
 
                 {/* ── MORE FROM THIS STORE ── */}
                 {similarProducts.length > 0 && (
-                    <View className="mt-2 bg-white pt-5 pb-6">
+                    <View className="mt-2 pt-5 pb-6" style={{ backgroundColor: colors.surface }}>
                         <View className="px-5 mb-4 flex-row items-center justify-between">
                             <View>
-                                <Text className="text-[16px] font-black text-slate-900 tracking-tight">More from this store</Text>
-                                <Text className="text-[12px] font-medium text-slate-400 mt-0.5">{similarProducts.length} similar products</Text>
+                                <Text style={{ color: colors.primaryText }} className="text-[16px] font-black tracking-tight">More from this store</Text>
+                                <Text style={{ color: colors.tertiaryText }} className="text-[12px] font-medium mt-0.5">{similarProducts.length} similar products</Text>
                             </View>
                             <TouchableOpacity
                                 onPress={() => router.push(`/shop/${shopId}` as any)}
-                                className="bg-slate-100 px-3 py-1.5 rounded-full"
+                                className="px-3 py-1.5 rounded-full"
+                                style={{ backgroundColor: isDark ? colors.elevated : '#f1f5f9' }}
                             >
-                                <Text className="text-[12px] font-bold text-slate-700">View All</Text>
+                                <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold">View All</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -466,35 +470,36 @@ export default function ProductDetailScreen() {
 }
 
 /* ── SKELETON LOADER ── */
-const SkeletonBlock = ({ className, style }: any) => {
+const SkeletonBlock = ({ className, style, isDark }: any) => {
     const opacity = useSharedValue(0.4);
     useEffect(() => {
         opacity.value = withRepeat(withTiming(1, { duration: 800 }), -1, true);
     }, []);
     const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
-    return <Animated.View className={`bg-slate-200 ${className}`} style={[style, animatedStyle]} />;
+    return <Animated.View className={`${className}`} style={[{ backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }, style, animatedStyle]} />;
 };
 
 function ProductSkeleton() {
+    const { colors, isDark } = useTheme();
     return (
-        <View className="flex-1 bg-white">
-            <SkeletonBlock className="w-full" style={{ height: IMAGE_HEIGHT }} />
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+            <SkeletonBlock isDark={isDark} className="w-full" style={{ height: IMAGE_HEIGHT }} />
             <View className="px-5 pt-6">
-                <SkeletonBlock className="w-3/4 h-6 rounded-lg mb-2" />
-                <SkeletonBlock className="w-1/3 h-4 rounded-lg mb-5" />
+                <SkeletonBlock isDark={isDark} className="w-3/4 h-6 rounded-lg mb-2" />
+                <SkeletonBlock isDark={isDark} className="w-1/3 h-4 rounded-lg mb-5" />
                 <View className="flex-row justify-between items-end mb-5">
-                    <SkeletonBlock className="w-24 h-8 rounded-lg" />
-                    <SkeletonBlock className="w-28 h-11 rounded-2xl" />
+                    <SkeletonBlock isDark={isDark} className="w-24 h-8 rounded-lg" />
+                    <SkeletonBlock isDark={isDark} className="w-28 h-11 rounded-2xl" />
                 </View>
                 <View className="flex-row gap-2 mb-5">
-                    <SkeletonBlock className="w-28 h-9 rounded-xl" />
-                    <SkeletonBlock className="w-28 h-9 rounded-xl" />
-                    <SkeletonBlock className="w-20 h-9 rounded-xl" />
+                    <SkeletonBlock isDark={isDark} className="w-28 h-9 rounded-xl" />
+                    <SkeletonBlock isDark={isDark} className="w-28 h-9 rounded-xl" />
+                    <SkeletonBlock isDark={isDark} className="w-20 h-9 rounded-xl" />
                 </View>
-                <SkeletonBlock className="w-full h-px mb-5" />
-                <SkeletonBlock className="w-1/2 h-5 rounded-lg mb-3" />
-                <SkeletonBlock className="w-full h-4 rounded-lg mb-2" />
-                <SkeletonBlock className="w-4/5 h-4 rounded-lg" />
+                <SkeletonBlock isDark={isDark} className="w-full h-px mb-5" />
+                <SkeletonBlock isDark={isDark} className="w-1/2 h-5 rounded-lg mb-3" />
+                <SkeletonBlock isDark={isDark} className="w-full h-4 rounded-lg mb-2" />
+                <SkeletonBlock isDark={isDark} className="w-4/5 h-4 rounded-lg" />
             </View>
         </View>
     );

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, StatusBar, Alert, ActivityIndicator, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, User, Phone, Mail, Lock, Shield, CheckCircle2, MapPin, Plus, Trash2, Home, Briefcase, Map, AlertTriangle } from 'lucide-react-native';
+import { ArrowLeft, User, Phone, Mail, Lock, Shield, CheckCircle2, MapPin, Plus, Trash2, Home, Briefcase, Map, AlertTriangle, Moon, Sun, Monitor } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme, ThemeMode } from '@/context/ThemeContext';
 import api from '@/api/api';
 import * as SecureStore from 'expo-secure-store';
 import * as Location from 'expo-location';
@@ -11,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 export default function SettingsScreen() {
     const router = useRouter();
     const { user, login } = useAuth();
+    const { colors, isDark, mode, setMode } = useTheme();
     const queryClient = useQueryClient();
     
     const [name, setName] = useState(user?.name || '');
@@ -152,20 +154,21 @@ export default function SettingsScreen() {
     };
 
     return (
-        <View className="flex-1 bg-[#F8FAFC]">
-            <StatusBar barStyle="dark-content" />
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
             
             {/* Header */}
-            <View className="bg-white pt-16 px-5 pb-4 shadow-sm relative z-10 border-b border-slate-100">
+            <View className="pt-16 px-5 pb-4 shadow-sm relative z-10 border-b" style={{ backgroundColor: colors.surface, borderBottomColor: colors.border }}>
                 <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-4">
                         <TouchableOpacity 
                             onPress={() => router.back()} 
-                            className="w-10 h-10 rounded-full bg-slate-50 items-center justify-center border border-slate-100"
+                            className="w-10 h-10 rounded-full items-center justify-center border"
+                            style={{ backgroundColor: isDark ? colors.elevated : '#f8fafc', borderColor: colors.border }}
                         >
-                            <ArrowLeft size={20} color="#0f172a" />
+                            <ArrowLeft size={20} color={colors.icon} />
                         </TouchableOpacity>
-                        <Text className="text-[20px] font-black text-slate-900 tracking-tight">Account Settings</Text>
+                        <Text style={{ color: colors.primaryText }} className="text-[20px] font-black tracking-tight">Account Settings</Text>
                     </View>
                 </View>
             </View>
@@ -174,54 +177,57 @@ export default function SettingsScreen() {
                 
                 {/* Personal Information */}
                 <View className="mb-8">
-                    <Text className="text-[13px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-3">Personal Details</Text>
+                    <Text style={{ color: colors.tertiaryText }} className="text-[13px] font-black uppercase tracking-widest ml-1 mb-3">Personal Details</Text>
                     
-                    <View className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+                    <View className="rounded-3xl shadow-sm border p-5" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
                         <View className="mb-5">
-                            <Text className="text-[12px] font-bold text-slate-500 mb-2 ml-1">Full Name</Text>
-                            <View className="bg-slate-50 border border-slate-200 rounded-2xl px-4 h-14 flex-row items-center gap-3">
-                                <User size={18} color="#64748b" />
+                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-2 ml-1">Full Name</Text>
+                            <View className="border rounded-2xl px-4 h-14 flex-row items-center gap-3" style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }}>
+                                <User size={18} color={colors.iconMuted} />
                                 <TextInput 
-                                    className="flex-1 text-[15px] font-bold text-slate-900 h-full"
+                                    className="flex-1 text-[15px] font-bold h-full"
+                                    style={{ color: colors.inputText }}
                                     value={name}
                                     onChangeText={setName}
                                     placeholder="Enter your name"
-                                    placeholderTextColor="#cbd5e1"
+                                    placeholderTextColor={colors.placeholder}
                                 />
                             </View>
                         </View>
 
                         <View className="mb-5">
-                            <Text className="text-[12px] font-bold text-slate-500 mb-2 ml-1">Phone Number</Text>
-                            <View className="bg-slate-50 border border-slate-200 rounded-2xl px-4 h-14 flex-row items-center gap-3">
-                                <Phone size={18} color="#64748b" />
+                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-2 ml-1">Phone Number</Text>
+                            <View className="border rounded-2xl px-4 h-14 flex-row items-center gap-3" style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }}>
+                                <Phone size={18} color={colors.iconMuted} />
                                 <TextInput 
-                                    className="flex-1 text-[15px] font-bold text-slate-900 h-full"
+                                    className="flex-1 text-[15px] font-bold h-full"
+                                    style={{ color: colors.inputText }}
                                     value={phone}
                                     onChangeText={setPhone}
                                     placeholder="Enter your phone number"
-                                    placeholderTextColor="#cbd5e1"
+                                    placeholderTextColor={colors.placeholder}
                                     keyboardType="phone-pad"
                                 />
                                 {user?.phone ? (
-                                    <Shield size={16} color="#10b981" />
+                                    <Shield size={16} color={colors.success} />
                                 ) : null}
                             </View>
-                            <Text className="text-[11px] font-semibold text-slate-400 mt-2 ml-1">
+                            <Text style={{ color: colors.tertiaryText }} className="text-[11px] font-semibold mt-2 ml-1">
                                 We will use this number to contact you during delivery.
                             </Text>
                         </View>
 
                         <View className="mb-6">
-                            <Text className="text-[12px] font-bold text-slate-500 mb-2 ml-1">Email Address</Text>
-                            <View className="bg-slate-50 border border-slate-200 rounded-2xl px-4 h-14 flex-row items-center gap-3">
-                                <Mail size={18} color="#64748b" />
+                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-2 ml-1">Email Address</Text>
+                            <View className="border rounded-2xl px-4 h-14 flex-row items-center gap-3" style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }}>
+                                <Mail size={18} color={colors.iconMuted} />
                                 <TextInput 
-                                    className="flex-1 text-[15px] font-bold text-slate-900 h-full"
+                                    className="flex-1 text-[15px] font-bold h-full"
+                                    style={{ color: colors.inputText }}
                                     value={email}
                                     onChangeText={setEmail}
                                     placeholder="Enter your email"
-                                    placeholderTextColor="#cbd5e1"
+                                    placeholderTextColor={colors.placeholder}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                 />
@@ -231,14 +237,15 @@ export default function SettingsScreen() {
                         <TouchableOpacity 
                             onPress={handleSaveProfile}
                             disabled={isSaving}
-                            className={`h-14 rounded-2xl flex-row items-center justify-center shadow-sm gap-2 ${isSaving ? 'bg-slate-700' : 'bg-slate-900'}`}
+                            className={`h-14 rounded-2xl flex-row items-center justify-center shadow-sm gap-2`}
+                            style={{ backgroundColor: isSaving ? colors.disabled : colors.primaryText }}
                         >
                             {isSaving ? (
-                                <ActivityIndicator size="small" color="#fff" />
+                                <ActivityIndicator size="small" color={colors.invertedText} />
                             ) : (
                                 <>
-                                    <CheckCircle2 size={18} color="#fff" />
-                                    <Text className="text-white font-black text-[15px]">Save Profile</Text>
+                                    <CheckCircle2 size={18} color={colors.invertedText} />
+                                    <Text className="font-black text-[15px]" style={{ color: colors.invertedText }}>Save Profile</Text>
                                 </>
                             )}
                         </TouchableOpacity>
@@ -248,41 +255,42 @@ export default function SettingsScreen() {
                 {/* Saved Locations */}
                 <View className="mb-8">
                     <View className="flex-row items-center justify-between mb-3 px-1">
-                        <Text className="text-[13px] font-black text-slate-400 uppercase tracking-widest">Saved Addresses</Text>
+                        <Text style={{ color: colors.tertiaryText }} className="text-[13px] font-black uppercase tracking-widest">Saved Addresses</Text>
                     </View>
                     
-                    <View className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4">
+                    <View className="rounded-3xl shadow-sm border p-4" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
                         {isLoadingLocations ? (
                             <View className="py-8 items-center justify-center">
-                                <ActivityIndicator size="small" color="#fbbf24" />
+                                <ActivityIndicator size="small" color={colors.accent} />
                             </View>
                         ) : savedLocations.length === 0 ? (
                             <View className="py-6 items-center justify-center">
-                                <Map size={32} color="#cbd5e1" />
-                                <Text className="text-[14px] font-bold text-slate-500 mt-3 mb-1">No saved addresses</Text>
-                                <Text className="text-[12px] font-medium text-slate-400">Add an address for faster checkout</Text>
+                                <Map size={32} color={colors.iconMuted} />
+                                <Text style={{ color: colors.secondaryText }} className="text-[14px] font-bold mt-3 mb-1">No saved addresses</Text>
+                                <Text style={{ color: colors.tertiaryText }} className="text-[12px] font-medium">Add an address for faster checkout</Text>
                             </View>
                         ) : (
                             savedLocations.map((loc: any, idx: number) => (
-                                <View key={loc._id} className={`flex-row items-start justify-between py-4 ${idx !== savedLocations.length - 1 ? 'border-b border-slate-100' : ''}`}>
+                                <View key={loc._id} className={`flex-row items-start justify-between py-4 ${idx !== savedLocations.length - 1 ? 'border-b' : ''}`} style={{ borderBottomColor: colors.border }}>
                                     <View className="flex-row items-start gap-3 flex-1 pr-4">
-                                        <View className="w-10 h-10 bg-slate-50 rounded-full items-center justify-center border border-slate-100">
+                                        <View className="w-10 h-10 rounded-full items-center justify-center border" style={{ backgroundColor: isDark ? colors.elevated : '#f8fafc', borderColor: colors.border }}>
                                             {getAddressIcon(loc.name)}
                                         </View>
                                         <View className="flex-1 mt-0.5">
-                                            <Text className="text-[15px] font-black text-slate-900 mb-1">{loc.name}</Text>
-                                            <Text className="text-[13px] font-medium text-slate-500 leading-relaxed">{loc.address}</Text>
+                                            <Text style={{ color: colors.primaryText }} className="text-[15px] font-black mb-1">{loc.name}</Text>
+                                            <Text style={{ color: colors.secondaryText }} className="text-[13px] font-medium leading-relaxed">{loc.address}</Text>
                                         </View>
                                     </View>
                                     <TouchableOpacity 
                                         onPress={() => deleteLocationMutation.mutate(loc._id)}
                                         disabled={deleteLocationMutation.isPending}
-                                        className="w-10 h-10 items-center justify-center bg-rose-50 rounded-full border border-rose-100"
+                                        className="w-10 h-10 items-center justify-center rounded-full border"
+                                        style={{ backgroundColor: colors.dangerMuted, borderColor: isDark ? 'rgba(248,113,113,0.3)' : '#ffe4e6' }}
                                     >
                                         {deleteLocationMutation.isPending ? (
-                                            <ActivityIndicator size="small" color="#e11d48" />
+                                            <ActivityIndicator size="small" color={colors.danger} />
                                         ) : (
-                                            <Trash2 size={16} color="#e11d48" />
+                                            <Trash2 size={16} color={colors.danger} />
                                         )}
                                     </TouchableOpacity>
                                 </View>
@@ -291,33 +299,66 @@ export default function SettingsScreen() {
 
                         <TouchableOpacity 
                             onPress={() => setIsAddressModalVisible(true)}
-                            className="mt-2 h-14 rounded-2xl flex-row items-center justify-center bg-amber-50 border border-amber-200 border-dashed gap-2"
+                            className="mt-2 h-14 rounded-2xl flex-row items-center justify-center border border-dashed gap-2"
+                            style={{ backgroundColor: colors.accentMuted, borderColor: isDark ? colors.accent : '#fcd34d' }}
                         >
-                            <Plus size={20} color="#d97706" />
-                            <Text className="text-amber-700 font-black text-[15px]">Add New Address</Text>
+                            <Plus size={20} color={colors.accent} />
+                            <Text style={{ color: colors.accentText }} className="font-black text-[15px]">Add New Address</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+
+                {/* Theme Preference */}
+                <View className="mb-8">
+                    <Text style={{ color: colors.tertiaryText }} className="text-[13px] font-black uppercase tracking-widest ml-1 mb-3">Theme</Text>
+                    <View className="rounded-3xl shadow-sm border p-4 flex-row justify-between gap-3" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+                        {(['light', 'dark', 'system'] as ThemeMode[]).map((m) => {
+                            const isSelected = mode === m;
+                            return (
+                                <TouchableOpacity
+                                    key={m}
+                                    onPress={() => setMode(m)}
+                                    style={{
+                                        backgroundColor: isSelected ? (isDark ? colors.elevated : colors.primaryText) : 'transparent',
+                                        borderColor: isSelected ? 'transparent' : colors.border
+                                    }}
+                                    className={`flex-1 py-3 rounded-2xl items-center border ${isSelected ? 'shadow-sm' : ''}`}
+                                >
+                                    {m === 'light' && <Sun size={20} color={isSelected ? colors.invertedText : colors.icon} />}
+                                    {m === 'dark' && <Moon size={20} color={isSelected ? colors.invertedText : colors.icon} />}
+                                    {m === 'system' && <Monitor size={20} color={isSelected ? colors.invertedText : colors.icon} />}
+                                    <Text 
+                                        className="text-[13px] font-bold mt-2 capitalize" 
+                                        style={{ color: isSelected ? colors.invertedText : colors.secondaryText }}
+                                    >
+                                        {m}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
                     </View>
                 </View>
 
                 {/* Danger Zone */}
                 <View className="mb-12">
-                    <Text className="text-[13px] font-black text-rose-300 uppercase tracking-widest ml-1 mb-3">Danger Zone</Text>
+                    <Text style={{ color: colors.danger }} className="text-[13px] font-black uppercase tracking-widest ml-1 mb-3">Danger Zone</Text>
                     
-                    <View className="bg-white rounded-3xl shadow-sm border border-rose-100 p-5">
-                        <Text className="text-[13px] font-bold text-slate-600 mb-4 leading-relaxed">
+                    <View className="rounded-3xl shadow-sm border p-5" style={{ backgroundColor: colors.surface, borderColor: isDark ? 'rgba(248,113,113,0.3)' : '#ffe4e6' }}>
+                        <Text style={{ color: colors.secondaryText }} className="text-[13px] font-bold mb-4 leading-relaxed">
                             Deleting your account is permanent and will remove all your data, orders, and saved addresses.
                         </Text>
                         <TouchableOpacity 
                             onPress={handleDeleteAccount}
                             disabled={isDeleting}
-                            className={`border h-14 rounded-2xl flex-row items-center justify-center gap-2 ${isDeleting ? 'bg-rose-100 border-rose-200' : 'bg-rose-50 border-rose-100'}`}
+                            className={`border h-14 rounded-2xl flex-row items-center justify-center gap-2`}
+                            style={{ backgroundColor: colors.dangerMuted, borderColor: isDark ? 'rgba(248,113,113,0.3)' : '#ffe4e6' }}
                         >
                             {isDeleting ? (
-                                <ActivityIndicator size="small" color="#e11d48" />
+                                <ActivityIndicator size="small" color={colors.danger} />
                             ) : (
                                 <>
-                                    <Lock size={18} color="#e11d48" />
-                                    <Text className="text-rose-600 font-black text-[15px]">Delete Account permanently</Text>
+                                    <Lock size={18} color={colors.danger} />
+                                    <Text style={{ color: colors.danger }} className="font-black text-[15px]">Delete Account permanently</Text>
                                 </>
                             )}
                         </TouchableOpacity>
@@ -332,47 +373,55 @@ export default function SettingsScreen() {
                 visible={isAddressModalVisible}
                 onRequestClose={() => !isGettingLocation && setIsAddressModalVisible(false)}
             >
-                <View className="flex-1 justify-end bg-black/50">
-                    <View className="bg-white rounded-t-3xl p-6 h-[80%]">
+                <View className="flex-1 justify-end" style={{ backgroundColor: colors.overlayStrong }}>
+                    <View className="rounded-t-3xl p-6 h-[80%]" style={{ backgroundColor: colors.surface }}>
                         <View className="flex-row justify-between items-center mb-6">
-                            <Text className="text-[22px] font-black text-slate-900">New Address</Text>
+                            <Text style={{ color: colors.primaryText }} className="text-[22px] font-black">New Address</Text>
                             <TouchableOpacity 
                                 onPress={() => setIsAddressModalVisible(false)}
                                 disabled={isGettingLocation}
-                                className="w-8 h-8 bg-slate-100 rounded-full items-center justify-center"
+                                className="w-8 h-8 rounded-full items-center justify-center"
+                                style={{ backgroundColor: isDark ? colors.elevated : '#f1f5f9' }}
                             >
-                                <Text className="font-bold text-slate-600">✕</Text>
+                                <Text style={{ color: colors.icon }} className="font-bold">✕</Text>
                             </TouchableOpacity>
                         </View>
 
-                        <View className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex-row items-start gap-3 mb-6">
-                            <AlertTriangle size={20} color="#d97706" className="mt-0.5" />
+                        <View className="border rounded-2xl p-4 flex-row items-start gap-3 mb-6" style={{ backgroundColor: colors.warningMuted, borderColor: isDark ? 'rgba(251,191,36,0.3)' : '#fde68a' }}>
+                            <AlertTriangle size={20} color={colors.warning} className="mt-0.5" />
                             <View className="flex-1">
-                                <Text className="text-[14px] font-black text-amber-900 mb-1">Important Note</Text>
-                                <Text className="text-[13px] font-medium text-amber-800 leading-relaxed">
+                                <Text className="text-[14px] font-black mb-1" style={{ color: isDark ? colors.warning : '#78350f' }}>Important Note</Text>
+                                <Text className="text-[13px] font-medium leading-relaxed" style={{ color: isDark ? '#fde68a' : '#92400e' }}>
                                     We will securely capture your <Text className="font-bold">current GPS location</Text> when you save this address. Please ensure you are physically at this address right now, so our delivery partners can find you easily.
                                 </Text>
                             </View>
                         </View>
 
-                        <Text className="text-[13px] font-bold text-slate-500 mb-2 ml-1">Save as</Text>
+                        <Text style={{ color: colors.secondaryText }} className="text-[13px] font-bold mb-2 ml-1">Save as</Text>
                         <View className="flex-row gap-3 mb-6">
-                            {['Home', 'Office', 'Other'].map(type => (
+                            {['Home', 'Office', 'Other'].map(type => {
+                                const isSelected = newAddressType === type;
+                                return (
                                 <TouchableOpacity 
                                     key={type}
                                     onPress={() => setNewAddressType(type)}
-                                    className={`flex-1 py-3 rounded-xl items-center border ${newAddressType === type ? 'bg-slate-900 border-slate-900' : 'bg-white border-slate-200'}`}
+                                    className={`flex-1 py-3 rounded-xl items-center border`}
+                                    style={{ 
+                                        backgroundColor: isSelected ? (isDark ? colors.elevated : colors.primaryText) : 'transparent',
+                                        borderColor: isSelected ? 'transparent' : colors.border
+                                    }}
                                 >
-                                    <Text className={`font-bold text-[14px] ${newAddressType === type ? 'text-white' : 'text-slate-600'}`}>{type}</Text>
+                                    <Text className="font-bold text-[14px]" style={{ color: isSelected ? colors.invertedText : colors.secondaryText }}>{type}</Text>
                                 </TouchableOpacity>
-                            ))}
+                            )})}
                         </View>
 
-                        <Text className="text-[13px] font-bold text-slate-500 mb-2 ml-1">Full Address details</Text>
+                        <Text style={{ color: colors.secondaryText }} className="text-[13px] font-bold mb-2 ml-1">Full Address details</Text>
                         <TextInput
-                            className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[15px] font-medium text-slate-900 h-32 mb-6"
+                            className="border rounded-2xl p-4 text-[15px] font-medium h-32 mb-6"
+                            style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
                             placeholder="House No, Building Name, Landmark, Area..."
-                            placeholderTextColor="#94a3b8"
+                            placeholderTextColor={colors.placeholder}
                             multiline
                             textAlignVertical="top"
                             value={newAddressText}
@@ -382,17 +431,18 @@ export default function SettingsScreen() {
                         <TouchableOpacity 
                             onPress={handleSaveNewAddress}
                             disabled={isGettingLocation}
-                            className={`h-14 rounded-2xl flex-row items-center justify-center shadow-sm gap-2 mt-auto ${isGettingLocation ? 'bg-slate-700' : 'bg-amber-500'}`}
+                            className={`h-14 rounded-2xl flex-row items-center justify-center shadow-sm gap-2 mt-auto`}
+                            style={{ backgroundColor: isGettingLocation ? colors.disabled : colors.accent }}
                         >
                             {isGettingLocation ? (
                                 <>
-                                    <ActivityIndicator size="small" color="#fff" />
-                                    <Text className="text-white font-black text-[15px]">Fetching Location & Saving...</Text>
+                                    <ActivityIndicator size="small" color={colors.invertedText} />
+                                    <Text className="font-black text-[15px]" style={{ color: colors.invertedText }}>Fetching Location & Saving...</Text>
                                 </>
                             ) : (
                                 <>
-                                    <MapPin size={18} color="#78350f" />
-                                    <Text className="text-amber-950 font-black text-[15px]">Save & Pin My GPS Location</Text>
+                                    <MapPin size={18} color={colors.accentText} />
+                                    <Text className="font-black text-[15px]" style={{ color: colors.accentText }}>Save & Pin My GPS Location</Text>
                                 </>
                             )}
                         </TouchableOpacity>

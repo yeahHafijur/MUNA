@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Search as SearchIcon, ArrowLeft, Store, Clock } from 'lucide-react-native';
 import { useCart } from '@/context/CartContext';
+import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
 
@@ -40,6 +41,7 @@ export default function SearchScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { cartItems, addToCart, overrideAndReplaceCart, updateQuantity, removeFromCart } = useCart();
+    const { colors, isDark } = useTheme();
     const inputRef = useRef<TextInput>(null);
 
     const [query, setQuery] = useState(params.q ? String(params.q) : '');
@@ -87,15 +89,16 @@ export default function SearchScreen() {
                 <View className="pt-2">
                     {/* Trending Searches */}
                     <View className="mb-6">
-                        <Text className="text-[14px] font-black text-slate-900 mb-3 px-1">Trending Searches</Text>
+                        <Text style={{ color: colors.primaryText }} className="text-[14px] font-black mb-3 px-1">Trending Searches</Text>
                         <View className="flex-row flex-wrap gap-2">
                             {['Milk & Bread', 'Fresh Vegetables', 'Maggi', 'Cold Drinks', 'Chicken', 'Eggs', 'Snacks'].map((item, idx) => (
                                 <TouchableOpacity 
                                     key={idx}
                                     onPress={() => setQuery(item)}
-                                    className="bg-white border border-slate-200 px-4 py-2 rounded-full shadow-sm"
+                                    style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
+                                    className="px-4 py-2 rounded-full shadow-sm"
                                 >
-                                    <Text className="text-[13px] font-bold text-slate-700">{item}</Text>
+                                    <Text style={{ color: colors.secondaryText }} className="text-[13px] font-bold">{item}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
@@ -103,7 +106,7 @@ export default function SearchScreen() {
 
                     {/* Popular Categories */}
                     <View>
-                        <Text className="text-[14px] font-black text-slate-900 mb-3 px-1">Explore Categories</Text>
+                        <Text style={{ color: colors.primaryText }} className="text-[14px] font-black mb-3 px-1">Explore Categories</Text>
                         <View className="flex-row flex-wrap justify-between gap-y-3">
                             {[
                                 { icon: '🥦', name: 'Vegetables' },
@@ -116,10 +119,11 @@ export default function SearchScreen() {
                                 <TouchableOpacity 
                                     key={idx}
                                     onPress={() => setQuery(cat.name)}
-                                    className="w-[31%] bg-white border border-slate-100 rounded-2xl p-3 items-center shadow-sm"
+                                    style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
+                                    className="w-[31%] rounded-2xl p-3 items-center shadow-sm"
                                 >
                                     <Text className="text-3xl mb-2">{cat.icon}</Text>
-                                    <Text className="text-[11px] font-bold text-slate-700 text-center">{cat.name}</Text>
+                                    <Text style={{ color: colors.secondaryText }} className="text-[11px] font-bold text-center">{cat.name}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
@@ -127,38 +131,39 @@ export default function SearchScreen() {
 
                     <View className="items-center justify-center pt-10 opacity-40">
                         <Text className="text-4xl mb-2">🛒</Text>
-                        <Text className="text-[12px] font-bold text-slate-500 text-center">
+                        <Text style={{ color: colors.tertiaryText }} className="text-[12px] font-bold text-center">
                             Type to find products & stores
                         </Text>
                     </View>
                 </View>
             ) : isLoading ? (
                 <View className="items-center justify-center pt-12">
-                    <ActivityIndicator size="large" color="#fbbf24" />
+                    <ActivityIndicator size="large" color={colors.accent} />
                 </View>
             ) : (
                 <View className="gap-6 mb-4">
                     {/* SHOPS SECTION */}
                     {searchResults?.shops?.length > 0 && (
                         <View>
-                            <Text className="text-[15px] font-black text-slate-900 mb-3">Stores</Text>
+                            <Text style={{ color: colors.primaryText }} className="text-[15px] font-black mb-3">Stores</Text>
                             <View className="gap-3">
                                 {searchResults.shops.map((shop: any) => (
                                     <TouchableOpacity
                                         key={shop._id}
                                         onPress={() => router.push(`/shop/${shop._id}`)}
-                                        className="bg-white p-3 rounded-xl border border-slate-100 flex-row items-center shadow-sm"
+                                        style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
+                                        className="p-3 rounded-xl flex-row items-center shadow-sm"
                                     >
                                         <View className="w-12 h-12 bg-amber-50 rounded-lg items-center justify-center mr-3">
                                             <Store size={24} color="#d97706" />
                                         </View>
                                         <View className="flex-1">
-                                            <Text className="text-[15px] font-bold text-slate-900">{shop.name}</Text>
-                                            <Text className="text-[12px] text-slate-500">{shop.category || 'Grocery'}</Text>
+                                            <Text style={{ color: colors.primaryText }} className="text-[15px] font-bold">{shop.name}</Text>
+                                            <Text style={{ color: colors.secondaryText }} className="text-[12px]">{shop.category || 'Grocery'}</Text>
                                         </View>
-                                        <View className="bg-slate-50 px-2 py-1 rounded flex-row items-center">
-                                            <Clock size={12} color="#64748b" />
-                                            <Text className="text-[10px] font-bold text-slate-600 ml-1">15 min</Text>
+                                        <View style={{ backgroundColor: isDark ? colors.elevated : '#f8fafc' }} className="px-2 py-1 rounded flex-row items-center">
+                                            <Clock size={12} color={colors.iconMuted} />
+                                            <Text style={{ color: colors.secondaryText }} className="text-[10px] font-bold ml-1">15 min</Text>
                                         </View>
                                     </TouchableOpacity>
                                 ))}
@@ -168,7 +173,7 @@ export default function SearchScreen() {
 
                     {/* PRODUCTS SECTION TITLE */}
                     {searchResults?.products?.length > 0 && (
-                        <Text className="text-[15px] font-black text-slate-900">Products</Text>
+                        <Text style={{ color: colors.primaryText }} className="text-[15px] font-black">Products</Text>
                     )}
                 </View>
             )}
@@ -180,8 +185,8 @@ export default function SearchScreen() {
             return (
                 <View className="items-center justify-center pt-16">
                     <Text className="text-5xl mb-3">🔍</Text>
-                    <Text className="text-[15px] font-black text-slate-600">No results found</Text>
-                    <Text className="text-[13px] font-medium text-slate-400 text-center mt-1">
+                    <Text style={{ color: colors.secondaryText }} className="text-[15px] font-black">No results found</Text>
+                    <Text style={{ color: colors.tertiaryText }} className="text-[13px] font-medium text-center mt-1">
                         Try checking for typos or using more general terms
                     </Text>
                 </View>
@@ -191,26 +196,33 @@ export default function SearchScreen() {
     };
 
     return (
-        <View className="flex-1 bg-white">
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
             {/* Header / Search Bar */}
-            <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-3 shadow-sm flex-row items-center gap-3 z-10">
+            <View 
+                style={{ backgroundColor: colors.surface, borderBottomColor: colors.border, borderBottomWidth: 1 }} 
+                className="pt-12 px-4 pb-3 shadow-sm flex-row items-center gap-3 z-10"
+            >
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
-                    <ArrowLeft size={24} color="#0f172a" />
+                    <ArrowLeft size={24} color={colors.icon} />
                 </TouchableOpacity>
-                <View className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 h-11 flex-row items-center gap-2">
-                    <SearchIcon size={18} color="#94a3b8" />
+                <View 
+                    style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, borderWidth: 1 }} 
+                    className="flex-1 rounded-xl px-3 h-11 flex-row items-center gap-2"
+                >
+                    <SearchIcon size={18} color={colors.iconMuted} />
                     <TextInput
                         ref={inputRef}
-                        className="flex-1 text-[15px] font-medium text-slate-900 h-full"
+                        style={{ color: colors.inputText }}
+                        className="flex-1 text-[15px] font-medium h-full"
                         placeholder="Search for groceries, veggies..."
-                        placeholderTextColor="#94a3b8"
+                        placeholderTextColor={colors.placeholder}
                         value={query}
                         onChangeText={setQuery}
                         autoFocus
                     />
                     {query.length > 0 && (
                         <TouchableOpacity onPress={() => setQuery('')} className="p-1">
-                            <Text className="text-slate-400 font-bold text-xs">✕</Text>
+                            <Text style={{ color: colors.iconMuted }} className="font-bold text-xs">✕</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -218,7 +230,8 @@ export default function SearchScreen() {
 
             {/* Main Content */}
             <FlatList 
-                className="flex-1 bg-slate-50"
+                className="flex-1"
+                style={{ backgroundColor: colors.background }}
                 keyboardShouldPersistTaps="handled"
                 data={(!debouncedQuery || isLoading) ? [] : (searchResults?.products || [])}
                 keyExtractor={(item) => item._id.toString()}

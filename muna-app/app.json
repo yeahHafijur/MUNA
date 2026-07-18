@@ -58,13 +58,6 @@
         {
           "locationWhenInUsePermission": "MUNA needs your location to show you nearby stores and daily market listings."
         }
-      ],
-      [
-        "@sentry/react-native/expo",
-        {
-          "organization": "muna",
-          "project": "muna"
-        }
       ]
     ],
     "experiments": {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { memo, useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';

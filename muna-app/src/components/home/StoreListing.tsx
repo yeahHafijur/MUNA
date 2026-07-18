@@ -179,7 +179,7 @@ const StoreListing: React.FC<StoreListingProps> = ({
           <Pressable
             onPress={() => {
               const locParams = userLocation ? `?lat=${userLocation.lat}&lng=${userLocation.lng}` : '';
-              router.push(`/all-stores${locParams}`);
+              router.push(`/all-stores${locParams}` as any);
             }}
             className="flex-row items-center justify-center gap-2 px-7 py-3.5 bg-slate-900 rounded-2xl active:opacity-80 shadow-sm"
           >

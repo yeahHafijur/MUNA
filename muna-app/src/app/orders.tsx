@@ -212,6 +212,17 @@ export default function OrdersScreen() {
                                     </Text>
                                 </View>
 
+                                {/* Instructions */}
+                                {order.instructions ? (
+                                    <View className="mt-3 bg-slate-50 border border-slate-100 rounded-xl p-3 flex-row items-start gap-2 shadow-sm">
+                                        <Text className="text-[14px] mt-0.5">💬</Text>
+                                        <View className="flex-1">
+                                            <Text className="text-slate-500 font-black text-[11px] uppercase tracking-wider mb-0.5">Your Instructions</Text>
+                                            <Text className="text-slate-800 font-medium text-[13px]">{order.instructions}</Text>
+                                        </View>
+                                    </View>
+                                ) : null}
+
                                 {/* Delivery OTP */}
                                 {(order.status === 'pending' || order.status === 'accepted' || order.status === 'preparing' || order.status === 'out_for_delivery') && order.deliveryOtp && (
                                     <View className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 flex-row items-center justify-between shadow-sm">

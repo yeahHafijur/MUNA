@@ -3,11 +3,14 @@ const Shop = require('../models/Shop');
 const Product = require('../models/Product');
 
 // Get all item categories for a shop (Public)
-// Returns: only this shop's custom categories
+// Returns: global categories + this shop's custom categories
 const getCategoriesByShop = async (req, res) => {
     try {
         const categories = await ItemCategory.find({
-            shopId: req.params.shopId
+            $or: [
+                { shopId: req.params.shopId },
+                { isGlobal: true }
+            ]
         }).sort({ sortOrder: 1, name: 1 }).lean();
         res.status(200).json(categories);
     } catch (error) {

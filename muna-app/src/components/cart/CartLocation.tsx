@@ -171,6 +171,57 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
                         </View>
                     )}
 
+                    {/* Quick GPS Location Button */}
+                    <TouchableOpacity 
+                        onPress={async () => {
+                            setLocating(true);
+                            try {
+                                const { status } = await Location.requestForegroundPermissionsAsync();
+                                if (status !== 'granted') {
+                                    Alert.alert('Permission denied', 'Allow location access in settings to deliver to your location.');
+                                    return;
+                                }
+                                const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+                                
+                                const addresses = await Location.reverseGeocodeAsync({
+                                    latitude: location.coords.latitude,
+                                    longitude: location.coords.longitude,
+                                });
+                                const address = addresses[0];
+                                const label = address ? [address.name, address.district || address.city, address.region].filter(Boolean).join(', ') : 'Current GPS Location';
+                                
+                                onLocationDetermined({
+                                    name: 'Current Location',
+                                    address: label,
+                                    lat: location.coords.latitude,
+                                    lng: location.coords.longitude
+                                });
+                                setSelectedAddressId('current-gps');
+                            } catch (error) {
+                                Alert.alert('Location Error', 'Could not fetch location. Please try again.');
+                            } finally {
+                                setLocating(false);
+                            }
+                        }}
+                        disabled={locating}
+                        className={`mb-3 h-14 rounded-2xl flex-row items-center justify-center shadow-sm border ${
+                            selectedAddressId === 'current-gps' 
+                            ? 'bg-amber-50 border-amber-400' 
+                            : 'bg-emerald-50 border-emerald-200'
+                        }`}
+                    >
+                        {locating ? (
+                            <ActivityIndicator size="small" color="#10b981" />
+                        ) : (
+                            <>
+                                <Navigation size={18} color={selectedAddressId === 'current-gps' ? '#b45309' : '#10b981'} className="mr-2" />
+                                <Text className={`font-black text-[15px] ${selectedAddressId === 'current-gps' ? 'text-amber-700' : 'text-emerald-700'}`}>
+                                    {selectedAddressId === 'current-gps' ? 'Current Location Selected ✅' : '📍 Use My Current Location'}
+                                </Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
+
                     {/* Add New Address Button */}
                     <TouchableOpacity 
                         onPress={() => {

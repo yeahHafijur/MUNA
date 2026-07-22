@@ -122,11 +122,16 @@ const createProduct = async (req, res) => {
         }
 
         // Resolve category: prefer categoryId (ObjectId), fallback to string
-        const resolvedCategory = categoryId || category;
+        const resolvedCategory = categoryId || category || "General";
 
         // Check if item already exists in Godown (case-insensitive)
         const MasterProduct = require('../models/MasterProduct');
-        const godownItem = await MasterProduct.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } }).lean();
+        let godownItem = null;
+        if (name && typeof name === 'string') {
+            // Escape regex chars to prevent regex crashes
+            const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            godownItem = await MasterProduct.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } }).lean();
+        }
         const status = godownItem ? 'approved' : 'pending';
 
         const product = await Product.create({
@@ -136,13 +141,15 @@ const createProduct = async (req, res) => {
             quantity: quantity || '',
             image,
             gallery: galleryUrls,
-            stock,
+            stock: stock || 0,
             shopId: shop._id,
+            inStock: req.body.inStock !== undefined ? (req.body.inStock === 'true' || req.body.inStock === true) : true,
             approvalStatus: status
         });
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({ message: "Server error" });
+        console.error("Create Product Error:", error);
+        res.status(500).json({ message: error.message || "Server error while creating product" });
     }
 };
 

@@ -103,7 +103,7 @@ export default function CartScreen() {
         }
         setSavingPhone(true);
         try {
-            const res = await api.put('/api/users/profile', { 
+            const res = await api.put('/api/user/profile', { 
                 name: user.name || 'User', 
                 phone: phoneNumber.replace(/\D/g, '') 
             });

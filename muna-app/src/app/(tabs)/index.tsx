@@ -248,7 +248,8 @@ export default function HomeScreen() {
           {/* CURATED COLLECTIONS */}
           <CuratedCollections featuredProducts={featuredProducts} />
 
-          {/* SHOP BY CATEGORY */}
+          {/* SHOP BY CATEGORY (Temporarily Hidden) */}
+          {/* 
           <View className="mt-2">
             <ShopByCategory
               categoryList={categoryList}
@@ -258,7 +259,8 @@ export default function HomeScreen() {
               setShowAllCategories={setShowAllCategories}
               userLocation={userLocation}
             />
-          </View>
+          </View> 
+          */}
 
           {/* QUICK DELIVERY */}
           <View className="mt-2 bg-white">

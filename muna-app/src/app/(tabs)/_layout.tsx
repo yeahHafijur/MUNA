@@ -3,12 +3,10 @@ import { Tabs } from 'expo-router';
 import { Home, Search, ShoppingBag, UserRound } from 'lucide-react-native';
 
 import { useCart } from '@/context/CartContext';
-import { useTheme } from '@/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { cartItems } = useCart();
-  const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
@@ -17,43 +15,25 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        tabBarActiveTintColor: colors.tabActive,
-        tabBarInactiveTintColor: colors.tabInactive,
+        tabBarActiveTintColor: '#f59e0b', // amber-500
+        tabBarInactiveTintColor: '#94a3b8',
         tabBarStyle: [
+          styles.tabBar,
           {
-            paddingTop: 7,
-            paddingHorizontal: 8,
-            backgroundColor: colors.tabBar,
-            borderTopWidth: 1,
-            borderTopColor: colors.tabBarBorder,
-            elevation: 10,
-            shadowColor: colors.shadow,
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: isDark ? 0 : 0.05,
-            shadowRadius: 10,
             height: (Platform.OS === 'ios' ? 86 : 65) + insets.bottom,
             paddingBottom: (Platform.OS === 'ios' ? 23 : 8) + insets.bottom,
-          },
+          }
         ],
-        tabBarItemStyle: { marginHorizontal: 3, borderRadius: 16 },
-        tabBarLabelStyle: { fontSize: 10.5, fontWeight: '700', marginTop: 2 },
-        tabBarBadgeStyle: {
-          minWidth: 18,
-          height: 18,
-          borderRadius: 9,
-          fontSize: 9,
-          fontWeight: '900',
-          lineHeight: 17,
-          backgroundColor: colors.badge,
-          color: '#FFFFFF',
-        },
+        tabBarItemStyle: styles.tabItem,
+        tabBarLabelStyle: styles.tabLabel,
+        tabBarBadgeStyle: styles.badge,
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size, focused }) => (
-            <Home size={size} color={color} fill={focused ? (isDark ? '#422006' : '#fef3c7') : 'none'} strokeWidth={2.2} />
+            <Home size={size} color={color} fill={focused ? '#fef3c7' : 'none'} strokeWidth={2.2} />
           ),
         }}
       />
@@ -73,7 +53,7 @@ export default function TabLayout() {
             <ShoppingBag
               size={size}
               color={color}
-              fill={focused ? (isDark ? '#422006' : '#fef3c7') : 'none'}
+              fill={focused ? '#fef3c7' : 'none'}
               strokeWidth={2.2}
             />
           ),
@@ -87,7 +67,7 @@ export default function TabLayout() {
             <UserRound
               size={size}
               color={color}
-              fill={focused ? (isDark ? '#422006' : '#fef3c7') : 'none'}
+              fill={focused ? '#fef3c7' : 'none'}
               strokeWidth={2.2}
             />
           ),
@@ -96,3 +76,30 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    paddingTop: 7,
+    paddingHorizontal: 8,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9', // slate-100
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+  },
+  tabItem: { marginHorizontal: 3, borderRadius: 16 },
+  tabLabel: { fontSize: 10.5, fontWeight: '700', marginTop: 2 },
+  badge: {
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    fontSize: 9,
+    fontWeight: '900',
+    lineHeight: 17,
+    backgroundColor: '#ef4444',
+    color: '#FFFFFF',
+  },
+});

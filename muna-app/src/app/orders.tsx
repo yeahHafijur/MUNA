@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Clock, Package, CheckCircle2, Truck, XCircle } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 import { formatDateTime } from '@/utils/format';
 
@@ -42,7 +41,6 @@ const getStatusIcon = (status: string) => {
 export default function OrdersScreen() {
     const router = useRouter();
     const { token } = useAuth();
-    const { colors, isDark } = useTheme();
     const queryClient = useQueryClient();
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
     const [cancellingId, setCancellingId] = useState<string | null>(null);
@@ -98,44 +96,42 @@ export default function OrdersScreen() {
     const totalSpent = deliveredOrders.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0);
 
     return (
-        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+        <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="pt-12 px-4 pb-4 shadow-sm flex-row items-center gap-3 border-b" style={{ backgroundColor: colors.surface, borderBottomColor: colors.border }}>
+            <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-4 shadow-sm flex-row items-center gap-3">
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
-                    <ArrowLeft size={24} color={colors.icon} />
+                    <ArrowLeft size={24} color="#0f172a" />
                 </TouchableOpacity>
-                <Text style={{ color: colors.primaryText }} className="text-[18px] font-black">Your Orders</Text>
+                <Text className="text-[18px] font-black text-slate-900">Your Orders</Text>
             </View>
 
             {/* Tabs */}
             <View className="flex-row items-center px-4 pt-4 pb-2 gap-3">
                 <TouchableOpacity 
                     onPress={() => setActiveTab('active')}
-                    className={`flex-1 py-2.5 rounded-xl items-center justify-center`}
-                    style={{ backgroundColor: activeTab === 'active' ? colors.accent : (isDark ? colors.elevated : '#f1f5f9') }}
+                    className={`flex-1 py-2.5 rounded-xl items-center justify-center ${activeTab === 'active' ? 'bg-amber-500' : 'bg-slate-200/60'}`}
                 >
-                    <Text className="text-[14px] font-black" style={{ color: activeTab === 'active' ? colors.accentText : colors.secondaryText }}>Active</Text>
+                    <Text className={`text-[14px] font-black ${activeTab === 'active' ? 'text-amber-950' : 'text-slate-500'}`}>Active</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                     onPress={() => setActiveTab('history')}
-                    className={`flex-1 py-2.5 rounded-xl items-center justify-center`}
-                    style={{ backgroundColor: activeTab === 'history' ? colors.accent : (isDark ? colors.elevated : '#f1f5f9') }}
+                    className={`flex-1 py-2.5 rounded-xl items-center justify-center ${activeTab === 'history' ? 'bg-amber-500' : 'bg-slate-200/60'}`}
                 >
-                    <Text className="text-[14px] font-black" style={{ color: activeTab === 'history' ? colors.accentText : colors.secondaryText }}>History</Text>
+                    <Text className={`text-[14px] font-black ${activeTab === 'history' ? 'text-amber-950' : 'text-slate-500'}`}>History</Text>
                 </TouchableOpacity>
             </View>
 
             {isLoading ? (
                 <View className="flex-1 items-center justify-center">
-                    <ActivityIndicator size="large" color={colors.accent} />
+                    <ActivityIndicator size="large" color="#fbbf24" />
                 </View>
             ) : filteredOrders.length === 0 ? (
                 <View className="flex-1 items-center justify-center p-4">
                     <Text className="text-6xl mb-4">{activeTab === 'active' ? '🛵' : '📦'}</Text>
-                    <Text style={{ color: colors.primaryText }} className="text-[18px] font-black mb-2">
+                    <Text className="text-[18px] font-black text-slate-900 mb-2">
                         {activeTab === 'active' ? 'No active orders' : 'No order history'}
                     </Text>
-                    <Text style={{ color: colors.secondaryText }} className="text-[13px] font-medium text-center">
+                    <Text className="text-[13px] font-medium text-slate-500 text-center">
                         {activeTab === 'active' 
                             ? "You don't have any ongoing deliveries right now." 
                             : "Your delivered and cancelled orders will appear here."}
@@ -186,16 +182,15 @@ export default function OrdersScreen() {
                                 key={order._id}
                                 activeOpacity={0.9}
                                 onPress={() => setExpandedOrderId(isExpanded ? null : order._id)}
-                                className={`rounded-3xl p-5 mb-4 shadow-sm border ${isExpanded ? 'shadow-md' : ''}`}
-                                style={{ backgroundColor: colors.surface, borderColor: isExpanded ? colors.accent : colors.border }}
+                                className={`bg-white rounded-3xl p-5 mb-4 shadow-sm border border-slate-100 ${isExpanded ? 'border-amber-200 shadow-md' : ''}`}
                             >
                                 {/* Order Header */}
                                 <View className="flex-row items-start justify-between mb-3">
                                     <View className="flex-1 pr-3">
-                                        <Text style={{ color: colors.primaryText }} className="text-[15px] font-black mb-0.5" numberOfLines={1}>
+                                        <Text className="text-[15px] font-black text-slate-900 mb-0.5" numberOfLines={1}>
                                             {order.shopId?.name || 'MUNA Store'}
                                         </Text>
-                                        <Text style={{ color: colors.tertiaryText }} className="text-[11px] font-bold">
+                                        <Text className="text-[11px] font-bold text-slate-400">
                                             {formatDateTime(order.createdAt)}
                                         </Text>
                                     </View>
@@ -209,72 +204,71 @@ export default function OrdersScreen() {
 
                                 {/* Order Summary */}
                                 <View className="flex-row items-center justify-between mt-2">
-                                    <Text style={{ color: colors.secondaryText }} className="text-[13px] font-bold">
+                                    <Text className="text-[13px] font-bold text-slate-600">
                                         {order.items?.length || 0} items
                                     </Text>
-                                    <Text style={{ color: colors.primaryText }} className="text-[16px] font-black">
+                                    <Text className="text-[16px] font-black text-slate-900">
                                         ₹{order.totalAmount}
                                     </Text>
                                 </View>
 
                                 {/* Instructions */}
                                 {order.instructions ? (
-                                    <View className="mt-3 border rounded-xl p-3 flex-row items-start gap-2 shadow-sm" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                                    <View className="mt-3 bg-slate-50 border border-slate-100 rounded-xl p-3 flex-row items-start gap-2 shadow-sm">
                                         <Text className="text-[14px] mt-0.5">💬</Text>
                                         <View className="flex-1">
-                                            <Text style={{ color: colors.tertiaryText }} className="font-black text-[11px] uppercase tracking-wider mb-0.5">Your Instructions</Text>
-                                            <Text style={{ color: colors.primaryText }} className="font-medium text-[13px]">{order.instructions}</Text>
+                                            <Text className="text-slate-500 font-black text-[11px] uppercase tracking-wider mb-0.5">Your Instructions</Text>
+                                            <Text className="text-slate-800 font-medium text-[13px]">{order.instructions}</Text>
                                         </View>
                                     </View>
                                 ) : null}
 
                                 {/* Delivery OTP */}
                                 {(order.status === 'pending' || order.status === 'accepted' || order.status === 'preparing' || order.status === 'out_for_delivery') && order.deliveryOtp && (
-                                    <View className="mt-3 border rounded-xl p-3 flex-row items-center justify-between shadow-sm" style={{ backgroundColor: isDark ? colors.elevated : '#fffbeb', borderColor: isDark ? colors.border : '#fde68a' }}>
+                                    <View className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 flex-row items-center justify-between shadow-sm">
                                         <View className="flex-row items-center gap-2">
                                             <Text className="text-[16px]">🔑</Text>
-                                            <Text style={{ color: isDark ? colors.primaryText : '#78350f' }} className="font-bold text-[13px]">Delivery OTP</Text>
+                                            <Text className="text-amber-900 font-bold text-[13px]">Delivery OTP</Text>
                                         </View>
-                                        <Text style={{ color: isDark ? colors.accent : '#b45309' }} className="font-black text-[20px] tracking-widest">{order.deliveryOtp}</Text>
+                                        <Text className="text-amber-700 font-black text-[20px] tracking-widest">{order.deliveryOtp}</Text>
                                     </View>
                                 )}
 
                                 {/* Expanded Details */}
                                 {isExpanded && (
-                                    <View className="mt-4 pt-4 border-t border-dashed" style={{ borderTopColor: colors.border }}>
-                                        <Text style={{ color: colors.tertiaryText }} className="text-[12px] font-black mb-3 uppercase tracking-wider">Order Items</Text>
+                                    <View className="mt-4 pt-4 border-t border-slate-100 border-dashed">
+                                        <Text className="text-[12px] font-black text-slate-400 mb-3 uppercase tracking-wider">Order Items</Text>
                                         <View className="gap-2.5 mb-4">
                                             {order.items?.map((item: any, idx: number) => (
                                                 <View key={idx} className="flex-row items-start justify-between gap-3">
                                                     <View className="flex-row items-center gap-2 flex-1">
-                                                        <View className="w-5 h-5 rounded flex items-center justify-center border" style={{ backgroundColor: isDark ? colors.elevated : '#f1f5f9', borderColor: colors.border }}>
-                                                            <Text style={{ color: colors.secondaryText }} className="text-[10px] font-black">{item.quantity}x</Text>
+                                                        <View className="w-5 h-5 bg-slate-100 rounded flex items-center justify-center border border-slate-200">
+                                                            <Text className="text-[10px] font-black text-slate-600">{item.quantity}x</Text>
                                                         </View>
-                                                        <Text style={{ color: colors.secondaryText }} className="text-[13px] font-semibold flex-1" numberOfLines={1}>
+                                                        <Text className="text-[13px] font-semibold text-slate-700 flex-1" numberOfLines={1}>
                                                             {item.productId?.name || 'Product'}
                                                         </Text>
                                                     </View>
-                                                    <Text style={{ color: colors.primaryText }} className="text-[13px] font-bold">₹{item.price * item.quantity}</Text>
+                                                    <Text className="text-[13px] font-bold text-slate-900">₹{item.price * item.quantity}</Text>
                                                 </View>
                                             ))}
                                         </View>
 
                                         {/* Cancel Button */}
                                         {order.status === 'pending' && (
-                                            <View className="mt-2 pt-4 border-t border-dashed" style={{ borderTopColor: colors.border }}>
+                                            <View className="mt-2 pt-4 border-t border-slate-100 border-dashed">
                                                 <TouchableOpacity 
                                                     onPress={() => handleCancelOrder(order._id)}
                                                     disabled={cancellingId === order._id}
-                                                    className="w-full border py-3 rounded-xl flex-row items-center justify-center shadow-sm"
-                                                    style={{ backgroundColor: colors.dangerMuted, borderColor: isDark ? 'rgba(248,113,113,0.3)' : '#ffe4e6' }}
+                                                    className="w-full bg-rose-50 border border-rose-100 py-3 rounded-xl flex-row items-center justify-center shadow-sm"
                                                 >
                                                     {cancellingId === order._id ? (
-                                                        <ActivityIndicator size="small" color={colors.danger} />
+                                                        <ActivityIndicator size="small" color="#ef4444" />
                                                     ) : (
-                                                        <Text style={{ color: colors.danger }} className="text-[13px] font-black">Cancel Order</Text>
+                                                        <Text className="text-rose-600 text-[13px] font-black">Cancel Order</Text>
                                                     )}
                                                 </TouchableOpacity>
-                                                <Text style={{ color: colors.tertiaryText }} className="text-[10px] font-semibold text-center mt-2">
+                                                <Text className="text-[10px] font-semibold text-slate-400 text-center mt-2">
                                                     Orders can only be cancelled before they are accepted by the store.
                                                 </Text>
                                             </View>

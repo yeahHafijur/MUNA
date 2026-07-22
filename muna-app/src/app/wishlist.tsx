@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Heart } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 import ProductCard from '@/components/ProductCard';
 
@@ -13,7 +12,6 @@ export default function WishlistScreen() {
     const router = useRouter();
     const { token } = useAuth();
     const { addToCart } = useCart();
-    const { colors, isDark } = useTheme();
 
     const { data: wishlistItems = [], isLoading } = useQuery({
         queryKey: ['wishlist'],
@@ -26,34 +24,33 @@ export default function WishlistScreen() {
     });
 
     return (
-        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+        <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="pt-12 px-4 pb-4 shadow-sm flex-row items-center gap-3 border-b" style={{ backgroundColor: colors.surface, borderBottomColor: colors.border }}>
+            <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-4 shadow-sm flex-row items-center gap-3">
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
-                    <ArrowLeft size={24} color={colors.icon} />
+                    <ArrowLeft size={24} color="#0f172a" />
                 </TouchableOpacity>
-                <Text style={{ color: colors.primaryText }} className="text-[18px] font-black">Your Wishlist</Text>
+                <Text className="text-[18px] font-black text-slate-900">Your Wishlist</Text>
             </View>
 
             {isLoading ? (
                 <View className="flex-1 items-center justify-center">
-                    <ActivityIndicator size="large" color={colors.accent} />
+                    <ActivityIndicator size="large" color="#fbbf24" />
                 </View>
             ) : wishlistItems.length === 0 ? (
                 <View className="flex-1 items-center justify-center p-4">
-                    <View className="w-20 h-20 rounded-full items-center justify-center mb-4" style={{ backgroundColor: colors.dangerMuted }}>
-                        <Heart size={40} color={colors.danger} />
+                    <View className="w-20 h-20 bg-rose-50 rounded-full items-center justify-center mb-4">
+                        <Heart size={40} color="#ef4444" />
                     </View>
-                    <Text style={{ color: colors.primaryText }} className="text-[18px] font-black mb-2">Wishlist is empty</Text>
-                    <Text style={{ color: colors.secondaryText }} className="text-[13px] font-medium text-center px-6">
+                    <Text className="text-[18px] font-black text-slate-900 mb-2">Wishlist is empty</Text>
+                    <Text className="text-[13px] font-medium text-slate-500 text-center px-6">
                         Save items you love here by tapping the heart icon on any product.
                     </Text>
                     <TouchableOpacity 
                         onPress={() => router.push('/')}
-                        className="mt-6 px-6 py-3 rounded-xl shadow-sm"
-                        style={{ backgroundColor: colors.primaryText }}
+                        className="mt-6 bg-slate-900 px-6 py-3 rounded-xl shadow-sm"
                     >
-                        <Text style={{ color: colors.invertedText }} className="font-black text-[14px]">Explore Products</Text>
+                        <Text className="text-white font-black text-[14px]">Explore Products</Text>
                     </TouchableOpacity>
                 </View>
             ) : (

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Store, UploadCloud } from 'lucide-react-native';
-import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 
 export default function VendorRequestScreen() {
@@ -12,7 +11,6 @@ export default function VendorRequestScreen() {
     const [phone, setPhone] = useState('');
     const [address, setAddress] = useState('');
     const [loading, setLoading] = useState(false);
-    const { colors, isDark } = useTheme();
 
     const handleSubmit = async () => {
         if (!shopName.trim() || !name.trim() || !phone.trim() || !address.trim()) {
@@ -46,61 +44,55 @@ export default function VendorRequestScreen() {
     };
 
     return (
-        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+        <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="pt-12 px-4 pb-4 shadow-sm flex-row items-center gap-3 border-b" style={{ backgroundColor: colors.surface, borderBottomColor: colors.border }}>
+            <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-4 shadow-sm flex-row items-center gap-3">
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
-                    <ArrowLeft size={24} color={colors.icon} />
+                    <ArrowLeft size={24} color="#0f172a" />
                 </TouchableOpacity>
-                <Text style={{ color: colors.primaryText }} className="text-[18px] font-black">Become a Vendor</Text>
+                <Text className="text-[18px] font-black text-slate-900">Become a Vendor</Text>
             </View>
 
             <ScrollView className="flex-1 px-4 pt-6" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                <View className="rounded-3xl p-6 border mb-6 items-center" style={{ backgroundColor: isDark ? 'rgba(16,185,129,0.1)' : '#ecfdf5', borderColor: isDark ? 'rgba(16,185,129,0.2)' : '#d1fae5' }}>
-                    <View className="w-16 h-16 rounded-full items-center justify-center mb-3" style={{ backgroundColor: isDark ? 'rgba(16,185,129,0.2)' : '#d1fae5' }}>
-                        <Store size={32} color="#10b981" />
+                <View className="bg-emerald-50 rounded-3xl p-6 border border-emerald-100 mb-6 items-center">
+                    <View className="w-16 h-16 bg-emerald-100 rounded-full items-center justify-center mb-3">
+                        <Store size={32} color="#059669" />
                     </View>
-                    <Text className="text-[18px] font-black mb-2" style={{ color: colors.success }}>Sell on MUNA</Text>
-                    <Text className="text-[13px] font-medium text-center leading-relaxed" style={{ color: isDark ? '#6ee7b7' : '#047857' }}>
+                    <Text className="text-[18px] font-black text-emerald-900 mb-2">Sell on MUNA</Text>
+                    <Text className="text-[13px] font-medium text-emerald-700 text-center leading-relaxed">
                         Reach thousands of customers in your area. Quick setup, lowest commission, and fast payouts.
                     </Text>
                 </View>
 
-                <View className="rounded-3xl p-5 shadow-sm border mb-8" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-                    <Text style={{ color: colors.primaryText }} className="text-[15px] font-black mb-5">Shop Details</Text>
+                <View className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-8">
+                    <Text className="text-[15px] font-black text-slate-900 mb-5">Shop Details</Text>
                     
                     <View className="gap-4">
                         <View>
-                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-1.5 ml-1">Shop Name</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Shop Name</Text>
                             <TextInput 
-                                className="border rounded-xl px-4 h-12 text-[15px] font-medium"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
                                 placeholder="E.g. Sharma Kirana Store"
-                                placeholderTextColor={colors.placeholder}
                                 value={shopName}
                                 onChangeText={setShopName}
                             />
                         </View>
                         
                         <View>
-                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-1.5 ml-1">Owner Name</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Owner Name</Text>
                             <TextInput 
-                                className="border rounded-xl px-4 h-12 text-[15px] font-medium"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
                                 placeholder="Your full name"
-                                placeholderTextColor={colors.placeholder}
                                 value={name}
                                 onChangeText={setName}
                             />
                         </View>
 
                         <View>
-                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-1.5 ml-1">Phone Number</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Phone Number</Text>
                             <TextInput 
-                                className="border rounded-xl px-4 h-12 text-[15px] font-medium"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
                                 placeholder="10-digit mobile number"
-                                placeholderTextColor={colors.placeholder}
                                 keyboardType="phone-pad"
                                 value={phone}
                                 onChangeText={setPhone}
@@ -108,23 +100,22 @@ export default function VendorRequestScreen() {
                         </View>
 
                         <View>
-                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-1.5 ml-1">Shop Address</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Shop Address</Text>
                             <TextInput 
-                                className="border rounded-xl px-4 py-3 text-[15px] font-medium"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText, height: 80, textAlignVertical: 'top' }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] font-medium text-slate-900"
                                 placeholder="Complete shop address"
-                                placeholderTextColor={colors.placeholder}
                                 multiline
                                 numberOfLines={3}
+                                style={{ height: 80, textAlignVertical: 'top' }}
                                 value={address}
                                 onChangeText={setAddress}
                             />
                         </View>
 
-                        <TouchableOpacity className="border-2 border-dashed rounded-xl p-6 items-center justify-center mt-2 opacity-50" style={{ backgroundColor: colors.inputBackground, borderColor: colors.border }}>
-                            <UploadCloud size={24} color={colors.iconMuted} className="mb-2" />
-                            <Text style={{ color: colors.secondaryText }} className="text-[13px] font-bold mb-1">Upload Shop Photo (Coming soon)</Text>
-                            <Text style={{ color: colors.tertiaryText }} className="text-[11px] font-medium">Optional but recommended</Text>
+                        <TouchableOpacity className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-6 items-center justify-center mt-2 opacity-50">
+                            <UploadCloud size={24} color="#94a3b8" className="mb-2" />
+                            <Text className="text-[13px] font-bold text-slate-600 mb-1">Upload Shop Photo (Coming soon)</Text>
+                            <Text className="text-[11px] font-medium text-slate-400">Optional but recommended</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity 

@@ -21,7 +21,6 @@ import CuratedCollections from '@/components/home/CuratedCollections';
 import { haversine } from '@/utils/homeUtils';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'expo-router';
 import { Navigation, ShoppingCart } from 'lucide-react-native';
 
@@ -55,7 +54,6 @@ export default function HomeScreen() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const insets = useSafeAreaInsets();
-  const { colors, isDark } = useTheme();
 
   const fetchGPSLocation = useCallback(async () => {
     try {
@@ -183,10 +181,10 @@ export default function HomeScreen() {
   }, [banners]);
 
   return (
-    <View className="flex-1" style={{ backgroundColor: colors.accent }}>
-      <StatusBar style="light" backgroundColor={colors.accent} />
+    <View className="flex-1 bg-amber-400">
+      <StatusBar style="dark" backgroundColor="#f59e0b" />
       
-      <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: colors.background }}>
+      <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
         <ScrollView
           className="flex-1"
           contentContainerClassName="pb-4 w-full max-w-7xl mx-auto"
@@ -233,12 +231,12 @@ export default function HomeScreen() {
         )}
 
         {/* BANNER CAROUSEL */}
-        <View className="pb-4" style={{ backgroundColor: colors.background }}>
+        <View className="bg-white pb-4">
           <PromoBanners banners={topBanners} />
         </View>
 
         {/* SEARCH (Sticky) */}
-        <View className="pt-1 pb-2 border-b shadow-sm z-50" style={{ elevation: 50, backgroundColor: colors.surface, borderBottomColor: colors.border }}>
+        <View className="bg-white pt-1 pb-2 border-b border-slate-100 shadow-sm z-50" style={{ elevation: 50 }}>
           <GlobalSearchBar />
         </View>
 
@@ -263,12 +261,12 @@ export default function HomeScreen() {
           </View>
 
           {/* QUICK DELIVERY */}
-          <View className="mt-2" style={{ backgroundColor: colors.background }}>
+          <View className="mt-2 bg-white">
             <QuickDeliveryStores shops={sortedShops} />
           </View>
 
           {/* ALL STORES */}
-          <View className="mt-2 pt-4" style={{ backgroundColor: colors.background }}>
+          <View className="mt-2 bg-white pt-4">
             <StoreListing
               sortedShops={sortedShops}
               loading={loadingShops}
@@ -281,7 +279,7 @@ export default function HomeScreen() {
           </View>
           
           {/* CTA & FOOTER */}
-          <View className="mt-2" style={{ backgroundColor: isDark ? colors.elevated : '#f8fafc' }}>
+          <View className="mt-2 bg-slate-50">
             <BecomeSellerCTA />
             <HowItWorks />
             <HomeFooter />

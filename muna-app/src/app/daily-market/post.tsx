@@ -4,7 +4,6 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { ArrowLeft, Camera, X } from 'lucide-react-native';
-import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 
 export default function PostAdScreen() {
@@ -16,7 +15,6 @@ export default function PostAdScreen() {
     const [address, setAddress] = useState('');
     const [images, setImages] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
-    const { colors, isDark } = useTheme();
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -73,48 +71,44 @@ export default function PostAdScreen() {
     };
 
     return (
-        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+        <View className="flex-1 bg-slate-50">
             {/* Header */}
-            <View className="pt-12 px-4 pb-4 shadow-sm flex-row items-center justify-between border-b" style={{ backgroundColor: colors.surface, borderBottomColor: colors.border }}>
+            <View className="bg-white border-b border-slate-100 pt-12 px-4 pb-4 shadow-sm flex-row items-center justify-between">
                 <View className="flex-row items-center gap-3">
                     <TouchableOpacity onPress={() => router.back()} className="p-1">
-                        <ArrowLeft size={24} color={colors.icon} />
+                        <ArrowLeft size={24} color="#0f172a" />
                     </TouchableOpacity>
-                    <Text style={{ color: colors.primaryText }} className="text-[18px] font-black">Post an Ad</Text>
+                    <Text className="text-[18px] font-black text-slate-900">Post an Ad</Text>
                 </View>
                 <TouchableOpacity onPress={handlePostAd} disabled={loading} className="px-2 py-1">
                     {loading ? (
-                        <ActivityIndicator size="small" color={colors.accent} />
+                        <ActivityIndicator size="small" color="#d97706" />
                     ) : (
-                        <Text className="text-[15px] font-black" style={{ color: colors.primary }}>Post</Text>
+                        <Text className="text-[15px] font-black text-amber-600">Post</Text>
                     )}
                 </TouchableOpacity>
             </View>
 
             <ScrollView className="flex-1 px-4 pt-6" showsVerticalScrollIndicator={false}>
-                <View className="rounded-3xl p-5 shadow-sm border mb-6" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-                    <Text style={{ color: colors.primaryText }} className="text-[15px] font-black mb-5">Ad Details</Text>
+                <View className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6">
+                    <Text className="text-[15px] font-black text-slate-900 mb-5">Ad Details</Text>
                     
                     <View className="gap-4">
                         <View>
-                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-1.5 ml-1">Title *</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Title *</Text>
                             <TextInput 
-                                className="border rounded-xl px-4 h-12 text-[15px] font-medium"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
                                 placeholder="What are you selling?"
-                                placeholderTextColor={colors.placeholder}
                                 value={title}
                                 onChangeText={setTitle}
                             />
                         </View>
                         
                         <View>
-                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-1.5 ml-1">Price (₹) *</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Price (₹) *</Text>
                             <TextInput 
-                                className="border rounded-xl px-4 h-12 text-[15px] font-medium"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
                                 placeholder="e.g. 1500"
-                                placeholderTextColor={colors.placeholder}
                                 keyboardType="numeric"
                                 value={price}
                                 onChangeText={setPrice}
@@ -122,26 +116,23 @@ export default function PostAdScreen() {
                         </View>
 
                         <View>
-                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-1.5 ml-1">Description *</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Description *</Text>
                             <TextInput 
-                                className="border rounded-xl px-4 py-3 text-[15px] font-medium"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText, height: 100, textAlignVertical: 'top' }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] font-medium text-slate-900"
                                 placeholder="Describe your item, condition, reason for selling..."
-                                placeholderTextColor={colors.placeholder}
                                 multiline
                                 numberOfLines={4}
+                                style={{ height: 100, textAlignVertical: 'top' }}
                                 value={description}
                                 onChangeText={setDescription}
                             />
                         </View>
 
                         <View>
-                            <Text style={{ color: colors.secondaryText }} className="text-[12px] font-bold mb-1.5 ml-1">Location (Optional)</Text>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Location (Optional)</Text>
                             <TextInput 
-                                className="border rounded-xl px-4 h-12 text-[15px] font-medium"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
                                 placeholder="e.g. Near XYZ hospital"
-                                placeholderTextColor={colors.placeholder}
                                 value={address}
                                 onChangeText={setAddress}
                             />
@@ -149,8 +140,8 @@ export default function PostAdScreen() {
                     </View>
                 </View>
 
-                <View className="rounded-3xl p-5 shadow-sm border mb-8" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-                    <Text style={{ color: colors.primaryText }} className="text-[15px] font-black mb-4">Photos</Text>
+                <View className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-8">
+                    <Text className="text-[15px] font-black text-slate-900 mb-4">Photos</Text>
                     
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
                         {images.map((uri, index) => (
@@ -158,8 +149,7 @@ export default function PostAdScreen() {
                                 <Image source={{ uri }} style={{ width: '100%', height: '100%' }} contentFit="cover" transition={200} cachePolicy="memory-disk" />
                                 <TouchableOpacity 
                                     onPress={() => removeImage(index)}
-                                    className="absolute top-1 right-1 rounded-full w-6 h-6 items-center justify-center"
-                                    style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}
+                                    className="absolute top-1 right-1 bg-white/80 rounded-full w-6 h-6 items-center justify-center"
                                 >
                                     <X size={14} color="#ef4444" />
                                 </TouchableOpacity>
@@ -169,15 +159,14 @@ export default function PostAdScreen() {
                         {images.length < 4 && (
                             <TouchableOpacity 
                                 onPress={pickImage}
-                                className="w-24 h-24 border-2 border-dashed rounded-xl items-center justify-center mr-3"
-                                style={{ backgroundColor: colors.inputBackground, borderColor: colors.border }}
+                                className="w-24 h-24 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl items-center justify-center mr-3"
                             >
-                                <Camera size={24} color={colors.iconMuted} className="mb-1" />
-                                <Text style={{ color: colors.tertiaryText }} className="text-[10px] font-bold">Add Photo</Text>
+                                <Camera size={24} color="#94a3b8" className="mb-1" />
+                                <Text className="text-[10px] font-bold text-slate-400">Add Photo</Text>
                             </TouchableOpacity>
                         )}
                     </ScrollView>
-                    <Text style={{ color: colors.tertiaryText }} className="text-[10px] font-medium mt-3 ml-1">
+                    <Text className="text-[10px] font-medium text-slate-400 mt-3 ml-1">
                         Upload up to 4 photos. First photo will be the cover.
                     </Text>
                 </View>

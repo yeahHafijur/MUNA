@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '@/api/api';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -20,7 +19,6 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const { colors, isDark } = useTheme();
   const router = useRouter();
 
   const handleGoogleBackendAuth = async (idToken: string) => {
@@ -81,26 +79,26 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 justify-center items-center p-4" style={{ backgroundColor: colors.background }}>
-      <View className="w-full max-w-[400px] rounded-2xl border shadow-sm p-8 sm:p-10" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+    <SafeAreaView className="flex-1 bg-gray-50 justify-center items-center p-4">
+      <View className="w-full max-w-[400px] bg-white rounded-2xl border border-gray-200 shadow-sm p-8 sm:p-10">
         
         {/* Header */}
         <View className="items-center mb-8">
-          <View className="w-16 h-16 mb-5 rounded-2xl overflow-hidden border items-center justify-center shadow-sm p-1" style={{ backgroundColor: isDark ? colors.elevated : '#ffffff', borderColor: colors.border }}>
+          <View className="w-16 h-16 mb-5 rounded-2xl overflow-hidden border border-gray-100 items-center justify-center bg-white shadow-sm p-1">
             <Image 
               source={require('../../assets/images/icon.png')} 
               style={{ width: '100%', height: '100%' }}
               contentFit="contain"
             />
           </View>
-          <Text style={{ color: colors.primaryText }} className="text-2xl font-bold tracking-tight mb-2">Welcome to MUNA</Text>
-          <Text style={{ color: colors.secondaryText }} className="text-sm font-medium">Sign in to your account to continue</Text>
+          <Text className="text-2xl font-bold tracking-tight mb-2 text-gray-900">Welcome to MUNA</Text>
+          <Text className="text-sm font-medium text-gray-500">Sign in to your account to continue</Text>
         </View>
 
         {/* Error State */}
         {error ? (
-          <View className="border rounded-lg p-3 mb-6 flex-row items-center" style={{ backgroundColor: colors.dangerMuted, borderColor: isDark ? 'rgba(248,113,113,0.3)' : '#fecaca' }}>
-            <Text style={{ color: colors.danger }} className="text-sm font-medium ml-2">{error}</Text>
+          <View className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6 flex-row items-center">
+            <Text className="text-red-600 text-sm font-medium ml-2">{error}</Text>
           </View>
         ) : null}
 
@@ -109,27 +107,26 @@ export default function LoginScreen() {
           <TouchableOpacity 
             onPress={onGoogleButtonPress}
             disabled={loading}
-            className={`w-full h-12 flex-row justify-center items-center border rounded-lg ${loading ? 'opacity-70' : ''}`}
-            style={{ backgroundColor: isDark ? colors.elevated : '#ffffff', borderColor: colors.border }}
+            className={`w-full h-12 flex-row justify-center items-center border border-gray-300 rounded-lg bg-white ${loading ? 'opacity-70' : ''}`}
           >
             {loading && !error ? (
-              <ActivityIndicator color={colors.accent} />
+              <ActivityIndicator color="#2563eb" />
             ) : (
-              <Text style={{ color: colors.primaryText }} className="font-semibold ml-2">Continue with Google</Text>
+              <Text className="text-gray-700 font-semibold ml-2">Continue with Google</Text>
             )}
           </TouchableOpacity>
         </View>
 
         {/* Footer */}
-        <View className="mt-8 pt-4 border-t" style={{ borderTopColor: colors.border }}>
-          <Text style={{ color: colors.tertiaryText }} className="text-[11px] font-medium text-center uppercase tracking-wider">
+        <View className="mt-8 pt-4 border-t border-gray-100">
+          <Text className="text-[11px] font-medium text-gray-400 text-center uppercase tracking-wider">
             By continuing, you agree to our{'\n'}Terms of Service & Privacy Policy
           </Text>
         </View>
         
       </View>
 
-      <Text style={{ color: colors.tertiaryText }} className="absolute bottom-6 text-[10px] font-bold uppercase tracking-widest">
+      <Text className="absolute bottom-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
         MUNA Platform
       </Text>
     </SafeAreaView>

@@ -5,7 +5,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, MapPin, Clock, Share2, MessageCircle, AlertTriangle } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 import api from '@/api/api';
 import { getImageUrl } from '@/utils/format';
 
@@ -26,7 +25,6 @@ export default function DailyMarketDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const { user, token } = useAuth();
-    const { colors, isDark } = useTheme();
     
     const [reporting, setReporting] = useState(false);
 
@@ -93,16 +91,16 @@ export default function DailyMarketDetailScreen() {
 
     if (isLoading) {
         return (
-            <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
-                <ActivityIndicator size="large" color={colors.accent} />
+            <View className="flex-1 items-center justify-center bg-white">
+                <ActivityIndicator size="large" color="#fbbf24" />
             </View>
         );
     }
 
     if (!item) {
         return (
-            <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
-                <Text style={{ color: colors.primaryText }}>Item not found.</Text>
+            <View className="flex-1 items-center justify-center bg-white">
+                <Text>Item not found.</Text>
             </View>
         );
     }
@@ -111,39 +109,37 @@ export default function DailyMarketDetailScreen() {
     const imageUrl = getImageUrl(item.images?.[0]);
 
     return (
-        <View className="flex-1" style={{ backgroundColor: colors.background }}>
+        <View className="flex-1 bg-white">
             <ScrollView className="flex-1">
                 {/* Header Actions */}
                 <View className="absolute top-10 left-4 right-4 z-50 flex-row justify-between items-center">
                     <TouchableOpacity 
                         onPress={() => router.back()}
-                        className="w-10 h-10 rounded-full items-center justify-center shadow-sm"
-                        style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.9)' }}
+                        className="w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow-sm"
                     >
-                        <ArrowLeft size={20} color={isDark ? '#fff' : '#0f172a'} />
+                        <ArrowLeft size={20} color="#0f172a" />
                     </TouchableOpacity>
                     <TouchableOpacity 
                         onPress={handleShare}
-                        className="w-10 h-10 rounded-full items-center justify-center shadow-sm"
-                        style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.9)' }}
+                        className="w-10 h-10 rounded-full bg-white/90 items-center justify-center shadow-sm"
                     >
-                        <Share2 size={18} color={isDark ? '#fff' : '#0f172a'} />
+                        <Share2 size={18} color="#0f172a" />
                     </TouchableOpacity>
                 </View>
 
                 {/* Image Gallery (Just first image for now) */}
-                <View className="w-full aspect-[4/3] relative" style={{ backgroundColor: colors.surface }}>
+                <View className="w-full aspect-[4/3] bg-slate-100 relative">
                     {imageUrl ? (
                         <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" transition={200} cachePolicy="memory-disk" />
                     ) : (
-                        <View className="flex-1 items-center justify-center" style={{ backgroundColor: isDark ? colors.elevated : '#fffbeb' }}>
+                        <View className="flex-1 items-center justify-center bg-amber-50">
                             <Text className="text-6xl">📦</Text>
                         </View>
                     )}
                     
                     {item.status !== 'available' && (
-                        <View className="absolute inset-0 items-center justify-center" style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)' }}>
-                            <View className="px-6 py-2 rounded-lg shadow-sm" style={{ backgroundColor: colors.danger }}>
+                        <View className="absolute inset-0 bg-white/60 items-center justify-center">
+                            <View className="bg-slate-900 px-6 py-2 rounded-lg shadow-sm">
                                 <Text className="text-white text-lg font-black uppercase tracking-wider">
                                     {item.status}
                                 </Text>
@@ -154,54 +150,54 @@ export default function DailyMarketDetailScreen() {
 
                 {/* Details */}
                 <View className="px-5 py-6">
-                    <Text style={{ color: colors.primaryText }} className="text-3xl font-black leading-none mb-3">
+                    <Text className="text-3xl font-black text-slate-900 leading-none mb-3">
                         ₹{item.price}
                     </Text>
                     
-                    <Text style={{ color: colors.primaryText }} className="text-[20px] font-bold leading-tight mb-4">
+                    <Text className="text-[20px] font-bold text-slate-800 leading-tight mb-4">
                         {item.title}
                     </Text>
 
                     <View className="flex-row items-center gap-4 mb-6">
                         <View className="flex-row items-center gap-1.5">
-                            <MapPin size={14} color={colors.icon} />
-                            <Text style={{ color: colors.secondaryText }} className="text-[13px] font-bold">
+                            <MapPin size={14} color="#64748b" />
+                            <Text className="text-[13px] font-bold text-slate-500">
                                 {item.address || 'Nearby'}
                             </Text>
                         </View>
                         <View className="flex-row items-center gap-1.5">
-                            <Clock size={14} color={colors.icon} />
-                            <Text style={{ color: colors.secondaryText }} className="text-[13px] font-bold">
+                            <Clock size={14} color="#64748b" />
+                            <Text className="text-[13px] font-bold text-slate-500">
                                 {formatTime(item.createdAt)}
                             </Text>
                         </View>
                     </View>
 
-                    <View className="mt-2 pt-6 border-t" style={{ borderTopColor: colors.border }}>
-                        <Text style={{ color: colors.primaryText }} className="text-[16px] font-black mb-3">Description</Text>
-                        <Text style={{ color: colors.secondaryText }} className="text-[14px] leading-relaxed">
+                    <View className="mt-2 pt-6 border-t border-slate-100">
+                        <Text className="text-[16px] font-black text-slate-900 mb-3">Description</Text>
+                        <Text className="text-[14px] text-slate-600 leading-relaxed">
                             {item.description}
                         </Text>
                     </View>
 
                     {/* Seller Info */}
-                    <View className="mt-8 rounded-2xl p-4 border flex-row items-center justify-between" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+                    <View className="mt-8 bg-slate-50 rounded-2xl p-4 border border-slate-100 flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
-                            <View className="w-12 h-12 rounded-full items-center justify-center border" style={{ backgroundColor: isDark ? 'rgba(217, 119, 6, 0.15)' : '#fef3c7', borderColor: isDark ? 'rgba(217, 119, 6, 0.3)' : '#fde68a' }}>
+                            <View className="w-12 h-12 bg-amber-100 rounded-full items-center justify-center border border-amber-200">
                                 <Text className="text-[20px]">👤</Text>
                             </View>
                             <View>
-                                <Text style={{ color: colors.primaryText }} className="text-[14px] font-bold">
+                                <Text className="text-[14px] font-bold text-slate-900">
                                     {item.seller?.name || 'MUNA User'}
                                 </Text>
-                                <Text style={{ color: colors.tertiaryText }} className="text-[11px] font-semibold mt-0.5">
+                                <Text className="text-[11px] font-semibold text-slate-500 mt-0.5">
                                     Joined recently
                                 </Text>
                             </View>
                         </View>
                         {!isOwner && (
                             <TouchableOpacity onPress={handleReport} disabled={reporting} className="p-2">
-                                <AlertTriangle size={18} color={colors.iconMuted} />
+                                <AlertTriangle size={18} color="#94a3b8" />
                             </TouchableOpacity>
                         )}
                     </View>
@@ -211,24 +207,23 @@ export default function DailyMarketDetailScreen() {
             </ScrollView>
 
             {/* Bottom Actions */}
-            <View className="absolute bottom-0 left-0 right-0 border-t p-4 shadow-lg pb-8" style={{ backgroundColor: colors.surface, borderTopColor: colors.border }}>
+            <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 shadow-lg pb-8">
                 {isOwner ? (
                     <TouchableOpacity 
-                        className="h-12 rounded-xl flex-row items-center justify-center shadow-sm"
-                        style={{ backgroundColor: colors.primaryText }}
+                        className="h-12 bg-slate-900 rounded-xl flex-row items-center justify-center shadow-sm"
                         onPress={() => router.push(`/daily-market/edit/${item._id}` as any)}
                     >
-                        <Text style={{ color: colors.invertedText }} className="font-black text-[15px]">Edit Ad</Text>
+                        <Text className="text-white font-black text-[15px]">Edit Ad</Text>
                     </TouchableOpacity>
                 ) : (
                     <TouchableOpacity 
                         disabled={item.status !== 'available'}
                         onPress={handleContactSeller}
-                        className={`h-12 rounded-xl flex-row items-center justify-center shadow-sm`}
-                        style={{ backgroundColor: item.status !== 'available' ? (isDark ? '#334155' : '#e2e8f0') : colors.accent }}
+                        className={`h-12 rounded-xl flex-row items-center justify-center shadow-sm
+                        ${item.status !== 'available' ? 'bg-slate-200' : 'bg-amber-400'}`}
                     >
                         {item.status !== 'available' ? (
-                            <Text style={{ color: colors.secondaryText }} className="font-black text-[15px]">Item Unavailable</Text>
+                            <Text className="text-slate-400 font-black text-[15px]">Item Unavailable</Text>
                         ) : (
                             <>
                                 <MessageCircle size={18} color="#451a03" className="mr-2" />

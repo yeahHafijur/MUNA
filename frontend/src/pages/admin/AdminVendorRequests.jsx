@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
 const IconBack = () => (
@@ -9,12 +10,20 @@ const IconBack = () => (
     </svg>
 );
 
+const inputClasses = "w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 focus:bg-white focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all";
+const labelClasses = "block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1";
+
 const AdminVendorRequests = () => {
     const { token, user } = useAuth();
     const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(null);
+
+    // Modal state for Approval
+    const [showModal, setShowModal] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [formData, setFormData] = useState({});
 
     useEffect(() => {
         if (user?.role !== 'super_admin') {
@@ -24,17 +33,21 @@ const AdminVendorRequests = () => {
         fetchRequests();
     }, [token, user, navigate]);
 
+    // Fetch shop categories for the form dropdown
+    const { data: shopCategories = [] } = useQuery({
+        queryKey: ['shop-categories'],
+        queryFn: async () => {
+            const res = await fetch('/api/shop-categories', { credentials: 'include' });
+            return await res.json();
+        }
+    });
+
     const fetchRequests = async () => {
         try {
-            const res = await fetch('/api/vendor-requests', { credentials: 'include', 
-                
-            });
+            const res = await fetch('/api/vendor-requests', { credentials: 'include' });
             const data = await res.json();
-            if (res.ok) {
-                setRequests(data);
-            } else {
-                toast.error(data.message || 'Failed to fetch requests');
-            }
+            if (res.ok) setRequests(data);
+            else toast.error(data.message || 'Failed to fetch requests');
         } catch (error) {
             toast.error('Error fetching requests');
         } finally {
@@ -47,13 +60,9 @@ const AdminVendorRequests = () => {
         try {
             const res = await fetch(`/api/vendor-requests/${id}/status`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ status })
             });
-            
             if (res.ok) {
                 toast.success(`Request marked as ${status}`);
                 fetchRequests();
@@ -64,6 +73,52 @@ const AdminVendorRequests = () => {
         } catch (error) {
             toast.error('Error updating status');
         } finally {
+            setUpdating(null);
+        }
+    };
+
+    const openReviewModal = (req) => {
+        setSelectedRequest(req);
+        setFormData({
+            requestId: req._id,
+            vendorName: req.name || '',
+            vendorEmail: req.vendorEmail || '',
+            vendorPhone: req.phone || '',
+            shopName: req.shopName || '',
+            shopAddress: req.address || '',
+            shopCategoryId: req.shopCategoryId || '',
+            shopCategory: req.shopCategory || 'General',
+            udyamNumber: req.udyamNumber || '',
+            shopLat: req.shopLat || '',
+            shopLng: req.shopLng || '',
+            openTime: req.openTime || '09:00',
+            closeTime: req.closeTime || '21:00'
+        });
+        setShowModal(true);
+    };
+
+    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    const submitApproval = async (e) => {
+        e.preventDefault();
+        setUpdating('approval');
+        const loadingToast = toast.loading("Creating vendor and shop...");
+        try {
+            const res = await fetch('/api/admin/onboard', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(formData)
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Error onboarding vendor');
+            
+            toast.success("Vendor & Shop Created and Request Approved!");
+            setShowModal(false);
+            fetchRequests();
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            toast.dismiss(loadingToast);
             setUpdating(null);
         }
     };
@@ -116,12 +171,12 @@ const AdminVendorRequests = () => {
                                         <div className="text-sm font-medium text-slate-700">{req.phone}</div>
                                     </div>
                                     <div className="flex items-start gap-3">
-                                        <span className="text-slate-400 mt-0.5">📍</span>
-                                        <div className="text-sm font-medium text-slate-700">{req.address}</div>
+                                        <span className="text-slate-400 mt-0.5">📧</span>
+                                        <div className="text-sm font-medium text-slate-700">{req.vendorEmail || 'Not Provided'}</div>
                                     </div>
                                     <div className="flex items-start gap-3">
-                                        <span className="text-slate-400 mt-0.5">👤</span>
-                                        <div className="text-sm font-medium text-slate-700">Account: {req.userId?.email || 'N/A'}</div>
+                                        <span className="text-slate-400 mt-0.5">📍</span>
+                                        <div className="text-sm font-medium text-slate-700">{req.address}</div>
                                     </div>
                                 </div>
 
@@ -138,11 +193,10 @@ const AdminVendorRequests = () => {
                                     {req.status !== 'approved' && req.status !== 'rejected' && (
                                         <>
                                             <button 
-                                                onClick={() => handleUpdateStatus(req._id, 'approved')}
-                                                disabled={updating === req._id}
+                                                onClick={() => openReviewModal(req)}
                                                 className="px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-bold transition-colors flex-1 text-center"
                                             >
-                                                Approve
+                                                Review & Approve
                                             </button>
                                             <button 
                                                 onClick={() => handleUpdateStatus(req._id, 'rejected')}
@@ -168,6 +222,109 @@ const AdminVendorRequests = () => {
                     </div>
                 )}
             </div>
+
+            {/* Approval Modal */}
+            {showModal && (
+                <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <h2 className="text-lg font-black text-gray-900 tracking-tight">Review & Create Shop</h2>
+                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                        </div>
+                        
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <form id="approveForm" onSubmit={submitApproval} className="space-y-6">
+                                
+                                {/* Vendor Section */}
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b pb-2">Vendor Owner</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className={labelClasses}>Full Name</label>
+                                            <input type="text" name="vendorName" required className={inputClasses} value={formData.vendorName} onChange={handleChange} />
+                                        </div>
+                                        <div>
+                                            <label className={labelClasses}>Email Address</label>
+                                            <input type="email" name="vendorEmail" required className={inputClasses} value={formData.vendorEmail} onChange={handleChange} />
+                                        </div>
+                                        <div>
+                                            <label className={labelClasses}>Phone</label>
+                                            <input type="tel" name="vendorPhone" required className={inputClasses} value={formData.vendorPhone} onChange={handleChange} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Shop Section */}
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b pb-2">Shop Details</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className={labelClasses}>Shop Name</label>
+                                            <input type="text" name="shopName" required className={inputClasses} value={formData.shopName} onChange={handleChange} />
+                                        </div>
+                                        <div>
+                                            <label className={labelClasses}>Category</label>
+                                            <select name="shopCategoryId" required className={inputClasses} value={formData.shopCategoryId} onChange={(e) => {
+                                                const selected = shopCategories.find(c => c._id === e.target.value);
+                                                setFormData({ ...formData, shopCategoryId: e.target.value, shopCategory: selected?.name || 'General' });
+                                            }}>
+                                                <option value="">Select Category</option>
+                                                {shopCategories.map(sc => <option key={sc._id} value={sc._id}>{sc.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="sm:col-span-2">
+                                            <label className={labelClasses}>Full Address</label>
+                                            <input type="text" name="shopAddress" required className={inputClasses} value={formData.shopAddress} onChange={handleChange} />
+                                        </div>
+                                        <div>
+                                            <label className={labelClasses}>Udyam Number (Optional)</label>
+                                            <input type="text" name="udyamNumber" className={inputClasses} value={formData.udyamNumber} onChange={handleChange} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Location Section */}
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b pb-2">Location & Timings</h3>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        <div className="col-span-2 sm:col-span-1">
+                                            <label className={labelClasses}>Latitude *</label>
+                                            <input type="number" step="any" name="shopLat" required className={inputClasses} value={formData.shopLat} onChange={handleChange} />
+                                        </div>
+                                        <div className="col-span-2 sm:col-span-1">
+                                            <label className={labelClasses}>Longitude *</label>
+                                            <input type="number" step="any" name="shopLng" required className={inputClasses} value={formData.shopLng} onChange={handleChange} />
+                                        </div>
+                                        <div className="col-span-1">
+                                            <label className={labelClasses}>Open Time</label>
+                                            <input type="time" name="openTime" required className={inputClasses} value={formData.openTime} onChange={handleChange} />
+                                        </div>
+                                        <div className="col-span-1">
+                                            <label className={labelClasses}>Close Time</label>
+                                            <input type="time" name="closeTime" required className={inputClasses} value={formData.closeTime} onChange={handleChange} />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {!formData.shopLat && (
+                                    <p className="text-xs text-red-500 font-bold bg-red-50 p-3 rounded-lg">
+                                        ⚠️ The vendor did not provide GPS coordinates. You must manually find and enter their Latitude & Longitude before approving.
+                                    </p>
+                                )}
+                            </form>
+                        </div>
+                        
+                        <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
+                            <button type="button" onClick={() => setShowModal(false)} className="px-6 py-2.5 rounded-lg text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" form="approveForm" disabled={updating === 'approval'} className="px-6 py-2.5 bg-emerald-500 text-white rounded-lg text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 flex items-center shadow-sm">
+                                {updating === 'approval' ? 'Approving...' : 'Confirm & Create Shop'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -30,6 +30,36 @@ const vendorRequestSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'contacted', 'approved', 'rejected'],
         default: 'pending'
+    },
+    vendorEmail: {
+        type: String,
+        trim: true
+    },
+    shopCategoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ShopCategory'
+    },
+    shopCategory: {
+        type: String,
+        trim: true
+    },
+    udyamNumber: {
+        type: String,
+        trim: true
+    },
+    shopLat: {
+        type: Number
+    },
+    shopLng: {
+        type: Number
+    },
+    openTime: {
+        type: String,
+        default: '09:00'
+    },
+    closeTime: {
+        type: String,
+        default: '21:00'
     }
 }, { timestamps: true });
 

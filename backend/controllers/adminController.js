@@ -81,6 +81,13 @@ const onboardVendorAndShop = async (req, res) => {
             }
         });
 
+        // 5. If this came from a vendor request, mark it as approved
+        const { requestId } = req.body;
+        if (requestId) {
+            const VendorRequest = require('../models/VendorRequest');
+            await VendorRequest.findByIdAndUpdate(requestId, { status: 'approved' });
+        }
+
         res.status(201).json({
             message: "Vendor and Shop successfully onboarded!",
             vendor: { name: vendor.name, phone: vendor.phone },

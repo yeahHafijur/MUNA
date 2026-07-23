@@ -3,10 +3,10 @@ const VendorRequest = require('../models/VendorRequest');
 // Create a new vendor request
 const createVendorRequest = async (req, res) => {
     try {
-        const { name, shopName, phone, address } = req.body;
+        const { name, shopName, phone, address, vendorEmail, shopCategoryId, shopCategory, udyamNumber, shopLat, shopLng, openTime, closeTime } = req.body;
 
         if (!name || !shopName || !phone || !address) {
-            return res.status(400).json({ message: "All fields are required" });
+            return res.status(400).json({ message: "Name, shopName, phone, and address are required" });
         }
 
         // Check if user already has a pending request
@@ -20,7 +20,15 @@ const createVendorRequest = async (req, res) => {
             name: name.trim(),
             shopName: shopName.trim(),
             phone: phone.trim(),
-            address: address.trim()
+            address: address.trim(),
+            vendorEmail: vendorEmail?.trim(),
+            shopCategoryId,
+            shopCategory: shopCategory?.trim(),
+            udyamNumber: udyamNumber?.trim(),
+            shopLat,
+            shopLng,
+            openTime: openTime || '09:00',
+            closeTime: closeTime || '21:00'
         });
 
         res.status(201).json({ message: "Request submitted successfully", vendorRequest });

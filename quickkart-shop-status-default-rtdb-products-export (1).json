@@ -1,0 +1,1142 @@
+{
+  "-OWFvKSvWcpvoG9SvfT8": {
+    "category": "Sweet & Snacks",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753704386509_rsg.jpg?alt=media&token=68e61f0e-b940-47e8-a093-dea0a27b8243",
+    "inStock": true,
+    "name": "Mishti 5 piece",
+    "price": 50
+  },
+  "-OWFw_nvnKg-jLP8UnIb": {
+    "category": "Sweet & Snacks",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753704717235_goza.jpg?alt=media&token=9824ec37-bc1f-448e-bf52-8ed147f76d5e",
+    "inStock": false,
+    "name": "GOZA 5 PC",
+    "price": 50
+  },
+  "-OWFwyPa74_AXMQAhDHA": {
+    "category": "Sweet & Snacks",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753704817827_SAMOSA.jpg?alt=media&token=7c6e6a9a-17d4-402e-b903-7e0a8197b190",
+    "inStock": false,
+    "name": "SHINGRA 5 Pc (SAMOSA)",
+    "price": 50
+  },
+  "-OWOmWizlb5bwRqo572h": {
+    "category": "Cold Drinks & Juices",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753853074850_orsl.jpg?alt=media&token=fd60503b-8d7f-44d3-9b9d-4e28507fbc2c",
+    "inStock": true,
+    "name": "ORSL(200 ml)",
+    "price": 35
+  },
+  "-OWOo0NPrh25dEoFaYGX": {
+    "category": "Masala & Oil",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753853466426_TMT.jpg?alt=media&token=2775fdbb-6567-4636-a21e-9dd0ae3b36de",
+    "inStock": true,
+    "name": "HALIDI POWDER SHALIMAR 100GM",
+    "price": 37
+  },
+  "-OWOoKJ42fg0p-OWFxA6": {
+    "category": "Cold Drinks & Juices",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753853546491_Screenshot%202025-07-30%20110141.jpg?alt=media&token=25983264-aafe-4423-93d3-5be24516fdff",
+    "inStock": false,
+    "name": "Sprite 2.25 L",
+    "price": 105
+  },
+  "-OWOp3noPT9MHkdWS7N1": {
+    "category": "Cold Drinks & Juices",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753853742114_Screenshot%202025-07-30%20110413.jpg?alt=media&token=48fd1f3f-060b-481e-bab2-5cf9f769d15d",
+    "inStock": false,
+    "name": "Campa Orange Flavoured Soft Drink 2 L",
+    "price": 95
+  },
+  "-OWQ6pStJ4fIxccMoDA_": {
+    "category": "Dairy",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753875435054_1000251406.jpg?alt=media&token=348a9f41-2f7a-48fd-a209-c967bd7ec374",
+    "inStock": true,
+    "name": "Milk, 500ML",
+    "price": 40
+  },
+  "-OWQ7g-TOvtHEKLqx3lE": {
+    "category": "Bakery & Biscuits",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753875657553_1000251408.jpg?alt=media&token=5774a428-de37-43b3-a9f9-f241d19c3f53",
+    "inStock": true,
+    "name": "Bikaji tana bana khatta meetha 200 g",
+    "price": 62
+  },
+  "-OWR_tEVDATmjKweCm6b": {
+    "category": "Cleaning Care",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753900094002_Screenshot%202025-07-30%20235753.jpg?alt=media&token=a8a68863-7d2b-464d-9904-ebf03744fe24",
+    "inStock": true,
+    "name": "Phenyle 200 ML",
+    "price": 30
+  },
+  "-OWUtxQWuEaHpJxDSmlH": {
+    "category": "Bakery & Biscuits",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753955686381_download%20(3).jpg?alt=media&token=cd5a9886-ad2f-42ba-b0b7-f370938be866",
+    "inStock": true,
+    "name": "Choco pie",
+    "price": 10
+  },
+  "-OWnM6f3LUl6omGdj1IM": {
+    "category": "Dawat-e-Biriyani",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754282099421_maxresdefault.jpg?alt=media&token=bf7562c9-2ede-494f-8a73-0112b519271b",
+    "inStock": false,
+    "name": "Chicken Biryani",
+    "price": 140
+  },
+  "-OWnN0P0CJvFFo6L7jWI": {
+    "category": "Dawat-e-Biriyani",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754282333844_IMG_3299%201.jpg?alt=media&token=fe9046cf-118d-4535-9e19-229b670d60f6",
+    "inStock": false,
+    "name": "Chicken Pulao",
+    "price": 120
+  },
+  "-OXA132sX_d9swiH2vBP": {
+    "category": "Atta Rice & Daal",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754679230965_1623927829613-fbbe2145-29f4-4a88-b153-c4f61c31de89.webp?alt=media&token=b8193ea8-8271-48df-a139-a3673a91a046",
+    "inStock": false,
+    "name": "atta 1kg",
+    "price": 50
+  },
+  "-OXA1YSYytzNJ01eGgZT": {
+    "category": "Atta Rice & Daal",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754679359876_41AbPtG-STL.jpg?alt=media&token=19a75142-1ed7-4b31-b83f-e4fd5a32e4e7",
+    "inStock": true,
+    "name": "Muri 500 Gm ( Khoi )",
+    "price": 30
+  },
+  "-OXA21F1j0A78wSiyQaC": {
+    "category": "Cold Drinks & Juices",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754679486068_61nAIUPn3pL._SX300_SY300_QL70_FMwebp_.webp?alt=media&token=ea1b546f-55b6-41c8-b1cf-2af72696d4c9",
+    "inStock": true,
+    "name": "Eno",
+    "price": 10
+  },
+  "-OXA2LZBpe9MGK00tQCz": {
+    "category": "Atta Rice & Daal",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754679567853_Maida-Loose-1-Kg.jpg?alt=media&token=e10440d5-a27f-430f-b7c0-62e768f7a117",
+    "inStock": true,
+    "name": "Maida 1Kg",
+    "price": 38
+  },
+  "-OXA2nckh1I3VSWZF4gB": {
+    "category": "Atta Rice & Daal",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754679688314_images.jpeg?alt=media&token=e0d658a1-d244-48a5-a3bc-8555d8d344c3",
+    "inStock": false,
+    "name": "CHATT MURI (KHOI)",
+    "price": 40
+  },
+  "-OXA37_tw-1rsxU_iJW8": {
+    "category": "Masala & Oil",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754679774206_download.jpeg?alt=media&token=bb5f3ae5-53a7-4386-abdb-6ffb8e7f3ddb",
+    "inStock": true,
+    "name": "CHILLI POWDER 100GM",
+    "price": 40
+  },
+  "-OXEvdw-yGYGOW0QO75K": {
+    "category": "Cold Drinks & Juices",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754761426501_Screenshot%202025-07-30%20110413.jpg?alt=media&token=105bbbce-bc92-47ff-b499-bb51544de8be",
+    "inStock": false,
+    "name": "Campa Orange 1 L",
+    "price": 50
+  },
+  "-OXHgIKb6-odkuEwzVzN": {
+    "category": "Bakery & Biscuits",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1754807742188_WhatsApp%20Image%202025-08-10%20at%2012.04.12.jpeg?alt=media&token=c24a4912-22d9-4fb1-a1e7-311ff902355f",
+    "inStock": true,
+    "name": "shamai",
+    "price": 20
+  },
+  "-OYCohj2XwPkJGpFe_Sq": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1755799803776_1000260825.jpg?alt=media&token=afa443d1-4726-4256-ad75-72af3757215f",
+    "inStock": true,
+    "name": "Pineapple Pastry",
+    "price": 30
+  },
+  "-OYCoog5hiG7I_gcBoxA": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1755799832639_1000260827.jpg?alt=media&token=6da0a40c-22c1-4363-bdd0-90c6c5b939a0",
+    "inStock": true,
+    "name": "Strawberry Pastry",
+    "price": 30
+  },
+  "-OYCp0Prfu5NfEehAHps": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1755799884623_1000260826.jpg?alt=media&token=39dc085f-c017-4515-aef0-8fbe3fadb7c3",
+    "inStock": true,
+    "name": "Vanilla Pastry",
+    "price": 30
+  },
+  "-OYCpFlnzsgYm6MBkTOG": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1755799947634_1000260832.jpg?alt=media&token=d81ad28d-8ddd-46e0-b4af-01396935a4b5",
+    "inStock": true,
+    "name": "Chocolate Pastry",
+    "price": 30
+  },
+  "-OZYtkBJcfrp3ZOjYFYM": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252534318_ChatGPT%20Image%20Sep%207%2C%202025%2C%2007_10_54%20PM.png?alt=media&token=43b8b471-ec49-444c-becf-e577cbcf6abe",
+    "inStock": true,
+    "name": "Pineapple Cake 0.5 Kg",
+    "price": 280
+  },
+  "-OZYvWD5x4w_2mNYVbkj": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252549576_ChatGPT%20Image%20Sep%207%2C%202025%2C%2007_10_54%20PM.png?alt=media&token=4aee696b-a74b-4513-bc8d-975e57246871",
+    "inStock": true,
+    "name": "Pineapple Cake 1 Kg",
+    "price": 560
+  },
+  "-OZYvhW3uXDgb2FKJnxu": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252566389_ChatGPT%20Image%20Sep%207%2C%202025%2C%2005_37_35%20PM.png?alt=media&token=28cb4194-2c98-4eed-bf90-c6d755b3714b",
+    "inStock": true,
+    "name": "Strawberry Cake 0.5 kg",
+    "price": 290
+  },
+  "-OZYvojUeAcb3Gl6D3kJ": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252581108_ChatGPT%20Image%20Sep%207%2C%202025%2C%2005_37_35%20PM.png?alt=media&token=ecbd7359-8300-4c67-9115-0b5dfdb5667b",
+    "inStock": true,
+    "name": "Strawberry Cake 1 kg",
+    "price": 580
+  },
+  "-OZYw1sBbN2XkY9jxvfH": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252597940_ChatGPT%20Image%20Sep%207%2C%202025%2C%2005_06_22%20PM.png?alt=media&token=a7bd2bc2-057e-4ea8-a188-570b29368df7",
+    "inStock": true,
+    "name": "Vanilla Cake 0.5 Kg",
+    "price": 275
+  },
+  "-OZYw9By8C6H3FnSxF5a": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252610988_ChatGPT%20Image%20Sep%207%2C%202025%2C%2005_06_22%20PM.png?alt=media&token=352cfedc-58db-41b1-afc6-9f1223c3ec79",
+    "inStock": true,
+    "name": "Vanilla Cake 1 Kg",
+    "price": 550
+  },
+  "-OZZQHgsyxntMkeJXTfe": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252755229_ChatGPT%20Image%20Sep%207%2C%202025%2C%2007_06_39%20PM.png?alt=media&token=fb7091de-804e-4531-912e-95e98fa81269",
+    "inStock": true,
+    "name": "Chocolate  Cake 0.5 Kg",
+    "price": 288
+  },
+  "-OZZQWi-dr-pn0Sv8qjF": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252816832_ChatGPT%20Image%20Sep%207%2C%202025%2C%2007_06_39%20PM.png?alt=media&token=e6f13911-1486-42f1-bcf3-6318206c0580",
+    "inStock": true,
+    "name": "Chocolate  Cake 1 Kg",
+    "price": 588
+  },
+  "-OZZRBAkHwEtOvxY1JR8": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757252990899_ChatGPT%20Image%20Sep%207%2C%202025%2C%2007_02_19%20PM.png?alt=media&token=8e2d4eec-ecde-4998-9a0b-474b25a15eaa",
+    "inStock": true,
+    "name": "Cake 0.5 kg",
+    "price": 280
+  },
+  "-OZZRLc3U6K7FSnlBsug": {
+    "category": "Bakery & Cake",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1757253033888_ChatGPT%20Image%20Sep%207%2C%202025%2C%2007_02_19%20PM.png?alt=media&token=020edaa6-3796-4307-bce5-0a9b3faa95ef",
+    "inStock": true,
+    "name": "Cake 1 kg",
+    "price": 575
+  },
+  "product10": {
+    "category": "Atta Rice & Daal",
+    "image": "images/chira.png",
+    "inStock": true,
+    "name": "Chira(500gm)",
+    "price": 25
+  },
+  "product101": {
+    "category": "Cleaning Care",
+    "image": "images/JK.png",
+    "name": "JK White saboon(1p)",
+    "price": 10
+  },
+  "product102": {
+    "category": "Cleaning Care",
+    "image": "images/comfort.png",
+    "name": "Comfort Morning fresh(210mL)",
+    "price": 58
+  },
+  "product103": {
+    "category": "Cleaning Care",
+    "image": "images/detol125mL.png",
+    "inStock": true,
+    "name": "Detol(125mL)",
+    "price": 80
+  },
+  "product104": {
+    "category": "Cleaning Care",
+    "image": "images/ujala.png",
+    "name": "Ujala(50mL)",
+    "price": 10
+  },
+  "product105": {
+    "category": "Cleaning Care",
+    "image": "images/phenyleBlack.jpg",
+    "name": "Phenyle Black(1btl)",
+    "price": 60
+  },
+  "product106": {
+    "category": "Cleaning Care",
+    "image": "images/phenyleWhite.jpg",
+    "name": "Phenyle White(1btl)",
+    "price": 60
+  },
+  "product107": {
+    "category": "Cleaning Care",
+    "image": "images/idashaban.jpg",
+    "inStock": true,
+    "name": "Snuball Saboon(1p)",
+    "price": 45
+  },
+  "product108": {
+    "category": "Cleaning Care",
+    "image": "images/surfExcel.png",
+    "name": "Surf Excel(75g)",
+    "price": 10
+  },
+  "product109": {
+    "category": "Cleaning Care",
+    "image": "images/jhama.jpg",
+    "name": "Jhama(1Pc)",
+    "price": 10
+  },
+  "product11": {
+    "category": "Atta Rice & Daal",
+    "image": "images/mutarice.png",
+    "inStock": false,
+    "name": "Muta Rice(1kg)",
+    "price": 35
+  },
+  "product110": {
+    "category": "Bakery & Biscuits",
+    "image": "images/sweatToast.jpg",
+    "name": "Sweat Toast(Big)",
+    "price": 50
+  },
+  "product111": {
+    "category": "Bakery & Biscuits",
+    "image": "images/sweatToast.jpg",
+    "name": "Sweat Toast(Small)",
+    "price": 30
+  },
+  "product112": {
+    "category": "Bakery & Biscuits",
+    "image": "images/britaniaBig.png",
+    "name": "Britania Marie(Big)",
+    "price": 40
+  },
+  "product113": {
+    "category": "Bakery & Biscuits",
+    "image": "images/britaniaSmall.png",
+    "name": "Britania Marie(Small)",
+    "price": 10
+  },
+  "product114": {
+    "category": "Bakery & Biscuits",
+    "image": "images/marieLight.png",
+    "inStock": true,
+    "name": "Marie Light(Big)",
+    "price": 40
+  },
+  "product115": {
+    "category": "Bakery & Biscuits",
+    "image": "images/2020biscuit.png",
+    "inStock": false,
+    "name": "20-20 Biscuit",
+    "price": 20
+  },
+  "product116": {
+    "category": "Bakery & Biscuits",
+    "image": "https://imgs.search.brave.com/tk-BeOJOPlRfkiDKaDJYmaSeo2zzhLcnSKuHUb0yLoE/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly90aWlt/Zy50aXN0YXRpYy5j/b20vZnAvMS8wMDcv/OTcxL3N3ZWV0LWNy/aXNweS1hbmQtZGVs/aWNpb3VzLXNlbWkt/c29mdC10aWdlci1n/bHVjb3NlLWJpc2N1/aXRzLTM2NS5qcGc",
+    "inStock": true,
+    "name": "Tiger Biscuit(1pc)",
+    "price": 5
+  },
+  "product117": {
+    "category": "Bakery & Biscuits",
+    "image": "images/nutriChoice.png",
+    "inStock": true,
+    "name": "Nutri Choice(1pkt)",
+    "price": 65
+  },
+  "product118": {
+    "category": "Bakery & Biscuits",
+    "image": "images/eatFitDigestive.png",
+    "inStock": true,
+    "name": "Eat-Fit Digestive(175gm)",
+    "price": 40
+  },
+  "product119": {
+    "category": "Bakery & Biscuits",
+    "image": "images/maggie.png",
+    "inStock": true,
+    "name": "Maggie(1pkt)",
+    "price": 10
+  },
+  "product12": {
+    "category": "Atta Rice & Daal",
+    "image": "images/pulaorice.png",
+    "name": "Basmati Rice(1kg)",
+    "price": 45
+  },
+  "product120": {
+    "category": "Bakery & Biscuits",
+    "image": "images/bikajiKuchKuch.png",
+    "name": "Bikaji Kuch Kuch(200gm)",
+    "price": 65
+  },
+  "product121": {
+    "category": "Bakery & Biscuits",
+    "image": "images/kolkataChanaChur.png",
+    "name": "Kolkata Chana chur(200gm)",
+    "price": 62
+  },
+  "product122": {
+    "category": "Bakery & Biscuits",
+    "image": "images/BikajiBhujia.png",
+    "name": "Bikaji Bhujia(200gm)",
+    "price": 65
+  },
+  "product123": {
+    "category": "Bakery & Biscuits",
+    "image": "images/parleG.jpg",
+    "inStock": false,
+    "name": "Parle G(1pkt)",
+    "price": 10
+  },
+  "product124": {
+    "category": "Bakery & Biscuits",
+    "image": "images/rusk.jpg",
+    "name": "Rusk(1pkt)",
+    "price": 10
+  },
+  "product125": {
+    "category": "Electronics",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753881883238_61SoyhruubL.jpg?alt=media&token=5a4d2dcf-92ef-4e3f-bd16-c46db63e7f48",
+    "name": "C to C type cable(1m) samsung",
+    "price": 150
+  },
+  "product126": {
+    "category": "Electronics",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753881938718_MD818.jpg?alt=media&token=17e1032a-1239-4ef7-a584-248a953d7644",
+    "name": "iPhone Data Cable(1m)",
+    "price": 150
+  },
+  "product127": {
+    "category": "Electronics",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753882224870_samsung-25w-pd-adapter-usb-c-cable-500x500.webp?alt=media&token=c7e7db5d-73e4-4e46-a468-de66f0e00d51",
+    "name": "Samsung 25W type C addopter",
+    "price": 520
+  },
+  "product128": {
+    "category": "Electronics",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753956213248_download%20(4).jpg?alt=media&token=a0491326-ee5f-42b6-9d79-ed499c89e527",
+    "name": "3 in 1 Black Kat Data cable",
+    "price": 210
+  },
+  "product13": {
+    "category": "Atta Rice & Daal",
+    "image": "images/chawal.png",
+    "name": "Assam king Pulao Rice(1kg)",
+    "price": 45
+  },
+  "product139": {
+    "category": "Electronics",
+    "image": "images/evereadyBattery.png",
+    "name": "Eveready Battery(1p)",
+    "price": 18
+  },
+  "product14": {
+    "category": "Arra Rice & Daal",
+    "image": "images/egg.png",
+    "inStock": true,
+    "name": "Eggs(4Pc)",
+    "price": 32
+  },
+  "product140": {
+    "category": "Electronics",
+    "image": "images/panasonicBattery.png",
+    "name": "Panasonic Battery(1P)",
+    "price": 12
+  },
+  "product148": {
+    "category": "Stationary",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753904204460_1000251600.jpg?alt=media&token=3019013d-3039-4c4b-9826-4f02cfee204f",
+    "name": "Flair Writo-meter Ball Pen(blue)",
+    "price": 20
+  },
+  "product149": {
+    "category": "Stationary",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753904291649_1000251601.webp?alt=media&token=8a39f09d-965d-48fd-b77b-dd380d230b6d",
+    "name": "Apsara Pencil(1 box)",
+    "price": 49
+  },
+  "product15": {
+    "category": "Dairy",
+    "image": "images/milk.png",
+    "inStock": true,
+    "name": "Milk (160ml)",
+    "price": 20
+  },
+  "product150": {
+    "category": "Stationary",
+    "image": "images/placeholder.png",
+    "inStock": false,
+    "name": "Apsara Eraser(2 pc)",
+    "price": 10
+  },
+  "product151": {
+    "category": "Stationary",
+    "image": "images/placeholder.png",
+    "inStock": false,
+    "name": "Apsara Sharpner(2 pc)",
+    "price": 10
+  },
+  "product154": {
+    "category": "Stationary",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753881828892_163_98eb3be7-ff19-4c67-aa45-3e04288ecd51.webp?alt=media&token=55578243-4c55-4515-8e6a-99a8d4c5fe31",
+    "name": "Elkos Pen(Pack of 5)",
+    "price": 30
+  },
+  "product155": {
+    "category": "Stationary",
+    "image": "images/feviKwik.png",
+    "inStock": false,
+    "name": "Fevi kwik(1Pc)",
+    "price": 10
+  },
+  "product157": {
+    "category": "Fish & Chicken",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753858041333_images%20(4).jpeg?alt=media&token=c7570181-9c5f-4eb1-9412-1fb0774f6324",
+    "inStock": true,
+    "name": "Rou Mass (1 kg)",
+    "price": 200
+  },
+  "product158": {
+    "category": "Fish & Chicken",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753858060565_images%20(4).jpeg?alt=media&token=5ff87f1f-83b2-433a-a7b8-24947caa5514",
+    "inStock": true,
+    "name": "Rou Mass (500 gm)",
+    "price": 100
+  },
+  "product159": {
+    "category": "Fish & Chicken",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753881710618_Screenshot%202025-07-30%20185124.jpg?alt=media&token=a408acc0-7a75-43a2-a24a-c01924141631",
+    "inStock": true,
+    "name": "Kos Mass (1 kg)",
+    "price": 200
+  },
+  "product16": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/hydrous.png",
+    "inStock": true,
+    "name": "Hydrous(500 ml)",
+    "price": 10
+  },
+  "product160": {
+    "category": "Fish & Chicken",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753881722217_Screenshot%202025-07-30%20185124.jpg?alt=media&token=4171cc42-7ba9-4692-8244-6f148a41c50f",
+    "inStock": true,
+    "name": "Kos Mass (500 gm)",
+    "price": 100
+  },
+  "product161": {
+    "category": "Fish & Chicken",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753781191288_images%20(3).jpeg?alt=media&token=6c17c005-f510-4799-ae1a-1d6593517fbb",
+    "inStock": true,
+    "name": "Chanda mass (500 gm)",
+    "price": 100
+  },
+  "product162": {
+    "category": "Fish & Chicken",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753781227180_images%20(3).jpeg?alt=media&token=62966160-b5ec-4159-a3d3-1479f1461207",
+    "inStock": true,
+    "name": "Chanda mass (1 kg)",
+    "price": 200
+  },
+  "product163": {
+    "category": "Fish & Chicken",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753713588534_images%20(2).jpeg?alt=media&token=272f503f-46da-4b00-8154-1e2d70abfa8c",
+    "inStock": true,
+    "name": "Boiler (chicken) (1 kg)",
+    "price": 260
+  },
+  "product164": {
+    "category": "Fish & Chicken",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753713556237_images%20(2).jpeg?alt=media&token=0eb0d532-8781-41b5-9e5d-a316b402cdff",
+    "inStock": true,
+    "name": "Boiler (chicken) (500 gm)",
+    "price": 130
+  },
+  "product167": {
+    "category": "Pan Corner",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753712525111_download.jpeg?alt=media&token=8da886bf-d727-4119-a3d9-b5edd1701895",
+    "name": "Shikhar(5Pc)",
+    "price": 50
+  },
+  "product168": {
+    "category": "Pan Corner",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753712583477_images%20(1).jpeg?alt=media&token=aee6a3cd-14ec-449d-bc79-8374710a4625",
+    "inStock": true,
+    "name": "Signature(2Pc)",
+    "price": 30
+  },
+  "product17": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/independence.png",
+    "inStock": false,
+    "name": "Independence Water(750mL)",
+    "price": 10
+  },
+  "product18": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/ORSL.png",
+    "inStock": true,
+    "name": "ORSL(160 ml)",
+    "price": 20
+  },
+  "product19": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/maza.jpg",
+    "inStock": false,
+    "name": "Maza(200 ml)",
+    "price": 10
+  },
+  "product2": {
+    "category": "Atta Rice & Daal",
+    "image": "https://imgs.search.brave.com/_3uakTkU_af6b0KhyeXE4Xlnv1-Pca02WwE2UtZ5snA/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly90aHVt/YnMuZHJlYW1zdGlt/ZS5jb20vYi9waWxl/LXN1Z2FyLTEzNDE5/MDQ4LmpwZw",
+    "name": "Sugar (1kg)",
+    "price": 46
+  },
+  "product20": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/sting.png",
+    "inStock": true,
+    "name": "Sting(250 ml)",
+    "price": 25
+  },
+  "product21": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/sprite.png",
+    "inStock": false,
+    "name": "Sprite(200 ml)",
+    "price": 20
+  },
+  "product22": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/PuroMango.png",
+    "inStock": false,
+    "name": "Puro Mango Drink(500)",
+    "price": 40
+  },
+  "product23": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/mango2L.png",
+    "inStock": false,
+    "name": "Mango Drink(2L)",
+    "price": 110
+  },
+  "product25": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/fanta.png",
+    "inStock": false,
+    "name": "Fanta(750ml)",
+    "price": 40
+  },
+  "product26": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/amulKool.png",
+    "inStock": false,
+    "name": "Amul kool(150ml)",
+    "price": 25
+  },
+  "product27": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/campaLemon.png",
+    "inStock": false,
+    "name": "Campa lemon flavour(500mL)",
+    "price": 20
+  },
+  "product28": {
+    "category": "Cold Drinks & Juices",
+    "image": "images/campaOrange.png",
+    "inStock": false,
+    "name": "Campa Orange flavour(500mL)",
+    "price": 20
+  },
+  "product29": {
+    "category": "Gass",
+    "image": "images/indanegas.png",
+    "inStock": false,
+    "name": "Indane Gas(14kg)",
+    "price": 988
+  },
+  "product3": {
+    "category": "Atta Rice & Daal",
+    "image": "images/soozi.png",
+    "name": "Soozi(500gm)",
+    "price": 30
+  },
+  "product30": {
+    "category": "Dry Fruits",
+    "image": "images/almond.png",
+    "name": "Almond(100gm)",
+    "price": 120
+  },
+  "product31": {
+    "category": "Dry Fruits",
+    "image": "images/kajuBadam.png",
+    "name": "Kaaju Badam(100gm)",
+    "price": 120
+  },
+  "product32": {
+    "category": "Dry Fruits",
+    "image": "images/talmisri.png",
+    "inStock": true,
+    "name": "Taalmisri(100gm)",
+    "price": 35
+  },
+  "product33": {
+    "category": "Dry Fruits",
+    "image": "images/kismis.png",
+    "name": "Kismis(80gm)",
+    "price": 60
+  },
+  "product34": {
+    "category": "Dry Fruits",
+    "image": "images/khejur.png",
+    "inStock": true,
+    "name": "Khejur(400gm)",
+    "price": 230
+  },
+  "product35": {
+    "category": "Baby Care",
+    "image": "images/huggies.png",
+    "inStock": false,
+    "name": "Huggies(S size)",
+    "price": 55
+  },
+  "product36": {
+    "category": "Baby Care",
+    "image": "images/huggies.png",
+    "inStock": false,
+    "name": "Huggies(M size)",
+    "price": 65
+  },
+  "product37": {
+    "category": "Baby Care",
+    "image": "images/huggies.png",
+    "inStock": false,
+    "name": "Huggies(L size)",
+    "price": 75
+  },
+  "product38": {
+    "category": "Baby Care",
+    "image": "images/babyOil.png",
+    "name": "Johnsonis baby oil(50mL) ",
+    "price": 75
+  },
+  "product39": {
+    "category": "Baby Care",
+    "image": "images/babySoap.png",
+    "name": "Johnsonis baby soap(25gm)",
+    "price": 20
+  },
+  "product4": {
+    "category": "Atta Rice & Daal",
+    "image": "images/soozi.png",
+    "name": "Soozi(250gm)",
+    "price": 15
+  },
+  "product40": {
+    "category": "Baby Care",
+    "image": "images/babyPowder.png",
+    "name": "Himalaya Baby Powder(30gm)",
+    "price": 30
+  },
+  "product41": {
+    "category": "Baby Care",
+    "image": "images/babycream.png",
+    "name": "Himalaya Baby cream(30mL)",
+    "price": 50
+  },
+  "product42": {
+    "category": "Maxo Killer & candle",
+    "image": "images/maxo.jpg",
+    "name": "Maxo(1pkt)",
+    "price": 29
+  },
+  "product43": {
+    "category": "Maxo Killer & candle",
+    "image": "images/candle.jpg",
+    "name": "Candle(1pkt)",
+    "price": 40
+  },
+  "product44": {
+    "category": "Maxo Killer & candle",
+    "image": "images/AgarBattiManMandir.png",
+    "name": "Agar Batti Man Mandir(1pkt)",
+    "price": 10
+  },
+  "product45": {
+    "category": "Maxo Killer & candle",
+    "image": "images/amenaAgarbatti.jpg",
+    "inStock": false,
+    "name": "Agar Batti Amena(1pkt)",
+    "price": 10
+  },
+  "product46": {
+    "category": "Maxo Killer & candle",
+    "image": "images/aladinkiller.jpg",
+    "name": "Aladin killer(1pkt)",
+    "price": 20
+  },
+  "product47": {
+    "category": "Colgate & Brush",
+    "image": "images/zigzag.png",
+    "name": "zig Zag Brush(1P)",
+    "price": 25
+  },
+  "product48": {
+    "category": "Colgate & Brush",
+    "image": "images/colgate.png",
+    "name": "Colgate(38gm)",
+    "price": 20
+  },
+  "product49": {
+    "category": "Colgate & Brush",
+    "image": "images/colgate.png",
+    "name": "Colgate(16gm)",
+    "price": 10
+  },
+  "product5": {
+    "category": "Atta Rice & Daal",
+    "image": "images/shamai.png",
+    "inStock": true,
+    "name": "Shamai(100gm)",
+    "price": 10
+  },
+  "product53": {
+    "category": "Masala & Oil",
+    "image": "images/hansh1L.jpg",
+    "inStock": true,
+    "name": "Mustard Oil Hansh(1L)",
+    "price": 195
+  },
+  "product54": {
+    "category": "Masala & Oil",
+    "image": "images/hansh500mL.jpg",
+    "inStock": true,
+    "name": "Mustard Oil Hansh(500ml)",
+    "price": 98
+  },
+  "product55": {
+    "category": "Masala & Oil",
+    "image": "images/hansh250mL.jpg",
+    "name": "Mustard Oil Hansh(250ml)",
+    "price": 50
+  },
+  "product56": {
+    "category": "Masala & Oil",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753883339000_download%20(2).jpg?alt=media&token=abd2db49-9a57-442b-9cb9-4286ee8fb8be",
+    "inStock": false,
+    "name": "Anupam Mustard Oil(500mL)",
+    "price": 95
+  },
+  "product57": {
+    "category": "Masala & Oil",
+    "image": "images/refinedOil.png",
+    "inStock": false,
+    "name": "Refined Oil(1L)",
+    "price": 160
+  },
+  "product58": {
+    "category": "Masala & Oil",
+    "image": "images/refinedOil.png",
+    "name": "Refined oil(500ml)",
+    "price": 80
+  },
+  "product59": {
+    "category": "Masala & Oil",
+    "image": "images/refinedOil.png",
+    "inStock": false,
+    "name": "Refined Oil(250ml)",
+    "price": 40
+  },
+  "product6": {
+    "category": "Atta Rice & Daal",
+    "image": "images/soyabean.png",
+    "name": "Soyabean(250gm)",
+    "price": 30
+  },
+  "product60": {
+    "category": "Masala & Oil",
+    "image": "images/achaar.jpg",
+    "inStock": true,
+    "name": "Achaar(250gm)",
+    "price": 50
+  },
+  "product61": {
+    "category": "Masala & Oil",
+    "image": "images/achaar.jpg",
+    "name": "Achaar(50gm)",
+    "price": 20
+  },
+  "product62": {
+    "category": "Masala & Oil",
+    "image": "images/garamMasalaGuta.jpg",
+    "name": "Garam Masala guta(50gm)",
+    "price": 75
+  },
+  "product63": {
+    "category": "Masala & Oil",
+    "image": "images/garamMasalaGutaSmall.jpg",
+    "name": "Garam Masala guta(10gm)",
+    "price": 10
+  },
+  "product64": {
+    "category": "Masala & Oil",
+    "image": "https://5.imimg.com/data5/SELLER/Default/2023/6/319576911/RY/HX/HT/191477818/medium-udad-appalam-papad-250x250.png",
+    "name": "Papad(70gm)",
+    "price": 35
+  },
+  "product65": {
+    "category": "Masala & Oil",
+    "image": "images/meatMasala.jpg",
+    "name": "EveryDay Meat Masala(1pkt)",
+    "price": 10
+  },
+  "product66": {
+    "category": "Masala & Oil",
+    "image": "images/garamMasala.jpg",
+    "name": "EveryDay Garam Masala(1pkt)",
+    "price": 10
+  },
+  "product67": {
+    "category": "Masala & Oil",
+    "image": "images/chickenMasala.jpg",
+    "name": "EveryDay Chicken Masala(1pkt)",
+    "price": 10
+  },
+  "product68": {
+    "category": "Masala & Oil",
+    "image": "images/jeera.jpg",
+    "name": "Jeera(50gm)",
+    "price": 25
+  },
+  "product69": {
+    "category": "Masala & Oil",
+    "image": "images/kalaJeera.jpg",
+    "name": "Kala Jeera(50gm)",
+    "price": 20
+  },
+  "product7": {
+    "category": "Atta Rice & Daal",
+    "image": "images/whitematar.png",
+    "name": "Matar Kalai(500gm)",
+    "price": 30
+  },
+  "product70": {
+    "category": "Masala & Oil",
+    "image": "images/meethajeera.jpg",
+    "name": "Meetha Jeera(50gm)",
+    "price": 20
+  },
+  "product71": {
+    "category": "Masala & Oil",
+    "image": "images/salt.jpg",
+    "name": "White cook salt(1kg)",
+    "price": 20
+  },
+  "product72": {
+    "category": "Masala & Oil",
+    "image": "images/borsola.png",
+    "inStock": true,
+    "name": "Borsola ChayPatti(250gm)",
+    "price": 80
+  },
+  "product73": {
+    "category": "Masala & Oil",
+    "image": "images/nameri.jpg",
+    "name": "Tea Nameri (25gm)",
+    "price": 10
+  },
+  "product74": {
+    "category": "Personal Care",
+    "image": "images/glow.jpg",
+    "name": "Glow and Lovely(1pkt)",
+    "price": 10
+  },
+  "product75": {
+    "category": "Personal Care",
+    "image": "images/heroine.jpg",
+    "name": "Heroine Saboon(1p)",
+    "price": 10
+  },
+  "product76": {
+    "category": "Personal Care",
+    "image": "images/jasmineOil.png",
+    "name": "Jasmine Oil(50ml)",
+    "price": 20
+  },
+  "product77": {
+    "category": "Personal Care",
+    "image": "images/nirmaSoap.jpg",
+    "name": "Nirma Sabaan(1p)",
+    "price": 10
+  },
+  "product78": {
+    "category": "Personal Care",
+    "image": "images/LifeBoy.png",
+    "name": "Lifeboy Sabaan(1p)",
+    "price": 10
+  },
+  "product79": {
+    "category": "Personal Care",
+    "image": "images/coconutoilParachute.jpg",
+    "name": "Coconut Oil(45mL)",
+    "price": 20
+  },
+  "product8": {
+    "category": "Atta Rice & Daal",
+    "image": "images/daal.png",
+    "name": "Mashoor Dal(500gm)",
+    "price": 55
+  },
+  "product80": {
+    "category": "Personal Care",
+    "image": "images/NiharOil.png",
+    "name": "Nihar Oil(40mL)",
+    "price": 10
+  },
+  "product81": {
+    "category": "Personal Care",
+    "image": "images/brahmolOil.png",
+    "name": "Brahmol oil(45mL)",
+    "price": 20
+  },
+  "product82": {
+    "category": "Personal Care",
+    "image": "images/pearsSoap.png",
+    "inStock": true,
+    "name": "Pears Saboon(1p)",
+    "price": 25
+  },
+  "product83": {
+    "category": "Personal Care",
+    "image": "images/lux.png",
+    "name": "Lux Saboon(1p)",
+    "price": 40
+  },
+  "product84": {
+    "category": "Personal Care",
+    "image": "images/detolSoap.png",
+    "name": "Detol Saboon(1p)",
+    "price": 10
+  },
+  "product85": {
+    "category": "Colgate & Brush",
+    "image": "images/dabur.png",
+    "name": "Dabur Colgate(1p)",
+    "price": 10
+  },
+  "product86": {
+    "category": "Personal Care",
+    "image": "images/almondOil.png",
+    "name": "Almond Drops Oil(190mL)",
+    "price": 142
+  },
+  "product87": {
+    "category": "Personal Care",
+    "image": "images/clinicPlusEgg.png",
+    "name": "Shampoo(Clinic plus)(10pkt)",
+    "price": 10
+  },
+  "product88": {
+    "category": "Personal Care",
+    "image": "images/dove.png",
+    "name": "Shampoo(Dove)(10pkt)",
+    "price": 20
+  },
+  "product89": {
+    "category": "Personal Care",
+    "image": "images/HimalayaFacewash.png",
+    "name": "Himalaya Face Wash(15mL)",
+    "price": 20
+  },
+  "product9": {
+    "category": "Atta Rice & Daal",
+    "image": "images/bootkalai.png",
+    "inStock": true,
+    "name": "Boot Kalai(500gm)",
+    "price": 40
+  },
+  "product90": {
+    "category": "Personal Care",
+    "image": "images/indicaHairColor.png",
+    "name": "Indica Hair color(1pkt)",
+    "price": 30
+  },
+  "product91": {
+    "category": "Personal Care",
+    "image": "images/navaratnaOil.png",
+    "name": "Navaratna Oil(10pkt)",
+    "price": 10
+  },
+  "product92": {
+    "category": "Personal Care",
+    "image": "images/gilletteGuard.png",
+    "name": "Gillette Guard(1P)",
+    "price": 25
+  },
+  "product93": {
+    "category": "Personal Care",
+    "image": "images/blade.jpg",
+    "name": "Gillete Guard Blade(10)",
+    "price": 30
+  },
+  "product94": {
+    "category": "Personal Care",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753883083544_download.jpg?alt=media&token=eca5d636-65bc-402c-8e57-773287fb682a",
+    "name": "Dermi Cool(50gm)",
+    "price": 50
+  },
+  "product95": {
+    "category": "Personal Care",
+    "image": "https://firebasestorage.googleapis.com/v0/b/quickkart-shop-status.firebasestorage.app/o/product_images%2Fproduct_1753883066473_download%20(1).jpg?alt=media&token=b5fc0cca-8e99-4d56-843b-738d2a09e8eb",
+    "name": "VI-JOHN(100gm)",
+    "price": 70
+  },
+  "product96": {
+    "category": "Cleaning Care",
+    "image": "images/harpic.png",
+    "name": "Harpic(200ml)",
+    "price": 46
+  },
+  "product97": {
+    "category": "Cleaning Care",
+    "image": "images/surfExcel.png",
+    "inStock": true,
+    "name": "Surf Excel(500gm)",
+    "price": 68
+  },
+  "product98": {
+    "category": "Cleaning Care",
+    "image": "images/nirmaBlue.png",
+    "name": "Nirma Blue(500gm)",
+    "price": 55
+  },
+  "product99": {
+    "category": "Cleaning Care",
+    "image": "images/surfExcelSoap.png",
+    "name": "Surf Excel Saboon(1p)",
+    "price": 10
+  }
+}

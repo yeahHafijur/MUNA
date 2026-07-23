@@ -1,23 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Store, UploadCloud } from 'lucide-react-native';
+import { ArrowLeft, Store, UploadCloud, Mail, Phone, User, Clock, MapPin } from 'lucide-react-native';
+import * as Location from 'expo-location';
 import api from '@/api/api';
 
 export default function VendorRequestScreen() {
     const router = useRouter();
-    const [shopName, setShopName] = useState('');
+    
+    // Vendor Details
     const [name, setName] = useState('');
+    const [vendorEmail, setVendorEmail] = useState('');
     const [phone, setPhone] = useState('');
+    
+    // Shop Details
+    const [shopName, setShopName] = useState('');
     const [address, setAddress] = useState('');
+    const [udyamNumber, setUdyamNumber] = useState('');
+    const [openTime, setOpenTime] = useState('09:00');
+    const [closeTime, setCloseTime] = useState('21:00');
+    
+    // Location Data (Background fetch)
+    const [shopLat, setShopLat] = useState<number | null>(null);
+    const [shopLng, setShopLng] = useState<number | null>(null);
+
+    // Categories
+    const [categories, setCategories] = useState<{_id: string, name: string}[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<{id: string, name: string} | null>(null);
+
     const [loading, setLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        const initForm = async () => {
+            try {
+                // Fetch Categories
+                const res = await api.get('/api/shop-categories');
+                setCategories(res.data || []);
+
+                // Silently fetch GPS location if possible
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status === 'granted') {
+                    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+                    setShopLat(loc.coords.latitude);
+                    setShopLng(loc.coords.longitude);
+                }
+            } catch (err) {
+                console.log("Initialization error:", err);
+            } finally {
+                setPageLoading(false);
+            }
+        };
+        initForm();
+    }, []);
 
     const handleSubmit = async () => {
-        if (!shopName.trim() || !name.trim() || !phone.trim() || !address.trim()) {
-            Alert.alert("Missing Fields", "Please fill in all the details.");
+        if (!name.trim() || !vendorEmail.trim() || !phone.trim()) {
+            Alert.alert("Missing Fields", "Please fill in all owner details.");
             return;
         }
-
+        if (!shopName.trim() || !address.trim() || !selectedCategory) {
+            Alert.alert("Missing Fields", "Please provide Shop Name, Address, and select a Category.");
+            return;
+        }
         if (phone.trim().length < 10) {
             Alert.alert("Invalid Phone", "Please enter a valid 10-digit phone number.");
             return;
@@ -26,10 +71,18 @@ export default function VendorRequestScreen() {
         setLoading(true);
         try {
             await api.post('/api/vendor-requests', {
-                shopName: shopName.trim(),
                 name: name.trim(),
+                vendorEmail: vendorEmail.trim(),
                 phone: phone.trim(),
-                address: address.trim()
+                shopName: shopName.trim(),
+                address: address.trim(),
+                shopCategoryId: selectedCategory.id,
+                shopCategory: selectedCategory.name,
+                udyamNumber: udyamNumber.trim(),
+                openTime,
+                closeTime,
+                shopLat,
+                shopLng
             });
             Alert.alert(
                 "Request Submitted!", 
@@ -42,6 +95,14 @@ export default function VendorRequestScreen() {
             setLoading(false);
         }
     };
+
+    if (pageLoading) {
+        return (
+            <View className="flex-1 bg-slate-50 items-center justify-center">
+                <ActivityIndicator size="large" color="#059669" />
+            </View>
+        );
+    }
 
     return (
         <View className="flex-1 bg-slate-50">
@@ -60,63 +121,153 @@ export default function VendorRequestScreen() {
                     </View>
                     <Text className="text-[18px] font-black text-emerald-900 mb-2">Sell on MUNA</Text>
                     <Text className="text-[13px] font-medium text-emerald-700 text-center leading-relaxed">
-                        Reach thousands of customers in your area. Quick setup, lowest commission, and fast payouts.
+                        Provide your details below. We'll set up your shop for you!
                     </Text>
                 </View>
 
+                {/* Owner Details */}
+                <View className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-5">
+                    <Text className="text-[15px] font-black text-slate-900 mb-5">Owner Details</Text>
+                    <View className="gap-4">
+                        <View>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Full Name *</Text>
+                            <View className="bg-slate-50 border border-slate-200 rounded-xl flex-row items-center px-4 h-12">
+                                <User size={18} color="#94a3b8" className="mr-2" />
+                                <TextInput 
+                                    className="flex-1 text-[15px] font-medium text-slate-900"
+                                    placeholder="Your full name"
+                                    value={name}
+                                    onChangeText={setName}
+                                />
+                            </View>
+                        </View>
+                        <View>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Email Address *</Text>
+                            <View className="bg-slate-50 border border-slate-200 rounded-xl flex-row items-center px-4 h-12">
+                                <Mail size={18} color="#94a3b8" className="mr-2" />
+                                <TextInput 
+                                    className="flex-1 text-[15px] font-medium text-slate-900"
+                                    placeholder="Google Email (e.g. name@gmail.com)"
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    value={vendorEmail}
+                                    onChangeText={setVendorEmail}
+                                />
+                            </View>
+                        </View>
+                        <View>
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Phone Number *</Text>
+                            <View className="bg-slate-50 border border-slate-200 rounded-xl flex-row items-center px-4 h-12">
+                                <Phone size={18} color="#94a3b8" className="mr-2" />
+                                <TextInput 
+                                    className="flex-1 text-[15px] font-medium text-slate-900"
+                                    placeholder="10-digit mobile number"
+                                    keyboardType="phone-pad"
+                                    maxLength={10}
+                                    value={phone}
+                                    onChangeText={setPhone}
+                                />
+                            </View>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Shop Details */}
                 <View className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-8">
                     <Text className="text-[15px] font-black text-slate-900 mb-5">Shop Details</Text>
                     
                     <View className="gap-4">
                         <View>
-                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Shop Name</Text>
-                            <TextInput 
-                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
-                                placeholder="E.g. Sharma Kirana Store"
-                                value={shopName}
-                                onChangeText={setShopName}
-                            />
-                        </View>
-                        
-                        <View>
-                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Owner Name</Text>
-                            <TextInput 
-                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
-                                placeholder="Your full name"
-                                value={name}
-                                onChangeText={setName}
-                            />
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Shop Name *</Text>
+                            <View className="bg-slate-50 border border-slate-200 rounded-xl flex-row items-center px-4 h-12">
+                                <Store size={18} color="#94a3b8" className="mr-2" />
+                                <TextInput 
+                                    className="flex-1 text-[15px] font-medium text-slate-900"
+                                    placeholder="E.g. Sharma Kirana Store"
+                                    value={shopName}
+                                    onChangeText={setShopName}
+                                />
+                            </View>
                         </View>
 
                         <View>
-                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Phone Number</Text>
-                            <TextInput 
-                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
-                                placeholder="10-digit mobile number"
-                                keyboardType="phone-pad"
-                                value={phone}
-                                onChangeText={setPhone}
-                            />
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Shop Category *</Text>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2 flex-row">
+                                {categories.map(cat => (
+                                    <TouchableOpacity 
+                                        key={cat._id}
+                                        onPress={() => setSelectedCategory({ id: cat._id, name: cat.name })}
+                                        className={`px-4 py-2 rounded-full mr-2 border ${
+                                            selectedCategory?.id === cat._id 
+                                            ? 'bg-amber-100 border-amber-400' 
+                                            : 'bg-slate-50 border-slate-200'
+                                        }`}
+                                    >
+                                        <Text className={`text-[13px] font-bold ${
+                                            selectedCategory?.id === cat._id 
+                                            ? 'text-amber-700' 
+                                            : 'text-slate-600'
+                                        }`}>
+                                            {cat.name}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
                         </View>
 
                         <View>
-                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Shop Address</Text>
-                            <TextInput 
-                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] font-medium text-slate-900"
-                                placeholder="Complete shop address"
-                                multiline
-                                numberOfLines={3}
-                                style={{ height: 80, textAlignVertical: 'top' }}
-                                value={address}
-                                onChangeText={setAddress}
-                            />
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Shop Address *</Text>
+                            <View className="bg-slate-50 border border-slate-200 rounded-xl flex-row px-4 py-3">
+                                <MapPin size={18} color="#94a3b8" className="mr-2 mt-0.5" />
+                                <TextInput 
+                                    className="flex-1 text-[15px] font-medium text-slate-900"
+                                    placeholder="Complete shop address"
+                                    multiline
+                                    numberOfLines={3}
+                                    style={{ height: 60, textAlignVertical: 'top' }}
+                                    value={address}
+                                    onChangeText={setAddress}
+                                />
+                            </View>
                         </View>
 
-                        <TouchableOpacity className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-6 items-center justify-center mt-2 opacity-50">
-                            <UploadCloud size={24} color="#94a3b8" className="mb-2" />
-                            <Text className="text-[13px] font-bold text-slate-600 mb-1">Upload Shop Photo (Coming soon)</Text>
-                            <Text className="text-[11px] font-medium text-slate-400">Optional but recommended</Text>
-                        </TouchableOpacity>
+                        <View className="flex-row gap-3 mt-1">
+                            <View className="flex-1">
+                                <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Opening Time</Text>
+                                <View className="bg-slate-50 border border-slate-200 rounded-xl flex-row items-center px-4 h-12">
+                                    <Clock size={16} color="#94a3b8" className="mr-2" />
+                                    <TextInput 
+                                        className="flex-1 text-[15px] font-medium text-slate-900"
+                                        placeholder="09:00"
+                                        value={openTime}
+                                        onChangeText={setOpenTime}
+                                    />
+                                </View>
+                            </View>
+                            <View className="flex-1">
+                                <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Closing Time</Text>
+                                <View className="bg-slate-50 border border-slate-200 rounded-xl flex-row items-center px-4 h-12">
+                                    <Clock size={16} color="#94a3b8" className="mr-2" />
+                                    <TextInput 
+                                        className="flex-1 text-[15px] font-medium text-slate-900"
+                                        placeholder="21:00"
+                                        value={closeTime}
+                                        onChangeText={setCloseTime}
+                                    />
+                                </View>
+                            </View>
+                        </View>
+
+                        <View className="mt-1">
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Udyam Number (Optional)</Text>
+                            <TextInput 
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-[15px] font-medium text-slate-900"
+                                placeholder="E.g. UDYAM-XX-00-0000000"
+                                value={udyamNumber}
+                                onChangeText={setUdyamNumber}
+                                autoCapitalize="characters"
+                            />
+                        </View>
 
                         <TouchableOpacity 
                             onPress={handleSubmit}

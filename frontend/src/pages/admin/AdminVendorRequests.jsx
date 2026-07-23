@@ -24,6 +24,7 @@ const AdminVendorRequests = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [formData, setFormData] = useState({});
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         if (user?.role !== 'super_admin') {
@@ -92,8 +93,10 @@ const AdminVendorRequests = () => {
             shopLat: req.shopLat || '',
             shopLng: req.shopLng || '',
             openTime: req.openTime || '09:00',
-            closeTime: req.closeTime || '21:00'
+            closeTime: req.closeTime || '21:00',
+            existingImage: req.shopImage || ''
         });
+        setSelectedImage(null);
         setShowModal(true);
     };
 
@@ -103,11 +106,22 @@ const AdminVendorRequests = () => {
         e.preventDefault();
         setUpdating('approval');
         const loadingToast = toast.loading("Creating vendor and shop...");
+        
         try {
+            const fd = new FormData();
+            Object.keys(formData).forEach(key => {
+                if (formData[key] !== null && formData[key] !== undefined) {
+                    fd.append(key, formData[key]);
+                }
+            });
+            if (selectedImage) {
+                fd.append('image', selectedImage);
+            }
+
             const res = await fetch('/api/admin/onboard', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(formData)
+                headers: { 'Authorization': `Bearer ${token}` }, // Browser automatically sets Content-Type for FormData
+                body: fd
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Error onboarding vendor');
@@ -306,6 +320,46 @@ const AdminVendorRequests = () => {
                                     </div>
                                 </div>
                                 
+                                {/* Image Section */}
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b pb-2">Shop Photo</h3>
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-24 h-24 rounded-xl border border-gray-200 overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center">
+                                            {selectedImage ? (
+                                                <img src={URL.createObjectURL(selectedImage)} className="w-full h-full object-cover" alt="Preview" />
+                                            ) : formData.existingImage ? (
+                                                <img src={formData.existingImage} className="w-full h-full object-cover" alt="Vendor Uploaded" />
+                                            ) : (
+                                                <span className="text-2xl text-gray-300">📷</span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className={labelClasses}>Replace / Upload Photo</label>
+                                            <input 
+                                                type="file" 
+                                                accept="image/*" 
+                                                onChange={(e) => {
+                                                    if (e.target.files && e.target.files[0]) {
+                                                        setSelectedImage(e.target.files[0]);
+                                                    }
+                                                }}
+                                                className="block w-full text-sm text-slate-500
+                                                    file:mr-4 file:py-2 file:px-4
+                                                    file:rounded-full file:border-0
+                                                    file:text-sm file:font-semibold
+                                                    file:bg-amber-50 file:text-amber-700
+                                                    hover:file:bg-amber-100"
+                                            />
+                                            {formData.existingImage && !selectedImage && (
+                                                <p className="text-xs text-emerald-600 font-bold mt-2">✓ Vendor provided a photo.</p>
+                                            )}
+                                            {!formData.existingImage && !selectedImage && (
+                                                <p className="text-xs text-amber-600 font-bold mt-2">No photo provided by vendor. You can upload one.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {!formData.shopLat && (
                                     <p className="text-xs text-red-500 font-bold bg-red-50 p-3 rounded-lg">
                                         ⚠️ The vendor did not provide GPS coordinates. You must manually find and enter their Latitude & Longitude before approving.

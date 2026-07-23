@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Store, UploadCloud, Mail, Phone, User, Clock, MapPin } from 'lucide-react-native';
 import * as Location from 'expo-location';
+import * as ImagePicker from 'expo-image-picker';
 import api from '@/api/api';
 
 export default function VendorRequestScreen() {
@@ -23,6 +24,9 @@ export default function VendorRequestScreen() {
     // Location Data (Background fetch)
     const [shopLat, setShopLat] = useState<number | null>(null);
     const [shopLng, setShopLng] = useState<number | null>(null);
+
+    // Image Data
+    const [image, setImage] = useState<string | null>(null);
 
     // Categories
     const [categories, setCategories] = useState<{_id: string, name: string}[]>([]);
@@ -54,6 +58,19 @@ export default function VendorRequestScreen() {
         initForm();
     }, []);
 
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.5,
+        });
+
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+    };
+
     const handleSubmit = async () => {
         if (!name.trim() || !vendorEmail.trim() || !phone.trim()) {
             Alert.alert("Missing Fields", "Please fill in all owner details.");
@@ -70,20 +87,34 @@ export default function VendorRequestScreen() {
 
         setLoading(true);
         try {
-            await api.post('/api/vendor-requests', {
-                name: name.trim(),
-                vendorEmail: vendorEmail.trim(),
-                phone: phone.trim(),
-                shopName: shopName.trim(),
-                address: address.trim(),
-                shopCategoryId: selectedCategory.id,
-                shopCategory: selectedCategory.name,
-                udyamNumber: udyamNumber.trim(),
-                openTime,
-                closeTime,
-                shopLat,
-                shopLng
+            const formData = new FormData();
+            formData.append('name', name.trim());
+            formData.append('vendorEmail', vendorEmail.trim());
+            formData.append('phone', phone.trim());
+            formData.append('shopName', shopName.trim());
+            formData.append('address', address.trim());
+            formData.append('shopCategoryId', selectedCategory.id);
+            formData.append('shopCategory', selectedCategory.name);
+            formData.append('udyamNumber', udyamNumber.trim());
+            formData.append('openTime', openTime);
+            formData.append('closeTime', closeTime);
+            
+            if (shopLat !== null && shopLng !== null) {
+                formData.append('shopLat', shopLat.toString());
+                formData.append('shopLng', shopLng.toString());
+            }
+
+            if (image) {
+                const filename = image.split('/').pop() || 'photo.jpg';
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : `image`;
+                formData.append('image', { uri: image, name: filename, type } as any);
+            }
+
+            await api.post('/api/vendor-requests', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
+            
             Alert.alert(
                 "Request Submitted!", 
                 "Our team will contact you shortly regarding your shop setup.",
@@ -267,6 +298,26 @@ export default function VendorRequestScreen() {
                                 onChangeText={setUdyamNumber}
                                 autoCapitalize="characters"
                             />
+                        </View>
+
+                        <View className="mt-1">
+                            <Text className="text-[12px] font-bold text-slate-500 mb-1.5 ml-1">Shop Photo (Optional)</Text>
+                            <TouchableOpacity onPress={pickImage} className="bg-slate-50 border-2 border-dashed border-emerald-200 rounded-xl p-6 items-center justify-center overflow-hidden min-h-[140px]">
+                                {image ? (
+                                    <View className="absolute inset-0">
+                                        <Image source={{ uri: image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                                        <View className="absolute inset-0 bg-black/40 items-center justify-center">
+                                            <Text className="text-white font-bold text-[13px]">Change Photo</Text>
+                                        </View>
+                                    </View>
+                                ) : (
+                                    <>
+                                        <UploadCloud size={24} color="#10b981" className="mb-2" />
+                                        <Text className="text-[13px] font-bold text-slate-600 mb-1">Tap to upload a photo</Text>
+                                        <Text className="text-[11px] font-medium text-slate-400">Clear photo helps customers find you</Text>
+                                    </>
+                                )}
+                            </TouchableOpacity>
                         </View>
 
                         <TouchableOpacity 

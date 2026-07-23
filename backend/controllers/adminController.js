@@ -65,7 +65,15 @@ const onboardVendorAndShop = async (req, res) => {
             resolvedCategoryId = catExists._id;
         }
 
-        // 4. Create the Shop
+        // 4. Handle Image Upload
+        let finalImageUrl = req.body.existingImage || "";
+        if (req.file) {
+            const { uploadStream } = require('../utils/cloudinary');
+            const result = await uploadStream(req.file.buffer, 'muna/shops');
+            finalImageUrl = result.secure_url;
+        }
+
+        // 5. Create the Shop
         const shop = await Shop.create({
             name: shopName,
             address: shopAddress,
@@ -74,6 +82,7 @@ const onboardVendorAndShop = async (req, res) => {
             udyamNumber: udyamNumber || "",
             location: locationData,
             vendorId: vendor._id,
+            image: finalImageUrl,
             autoSchedule: {
                 enabled: true,
                 openTime: openTime,

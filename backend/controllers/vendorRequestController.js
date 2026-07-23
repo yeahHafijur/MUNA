@@ -15,6 +15,13 @@ const createVendorRequest = async (req, res) => {
             return res.status(400).json({ message: "You already have a pending request. Please wait for our team to contact you." });
         }
 
+        let shopImageUrl = '';
+        if (req.file) {
+            const { uploadStream } = require('../utils/cloudinary');
+            const result = await uploadStream(req.file.buffer, 'muna/vendor-requests');
+            shopImageUrl = result.secure_url;
+        }
+
         const vendorRequest = await VendorRequest.create({
             userId: req.user._id,
             name: name.trim(),
@@ -28,7 +35,8 @@ const createVendorRequest = async (req, res) => {
             shopLat,
             shopLng,
             openTime: openTime || '09:00',
-            closeTime: closeTime || '21:00'
+            closeTime: closeTime || '21:00',
+            shopImage: shopImageUrl
         });
 
         res.status(201).json({ message: "Request submitted successfully", vendorRequest });

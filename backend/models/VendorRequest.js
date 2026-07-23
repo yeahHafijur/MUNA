@@ -60,6 +60,10 @@ const vendorRequestSchema = new mongoose.Schema({
     closeTime: {
         type: String,
         default: '21:00'
+    },
+    shopImage: {
+        type: String,
+        default: ''
     }
 }, { timestamps: true });
 

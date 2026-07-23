@@ -6,9 +6,10 @@ const {
     updateVendorRequestStatus
 } = require('../controllers/vendorRequestController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 // Customer: Submit a new vendor request
-router.post('/', protect, createVendorRequest);
+router.post('/', protect, upload.single('image'), createVendorRequest);
 
 // Super Admin: Get all requests
 router.get('/', protect, authorize('super_admin'), getVendorRequests);

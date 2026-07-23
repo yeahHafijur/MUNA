@@ -120,6 +120,11 @@ export default function ShopDetailScreen() {
         return Array.from(prodCatNames).sort();
     }, [products, categoriesList]);
 
+    const featuredProducts = useMemo(() => {
+        // Just take 6 items to show in the popular section
+        return products.slice(0, 6);
+    }, [products]);
+
     const filteredProducts = useMemo(() => {
         return products.filter(p => {
             if (!p) return false;
@@ -335,6 +340,36 @@ export default function ShopDetailScreen() {
                 <View className="px-4 py-6">
                     {(selectedCategory === null && !searchQuery) ? (
                         <View>
+                            {/* Popular Items Horizontal Scroll */}
+                            {featuredProducts.length > 0 && (
+                                <View className="mb-8 -mx-4">
+                                    <View className="flex-row items-center justify-between mb-4 px-5">
+                                        <Text className="text-[17px] font-black text-slate-900 tracking-tight">Popular Items</Text>
+                                        <TouchableOpacity onPress={() => setSelectedCategory('All')}>
+                                            <Text className="text-[12px] font-bold text-amber-600">See All</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <ScrollView 
+                                        horizontal 
+                                        showsHorizontalScrollIndicator={false}
+                                        contentContainerStyle={{ paddingHorizontal: 16, gap: 16 }}
+                                    >
+                                        {featuredProducts.map(prod => (
+                                            <View key={prod._id} className="w-[150px]">
+                                                <ProductCard 
+                                                    product={prod}
+                                                    onClick={() => router.push(`/product/${id}/${prod._id}` as any)}
+                                                    onAddClick={() => handleAddToCart(prod, id)}
+                                                    quantity={cartItems.find(item => item.productId === prod._id)?.quantity || 0}
+                                                    onIncrement={() => updateQuantity(prod._id, (cartItems.find(item => item.productId === prod._id)?.quantity || 0) + 1)}
+                                                    onDecrement={() => updateQuantity(prod._id, (cartItems.find(item => item.productId === prod._id)?.quantity || 0) - 1)}
+                                                />
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                </View>
+                            )}
+
                             <View className="flex-row items-center justify-between mb-4 px-1">
                                 <Text className="text-[17px] font-black text-slate-900 tracking-tight">Browse by Category</Text>
                                 <Text className="text-[12px] font-bold text-slate-500">{categories.length + 1} categories</Text>

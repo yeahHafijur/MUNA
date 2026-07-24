@@ -16,7 +16,7 @@ const getAllShops = async (req, res) => {
 const getAllShopsForAdmin = async (req, res) => {
     try {
         const query = Shop.find({})
-            .select('name address image category isOpen isActive location rating udyamNumber vendorId')
+            .select('name address image category isOpen isActive location rating udyamNumber vendorId autoSchedule')
             .populate('vendorId', 'name email phone');
         const shops = await query.lean();
         res.status(200).json(shops);
@@ -111,6 +111,18 @@ const updateShop = async (req, res) => {
         // Super admin can change name, vendor cannot
         if (req.user.role === 'super_admin' && req.body.name) {
             shop.name = req.body.name;
+        }
+        
+        // Update User info if passed
+        if (req.body.vendorName || req.body.vendorEmail || req.body.vendorPhone) {
+            const User = require('../models/User');
+            const vendor = await User.findById(shop.vendorId);
+            if (vendor) {
+                if (req.body.vendorName) vendor.name = req.body.vendorName;
+                if (req.body.vendorEmail) vendor.email = req.body.vendorEmail;
+                if (req.body.vendorPhone) vendor.phone = req.body.vendorPhone;
+                await vendor.save();
+            }
         }
         
         shop.address = req.body.address || shop.address;
@@ -228,6 +240,42 @@ const calculateDelivery = async (req, res) => {
     }
 };
 
+const deleteShop = async (req, res) => {
+    try {
+        const shop = await Shop.findById(req.params.id);
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" });
+        }
+
+        const isOwner = shop.vendorId && shop.vendorId.toString() === req.user._id.toString();
+        if (!isOwner && req.user.role !== 'super_admin') {
+            return res.status(403).json({ message: "Not authorized to delete this shop" });
+        }
+
+        const shopId = shop._id;
+        const vendorId = shop.vendorId;
+
+        // Cascade Delete
+        const MasterProduct = require('../models/MasterProduct');
+        const ShopCategory = require('../models/ShopCategory');
+        const User = require('../models/User');
+
+        await MasterProduct.deleteMany({ shopId });
+        await ShopCategory.deleteMany({ shopId });
+        await shop.deleteOne();
+
+        // Check if vendor has other shops
+        const otherShops = await Shop.countDocuments({ vendorId });
+        if (otherShops === 0) {
+            await User.findByIdAndUpdate(vendorId, { role: 'user' });
+        }
+
+        res.status(200).json({ message: "Shop deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 module.exports = {
     getAllShops,
     getAllShopsForAdmin,
@@ -236,5 +284,6 @@ module.exports = {
     createShop,
     updateShop,
     calculateDelivery,
-    updateShopImage
+    updateShopImage,
+    deleteShop
 };

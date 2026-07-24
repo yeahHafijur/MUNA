@@ -19,7 +19,8 @@ const AdminShops = () => {
 
     const [editingShop, setEditingShop] = useState(null);
     const [editFormData, setEditFormData] = useState({
-        name: '', address: '', category: '', udyamNumber: '', lat: '', lng: '', image: null, imagePreview: ''
+        name: '', address: '', category: '', udyamNumber: '', lat: '', lng: '', image: null, imagePreview: '',
+        vendorName: '', vendorEmail: '', vendorPhone: '', openTime: '', closeTime: ''
     });
 
     const [newCatForm, setNewCatForm] = useState({ name: '', image: null, imagePreview: '' });
@@ -56,7 +57,9 @@ const AdminShops = () => {
             name: shop.name || '', address: shop.address || '', category: shop.category || '',
             udyamNumber: shop.udyamNumber || '',
             lat: shop.location?.coordinates[1] || '', lng: shop.location?.coordinates[0] || '',
-            image: null, imagePreview: shop.image || ''
+            image: null, imagePreview: shop.image || '',
+            vendorName: shop.vendorId?.name || '', vendorEmail: shop.vendorId?.email || '', vendorPhone: shop.vendorId?.phone || '',
+            openTime: shop.autoSchedule?.openTime || '09:00', closeTime: shop.autoSchedule?.closeTime || '21:00'
         });
     };
 
@@ -78,7 +81,9 @@ const AdminShops = () => {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({
                     name: editFormData.name, address: editFormData.address, category: editFormData.category,
-                    udyamNumber: editFormData.udyamNumber, lat: editFormData.lat, lng: editFormData.lng
+                    udyamNumber: editFormData.udyamNumber, lat: editFormData.lat, lng: editFormData.lng,
+                    vendorName: editFormData.vendorName, vendorEmail: editFormData.vendorEmail, vendorPhone: editFormData.vendorPhone,
+                    autoSchedule: { openTime: editFormData.openTime, closeTime: editFormData.closeTime }
                 })
             });
             if (res.ok) {
@@ -109,6 +114,28 @@ const AdminShops = () => {
             if (res.ok) queryClient.invalidateQueries({ queryKey: ['admin-shops'] });
             else { const d = await res.json(); toast.error(d.message || 'Failed'); }
         } catch (err) { toast.error("Error toggling status."); }
+    };
+
+    const handleDeleteShop = async (shopId) => {
+        if (!window.confirm("Are you SURE you want to completely DELETE this shop? This will erase all its products and categories permanently!")) return;
+        try {
+            const loadingToast = toast.loading("Deleting shop...");
+            const res = await fetch(`/api/shops/${shopId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            toast.dismiss(loadingToast);
+            if (res.ok) {
+                toast.success("Shop deleted successfully!");
+                if (editingShop?._id === shopId) setEditingShop(null);
+                queryClient.invalidateQueries({ queryKey: ['admin-shops'] });
+            } else {
+                const d = await res.json();
+                toast.error(d.message || "Failed to delete");
+            }
+        } catch (error) {
+            toast.error("Error deleting shop.");
+        }
     };
 
     const handleCatChange = (e) => {
@@ -240,16 +267,39 @@ const AdminShops = () => {
 
                             <div><label className={labelClasses}>Shop Name</label><input type="text" name="name" required className={inputClasses} value={editFormData.name} onChange={handleEditChange} /></div>
                             <div><label className={labelClasses}>Address</label><input type="text" name="address" required className={inputClasses} value={editFormData.address} onChange={handleEditChange} /></div>
-                            <div><label className={labelClasses}>Category</label><input type="text" name="category" className={inputClasses} value={editFormData.category} onChange={handleEditChange} /></div>
-                            <div><label className={labelClasses}>Udyam Number</label><input type="text" name="udyamNumber" className={`${inputClasses} font-mono`} value={editFormData.udyamNumber} onChange={handleEditChange} /></div>
+                            
+                            {/* Vendor Details */}
+                            <div className="pt-2">
+                                <h4 className="text-xs font-bold text-slate-800 mb-2 uppercase tracking-wide">Vendor / Owner Details</h4>
+                                <div className="space-y-3">
+                                    <div><label className={labelClasses}>Owner Name</label><input type="text" name="vendorName" className={inputClasses} value={editFormData.vendorName} onChange={handleEditChange} /></div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className={labelClasses}>Email</label><input type="email" name="vendorEmail" className={inputClasses} value={editFormData.vendorEmail} onChange={handleEditChange} /></div>
+                                        <div><label className={labelClasses}>Phone</label><input type="tel" name="vendorPhone" className={inputClasses} value={editFormData.vendorPhone} onChange={handleEditChange} /></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-2">
+                                <h4 className="text-xs font-bold text-slate-800 mb-2 uppercase tracking-wide">Shop Metadata</h4>
+                                <div className="grid grid-cols-2 gap-4 mb-3">
+                                    <div><label className={labelClasses}>Category</label><input type="text" name="category" className={inputClasses} value={editFormData.category} onChange={handleEditChange} /></div>
+                                    <div><label className={labelClasses}>Udyam Number</label><input type="text" name="udyamNumber" className={`${inputClasses} font-mono`} value={editFormData.udyamNumber} onChange={handleEditChange} /></div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className={labelClasses}>Open Time (HH:MM)</label><input type="time" name="openTime" className={inputClasses} value={editFormData.openTime} onChange={handleEditChange} /></div>
+                                    <div><label className={labelClasses}>Close Time (HH:MM)</label><input type="time" name="closeTime" className={inputClasses} value={editFormData.closeTime} onChange={handleEditChange} /></div>
+                                </div>
+                            </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div><label className={labelClasses}>Latitude</label><input type="number" step="any" name="lat" required className={inputClasses} value={editFormData.lat} onChange={handleEditChange} /></div>
                                 <div><label className={labelClasses}>Longitude</label><input type="number" step="any" name="lng" required className={inputClasses} value={editFormData.lng} onChange={handleEditChange} /></div>
                             </div>
 
-                            <div className="pt-4 border-t border-gray-100">
+                            <div className="pt-4 flex flex-col gap-3 border-t border-gray-100">
                                 <button type="submit" className={`${btnPrimaryClasses} w-full py-3`}>Save Changes</button>
+                                <button type="button" onClick={() => handleDeleteShop(editingShop._id)} className="w-full py-3 px-6 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 active:scale-95 transition-all">Delete Shop</button>
                             </div>
                         </form>
 

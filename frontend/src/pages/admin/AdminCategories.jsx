@@ -124,7 +124,7 @@ const AdminCategories = () => {
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                         <h2 className="text-base font-black text-gray-900 tracking-tight">Shop Categories (Strict)</h2>
                     </div>
-                    <div className="p-6 border-b border-gray-100 bg-white">
+                    <div className="p-6 border-b border-gray-100 bg-white" id="shop-cat-form">
                         <form onSubmit={handleShopCatSubmit} className="flex flex-col sm:flex-row gap-4 items-end">
                             <div className="flex-1 w-full">
                                 <label className={labelClasses}>Category Name</label>
@@ -148,7 +148,7 @@ const AdminCategories = () => {
                                     <span className="text-sm font-bold text-gray-900">{sc.name}</span>
                                 </div>
                                 <div className="flex gap-3">
-                                    <button onClick={() => { setEditingShopCat(sc); setShopCatForm({ name: sc.name, image: null, imagePreview: sc.image || '' }); }} className="text-sm font-bold text-blue-600 hover:text-blue-800">Edit</button>
+                                    <button onClick={() => { setEditingShopCat(sc); setShopCatForm({ name: sc.name, image: null, imagePreview: sc.image || '' }); document.getElementById('shop-cat-form')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-sm font-bold text-blue-600 hover:text-blue-800">Edit</button>
                                     <button onClick={() => handleDeleteShopCat(sc._id)} className="text-sm font-bold text-red-600 hover:text-red-800">Delete</button>
                                 </div>
                             </div>
@@ -161,7 +161,7 @@ const AdminCategories = () => {
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                         <h2 className="text-base font-black text-gray-900 tracking-tight">Global Item Categories 🌐</h2>
                     </div>
-                    <div className="p-6 border-b border-gray-100 bg-white">
+                    <div className="p-6 border-b border-gray-100 bg-white" id="item-cat-form">
                         <form onSubmit={handleItemCatSubmit} className="flex flex-col sm:flex-row gap-4 items-end">
                             <div className="flex-1 w-full">
                                 <label className={labelClasses}>Category Name</label>
@@ -185,7 +185,7 @@ const AdminCategories = () => {
                                     <span className="text-sm font-bold text-gray-900">{ic.name} <span className="ml-2 px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded">Global</span></span>
                                 </div>
                                 <div className="flex gap-3">
-                                    <button onClick={() => { setEditingItemCat(ic); setItemCatForm({ name: ic.name, image: null, imagePreview: ic.image || '' }); }} className="text-sm font-bold text-blue-600 hover:text-blue-800">Edit</button>
+                                    <button onClick={() => { setEditingItemCat(ic); setItemCatForm({ name: ic.name, image: null, imagePreview: ic.image || '' }); document.getElementById('item-cat-form')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-sm font-bold text-blue-600 hover:text-blue-800">Edit</button>
                                     <button onClick={() => handleDeleteItemCat(ic._id)} className="text-sm font-bold text-red-600 hover:text-red-800">Delete</button>
                                 </div>
                             </div>

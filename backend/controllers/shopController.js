@@ -267,7 +267,7 @@ const deleteShop = async (req, res) => {
         // Check if vendor has other shops
         const otherShops = await Shop.countDocuments({ vendorId });
         if (otherShops === 0) {
-            await User.findByIdAndUpdate(vendorId, { role: 'user' });
+            await User.findByIdAndUpdate(vendorId, { role: 'customer' });
         }
 
         res.status(200).json({ message: "Shop deleted successfully" });

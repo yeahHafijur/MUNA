@@ -5,7 +5,9 @@ import { toast } from 'react-toastify';
 import { useQuery } from '@tanstack/react-query';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/cropImage';
+import { optimizeImage } from '../../utils/imageUtils';
 import GodownMultiImportModal from '../../components/GodownMultiImportModal';
+import PageHeader from '../../components/ui/PageHeader';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -231,47 +233,50 @@ const VendorMenu = () => {
         <div className="fixed inset-0 z-[100] bg-[#F8FAFC] flex flex-col font-sans">
 
             {/* ─── NATIVE HEADER ─── */}
-            <div className="bg-white px-4 py-3 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }}
-                        className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
-                    >
-                        <IconBack />
-                    </button>
-                    <span className="text-base font-extrabold text-slate-900 tracking-tight">Catalog</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <button className="px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all" onClick={() => setShowMultiImportModal(true)}>
-                        ⬇️ Import Multiple
-                    </button>
-                    <button className="px-4 py-2 bg-amber-400 text-amber-950 rounded-xl text-[12px] font-black shadow-[0_4px_14px_rgba(251,191,36,0.3)] active:scale-95 transition-transform" onClick={openAddProd}>
-                        + Add Item
-                    </button>
-                </div>
-            </div>
+            <PageHeader 
+                title="Catalog" 
+                sticky={true} 
+                onBack={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }}
+                right={
+                    <div className="flex items-center gap-2">
+                        <button className="px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all" onClick={() => setShowMultiImportModal(true)}>
+                            Import Multiple
+                        </button>
+                        <button className="px-4 py-2 bg-amber-400 text-amber-950 rounded-xl text-[12px] font-black shadow-[0_4px_14px_rgba(251,191,36,0.3)] active:scale-95 transition-transform" onClick={openAddProd}>
+                            + Add Item
+                        </button>
+                    </div>
+                }
+            />
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 max-w-7xl mx-auto w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div className="flex flex-col md:flex-row gap-6">
 
                     {/* ── CATEGORY SIDEBAR (Desktop) ── */}
                     <div className="hidden md:block w-64 shrink-0 space-y-1">
-                        <button className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-[16px] text-[14px] font-black transition-all ${!selectedCat ? 'bg-slate-900 text-white shadow-md' : 'hover:bg-slate-50 text-slate-600'}`} onClick={() => setSelectedCat(null)}>
-                            📦 All Items <span className="ml-auto text-[10px] font-bold opacity-60 bg-white/20 px-2 py-0.5 rounded-md">{products.length}</span>
-                        </button>
+                            <button onClick={() => setSelectedCat(null)} className={`flex-shrink-0 w-[100px] h-[120px] rounded-[18px] flex flex-col items-center justify-center gap-2 border-2 transition-all ${selectedCat === null ? 'border-amber-400 bg-amber-50 shadow-sm' : 'border-transparent bg-white shadow-sm hover:shadow-md text-slate-500'}`}>
+                                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-xl">
+                                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 01-1.125-1.125v-3.75zM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 01-1.125-1.125v-8.25zM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 01-1.125-1.125v-2.25z" /></svg>
+                                </div>
+                                <span className="text-[11px] font-black text-slate-800 text-center leading-tight">
+                                    All Items <span className="ml-auto text-[10px] font-bold opacity-60 bg-white/20 px-2 py-0.5 rounded-md">{products.length}</span>
+                                </span>
+                            </button>
                         <div className="my-2 border-t border-slate-100"></div>
                         <div className="flex items-center justify-between px-2 mb-2">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Categories</span>
                             <button onClick={openAddCat} className="text-amber-500 text-[10px] font-black uppercase tracking-wider hover:text-amber-600">+ Add</button>
                         </div>
-                        {categories.map(cat => (
-                            <div key={cat._id} className="group relative">
-                                <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-[16px] text-[13px] font-bold transition-all pr-10 ${selectedCat === cat._id ? 'bg-amber-100 text-amber-900' : 'hover:bg-slate-50 text-slate-700'}`} onClick={() => setSelectedCat(cat._id)}>
-                                    {cat.image ? <img src={cat.image} className="w-6 h-6 rounded-lg object-cover" /> : '🏷'}
-                                    <span className="truncate">{cat.name}</span>
-                                    <span className="ml-auto text-[10px] font-black opacity-50">{getCatCount(cat._id)}</span>
+                        {categories.map(c => (
+                            <div key={c._id} className="group relative">
+                                <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-[16px] text-[13px] font-bold transition-all pr-10 ${selectedCat === c._id ? 'bg-amber-100 text-amber-900' : 'hover:bg-slate-50 text-slate-700'}`} onClick={() => setSelectedCat(c._id)}>
+                                        <img src={c.image ? optimizeImage(c.image) : '/placeholder.jpg'} alt={c.name} className="w-12 h-12 rounded-full object-cover shadow-sm bg-slate-100" />
+                                    <span className="text-[11px] font-black text-slate-800 text-center leading-tight">{c.name}</span>
+                                    <span className="text-[10px] font-bold text-slate-400">{getCatCount(c._id)} items</span>
+                                    <button onClick={(e) => { e.stopPropagation(); openEditCat(c); }} className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-xl bg-white shadow-sm border border-slate-100 hidden group-hover:flex items-center justify-center text-slate-600">
+                                        <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
+                                    </button>
                                 </button>
-                                <button onClick={(e) => { e.stopPropagation(); openEditCat(cat); }} className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-xl bg-white shadow-sm border border-slate-100 hidden group-hover:flex items-center justify-center text-[10px]">✏️</button>
                             </div>
                         ))}
                     </div>
@@ -311,9 +316,13 @@ const VendorMenu = () => {
                                         <p className="text-[10px] font-bold text-slate-400 mb-3">{getCatName(getProductCatId(p))}</p>
                                         <div className="mt-auto flex items-center justify-between">
                                             <span className="text-[15px] font-black text-slate-900">₹{p.price}</span>
-                                            <div className="flex gap-1.5">
-                                                <button className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-50 text-slate-500 hover:bg-amber-100 hover:text-amber-700 transition-colors" onClick={() => openEditProd(p)}>✏️</button>
-                                                <button className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-50 text-rose-500 hover:bg-rose-100 transition-colors" onClick={() => deleteProd(p)}>🗑</button>
+                                            <div className="flex gap-2">
+                                                <button className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-50 text-slate-500 hover:bg-amber-100 hover:text-amber-700 transition-colors" onClick={() => openEditProd(p)}>
+                                                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
+                                                </button>
+                                                <button className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition-colors" onClick={() => deleteProd(p)}>
+                                                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

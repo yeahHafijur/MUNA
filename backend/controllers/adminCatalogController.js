@@ -12,6 +12,15 @@ const logAction = async (adminId, shopId, action, targetId, targetName, details 
     }
 };
 
+// ── Helper: Escape regex metacharacters (prevents ReDoS / regex injection) ──
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// ── Helper: Clamp pagination params ──
+const clampPagination = (page, limit, defaultLimit, maxLimit) => ({
+    page: Math.max(parseInt(page) || 1, 1),
+    limit: Math.min(Math.max(parseInt(limit) || defaultLimit, 1), maxLimit)
+});
+
 // ══════════════════════════════════════
 //  PRODUCTS
 // ══════════════════════════════════════
@@ -21,23 +30,24 @@ const logAction = async (adminId, shopId, action, targetId, targetName, details 
 const getShopProducts = async (req, res) => {
     try {
         const { shopId } = req.params;
-        const { search, categoryId, page = 1, limit = 50 } = req.query;
+        const { search, categoryId } = req.query;
+        const { page, limit } = clampPagination(req.query.page, req.query.limit, 50, 100);
 
         const shop = await Shop.findById(shopId).lean();
         if (!shop) return res.status(404).json({ message: "Shop not found" });
 
         const filter = { shopId };
         if (categoryId) filter.category = categoryId;
-        if (search) {
-            filter.name = { $regex: search, $options: 'i' };
+        if (search && search.length <= 100) {
+            filter.name = { $regex: escapeRegex(String(search)), $options: 'i' };
         }
 
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const skip = (page - 1) * limit;
         const total = await Product.countDocuments(filter);
         const products = await Product.find(filter)
             .sort({ inStock: -1, createdAt: -1 })
             .skip(skip)
-            .limit(parseInt(limit))
+            .limit(limit)
             .lean();
 
         // Populate category names
@@ -59,8 +69,8 @@ const getShopProducts = async (req, res) => {
         res.status(200).json({
             products: populatedProducts,
             total,
-            page: parseInt(page),
-            totalPages: Math.ceil(total / parseInt(limit)),
+            page,
+            totalPages: Math.ceil(total / limit),
             shop: { _id: shop._id, name: shop.name }
         });
     } catch (error) {
@@ -447,22 +457,22 @@ const reorderCategories = async (req, res) => {
 const getAuditLogs = async (req, res) => {
     try {
         const { shopId } = req.params;
-        const { page = 1, limit = 30 } = req.query;
+        const { page, limit } = clampPagination(req.query.page, req.query.limit, 30, 100);
 
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const skip = (page - 1) * limit;
         const total = await AuditLog.countDocuments({ shopId });
         const logs = await AuditLog.find({ shopId })
             .sort({ timestamp: -1 })
             .skip(skip)
-            .limit(parseInt(limit))
+            .limit(limit)
             .populate('adminId', 'name email')
             .lean();
 
         res.status(200).json({
             logs,
             total,
-            page: parseInt(page),
-            totalPages: Math.ceil(total / parseInt(limit))
+            page,
+            totalPages: Math.ceil(total / limit)
         });
     } catch (error) {
         console.error('[AdminCatalog] getAuditLogs error:', error);

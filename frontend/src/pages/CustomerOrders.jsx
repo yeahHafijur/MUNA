@@ -24,6 +24,18 @@ const getStatusColor = (status) => {
     }
 };
 
+const getStatusIcon = (status) => {
+    switch (status) {
+        case 'pending': return '⏳';
+        case 'accepted': return '✅';
+        case 'preparing': return '👨‍🍳';
+        case 'out_for_delivery': return '🛵';
+        case 'delivered': return '✅';
+        case 'cancelled': return '❌';
+        default: return '⏳';
+    }
+};
+
 const formatTime = (dateString) => {
     const d = new Date(dateString);
     let h = d.getHours();
@@ -154,90 +166,114 @@ const CustomerOrders = () => {
                     </div>
                 ) : (
                     <div className="space-y-4 px-4">
-                        {filteredOrders.map(order => (
-                            <div key={order._id} className="bg-white rounded-[20px] shadow-[0_2px_15px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden transition-all duration-200">
+                        {filteredOrders.map(order => {
+                            const isExpanded = expandedOrderId === order._id;
+                            const isActiveStatus = ['pending', 'accepted', 'preparing', 'out_for_delivery'].includes(order.status);
+                            return (
+                            <div key={order._id} className={`bg-white rounded-3xl p-5 shadow-[0_2px_15px_rgba(0,0,0,0.03)] border relative overflow-hidden transition-all duration-200 ${isExpanded ? 'border-amber-200 shadow-md' : 'border-slate-100'}`}>
                                 {/* Side Status Bar (from Vendor UI) */}
                                 <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${getStatusColor(order.status).split(' ')[0]}`}></div>
 
                                 <div
-                                    className="p-4 pl-5 cursor-pointer active:bg-slate-50 transition-colors"
+                                    className="cursor-pointer active:bg-slate-50 transition-colors"
                                     onClick={() => {
                                         if (navigator.vibrate) navigator.vibrate(30);
-                                        setExpandedOrderId(expandedOrderId === order._id ? null : order._id);
+                                        setExpandedOrderId(isExpanded ? null : order._id);
                                     }}
                                 >
                                     <div className="flex justify-between items-start mb-3">
-                                        <div>
-                                            <div className="text-xs font-black text-slate-400 mb-0.5">ORDER #{order._id.slice(-6).toUpperCase()}</div>
-                                            <div className="font-bold text-slate-800 text-[15px]">{order.shopId?.name || "Local Shop"}</div>
+                                        <div className="flex-1 pr-3 min-w-0">
+                                            <div className="text-[15px] font-black text-slate-900 mb-0.5 truncate">{order.shopId?.name || "MUNA Store"}</div>
+                                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+                                                <span>#{order._id.slice(-6).toUpperCase()}</span>
+                                                <span>•</span>
+                                                <span>{formatTime(order.createdAt)}</span>
+                                            </div>
                                         </div>
-                                        <div className={`px-2.5 py-1 rounded-md border text-[10px] font-black uppercase tracking-wider ${getStatusColor(order.status)}`}>
-                                            {STATUS_LABELS[order.status] || order.status}
+                                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider shadow-sm shrink-0 ${getStatusColor(order.status)}`}>
+                                            <span>{getStatusIcon(order.status)}</span>
+                                            <span>{STATUS_LABELS[order.status] || order.status}</span>
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-between items-end">
-                                        <div className="flex flex-col gap-1 text-[13px]">
-                                            <div className="flex items-center gap-2 text-slate-500 font-medium">
-                                                <span>⏱️</span> {formatTime(order.createdAt)}
-                                            </div>
-                                            <div className="flex items-center gap-2 text-slate-400 text-xs font-bold mt-1">
-                                                <span>{order.items.length} Items</span> 
-                                                <span className={`transition-transform duration-300 ml-1 inline-block ${expandedOrderId === order._id ? 'rotate-180' : ''}`}>▼</span>
-                                            </div>
+                                    <div className="flex justify-between items-center mt-2">
+                                        <div className="flex items-center gap-2 text-[13px] font-bold text-slate-600">
+                                            <span>{order.items.length} Items</span>
+                                            <span className={`transition-transform duration-300 ml-1 inline-block text-[10px] ${isExpanded ? 'rotate-180' : ''}`}>▼</span>
                                         </div>
-                                        <div className="text-right">
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Amount</div>
-                                            <div className="font-black text-slate-900 text-lg">₹{order.totalAmount}</div>
-                                        </div>
+                                        <div className="text-[16px] font-black text-slate-900">₹{order.totalAmount}</div>
                                     </div>
+
+                                    {order.instructions && (
+                                        <div className="mt-3 bg-slate-50 border border-slate-100 rounded-xl p-3 flex items-start gap-2 shadow-sm">
+                                            <span className="text-[14px] mt-0.5">💬</span>
+                                            <div className="flex-1 min-w-0">
+                                                <span className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-0.5">Your Instructions</span>
+                                                <span className="block text-[13px] font-medium text-slate-800 leading-snug">{order.instructions}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {isActiveStatus && order.deliveryOtp && (
+                                        <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center justify-between shadow-sm">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[16px]">🔑</span>
+                                                <span className="text-[13px] font-bold text-amber-900">Delivery OTP</span>
+                                            </div>
+                                            <span className="text-[20px] font-black text-amber-700 tracking-widest">{order.deliveryOtp}</span>
+                                        </div>
+                                    )}
                                 </div>
 
-                                {expandedOrderId === order._id && (
-                                    <div className="px-5 pb-5 pt-2 border-t border-slate-100 border-dashed animate-in slide-in-from-top-2 duration-200 bg-slate-50/30">
-
-                                        {/* 🚀 DISPLAY OTP TO CUSTOMER */}
-                                        {order.status === 'out_for_delivery' && (
-                                            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mt-3 mb-5 text-center shadow-sm">
-                                                <span className="block text-[10px] font-black uppercase text-amber-800/70 tracking-widest mb-1.5">Delivery PIN</span>
-                                                <span className="block text-4xl font-black text-amber-600 tracking-[0.25em]">{order.deliveryOtp || '----'}</span>
-                                                <span className="block text-[10px] font-bold text-amber-700 mt-2 leading-tight">Share this PIN with the delivery partner.</span>
-                                            </div>
-                                        )}
-
-                                        <div className="py-2 space-y-2.5">
+                                {isExpanded && (
+                                    <div className="mt-4 pt-4 border-t border-slate-100 border-dashed animate-in slide-in-from-top-2 duration-200">
+                                        <span className="block text-[12px] font-black text-slate-400 mb-3 uppercase tracking-wider">Order Items</span>
+                                        <div className="space-y-2.5 mb-4">
                                             {order.items.map((item, idx) => (
-                                                <div key={idx} className="flex justify-between text-[13px] font-semibold text-slate-600">
-                                                    <span><span className="font-black text-slate-400 mr-2">{item.quantity}×</span>{item.name}</span>
-                                                    <span className="font-bold text-slate-900">₹{item.price * item.quantity}</span>
+                                                <div key={idx} className="flex items-start justify-between gap-3 pb-2 border-b border-slate-100/50 last:border-0 last:pb-0">
+                                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                        {item.productId?.image ? (
+                                                            <div className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+                                                                <img src={item.productId.image} alt={item.name} className="w-full h-full object-cover" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-10 h-10 shrink-0 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-[16px]">
+                                                                📦
+                                                            </div>
+                                                        )}
+                                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                            <span className="w-5 h-5 bg-slate-100 rounded flex items-center justify-center border border-slate-200 text-[10px] font-black text-slate-600 shrink-0">{item.quantity}x</span>
+                                                            <span className="text-[13px] font-semibold text-slate-700 truncate">{item.name}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-[13px] font-bold text-slate-900 shrink-0 self-center">₹{item.price * item.quantity}</span>
                                                 </div>
                                             ))}
                                         </div>
 
-                                        {order.instructions && (
-                                            <div className="bg-amber-50/50 border border-amber-100/50 p-3.5 rounded-xl mt-3 mb-3">
-                                                <strong className="block text-[10px] font-black uppercase text-amber-700/80 tracking-wider mb-1">📝 Instructions</strong>
-                                                <span className="text-xs font-semibold text-amber-900/90">{order.instructions}</span>
-                                            </div>
-                                        )}
-
-                                        <div className="flex justify-between items-center pt-4 mt-3 border-t border-slate-200/60">
+                                        <div className="flex justify-between items-center pt-3 border-t border-slate-100">
                                             <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Total Paid</span>
                                             <span className="text-lg font-black text-slate-900">₹{order.totalAmount}</span>
                                         </div>
 
                                         {order.status === 'pending' && (
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); handleCancelOrder(order._id); }}
-                                                className="w-full mt-5 py-3.5 bg-rose-50 text-rose-600 rounded-xl text-[13px] font-black border border-rose-100 active:scale-95 transition-transform"
-                                            >
-                                                Cancel Order
-                                            </button>
+                                            <div className="mt-4 pt-4 border-t border-slate-100 border-dashed">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleCancelOrder(order._id); }}
+                                                    className="w-full py-3 bg-rose-50 text-rose-600 rounded-xl text-[13px] font-black border border-rose-100 active:scale-[0.98] transition-transform"
+                                                >
+                                                    Cancel Order
+                                                </button>
+                                                <span className="block text-[10px] font-semibold text-slate-400 text-center mt-2">
+                                                    Orders can only be cancelled before they are accepted by the store.
+                                                </span>
+                                            </div>
                                         )}
                                     </div>
                                 )}
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

@@ -38,15 +38,19 @@ const IconEdit = () => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
     </svg>
 );
-const IconMapPin = () => (
+const IconHeadphones = () => (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 14.25v3m7.5-3v3m-7.5-3a.75.75 0 01.75-.75h1.5a.75.75 0 01.75.75v3a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-3zm7.5 0a.75.75 0 01.75-.75h1.5a.75.75 0 01.75.75v3a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-3zm-9.75 3A3.75 3.75 0 0112 10.5m0 0a3.75 3.75 0 017.5 0M4.5 19.5h15m-15 0v-5.25m15 5.25v-5.25M8.25 7.5V5.625A2.625 2.625 0 0110.875 3h2.25A2.625 2.625 0 0115.75 5.625V7.5" />
     </svg>
 );
 const IconVendor = () => (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+    </svg>
+);
+const IconUser = () => (
+    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
     </svg>
 );
 
@@ -69,28 +73,38 @@ const MenuRow = ({ icon, title, subtitle, onClick, isDanger, isLast }) => (
     </div>
 );
 
-/* ─── Quick Action Chip ─── */
-const QuickActionChip = ({ icon, label, onClick, colorClass }) => (
-    <div
-        onClick={() => { if (navigator.vibrate) navigator.vibrate(40); onClick(); }}
-        className="flex flex-col items-center justify-center bg-white py-3 rounded-2xl border border-slate-100/60 shadow-[0_2px_8px_rgba(0,0,0,0.02)] active:scale-95 transition-transform cursor-pointer"
-    >
-        <div className={`mb-1 ${colorClass}`}>{icon}</div>
-        <span className="text-[11px] font-bold text-slate-600 tracking-wide">{label}</span>
-    </div>
-);
-
 const Profile = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
-
-    if (!user) return null;
 
     const handleLogout = () => {
         toast.success("Logged out successfully");
         logout();
         navigate('/');
     };
+
+    /* ── GUEST STATE ── */
+    if (!user) {
+        return (
+            <div className="fixed inset-0 z-[100] flex flex-col bg-[#F5F6F8] overflow-hidden font-sans">
+                <div className="flex-1 flex flex-col items-center justify-center px-6 -mt-10">
+                    <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-slate-100 text-slate-400">
+                        <IconUser />
+                    </div>
+                    <h2 className="text-[20px] font-extrabold text-slate-900 mb-2 text-center tracking-tight">Your Profile</h2>
+                    <p className="text-[14px] font-medium text-slate-500 mb-8 text-center leading-relaxed max-w-[280px]">
+                        Login or create an account to view orders, manage addresses, and access wishlist.
+                    </p>
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="w-full max-w-xs bg-slate-900 py-4 rounded-xl shadow-sm text-white text-[15px] font-bold active:scale-[0.98] transition-transform"
+                    >
+                        Login / Signup
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="fixed inset-0 z-[100] flex flex-col bg-[#F5F6F8] overflow-hidden font-sans">
@@ -129,32 +143,76 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* ── QUICK ACTIONS ── */}
-                <div className="grid grid-cols-3 gap-3 p-4">
-                    <QuickActionChip icon={<IconPackage />} label="Orders" onClick={() => navigate('/profile/orders')} colorClass="text-blue-500" />
-                    <QuickActionChip icon={<IconMapPin />} label="Addresses" onClick={() => navigate('/profile/settings')} colorClass="text-emerald-500" />
-                    <QuickActionChip icon={<IconHeart />} label="Wishlist" onClick={() => navigate('/profile/wishlist')} colorClass="text-rose-500" />
-                </div>
+                <div className="px-5 mt-5">
+                    {/* ── ACTION CARDS: ORDERS & WISHLIST ── */}
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                        <div
+                            onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/profile/orders'); }}
+                            className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] active:scale-[0.97] transition-transform cursor-pointer"
+                        >
+                            <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-700 shrink-0">
+                                <IconPackage />
+                            </div>
+                            <div>
+                                <span className="block text-[14px] font-bold text-slate-900 leading-tight">Orders</span>
+                                <span className="block text-[11px] font-medium text-slate-500 mt-0.5">Track & Reorder</span>
+                            </div>
+                        </div>
 
-                {/* ── MENUS ── */}
-                <div className="px-4 space-y-3 pb-8">
-                    
-                    <div className="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-slate-100 overflow-hidden">
-                        <MenuRow icon={<IconPackage />} title="My Orders" subtitle="Track or reorder past items" onClick={() => navigate('/profile/orders')} />
-                        <MenuRow icon={<IconHeart />} title="My Wishlist" subtitle="Saved items for later" onClick={() => navigate('/profile/wishlist')} />
-                        <MenuRow icon={<IconSettings />} title="Profile Settings" subtitle="Edit details & locations" onClick={() => navigate('/profile/settings')} isLast />
+                        <div
+                            onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/profile/wishlist'); }}
+                            className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] active:scale-[0.97] transition-transform cursor-pointer"
+                        >
+                            <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-700 shrink-0">
+                                <IconHeart />
+                            </div>
+                            <div>
+                                <span className="block text-[14px] font-bold text-slate-900 leading-tight">Wishlist</span>
+                                <span className="block text-[11px] font-medium text-slate-500 mt-0.5">Saved Items</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-slate-100 overflow-hidden">
-                        <MenuRow icon={<IconVendor />} title="Become a Vendor" subtitle="Open your own shop on MUNA" onClick={() => navigate('/profile/vendor-request')} isLast />
+                    {/* ── VENDOR DASHBOARD BANNER ── */}
+                    {user?.role === 'vendor' && (
+                        <div
+                            onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor-dashboard'); }}
+                            className="flex items-center justify-between bg-slate-900 p-4 rounded-2xl mb-6 shadow-sm active:scale-[0.98] transition-transform cursor-pointer"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white shrink-0">
+                                    <IconVendor />
+                                </div>
+                                <div>
+                                    <span className="block text-[15px] font-bold text-white leading-tight">Vendor Dashboard</span>
+                                    <span className="block text-[12px] font-medium text-slate-300 mt-0.5">Manage your business</span>
+                                </div>
+                            </div>
+                            <IconChevron />
+                        </div>
+                    )}
+
+                    {/* ── ACCOUNT ── */}
+                    <h3 className="text-[13px] font-bold text-slate-500 mb-2 ml-1 tracking-wide">ACCOUNT</h3>
+                    <div className="bg-white rounded-2xl border border-slate-100 mb-6 overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                        <MenuRow icon={<IconSettings />} title="Account Settings" subtitle="Personal Details, Locations" onClick={() => navigate('/profile/settings')} isLast />
                     </div>
 
-                    <div className="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                    {/* ── SUPPORT & MORE ── */}
+                    <h3 className="text-[13px] font-bold text-slate-500 mb-2 ml-1 tracking-wide">SUPPORT & MORE</h3>
+                    <div className="bg-white rounded-2xl border border-slate-100 mb-6 overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                        {user?.role !== 'vendor' && (
+                            <MenuRow icon={<IconVendor />} title="Become a Seller" subtitle="Grow your business with MUNA" onClick={() => navigate('/profile/vendor-request')} />
+                        )}
+                        <MenuRow icon={<IconHeadphones />} title="Help & Support" subtitle="Contact customer service" onClick={() => window.location.href = 'mailto:ofassam@gmail.com'} />
                         <MenuRow icon={<IconLogout />} title="Log Out" isDanger onClick={handleLogout} isLast />
                     </div>
 
-                    <div className="text-center pt-4">
-                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">MUNA App v2.0</p>
+                    {/* ── FOOTER / VERSION ── */}
+                    <div className="text-center pt-2 pb-4">
+                        <p className="text-[12px] font-black text-slate-300 tracking-[0.3em] mb-1">M U N A</p>
+                        <p className="text-[11px] font-semibold text-slate-400">Proudly made in Assam ❤️</p>
+                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-2">MUNA Web v2.0</p>
                     </div>
                 </div>
             </div>

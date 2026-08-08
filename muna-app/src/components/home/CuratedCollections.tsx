@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import ProductCard from '../ProductCard';
@@ -47,28 +47,44 @@ export default function CuratedCollections({ featuredProducts }: CuratedCollecti
         }
     };
 
-    const renderCollection = (collection: any, idx: number) => {
-        // Filter products that match any keyword in name or category
-        const matchedProducts = featuredProducts.filter(prod => {
-            const name = prod.name?.toLowerCase() || '';
-            const cat = prod.category?.name?.toLowerCase() || (typeof prod.category === 'string' ? prod.category.toLowerCase() : '');
-            return collection.keywords.some((kw: string) => name.includes(kw) || cat.includes(kw));
-        }).slice(0, 5); // Take top 5
+    const [activeCollection, setActiveCollection] = useState<any>(null);
 
-        if (matchedProducts.length === 0) return null;
+    useEffect(() => {
+        if (!featuredProducts || featuredProducts.length === 0) {
+            setActiveCollection(null);
+            return;
+        }
+        
+        const validCollections = collections.map(collection => {
+            const matchedProducts = featuredProducts.filter(prod => {
+                const name = prod.name?.toLowerCase() || '';
+                const cat = prod.category?.name?.toLowerCase() || (typeof prod.category === 'string' ? prod.category.toLowerCase() : '');
+                return collection.keywords.some((kw: string) => name.includes(kw) || cat.includes(kw));
+            }).slice(0, 5);
+            return { ...collection, matchedProducts };
+        }).filter(c => c.matchedProducts.length > 0);
 
-        return (
-            <View key={idx} className={`mb-6 py-5 ${collection.bgColor} border-y border-slate-100/50`}>
+        if (validCollections.length > 0) {
+            const randomIdx = Math.floor(Math.random() * validCollections.length);
+            setActiveCollection(validCollections[randomIdx]);
+        }
+    }, [featuredProducts]);
+
+    if (!activeCollection) return null;
+
+    return (
+        <View className="mt-2">
+            <View className={`mb-6 py-5 ${activeCollection.bgColor} border-y border-slate-100/50`}>
                 <View className="px-4 mb-3">
-                    <Text className="text-[18px] font-black text-slate-900">{collection.title}</Text>
-                    <Text className="text-[12px] font-medium text-slate-600 mt-0.5">{collection.subtitle}</Text>
+                    <Text className="text-[18px] font-black text-slate-900">{activeCollection.title}</Text>
+                    <Text className="text-[12px] font-medium text-slate-600 mt-0.5">{activeCollection.subtitle}</Text>
                 </View>
                 <ScrollView 
                     horizontal 
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ paddingHorizontal: 12, gap: 12 }}
                 >
-                    {matchedProducts.map(prod => {
+                    {activeCollection.matchedProducts.map((prod: any) => {
                         const cartItem = cartItems.find((item: any) => item.productId === prod._id);
                         const quantity = cartItem ? cartItem.quantity : 0;
                         const shopId = prod.shopId?._id || prod.shopId;
@@ -94,12 +110,6 @@ export default function CuratedCollections({ featuredProducts }: CuratedCollecti
                     })}
                 </ScrollView>
             </View>
-        );
-    };
-
-    return (
-        <View className="mt-2">
-            {collections.map((coll, idx) => renderCollection(coll, idx))}
         </View>
     );
 }

@@ -1,9 +1,21 @@
 const Order = require('../models/Order');
+const crypto = require('crypto');
 const mongoose = require('mongoose');
-const { getDistanceFromLatLonInKm } = require('../utils/geo');
 const Product = require('../models/Product');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
+
+// Hard caps enforced on every order to prevent abuse / DoS
+const MAX_ITEMS_PER_ORDER = 50;
+const MAX_QUANTITY_PER_ITEM = 50;
+const OTP_MAX_ATTEMPTS = 5;
+const OTP_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+// Utility: clamp pagination params to a safe range
+const clampPagination = (page, limit, defaultLimit = 20, maxLimit = 100) => ({
+    page: Math.max(parseInt(page) || 1, 1),
+    limit: Math.min(Math.max(parseInt(limit) || defaultLimit, 1), maxLimit)
+});
 
 const { sendAndSaveNotification } = require('../utils/notificationService');
 
@@ -12,18 +24,38 @@ const { sendAndSaveNotification } = require('../utils/notificationService');
 const placeOrder = async (req, res) => {
     let session;
     try {
-        const { shopId, items, totalAmount, deliveryLocation, customerPhone, instructions } = req.body;
+        const { shopId, items, deliveryLocation, customerPhone, instructions } = req.body;
 
-        if (!items || items.length === 0) {
+        if (!Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ message: "Your cart is empty!" });
+        }
+        if (items.length > MAX_ITEMS_PER_ORDER) {
+            return res.status(400).json({ message: `A maximum of ${MAX_ITEMS_PER_ORDER} items is allowed per order` });
+        }
+        for (const item of items) {
+            const qty = Number(item.quantity);
+            if (!Number.isInteger(qty) || qty < 1 || qty > MAX_QUANTITY_PER_ITEM) {
+                return res.status(400).json({ message: `Each item quantity must be a whole number between 1 and ${MAX_QUANTITY_PER_ITEM}` });
+            }
+            if (!mongoose.Types.ObjectId.isValid(item.productId)) {
+                return res.status(400).json({ message: "Invalid product in cart" });
+            }
         }
         
         if (!mongoose.Types.ObjectId.isValid(shopId)) {
             return res.status(400).json({ message: "Invalid Shop ID" });
         }
 
-        const custLat = deliveryLocation.lat;
-        const custLng = deliveryLocation.lng;
+        const custLat = Number(deliveryLocation?.lat);
+        const custLng = Number(deliveryLocation?.lng);
+        if (!deliveryLocation?.address || !Number.isFinite(custLat) || !Number.isFinite(custLng)) {
+            return res.status(400).json({ message: "A valid delivery location is required" });
+        }
+        const normalizedDeliveryLocation = {
+            ...deliveryLocation,
+            lat: custLat,
+            lng: custLng
+        };
 
         // Rule 3: Distance calculation using MongoDB $geoNear
         const shopResults = await Shop.aggregate([
@@ -99,7 +131,7 @@ const placeOrder = async (req, res) => {
                 productId: item.productId,
                 name: product.name,
                 price: product.price,
-                quantity: item.quantity
+                quantity: Number(item.quantity)
             });
         }
 
@@ -112,7 +144,7 @@ const placeOrder = async (req, res) => {
         }
 
         const finalTotalAmount = itemsTotal + fee;
-        const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+        const generatedOtp = crypto.randomInt(1000, 10000).toString();
 
         const orderResult = await Order.create([{
             customerId: req.user._id,
@@ -120,7 +152,7 @@ const placeOrder = async (req, res) => {
             items: verifiedItems,
             totalAmount: finalTotalAmount,
             deliveryFee: fee,
-            deliveryLocation,
+            deliveryLocation: normalizedDeliveryLocation,
             instructions: instructions || '',
             deliveryOtp: generatedOtp
         }], { session });
@@ -218,14 +250,14 @@ const cancelOrder = async (req, res) => {
 // 3. Get Customer's Orders
 const getCustomerOrders = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 20;
+        const { page, limit } = clampPagination(req.query.page, req.query.limit);
         
         const filter = { customerId: req.user._id };
         const total = await Order.countDocuments(filter);
         
         const orders = await Order.find(filter)
             .populate('shopId', 'name address image')
+            .populate('items.productId', 'image')
             .sort('-createdAt')
             .skip((page - 1) * limit)
             .limit(limit)
@@ -254,7 +286,8 @@ const getVendorOrders = async (req, res) => {
             return res.status(404).json({ message: "You don't have any shop." });
         }
 
-        const { page = 1, limit = 20, status, search, from, to, date } = req.query;
+        const { page, limit } = clampPagination(req.query.page, req.query.limit);
+        const { status, search, from, to, date } = req.query;
 
         let filter = { shopId: shop._id };
 
@@ -279,8 +312,10 @@ const getVendorOrders = async (req, res) => {
             if (to) filter.createdAt.$lte = new Date(to + 'T23:59:59.999Z');
         }
 
-        if (search) {
-            const searchRegex = new RegExp(search, 'i');
+        if (search && search.length <= 100) {
+            // Escape regex metacharacters to prevent ReDoS / regex injection
+            const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const searchRegex = new RegExp(escapeRegex(String(search)), 'i');
             const matchingUsers = await User.find({
                 $or: [{ name: searchRegex }, { phone: searchRegex }]
             }).select('_id');
@@ -293,25 +328,28 @@ const getVendorOrders = async (req, res) => {
             if (mongoose.Types.ObjectId.isValid(search)) {
                 filter.$or.push({ _id: search });
             }
+        } else if (search) {
+            return res.status(400).json({ message: "Search query is too long" });
         }
 
         let query = Order.find(filter)
             .select('-deliveryOtp') // Security: Don't send OTP to vendor, otherwise they can cheat via DevTools!
             .populate('customerId', 'name email phone')
+            .populate('items.productId', 'image')
             .sort('-createdAt');
 
         const total = await Order.countDocuments(filter);
-        const skip = (Number(page) - 1) * Number(limit);
+        const skip = (page - 1) * limit;
 
-        const orders = await query.skip(skip).limit(Number(limit)).lean();
+        const orders = await query.skip(skip).limit(limit).lean();
 
         res.status(200).json({
             orders: orders,
             pagination: {
                 total,
-                page: Number(page),
-                limit: Number(limit),
-                pages: Math.ceil(total / Number(limit))
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
             }
         });
     } catch (error) {
@@ -358,12 +396,32 @@ const updateOrderStatus = async (req, res) => {
 
         // 🚀 NEW LOGIC: VERIFY OTP IF VENDOR MARKS AS DELIVERED
         if (status === 'delivered' && order.deliveryOtp) {
+            // Brute-force protection: lock the order after too many failed PIN attempts
+            if (order.otpLockedUntil && order.otpLockedUntil > new Date()) {
+                return res.status(429).json({ message: "Too many incorrect PIN attempts. Please wait a few minutes." });
+            }
             if (!deliveryOtp) {
                 return res.status(400).json({ message: "Delivery PIN is required to complete this order." });
             }
-            if (order.deliveryOtp !== deliveryOtp.toString()) {
+
+            const provided = String(deliveryOtp);
+            const expected = String(order.deliveryOtp);
+            const pinMatches = provided.length === expected.length &&
+                crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+
+            if (!pinMatches) {
+                order.otpAttempts = (order.otpAttempts || 0) + 1;
+                if (order.otpAttempts >= OTP_MAX_ATTEMPTS) {
+                    order.otpLockedUntil = new Date(Date.now() + OTP_LOCKOUT_MS);
+                    order.otpAttempts = 0;
+                }
+                await order.save();
                 return res.status(400).json({ message: "Incorrect PIN! Please ask the customer for the correct 4-digit PIN." });
             }
+
+            // Correct PIN: reset attempt tracking
+            order.otpAttempts = 0;
+            order.otpLockedUntil = null;
 
             // Increment salesCount for each product in the order
             try {
@@ -401,7 +459,14 @@ const updateOrderStatus = async (req, res) => {
             { actionUrl: "/orders", route: "/orders", type: "order" }
         );
 
-        res.status(200).json(updatedOrder);
+        // Security: Never expose the delivery OTP to the vendor (they could mark orders
+        // delivered before actually handing them over, defeating the PIN check).
+        const safeOrder = updatedOrder.toObject ? updatedOrder.toObject() : { ...updatedOrder };
+        delete safeOrder.deliveryOtp;
+        delete safeOrder.otpAttempts;
+        delete safeOrder.otpLockedUntil;
+
+        res.status(200).json(safeOrder);
     } catch (error) {
         console.error("updateOrderStatus error:", error);
         res.status(500).json({ message: "Something went wrong. Please try again." });
@@ -428,10 +493,14 @@ const getAllOrdersForAdmin = async (req, res) => {
             createdAt: { $gte: startOfDay, $lte: endOfDay }
         };
         
+        // Hard cap to bound DB load / response size (response shape must stay an array for the admin UI)
+        const MAX_ADMIN_ORDERS = 500;
         const orders = await Order.find(filter)
             .populate('shopId', 'name vendorId address isActive')
+            .populate('items.productId', 'image')
             .populate('customerId', 'name phone')
             .sort({ createdAt: -1 })
+            .limit(MAX_ADMIN_ORDERS)
             .lean();
 
         res.status(200).json(orders);

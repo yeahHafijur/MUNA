@@ -62,8 +62,8 @@ const getMessages = async (req, res) => {
             return res.status(403).json({ message: "Not authorized" });
         }
 
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 30;
+        const page = Math.max(parseInt(req.query.page) || 1, 1);
+        const limit = Math.min(Math.max(parseInt(req.query.limit) || 30, 1), 100);
         const skip = (page - 1) * limit;
 
         // Sort descending to get newest messages first, then reverse them for UI
@@ -112,6 +112,9 @@ const sendMessage = async (req, res) => {
 
         if (!text) {
             return res.status(400).json({ message: "Message text is required." });
+        }
+        if (typeof text !== 'string' || text.length > 4000) {
+            return res.status(400).json({ message: "Message is too long (max 4000 characters)." });
         }
 
         const message = await ChatMessage.create({

@@ -19,42 +19,6 @@ const IcoBack = () => (
     </svg>
 );
 
-const IcoShop = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6 text-slate-400">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
-    </svg>
-);
-
-const IcoProduct = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="w-8 h-8 text-slate-300">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-    </svg>
-);
-
-const IcoDairy = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6 text-slate-700">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-    </svg>
-);
-
-const IcoVeggies = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6 text-slate-700">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-    </svg>
-);
-
-const IcoSnacks = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6 text-slate-700">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
-    </svg>
-);
-
-const IcoDrinks = () => (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6 text-slate-700">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-    </svg>
-);
-
 const IcoTime = () => (
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="w-3 h-3 mr-1">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -200,7 +164,7 @@ const Search = () => {
                             🔍
                         </div>
                         <h3 className="text-[16px] font-black text-slate-900 mb-1 tracking-tight">No results found</h3>
-                        <p className="text-[12px] font-medium text-slate-500 px-8 leading-relaxed">We couldn't find anything matching "{debouncedQuery}". Check spelling or try another term.</p>
+                        <p className="text-[12px] font-medium text-slate-500 px-8 leading-relaxed">We couldn't find anything matching "{debouncedQuery}". Try checking for typos or using more general terms.</p>
                     </div>
                 )}
 
@@ -268,14 +232,14 @@ const Search = () => {
                 {/* ── Rich Initial View (Blinkit Style) ── */}
                 {!hasSearched && !isLoading && (
                     <div className="pt-2 pb-10 animate-in fade-in duration-200">
-                        {/* Recent / Trending Badges */}
+                        {/* Trending Searches */}
                         <div className="mb-8">
                             <h3 className="text-[14px] font-black text-slate-800 mb-3 px-1">Trending Searches</h3>
                             <div className="flex flex-wrap gap-2">
-                                {['Fresh Milk', 'Bread', 'Eggs', 'Maggi', 'Coke', 'Atta', 'Chips', 'Onion', 'Rice'].map((tag, i) => (
+                                {['Milk & Bread', 'Fresh Vegetables', 'Maggi', 'Cold Drinks', 'Chicken', 'Eggs', 'Snacks'].map((tag, i) => (
                                     <span
                                         key={tag}
-                                        onClick={() => setQuery(tag.split(' ')[0])}
+                                        onClick={() => setQuery(tag)}
                                         className="bg-white border border-slate-200/70 px-4 py-2 rounded-[12px] text-[13px] font-bold text-slate-700 shadow-[0_2px_10px_rgba(0,0,0,0.03)] active:bg-amber-100 active:text-amber-900 active:border-amber-200 transition-colors cursor-pointer"
                                     >
                                         {i === 0 ? '🔥 ' : ''}{tag}
@@ -284,32 +248,37 @@ const Search = () => {
                             </div>
                         </div>
 
-                        {/* Top Categories Grid - Colorful */}
+                        {/* Explore Categories - Emoji Grid */}
                         <div className="mb-6">
                             <h3 className="text-[14px] font-black text-slate-800 mb-3 px-1">Explore Categories</h3>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-3 gap-3">
                                 {[
-                                    { name: 'Dairy & Milk', emoji: '🥛', bg: 'bg-blue-50/80', border: 'border-blue-100', text: 'text-blue-900' },
-                                    { name: 'Fresh Veggies', emoji: '🥬', bg: 'bg-green-50/80', border: 'border-green-100', text: 'text-green-900' },
-                                    { name: 'Snacks & Munchies', emoji: '🍟', bg: 'bg-orange-50/80', border: 'border-orange-100', text: 'text-orange-900' },
-                                    { name: 'Cold Drinks', emoji: '🥤', bg: 'bg-teal-50/80', border: 'border-teal-100', text: 'text-teal-900' },
-                                    { name: 'Meat & Eggs', emoji: '🍗', bg: 'bg-rose-50/80', border: 'border-rose-100', text: 'text-rose-900' },
-                                    { name: 'Personal Care', emoji: '🧴', bg: 'bg-purple-50/80', border: 'border-purple-100', text: 'text-purple-900' },
+                                    { name: 'Vegetables', emoji: '🥦' },
+                                    { name: 'Fruits', emoji: '🍎' },
+                                    { name: 'Meat & Fish', emoji: '🍗' },
+                                    { name: 'Dairy', emoji: '🥛' },
+                                    { name: 'Sweets', emoji: '🍫' },
+                                    { name: 'Cleaning', emoji: '🧼' },
                                 ].map((cat) => (
                                     <div
                                         key={cat.name}
-                                        onClick={() => setQuery(cat.name.split(' ')[0])}
-                                        className={`flex items-center justify-between p-4 rounded-[16px] border ${cat.bg} ${cat.border} shadow-[0_2px_10px_rgba(0,0,0,0.02)] active:scale-95 transition-transform cursor-pointer`}
+                                        onClick={() => setQuery(cat.name)}
+                                        className="flex flex-col items-center justify-center bg-white border border-slate-100 rounded-2xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] active:scale-95 transition-transform cursor-pointer"
                                     >
-                                        <span className={`text-[13px] font-black ${cat.text} max-w-[60%] leading-tight`}>{cat.name}</span>
-                                        <span className="text-3xl drop-shadow-sm">{cat.emoji}</span>
+                                        <span className="text-3xl mb-2 drop-shadow-sm">{cat.emoji}</span>
+                                        <span className="text-[11px] font-bold text-slate-700 text-center leading-tight">{cat.name}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                        
-                        {/* Empty Space filler to push footer down and make it feel "full" */}
-                        <div className="h-10"></div>
+
+                        {/* Type to find placeholder */}
+                        <div className="flex flex-col items-center justify-center pt-10 opacity-40 pointer-events-none">
+                            <span className="text-4xl mb-2">🛒</span>
+                            <span className="text-[12px] font-bold text-slate-500 text-center">
+                                Type to find products & stores
+                            </span>
+                        </div>
                     </div>
                 )}
             </div>

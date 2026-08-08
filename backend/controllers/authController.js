@@ -4,8 +4,8 @@ const User = require('../models/User');
 
 
 // Generate Token
-const generateToken = (id, role) => {
-    return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+const generateToken = (id, role, tokenVersion) => {
+    return jwt.sign({ id, role, tv: tokenVersion }, process.env.JWT_SECRET, {
         expiresIn: '7d',
     });
 };
@@ -62,7 +62,7 @@ const googleLogin = async (req, res) => {
             await user.save();
         }
 
-        const token = generateToken(user._id, user.role);
+        const token = generateToken(user._id, user.role, user.tokenVersion);
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -85,7 +85,7 @@ const googleLogin = async (req, res) => {
 
     } catch (error) {
         console.error("Google Auth Error:", error);
-        res.status(500).json({ message: "Google login failed: " + (error.message || error.toString()) });
+        res.status(500).json({ message: "Google login failed. Please try again." });
     }
 };
 
@@ -229,6 +229,9 @@ const deleteAccount = async (req, res) => {
             return res.status(403).json({ message: "Vendors must contact support to delete their account and shop." });
         }
 
+        // Revoke any outstanding JWTs before deleting the account
+        user.tokenVersion = (user.tokenVersion || 0) + 1;
+        await user.save();
         await user.deleteOne();
         res.status(200).json({ message: "Account deleted successfully" });
     } catch (error) {
@@ -292,9 +295,13 @@ const logout = async (req, res) => {
     try {
         // Best-effort FCM token cleanup (req.user may be available if token is valid)
         const { fcmToken } = req.body || {};
-        if (req.user && fcmToken) {
-            const { removeFcmToken } = require('../utils/notificationService');
-            await removeFcmToken(req.user._id, fcmToken);
+        if (req.user) {
+            if (fcmToken) {
+                const { removeFcmToken } = require('../utils/notificationService');
+                await removeFcmToken(req.user._id, fcmToken);
+            }
+            // Revoke this session's token so it can't be replayed if stolen
+            await User.findByIdAndUpdate(req.user._id, { $inc: { tokenVersion: 1 } });
         }
 
         res.cookie('token', '', {

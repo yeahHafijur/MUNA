@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Linking, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Linking, Alert, Image } from 'react-native';
 
 interface VendorOrderCardProps {
     order: any;
@@ -50,7 +50,16 @@ const VendorOrderCard: React.FC<VendorOrderCardProps> = ({ order, updatingStatus
 
             <View className="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3">
                 {order.items.map((i: any) => (
-                    <View key={i._id} className="flex-row items-center py-1 flex-1">
+                    <View key={i._id} className="flex-row items-center py-2 flex-1 border-b border-slate-100 last:border-0">
+                        {i.productId?.image ? (
+                            <View className="w-10 h-10 rounded-lg overflow-hidden bg-slate-200 mr-3 border border-slate-200">
+                                <Image source={{ uri: i.productId.image }} style={{ width: '100%', height: '100%' }} />
+                            </View>
+                        ) : (
+                            <View className="w-10 h-10 rounded-lg bg-slate-200 mr-3 border border-slate-200 items-center justify-center">
+                                <Text className="text-[16px]">📦</Text>
+                            </View>
+                        )}
                         <Text className="font-bold text-slate-400 mr-2">{i.quantity}×</Text>
                         <Text className="text-[13px] font-medium text-slate-700 flex-1">{i.name}</Text>
                     </View>

@@ -24,7 +24,6 @@ export const requestFirebaseNotificationPermission = async () => {
         vapidKey: "BBnHrHqSkDnBw35QcLtBi5XFD3vLwu5C9-bonVmtVzqDAeHDSkCaRw6-J0JRqPJ1e3uI5-KDZkU-8KdOT5u7bUQ"
       });
       if (token) {
-        console.log("FCM Token:", token);
         return token;
       } else {
         console.log("No registration token available. Request permission to generate one.");

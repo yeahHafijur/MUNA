@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { optimizeImage } from '../utils/imageUtils';
 import { toast } from 'react-toastify';
+import PageHeader from '../components/ui/PageHeader';
 
 /* ─── Standard Native Icons ─── */
 const IcoBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>;
@@ -101,21 +102,38 @@ const ProductDetail = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-white flex flex-col items-center justify-center">
-                <div className="w-8 h-8 border-4 border-gray-200 border-t-gray-800 rounded-full animate-spin" />
+            <div className="min-h-screen bg-slate-50/70 font-sans">
+                <div className="sticky top-0 z-20 bg-white px-4 py-3.5 flex items-center gap-3 border-b border-slate-100">
+                    <div className="w-9 h-9 rounded-full bg-slate-100 animate-pulse" />
+                    <div className="skeleton w-40 h-4" />
+                </div>
+                <div className="p-4 sm:p-8 bg-white">
+                    <div className="aspect-square max-h-[400px] w-full skeleton-block rounded-2xl" />
+                </div>
+                <div className="bg-white px-4 py-5 space-y-3">
+                    <div className="skeleton w-24 h-3" />
+                    <div className="skeleton w-3/4 h-5" />
+                    <div className="skeleton w-28 h-7" />
+                </div>
+                <div className="bg-white px-4 py-5 space-y-2 border-t border-slate-100">
+                    <div className="skeleton w-32 h-4" />
+                    <div className="skeleton w-full h-3" />
+                    <div className="skeleton w-full h-3" />
+                    <div className="skeleton w-2/3 h-3" />
+                </div>
             </div>
         );
     }
 
     if (!product || !shop) {
         return (
-            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
-                <div className="w-24 h-24 mb-4"><IcoPlaceholder /></div>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">Product Not Found</h2>
-                <p className="text-sm text-gray-500 mb-6">This item is currently unavailable.</p>
+            <div className="min-h-screen bg-slate-50/70 flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-24 h-24 mb-4 text-slate-300"><IcoPlaceholder /></div>
+                <h2 className="text-lg font-black text-slate-900 mb-1">Product Not Found</h2>
+                <p className="text-sm text-slate-500 mb-6">This item is currently unavailable.</p>
                 <button
                     onClick={() => navigate(-1)}
-                    className="px-6 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg"
+                    className="btn-dark btn-md"
                 >
                     Go Back
                 </button>
@@ -151,31 +169,31 @@ const ProductDetail = () => {
     const activeImage = allImages.length > 0 ? optimizeImage(allImages[activeImageIndex], 800) : null;
 
     return (
-        <div className="min-h-screen bg-gray-100 font-sans pb-40">
+        <div className="min-h-screen bg-slate-50/70 font-sans pb-40">
 
-            {/* ─── STANDARD STICKY HEADER ─── */}
-            <header className="sticky top-0 inset-x-0 z-50 bg-white border-b border-gray-200 flex items-center justify-between px-2 py-2">
-                <button
-                    className="p-2 text-gray-800 active:bg-gray-100 rounded-full transition-colors"
-                    onClick={() => navigate(-1)}
-                >
-                    <IcoBack />
-                </button>
-                <div className="flex items-center">
-                    <button
-                        className={`p-2 rounded-full active:bg-gray-100 transition-colors ${liked ? 'text-red-500' : 'text-gray-800'}`}
-                        onClick={toggleLike}
-                    >
-                        <IcoHeart filled={liked} />
-                    </button>
-                    <button
-                        className="p-2 text-gray-800 active:bg-gray-100 rounded-full transition-colors"
-                        onClick={handleShare}
-                    >
-                        <IcoShare />
-                    </button>
-                </div>
-            </header>
+            {/* ─── STICKY HEADER ─── */}
+            <PageHeader
+                title={product.name || 'Product'}
+                onBack={() => navigate(-1)}
+                right={
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-all ${liked ? 'text-rose-500 bg-rose-50' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
+                            onClick={toggleLike}
+                            aria-label="Save to wishlist"
+                        >
+                            <IcoHeart filled={liked} />
+                        </button>
+                        <button
+                            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 bg-slate-50 hover:bg-slate-100 active:scale-90 transition-all"
+                            onClick={handleShare}
+                            aria-label="Share"
+                        >
+                            <IcoShare />
+                        </button>
+                    </div>
+                }
+            />
 
             {/* ─── PRODUCT IMAGE GALLERY ─── */}
             <section className="w-full bg-white flex flex-col p-4 sm:p-8">
@@ -197,7 +215,7 @@ const ProductDetail = () => {
                             <button
                                 key={idx}
                                 onClick={() => { setActiveImageIndex(idx); triggerHaptic(20); }}
-                                className={`w-16 h-16 shrink-0 rounded-xl overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-amber-400 scale-105 shadow-sm' : 'border-gray-100 opacity-70 active:scale-95'}`}
+                                className={`w-16 h-16 shrink-0 rounded-xl overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-brand-400 scale-105 shadow-sm' : 'border-slate-100 opacity-70 active:scale-95'}`}
                             >
                                 <img src={optimizeImage(img, 200)} className="w-full h-full object-contain mix-blend-multiply" alt={`Gallery ${idx+1}`} />
                             </button>
@@ -207,36 +225,38 @@ const ProductDetail = () => {
             </section>
 
             {/* ─── MAIN INFO SECTION ─── */}
-            <section className="bg-white px-4 py-5 mb-2 border-b border-gray-200">
-                <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            <section className="bg-white px-4 py-5 mb-2 border-b border-slate-100">
+                <p className="text-[11px] font-black text-brand-600 uppercase tracking-widest mb-1.5">
                     {typeof product.category === 'object' ? product.category?.name || 'Category' : product.category || 'Category'}
                 </p>
-                <h1 className="text-xl font-bold text-gray-900 leading-snug mb-3 tracking-tight">
-                    {product.name} {product.quantity && <span className="text-gray-500 font-medium text-lg">({product.quantity})</span>}
+                <h1 className="text-xl font-black text-slate-900 leading-snug mb-3 tracking-tight">
+                    {product.name} {product.quantity && <span className="text-slate-500 font-semibold text-lg">({product.quantity})</span>}
                 </h1>
 
-                <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl font-bold text-gray-900 tracking-tight">₹{product.price}</span>
+                <div className="flex items-center gap-2.5 mb-2">
+                    <span className="text-2xl font-black text-slate-900 tracking-tight">₹{product.price}</span>
+                    <span className="text-[15px] font-bold text-slate-400 line-through">₹{Math.floor((product.price || 0) * 1.15)}</span>
+                    <span className="text-[11px] font-black text-success-700 bg-success-50 px-1.5 py-0.5 rounded-md border border-success-100">15% OFF</span>
                 </div>
 
-                <div className="text-sm text-gray-500 mt-3 pt-3 border-t border-gray-100">
-                    Sold by <span className="font-semibold text-gray-900">{shop.name}</span>
+                <div className="text-sm text-slate-500 mt-3 pt-3 border-t border-slate-100">
+                    Sold by <span className="font-semibold text-slate-900">{shop.name}</span>
                 </div>
             </section>
 
             {/* ─── DETAILS SECTION ─── */}
-            <section className="bg-white px-4 py-5 border-y border-gray-200 mb-2">
-                <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Product Details</h2>
-                <p className="text-sm text-gray-600 leading-relaxed">
+            <section className="bg-white px-4 py-5 border-y border-slate-100 mb-2">
+                <h2 className="text-[13px] font-black text-slate-900 mb-2 uppercase tracking-wide">Product Details</h2>
+                <p className="text-sm text-slate-600 leading-relaxed">
                     {product.description || `High-quality product sourced directly from ${shop.name}. We ensure standard packaging and swift delivery directly to your location.`}
                 </p>
             </section>
 
             {/* ─── SIMILAR PRODUCTS CAROUSEL ─── */}
             {similarProducts.length > 0 && (
-                <section className="bg-white py-5 border-y border-gray-200 mb-2">
+                <section className="bg-white py-5 border-y border-slate-100 mb-2">
                     <div className="px-4 flex justify-between items-center mb-4">
-                        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide">More from this store</h2>
+                        <h2 className="text-[13px] font-black text-slate-900 uppercase tracking-wide">More from this store</h2>
                     </div>
 
                     {/* Horizontal Scroll Container */}
@@ -245,9 +265,9 @@ const ProductDetail = () => {
                             <div
                                 key={p._id}
                                 onClick={() => navigate(`/shop/${shopId}/product/${p._id}`)}
-                                className="w-[140px] shrink-0 border border-gray-200 rounded-lg p-2.5 flex flex-col snap-start cursor-pointer active:bg-gray-50 transition-colors"
+                                className="w-[140px] shrink-0 bg-white rounded-xl border border-slate-100 p-2.5 flex flex-col snap-start cursor-pointer active:scale-[0.98] transition-all shadow-card hover:shadow-card-hover"
                             >
-                                <div className="aspect-square w-full bg-white mb-2 flex items-center justify-center relative rounded overflow-hidden">
+                                <div className="aspect-square w-full bg-[#F8F9FA] mb-2 flex items-center justify-center relative rounded-lg overflow-hidden">
                                     {p.image ? (
                                         <img src={optimizeImage(p.image, 200)} alt={p.name} className="w-full h-full object-contain mix-blend-multiply" />
                                     ) : (
@@ -255,17 +275,17 @@ const ProductDetail = () => {
                                     )}
                                     {!p.inStock && (
                                         <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex items-center justify-center">
-                                            <span className="bg-white text-gray-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border border-gray-200 shadow-sm">Sold Out</span>
+                                            <span className="bg-slate-800 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">Sold Out</span>
                                         </div>
                                     )}
                                 </div>
-                                <h3 className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug mb-2 flex-1">
-                                    {p.name} {p.quantity && <span className="text-gray-500">({p.quantity})</span>}
+                                <h3 className="text-xs font-bold text-slate-800 line-clamp-2 leading-snug mb-2 flex-1">
+                                    {p.name} {p.quantity && <span className="text-slate-500">({p.quantity})</span>}
                                 </h3>
                                 <div className="flex items-center justify-between mt-auto">
-                                    <span className="text-sm font-bold text-gray-900 tracking-tight">₹{p.price}</span>
+                                    <span className="text-sm font-black text-slate-900 tracking-tight">₹{p.price}</span>
                                     <button
-                                        className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 active:bg-gray-200 transition-colors disabled:opacity-50"
+                                        className="w-7 h-7 rounded-full bg-success-600 text-white flex items-center justify-center active:bg-success-700 active:scale-90 transition-all disabled:opacity-50 shadow-sm"
                                         disabled={!p.inStock}
                                         onClick={(e) => { e.stopPropagation(); handleAdd(p); }}
                                     >
@@ -278,35 +298,35 @@ const ProductDetail = () => {
                 </section>
             )}
 
-            {/* ─── STANDARD BOTTOM BAR ─── */}
-            <div className="fixed bottom-[64px] inset-x-0 bg-white border-t border-gray-200 p-3 z-50">
+            {/* ─── BOTTOM BAR ─── */}
+            <div className="fixed bottom-[64px] inset-x-0 bg-white border-t border-slate-100 p-3 z-50 shadow-[0_-4px_20px_rgba(15,23,42,0.06)]">
                 <div className="max-w-xl mx-auto w-full flex gap-3">
                     {!product.inStock ? (
-                        <button className="w-full py-3.5 bg-gray-100 text-gray-400 rounded-lg font-semibold text-sm cursor-not-allowed">
+                        <button className="w-full py-3.5 bg-slate-100 text-slate-400 rounded-xl font-black text-sm cursor-not-allowed">
                             Out of Stock
                         </button>
                     ) : cartItem ? (
                         <>
                             {/* Native Quantity Controller */}
-                            <div className="flex items-center justify-between bg-white border border-gray-300 rounded-lg px-2 w-[120px] shrink-0">
+                            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-2 w-[120px] shrink-0 shadow-sm">
                                 <button
-                                    className="p-2 text-gray-600 active:bg-gray-100 rounded"
+                                    className="p-2 text-slate-600 active:bg-slate-100 rounded-lg"
                                     onClick={() => { triggerHaptic(30); updateQuantity(product._id, cartItem.quantity - 1); }}
                                 >
                                     <IcoMinus />
                                 </button>
-                                <span className="font-semibold text-base text-gray-900">
+                                <span className="font-black text-base text-slate-900">
                                     {cartItem.quantity}
                                 </span>
                                 <button
-                                    className="p-2 text-gray-600 active:bg-gray-100 rounded"
+                                    className="p-2 text-slate-600 active:bg-slate-100 rounded-lg"
                                     onClick={() => { triggerHaptic(30); updateQuantity(product._id, cartItem.quantity + 1); }}
                                 >
                                     <IcoPlus />
                                 </button>
                             </div>
                             <button
-                                className="flex-1 py-3.5 bg-gray-900 text-white rounded-lg font-semibold text-sm active:bg-gray-800 transition-colors"
+                                className="flex-1 py-3.5 bg-success-600 text-white rounded-xl font-black text-sm active:bg-success-700 transition-colors shadow-[0_4px_14px_rgba(16,185,129,0.3)]"
                                 onClick={() => navigate('/cart')}
                             >
                                 Go to Cart
@@ -314,7 +334,7 @@ const ProductDetail = () => {
                         </>
                     ) : (
                         <button
-                            className="w-full py-3.5 bg-amber-400 text-amber-950 rounded-lg font-semibold text-sm active:bg-amber-500 transition-colors"
+                            className="w-full py-3.5 bg-success-600 text-white rounded-xl font-black text-sm active:bg-success-700 transition-colors shadow-[0_4px_14px_rgba(16,185,129,0.3)]"
                             onClick={() => handleAdd(product)}
                         >
                             Add to Cart

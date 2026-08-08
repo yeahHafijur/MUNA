@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Clock, Package, CheckCircle2, Truck, XCircle } from 'lucide-react-native';
@@ -240,16 +240,27 @@ export default function OrdersScreen() {
                                         <Text className="text-[12px] font-black text-slate-400 mb-3 uppercase tracking-wider">Order Items</Text>
                                         <View className="gap-2.5 mb-4">
                                             {order.items?.map((item: any, idx: number) => (
-                                                <View key={idx} className="flex-row items-start justify-between gap-3">
-                                                    <View className="flex-row items-center gap-2 flex-1">
-                                                        <View className="w-5 h-5 bg-slate-100 rounded flex items-center justify-center border border-slate-200">
-                                                            <Text className="text-[10px] font-black text-slate-600">{item.quantity}x</Text>
+                                                <View key={idx} className="flex-row items-start justify-between gap-3 pb-2 border-b border-slate-100 last:border-0 last:pb-0">
+                                                    <View className="flex-row items-center gap-3 flex-1">
+                                                        {item.productId?.image ? (
+                                                            <View className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+                                                                <Image source={{ uri: item.productId.image }} style={{ width: '100%', height: '100%' }} />
+                                                            </View>
+                                                        ) : (
+                                                            <View className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 items-center justify-center">
+                                                                <Text className="text-[16px]">📦</Text>
+                                                            </View>
+                                                        )}
+                                                        <View className="flex-row items-center gap-2 flex-1">
+                                                            <View className="w-5 h-5 bg-slate-100 rounded flex items-center justify-center border border-slate-200">
+                                                                <Text className="text-[10px] font-black text-slate-600">{item.quantity}x</Text>
+                                                            </View>
+                                                            <Text className="text-[13px] font-semibold text-slate-700 flex-1" numberOfLines={1}>
+                                                                {item.name || 'Product'}
+                                                            </Text>
                                                         </View>
-                                                        <Text className="text-[13px] font-semibold text-slate-700 flex-1" numberOfLines={1}>
-                                                            {item.productId?.name || 'Product'}
-                                                        </Text>
                                                     </View>
-                                                    <Text className="text-[13px] font-bold text-slate-900">₹{item.price * item.quantity}</Text>
+                                                    <Text className="text-[13px] font-bold text-slate-900 self-center">₹{item.price * item.quantity}</Text>
                                                 </View>
                                             ))}
                                         </View>

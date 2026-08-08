@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Share, ActivityIndicator, Dimensions, StatusBar } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Share, ActivityIndicator, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
+import { StatusBar } from 'expo-status-bar';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Heart, Share2, Minus, Plus, Clock, ShoppingCart, Store, ChevronRight, Shield, Truck, Star } from 'lucide-react-native';
@@ -174,6 +175,7 @@ export default function ProductDetailScreen() {
     const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
     const isOutOfStock = product.inStock === false || (shop && shop.isOpen === false);
     const imageUrl = getImageUrl(product.image);
+    const shopImageUrl = shop?.image ? getImageUrl(shop.image) : null;
 
     const similarProducts = Array.isArray(allShopProducts)
         ? allShopProducts.filter(p => p._id !== product._id).slice(0, 8)
@@ -373,8 +375,8 @@ export default function ProductDetailScreen() {
                         activeOpacity={0.7}
                     >
                         <View className="w-12 h-12 rounded-2xl bg-slate-100 items-center justify-center mr-3 overflow-hidden">
-                            {shop.image ? (
-                                <Image source={{ uri: getImageUrl(shop.image) }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+                            {shopImageUrl ? (
+                                <Image source={{ uri: shopImageUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                             ) : (
                                 <Store size={22} color="#64748b" />
                             )}

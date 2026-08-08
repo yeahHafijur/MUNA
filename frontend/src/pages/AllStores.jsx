@@ -1,19 +1,26 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { haversine } from '../utils/homeUtils.js';
 import StoreListing from '../components/home/StoreListing';
+import PageHeader from '../components/ui/PageHeader';
+
+const IcoSearch = () => (
+    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+    </svg>
+);
 
 const AllStores = () => {
-    const navigate = useNavigate();
     const [userLocation, setUserLocation] = useState(null);
     const [activeCategory, setActiveCategory] = useState('All');
+    const [searchQuery, setSearchQuery] = useState('');
 
     /* ── Fetch Data ── */
-    const { data: shops = [], isLoading: loading } = useQuery({
+    const { data: shopsData = [], isLoading: loading } = useQuery({
         queryKey: ['shops'],
         queryFn: () => fetch('/api/shops', { credentials: 'include' }).then(r => r.json()),
     });
+    const shops = Array.isArray(shopsData) ? shopsData : [];
 
     /* ── Geolocation ── */
     useEffect(() => {
@@ -26,6 +33,11 @@ const AllStores = () => {
     }, []);
 
     /* ── Derived Data ── */
+    const categories = useMemo(() => {
+        const set = new Set(shops.map(s => s.category || 'Grocery'));
+        return ['All', ...Array.from(set).sort()];
+    }, [shops]);
+
     const sortedShops = useMemo(() => {
         let list = shops.map(shop => {
             let distance = Infinity;
@@ -39,30 +51,57 @@ const AllStores = () => {
             list = list.filter(s => (s.category || 'Grocery') === activeCategory);
         }
 
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            list = list.filter(s =>
+                s.name.toLowerCase().includes(q) ||
+                s.address?.toLowerCase().includes(q) ||
+                (s.category || '').toLowerCase().includes(q)
+            );
+        }
+
         return list.sort((a, b) => {
             if (a.isOpen !== b.isOpen) return a.isOpen ? -1 : 1;
             return a.distance - b.distance;
         });
-    }, [shops, userLocation, activeCategory]);
+    }, [shops, userLocation, activeCategory, searchQuery]);
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col -mx-4 -mt-4">
-            {/* Header */}
-            <div className="bg-white px-4 py-4 flex items-center gap-3 shadow-sm sticky top-0 z-50">
-                <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-slate-100 active:bg-slate-200 transition-colors">
-                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-700">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                    </svg>
-                </button>
-                <div>
-                    <h1 className="text-[18px] font-black text-slate-900 leading-tight">All Stores</h1>
-                    <p className="text-[11px] font-bold text-slate-500">Explore everything near you</p>
+        <div className="min-h-screen bg-slate-50/70 flex flex-col font-sans">
+            <PageHeader title="All Stores" subtitle="Explore everything near you" />
+
+            {/* Search + category chips */}
+            <div className="bg-white border-b border-slate-100 px-4 pt-3 pb-3 space-y-3">
+                <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                        <IcoSearch />
+                    </span>
+                    <input
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search stores or categories..."
+                        className="input-field pl-10"
+                    />
+                </div>
+                <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-1 px-1">
+                    {categories.map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => setActiveCategory(cat)}
+                            className={`shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-black tracking-tight transition-all active:scale-95 border
+                                ${activeCategory === cat
+                                    ? 'bg-brand-400 text-amber-950 border-brand-400 shadow-cta'
+                                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
+                        >
+                            {cat}
+                        </button>
+                    ))}
                 </div>
             </div>
 
             {/* Content */}
             <div className="flex-1 pb-20">
-                <StoreListing 
+                <StoreListing
                     sortedShops={sortedShops}
                     loading={loading}
                     activeCategory={activeCategory}

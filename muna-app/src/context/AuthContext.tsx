@@ -79,9 +79,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
     setToken(null);
     try {
+      // Revoke the server-side token (bumps tokenVersion) before clearing local storage
+      try {
+        await api.post('/api/auth/logout');
+      } catch {
+        // Ignore logout API failures — local cleanup still proceeds
+      }
+
       await SecureStore.deleteItemAsync('user');
       await SecureStore.deleteItemAsync('token');
-      
+
       // Force Google to forget the session so it asks for the account again next time
       try {
         await GoogleSignin.signOut();

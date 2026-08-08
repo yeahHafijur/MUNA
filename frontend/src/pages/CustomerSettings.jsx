@@ -51,6 +51,10 @@ const CustomerSettings = () => {
     const [isAddressesModalOpen, setIsAddressesModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deleteConfirmText, setDeleteConfirmText] = useState('');
+    const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
+    const [newAddressType, setNewAddressType] = useState('Home');
+    const [newAddressText, setNewAddressText] = useState('');
+    const [isSavingAddress, setIsSavingAddress] = useState(false);
 
     useEffect(() => {
         if (!user) navigate('/login');
@@ -95,6 +99,51 @@ const CustomerSettings = () => {
                 toast.success("Location deleted");
             }
         } catch (error) { toast.error("Error deleting location"); }
+    };
+
+    const handleSaveNewAddress = async () => {
+        if (!newAddressText.trim()) return toast.error("Please enter the full address details.");
+        if (!('geolocation' in navigator)) return toast.error("GPS is not supported in this browser.");
+
+        setIsSavingAddress(true);
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                try {
+                    const res = await fetch('/api/auth/save-location', {
+                        credentials: 'include',
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({
+                            name: newAddressType,
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude,
+                            address: newAddressText
+                        })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        login({ ...user, savedLocations: data.savedLocations }, token);
+                        toast.success("Address saved successfully!");
+                        setIsAddAddressModalOpen(false);
+                        setNewAddressText('');
+                        setNewAddressType('Home');
+                    } else {
+                        toast.error(data.message || "Failed to save address");
+                    }
+                } catch (error) {
+                    console.error("[Add Address] Save error:", error);
+                    toast.error("Server error saving address");
+                } finally {
+                    setIsSavingAddress(false);
+                }
+            },
+            (err) => {
+                console.error("[Add Address] Geolocation error:", err);
+                setIsSavingAddress(false);
+                toast.error("Could not get your location. Please ensure GPS is enabled.");
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
+        );
     };
 
     const handleEnableNotifications = async () => {
@@ -168,7 +217,7 @@ const CustomerSettings = () => {
 
                 <div>
                     <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">General</h3>
-                    <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                    <div className="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
                         <SettingRow icon={<IconUser />} title="Edit Profile" subtitle="Name & Contact" onClick={handleOpenEditProfile} />
                         <SettingRow icon={<IconMapPin />} title="Addresses" subtitle="Manage delivery locations" rightText={user.savedLocations?.length ? `${user.savedLocations.length} Saved` : 'None'} onClick={() => setIsAddressesModalOpen(true)} isLast={true} />
                     </div>
@@ -176,20 +225,20 @@ const CustomerSettings = () => {
 
                 <div>
                     <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">App Settings</h3>
-                    <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                    <div className="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
                         <SettingRow icon={<IconBell />} title="Notifications" subtitle="Order alerts & offers" badge={Notification.permission === 'granted' ? 'Enabled' : 'Off'} onClick={handleEnableNotifications} isLast={true} />
                     </div>
                 </div>
 
                 <div>
                     <h3 className="px-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Legal</h3>
-                    <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
+                    <div className="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden">
                         <SettingRow icon={<IconShield />} title="Privacy Policy" onClick={() => navigate('/privacy-policy')} isLast={true} />
                     </div>
                 </div>
 
                 <div className="pt-2">
-                    <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-rose-50 overflow-hidden">
+                    <div className="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-rose-50 overflow-hidden">
                         <SettingRow icon={<IconTrash />} title="Delete Account" subtitle="Permanently erase data" isDanger={true} onClick={handleDeleteAccount} isLast={true} />
                     </div>
                 </div>
@@ -241,6 +290,62 @@ const CustomerSettings = () => {
                             <p className="text-[12px] font-semibold text-slate-500 mt-1">Addresses save automatically during checkout.</p>
                         </div>
                     )}
+
+                    {/* Add New Address */}
+                    <button
+                        onClick={() => { if (navigator.vibrate) navigator.vibrate(30); setIsAddAddressModalOpen(true); }}
+                        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/50 text-amber-700 text-[13px] font-black uppercase tracking-wider active:scale-[0.98] active:bg-amber-50 transition-all"
+                    >
+                        <span className="text-[16px] leading-none">＋</span> Add New Address
+                    </button>
+                </div>
+            </Modal>
+
+            {/* ─── MODAL: ADD NEW ADDRESS ─── */}
+            <Modal isOpen={isAddAddressModalOpen} onClose={() => !isSavingAddress && setIsAddAddressModalOpen(false)} title="New Address">
+                <div className="space-y-5">
+                    <div className="bg-amber-50 border border-amber-100 rounded-2xl p-3.5">
+                        <p className="text-[11px] font-medium text-amber-800 leading-relaxed">
+                            We will securely capture your <strong>current GPS location</strong> when you save this address. Please make sure you are physically at this address right now, so our delivery partners can find you easily.
+                        </p>
+                    </div>
+
+                    <div>
+                        <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2.5">Address Type</span>
+                        <div className="grid grid-cols-3 gap-2">
+                            {['Home', 'Office', 'Other'].map(type => (
+                                <button
+                                    key={type}
+                                    type="button"
+                                    onClick={() => { if (navigator.vibrate) navigator.vibrate(20); setNewAddressType(type); }}
+                                    className={`py-3 rounded-xl border font-bold text-[14px] active:scale-[0.97] transition-all ${newAddressType === type ? 'bg-slate-900 border-slate-900 text-white shadow-sm' : 'bg-white border-slate-200 text-slate-600'}`}
+                                >
+                                    {type}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2.5">Full Address Details</span>
+                        <textarea
+                            value={newAddressText}
+                            onChange={(e) => setNewAddressText(e.target.value)}
+                            rows={3}
+                            placeholder="House No., Building, Street, Area, Landmark..."
+                            className="w-full px-4 py-3 bg-slate-50 border-2 border-transparent rounded-2xl text-slate-900 font-bold text-[13px] focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder:text-slate-400 placeholder:font-medium"
+                        />
+                    </div>
+
+                    <Button
+                        onClick={handleSaveNewAddress}
+                        isLoading={isSavingAddress}
+                        fullWidth
+                        className="text-[15px]"
+                        size="lg"
+                    >
+                        {isSavingAddress ? 'Getting Location...' : 'Save Address'}
+                    </Button>
                 </div>
             </Modal>
 

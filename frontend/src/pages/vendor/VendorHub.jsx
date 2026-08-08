@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { requestFirebaseNotificationPermission } from '../../firebase';
+import PageHeader from '../../components/ui/PageHeader';
 
 /* ─── Crisp Native Icons ─── */
 const IcoOrders = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>;
@@ -181,14 +182,11 @@ const VendorHub = () => {
         <div className="fixed inset-0 z-[100] flex flex-col bg-[#F5F6F8] overflow-hidden font-sans pb-4">
             
             {/* ── HEADER ── */}
-            <div className="sticky top-0 z-20 bg-white border-b border-slate-100 shadow-sm">
-                <div className="flex items-center justify-between px-4 py-3">
-                    <button onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/'); }} className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform">
-                        <IconBack />
-                    </button>
-                    <span className="text-[17px] font-extrabold text-slate-900 tracking-tight">Merchant Hub</span>
-                    
-                    {/* Store Status Toggle */}
+            <PageHeader 
+                title="Merchant Hub" 
+                sticky={true} 
+                onBack={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/'); }}
+                right={
                     <button
                         onClick={handleToggleShopStatus}
                         className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 border ${shop.isOpen ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}
@@ -196,8 +194,8 @@ const VendorHub = () => {
                         <span className={`w-2 h-2 rounded-full ${shop.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
                         {shop.isOpen ? 'Open' : 'Closed'}
                     </button>
-                </div>
-            </div>
+                }
+            />
 
             <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 
@@ -206,7 +204,11 @@ const VendorHub = () => {
                     <div className="flex items-center gap-4">
                         <div className="shrink-0">
                             <div className="w-16 h-16 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center text-2xl shadow-sm overflow-hidden bg-gradient-to-br from-amber-100 to-amber-200">
-                                {shop.image ? <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" /> : '🏪'}
+                                {shop.image ? <img src={shop.image} alt={shop.name} className="w-full h-full object-cover" /> : (
+                                    <div className="w-full h-full flex items-center justify-center bg-amber-50 text-amber-500">
+                                        <svg fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-8 h-8"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import PageHeader from '../../components/ui/PageHeader';
 
 /* ─── Premium Crisp Icons ─── */
 const IconBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
@@ -156,10 +157,21 @@ const VendorOrders = () => {
                 <span className="text-[12px] font-semibold text-slate-500">{order.customerId?.phone || 'N/A'}</span>
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-3 text-[12px] font-semibold text-slate-600 border border-slate-100/50">
+            <div className="bg-slate-50 rounded-xl p-3 text-[12px] font-semibold text-slate-600 border border-slate-100/50 space-y-2">
                 {order.items.map(i => (
-                    <div key={i._id} className="flex justify-between items-center py-1">
-                        <span><span className="font-black text-slate-400 mr-2">{i.quantity}×</span> {i.name}</span>
+                    <div key={i._id} className="flex items-center pb-2 border-b border-slate-100/80 last:border-0 last:pb-0">
+                        {i.productId?.image ? (
+                            <div className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-slate-200 mr-3 border border-slate-200">
+                                <img src={i.productId.image} alt={i.name} className="w-full h-full object-cover" />
+                            </div>
+                        ) : (
+                            <div className="w-10 h-10 shrink-0 rounded-lg bg-slate-200 mr-3 border border-slate-200 flex items-center justify-center text-lg">
+                                📦
+                            </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <div className="truncate"><span className="font-black text-slate-400 mr-2">{i.quantity}×</span> {i.name}</div>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -251,15 +263,7 @@ const VendorOrders = () => {
 
             {/* ─── NATIVE HEADER & CONTROLS (Sticky) ─── */}
             <div className="bg-white sticky top-0 z-50 shadow-sm">
-                <div className="px-4 py-3 flex items-center gap-3">
-                    <button
-                        onClick={() => { if (navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }}
-                        className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
-                    >
-                        <IconBack />
-                    </button>
-                    <span className="text-base font-extrabold text-slate-900 tracking-tight">Manage Orders</span>
-                </div>
+                <PageHeader title="Manage Orders" sticky={false} onBack={() => { if(navigator.vibrate) navigator.vibrate(40); navigate('/vendor'); }} />
                 
                 {/* ── Native Segmented Control ── */}
                 <div className="px-4 pb-3">

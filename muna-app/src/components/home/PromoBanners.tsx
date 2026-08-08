@@ -37,7 +37,12 @@ const PromoBanners: React.FC<PromoBannersProps> = ({ banners }) => {
             <Pressable
               key={b._id}
               onPress={() => {
-                if (b.link) Linking.openURL(b.link);
+                if (!b.link) return;
+                const url = String(b.link).trim();
+                const scheme = url.split('://')[0].toLowerCase();
+                if (scheme === 'http' || scheme === 'https' || scheme === 'munaapp') {
+                  Linking.openURL(url);
+                }
               }}
               style={{ width: BANNER_WIDTH, height: BANNER_HEIGHT }}
               className="rounded-[20px] overflow-hidden shadow-sm relative bg-slate-100">

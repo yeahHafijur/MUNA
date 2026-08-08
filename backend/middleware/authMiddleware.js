@@ -23,6 +23,12 @@ const protect = async (req, res, next) => {
                 return res.status(401).json({ message: "Not authorized, user not found" });
             }
 
+            // Revocation check: token must carry the user's current tokenVersion.
+            // Bumped on logout/account deletion so stolen tokens die immediately.
+            if (decoded.tv !== req.user.tokenVersion) {
+                return res.status(401).json({ message: "Not authorized, token failed" });
+            }
+
             // Agar sab theek hai toh agle step (controller) par jane do
             next();
         } catch (error) {

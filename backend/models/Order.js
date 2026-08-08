@@ -61,10 +61,19 @@ const orderSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    //  Delivery Security PIN (OTP)
+    // Delivery Security PIN (OTP)
     deliveryOtp: {
         type: String,
         required: true
+    },
+    // Brute-force protection for the delivery PIN
+    otpAttempts: {
+        type: Number,
+        default: 0
+    },
+    otpLockedUntil: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 

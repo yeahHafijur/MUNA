@@ -7,13 +7,18 @@ const getAllMasterProducts = async (req, res) => {
         const status = req.query.status;
         let filter = {};
         if (query) {
-            filter.name = { $regex: query, $options: 'i' };
+            if (query.length > 100) {
+                return res.status(400).json({ message: "Search query is too long" });
+            }
+            // Escape regex metacharacters to prevent ReDoS / regex injection
+            const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            filter.name = { $regex: escaped, $options: 'i' };
         }
         if (status) {
             filter.status = status;
         }
         
-        const products = await MasterProduct.find(filter).sort({ name: 1 });
+        const products = await MasterProduct.find(filter).sort({ name: 1 }).limit(500);
         res.status(200).json(products);
     } catch (error) {
         res.status(500).json({ message: "Server error" });

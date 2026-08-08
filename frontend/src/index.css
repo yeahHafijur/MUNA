@@ -1,27 +1,119 @@
 @import "tailwindcss";
 
-html, body {
-  /* Prevent double tap to zoom in mobile browsers */
-  touch-action: pan-x pan-y;
-  /* Prevent font scaling in landscape mode */
-  -webkit-text-size-adjust: 100%;
-  
-  /* Disable text selection globally */
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+@theme {
+    /* ── MUNA Brand Palette (amber-primary, emerald-success) ── */
+    --color-brand-50: #fffbeb;
+    --color-brand-100: #fef3c7;
+    --color-brand-200: #fde68a;
+    --color-brand-300: #fcd34d;
+    --color-brand-400: #fbbf24;
+    --color-brand-500: #f59e0b;
+    --color-brand-600: #d97706;
+    --color-brand-700: #b45309;
+    --color-brand-800: #92400e;
+    --color-brand-900: #78350f;
+
+    --color-success-50: #ecfdf5;
+    --color-success-100: #d1fae5;
+    --color-success-500: #10b981;
+    --color-success-600: #059669;
+    --color-success-700: #047857;
+
+    /* ── Surfaces ── */
+    --color-surface: #f5f5f7;
+    --color-ink: #0f172a;
+
+    /* ── Elevation ── */
+    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.04);
+    --shadow-card-hover: 0 2px 4px rgba(15, 23, 42, 0.06), 0 12px 32px rgba(15, 23, 42, 0.1);
+    --shadow-cta: 0 4px 14px rgba(251, 191, 36, 0.35);
+
+    /* ── Radii ── */
+    --radius-card: 1rem;
+    --radius-pill: 999px;
 }
 
-/* Allow text selection in form inputs and textareas so users can still type/copy/paste */
-input, textarea {
-  -webkit-user-select: auto;
-  -ms-user-select: auto;
-  user-select: auto;
+@layer base {
+    html, body {
+        /* Prevent double tap to zoom in mobile browsers */
+        touch-action: pan-x pan-y;
+        /* Prevent font scaling in landscape mode */
+        -webkit-text-size-adjust: 100%;
+
+        /* Disable text selection globally */
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        /* Crisp rendering + no gray tap flash on mobile */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Allow text selection in form inputs and textareas so users can still type/copy/paste */
+    input, textarea {
+        -webkit-user-select: auto;
+        -ms-user-select: auto;
+        user-select: auto;
+    }
+}
+
+@layer components {
+    /* ── Shared Card ── */
+    .card {
+        @apply bg-white rounded-2xl border border-slate-100/80 shadow-card;
+    }
+
+    .card-hover {
+        @apply hover:shadow-card-hover transition-shadow duration-200;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+        @apply inline-flex items-center justify-center font-bold tracking-tight transition-all duration-200 active:scale-[0.98] outline-none disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed select-none bg-brand-400 hover:bg-brand-500 text-amber-950 shadow-cta;
+    }
+    .btn-success {
+        @apply inline-flex items-center justify-center font-bold tracking-tight transition-all duration-200 active:scale-[0.98] outline-none disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed select-none bg-success-600 hover:bg-success-700 text-white shadow-[0_4px_14px_rgba(16,185,129,0.35)];
+    }
+    .btn-dark {
+        @apply inline-flex items-center justify-center font-bold tracking-tight transition-all duration-200 active:scale-[0.98] outline-none disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed select-none bg-ink hover:bg-slate-800 text-white shadow-[0_4px_14px_rgba(15,23,42,0.25)];
+    }
+    .btn-outline {
+        @apply inline-flex items-center justify-center font-bold tracking-tight transition-all duration-200 active:scale-[0.98] outline-none disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed select-none bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50;
+    }
+    .btn-ghost {
+        @apply inline-flex items-center justify-center font-bold tracking-tight transition-all duration-200 active:scale-[0.98] outline-none disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed select-none bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900;
+    }
+    .btn-sm { @apply px-3 py-1.5 text-xs rounded-lg gap-1.5; }
+    .btn-md { @apply px-4 py-2.5 text-sm rounded-xl gap-2; }
+    .btn-lg { @apply px-6 py-3.5 text-[15px] rounded-2xl gap-2.5; }
+
+    /* ── Form fields ── */
+    .input-field {
+        @apply w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-semibold text-slate-900 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all placeholder:text-slate-300;
+    }
+
+    /* ── Skeleton loaders ── */
+    .skeleton {
+        @apply animate-pulse bg-slate-200/80 rounded-full;
+    }
+    .skeleton-block {
+        @apply animate-pulse bg-slate-200/60 rounded-xl;
+    }
+
+    /* ── Section title bar ── */
+    .section-title {
+        @apply flex items-center gap-2.5;
+    }
+    .section-title-bar {
+        @apply w-1.5 h-6 bg-brand-400 rounded-full;
+    }
 }
 
 @utility no-scrollbar {
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }

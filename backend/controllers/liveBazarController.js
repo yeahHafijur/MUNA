@@ -19,13 +19,21 @@ const postItem = async (req, res) => {
         }
 
         const hours = parseInt(durationHours) || 24;
+        if (hours < 1 || hours > 168) {
+            return res.status(400).json({ message: "durationHours must be between 1 and 168" });
+        }
         const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
+
+        const numericPrice = Number(price);
+        if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+            return res.status(400).json({ message: "Price must be a positive number" });
+        }
 
         const newItem = await LiveBazarItem.create({
             userId: req.user._id,
-            title,
-            price: Number(price),
-            description,
+            title: String(title).slice(0, 200),
+            price: numericPrice,
+            description: description ? String(description).slice(0, 2000) : '',
             image: imageUrl,
             location: {
                 type: 'Point',
@@ -64,12 +72,12 @@ const getNearbyItems = async (req, res) => {
                     $maxDistance: distanceInMeters
                 }
             }
-        }).populate('userId', 'name phone profilePicture').sort({ createdAt: -1 });
+        }).populate('userId', 'name phone profilePicture').sort({ createdAt: -1 }).limit(200);
 
         res.status(200).json(items);
     } catch (error) {
         console.error("LiveBazar getNearbyItems Error:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -97,7 +105,13 @@ const updateStatus = async (req, res) => {
             return res.status(403).json({ message: "Not authorized to update this item." });
         }
 
-        item.status = req.body.status || 'soldout';
+        const validStatuses = ['active', 'soldout'];
+        const newStatus = req.body.status || 'soldout';
+        if (!validStatuses.includes(newStatus)) {
+            return res.status(400).json({ message: "Invalid status value" });
+        }
+
+        item.status = newStatus;
         await item.save();
 
         res.status(200).json({ message: `Item marked as ${item.status}`, item });

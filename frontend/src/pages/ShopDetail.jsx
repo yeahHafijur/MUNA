@@ -194,7 +194,7 @@ const ShopDetail = () => {
                                         className={`sd-chip ${selectedCategory === 'All' ? 'sd-chip--active' : ''}`}
                                         onClick={() => setSelectedCategory('All')}
                                     >
-                                        📦 All <span className="sd-chip-count">({products.length})</span>
+                                        All <span className="sd-chip-count">({products.length})</span>
                                     </button>
                                     {categories.map((cat, idx) => {
                                         const customImg = getCatImage(cat);
@@ -207,7 +207,7 @@ const ShopDetail = () => {
                                                 {customImg ? (
                                                     <img src={optimizeImage(customImg)} alt={cat} style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover', display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '4px' }} />
                                                 ) : (
-                                                    <span style={{ marginRight: '4px', fontSize: '16px' }}>🏷</span>
+                                                    <svg style={{ marginRight: '4px', width: '16px', height: '16px', display: 'inline-block', verticalAlign: 'text-bottom' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path strokeLinecap="round" strokeLinejoin="round" d="M6 7.5h.008v.008H6V7.5z" /></svg>
                                                 )}
                                                 {cat}
                                                 <span className="sd-chip-count">
@@ -226,7 +226,9 @@ const ShopDetail = () => {
                         {products.length === 0 ? (
                             /* ── No products ── */
                             <div className="sd-empty">
-                                <span className="sd-empty-emoji">📦</span>
+                                <div className="sd-empty-emoji w-16 h-16 flex items-center justify-center mx-auto text-slate-300">
+                                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                                </div>
                                 <div className="sd-empty-title">No products available</div>
                                 <div className="sd-empty-sub">This shop hasn't added any items yet.</div>
                             </div>

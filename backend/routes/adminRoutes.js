@@ -3,10 +3,11 @@ const router = express.Router();
 const { onboardVendorAndShop, broadcastNotification } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
+const { validateUploadedImages } = upload;
 
 // Route to onboard a new vendor and their shop
 // /api/admin/onboard
-router.post('/onboard', protect, authorize('super_admin'), upload.single('image'), onboardVendorAndShop);
+router.post('/onboard', protect, authorize('super_admin'), upload.single('image'), validateUploadedImages, onboardVendorAndShop);
 
 // Route to broadcast notification to users
 // /api/admin/broadcast

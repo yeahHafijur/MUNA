@@ -161,8 +161,8 @@ export default function HomeScreen() {
     return list
       .filter((shop: any) => {
         // HIDE SHOPS THAT ARE MORE THAN 25 KM AWAY
-        if (shop.distance !== Infinity && shop.distance > 25) {
-          return false;
+        if (userLocation) {
+          if (shop.distance > 25) return false;
         }
 
         if (activeCategory === 'All') return true;

@@ -20,10 +20,15 @@ const app = express();
 const server = http.createServer(app);
 
 // ---- SOCKET.IO SETUP ----
+// NOTE: Vercel preview deployments (`.vercel.app`) are only allowed if
+// `ALLOW_VERCEL_PREVIEWS=true` is set — off by default for security.
+const allowVercelPreviews = process.env.ALLOW_VERCEL_PREVIEWS === 'true';
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:4173',
     'http://127.0.0.1:5173',
+    'http://localhost:3001',
+    'http://127.0.0.1:3001',
     'https://munastore.in',
     'https://www.munastore.in',
     'https://munahut.in',
@@ -31,14 +36,18 @@ const allowedOrigins = [
     process.env.FRONTEND_URL   // Set this in .env for production
 ].filter(Boolean);
 
+// Shared origin check for both HTTP CORS and socket.io
+const isAllowedOrigin = (origin) => {
+    if (!origin) return true; // Non-browser clients (curl, mobile native)
+    if (allowedOrigins.includes(origin)) return true;
+    if (allowVercelPreviews && origin.endsWith('.vercel.app')) return true;
+    return false;
+};
+
 const io = new Server(server, {
     cors: {
         origin: function (origin, callback) {
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.includes(origin)) {
-                return callback(null, true);
-            }
-            if (origin.endsWith('.vercel.app')) {
+            if (isAllowedOrigin(origin)) {
                 return callback(null, true);
             }
             return callback(new Error('Not allowed by CORS'));
@@ -60,6 +69,7 @@ io.use(async (socket, next) => {
         const User = require('./models/User');
         const user = await User.findById(decoded.id);
         if (!user) return next(new Error('User not found'));
+        if (decoded.tv !== user.tokenVersion) return next(new Error('Invalid token'));
         
         socket.user = user;
         next();
@@ -92,11 +102,19 @@ io.on("connection", (socket) => {
     socket.on("mark_as_read", async (data) => {
         // data: { sessionId, messageIds }
         try {
-            if (data.messageIds && Array.isArray(data.messageIds) && data.messageIds.length > 0) {
+            if (data.sessionId && data.messageIds && Array.isArray(data.messageIds) && data.messageIds.length > 0) {
+                // Security: only allow marking messages as read in sessions the user belongs to
+                const ChatSession = require('./models/ChatSession');
+                const session = await ChatSession.findById(data.sessionId);
+                const userId = socket.user._id.toString();
+                if (!session || (session.buyerId.toString() !== userId && session.sellerId.toString() !== userId)) {
+                    return; // Unauthorized — ignore
+                }
+
                 const validIds = data.messageIds.filter(id => mongoose.Types.ObjectId.isValid(id));
                 if (validIds.length > 0) {
                     await ChatMessage.updateMany(
-                        { _id: { $in: validIds } },
+                        { _id: { $in: validIds }, sessionId: session._id },
                         { $set: { isRead: true } }
                     );
                 }
@@ -113,7 +131,21 @@ io.on("connection", (socket) => {
     });
 });
 
-app.use(helmet());
+// Security headers: strict CSP (API returns JSON only) + HSTS preload for HTTPS-only deployments
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'none'"],
+            frameAncestors: ["'none'"], // blocks clickjacking via <iframe>
+            upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
+        }
+    },
+    hsts: {
+        maxAge: 63072000, // 2 years
+        includeSubDomains: true,
+        preload: true
+    }
+}));
 
 // Compress all responses for extreme performance
 app.use(compression());
@@ -130,18 +162,9 @@ app.set('trust proxy', 1);
 // CORS — Only allow your own frontend origin
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        
-        // Check exact match in allowedOrigins
-        if (allowedOrigins.includes(origin)) {
+        if (isAllowedOrigin(origin)) {
             return callback(null, true);
         }
-        
-        // Allow any vercel.app domain dynamically
-        if (origin.endsWith('.vercel.app')) {
-            return callback(null, true);
-        }
-
         return callback(new Error('Not allowed by CORS'));
     },
     credentials: true
@@ -165,6 +188,22 @@ const authLimiter = rateLimit({
     message: { message: "Too many login attempts. Please try again later." }
 });
 app.use('/api/auth/', authLimiter);
+
+// Dedicated limiter for order placement — 20 orders per 15 minutes per IP
+const orderLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: { message: "Too many orders. Please try again later." }
+});
+app.post('/api/orders', orderLimiter);
+
+// Dedicated limiter for order status changes (also guards OTP brute-force) — 60 per 15 minutes per IP
+const orderStatusLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+    message: { message: "Too many status updates. Please try again later." }
+});
+app.put('/api/orders/:id/status', orderStatusLimiter);
 
 app.use('/api/shops', (req, res, next) => {
     if (req.method === 'GET') {

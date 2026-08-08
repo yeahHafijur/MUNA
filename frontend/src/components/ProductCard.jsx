@@ -1,4 +1,3 @@
-import React from 'react';
 import { optimizeImage } from '../utils/imageUtils';
 
 const IcoTime = () => (
@@ -42,7 +41,9 @@ const ProductCard = ({
                 {product.image ? (
                     <img src={optimizeImage(product.image, 300)} alt={product.name} className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm" />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl opacity-50">📦</div>
+                    <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-200">
+                        <svg fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-10 h-10"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                    </div>
                 )}
                 
                 {/* Out of stock overlay */}

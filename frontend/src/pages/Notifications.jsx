@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
-
-const IcoBack = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>;
-const IcoBell = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>;
-const IcoTrash = () => <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>;
+import PageHeader from '../components/ui/PageHeader';
+import { Bell, Package, MessageSquare, Megaphone, Info, CheckCheck } from 'lucide-react';
 
 const Notifications = () => {
     const { user, token } = useAuth();
@@ -21,19 +19,16 @@ const Notifications = () => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await fetch('/api/notifications', { credentials: 'include',   });
+            const res = await fetch('/api/notifications', { credentials: 'include' });
             const data = await res.json();
             
-            // Render them exactly as fetched (so unread items show visually as unread)
+            // Render them exactly as fetched
             setNotifications(data);
 
             // Automatically mark all as read in the backend if there are unread items
             const hasUnread = data.some(n => !n.isRead);
             if (hasUnread) {
-                await fetch('/api/notifications/read-all', { credentials: 'include', 
-                    method: 'PUT'
-                });
-                // Invalidate the unread count so the global badge clears immediately
+                await fetch('/api/notifications/read-all', { credentials: 'include', method: 'PUT' });
                 queryClient.invalidateQueries(['unread-count']);
             }
         } catch (err) {
@@ -43,111 +38,125 @@ const Notifications = () => {
         }
     };
 
-    const handleNotifClick = (actionUrl) => {
-        if (actionUrl) navigate(actionUrl);
+    const markAllAsReadLocal = () => {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     };
 
-    const deleteNotification = async (id, e) => {
-        e.stopPropagation();
-        try {
-            await fetch(`/api/notifications/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            setNotifications(notifications.filter(n => n._id !== id));
-        } catch (err) { console.error("Failed to delete notification:", err); }
+    const handleNotifClick = (notification) => {
+        if (!notification.isRead) {
+            // Optimistically mark as read in UI
+            setNotifications(prev => prev.map(n => n._id === notification._id ? { ...n, isRead: true } : n));
+        }
+        
+        let targetUrl = notification.actionUrl;
+        
+        // Smart fallbacks if actionUrl is missing
+        if (!targetUrl) {
+            if (notification.type === 'order') targetUrl = '/orders';
+            else if (notification.type === 'chat') targetUrl = '/chat';
+        }
+        
+        // Normalize deprecated URLs
+        if (targetUrl === '/profile/orders') targetUrl = '/orders';
+
+        if (targetUrl) navigate(targetUrl);
+    };
+
+    const timeAgo = (date) => {
+        const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + " years ago";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " months ago";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " days ago";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hours ago";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " mins ago";
+        return "just now";
+    };
+
+    const getIcon = (type) => {
+        switch (type) {
+            case 'order': return <Package size={20} color="#0ea5e9" />;
+            case 'chat': return <MessageSquare size={20} color="#10b981" />;
+            case 'promo': return <Megaphone size={20} color="#f59e0b" />;
+            case 'system': return <Info size={20} color="#64748b" />;
+            default: return <Bell size={20} color="#8b5cf6" />;
+        }
+    };
+
+    const getBgColor = (type) => {
+        switch (type) {
+            case 'order': return 'bg-sky-100';
+            case 'chat': return 'bg-emerald-100';
+            case 'promo': return 'bg-amber-100';
+            case 'system': return 'bg-slate-100';
+            default: return 'bg-purple-100';
+        }
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-50 font-sans antialiased overflow-hidden">
-            
-            {/* ════════ PREMIUM HEADER ════════ */}
-            <div className="shrink-0 bg-amber-400 pt-10 px-4 pb-4 shadow-md relative overflow-hidden rounded-b-[20px] z-20">
-                <div className="absolute right-[-10px] top-2 text-[90px] opacity-[0.15] rotate-12 pointer-events-none drop-shadow-sm">
-                    🔔
-                </div>
-                <div className="flex items-center gap-3 relative z-10 max-w-2xl mx-auto">
-                    <button 
-                        onClick={() => navigate(-1)} 
-                        className="w-10 h-10 bg-white/30 hover:bg-white/50 border border-white/40 text-slate-900 rounded-full flex items-center justify-center active:scale-95 transition-all backdrop-blur-sm"
-                    >
-                        <IcoBack />
-                    </button>
-                    <div>
-                        <h1 className="text-[20px] font-black text-amber-950 tracking-tight leading-tight">Notifications</h1>
-                        <p className="text-[11px] font-bold text-amber-900/80 uppercase tracking-widest mt-0.5">Stay updated</p>
-                    </div>
-                </div>
-            </div>
+        <div className="fixed inset-0 z-[100] flex flex-col bg-white font-sans antialiased overflow-hidden">
+            <PageHeader 
+                title="Notifications" 
+                variant="white"
+                right={
+                    notifications.some(n => !n.isRead) ? (
+                        <button 
+                            onClick={markAllAsReadLocal}
+                            className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 active:scale-95 transition-transform"
+                        >
+                            <CheckCheck size={14} color="#64748b" />
+                            <span className="text-[12px] font-bold text-slate-600">Read All</span>
+                        </button>
+                    ) : null
+                }
+            />
 
-            {/* ════════ NOTIFICATION LIST ════════ */}
-            <div className="flex-1 overflow-y-auto px-4 py-5 max-w-2xl mx-auto w-full">
+            <div className="flex-1 overflow-y-auto w-full max-w-2xl mx-auto">
                 {loading ? (
-                    <div className="space-y-4">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="bg-white rounded-[18px] p-4 border border-slate-100 shadow-sm flex gap-4 animate-pulse">
-                                <div className="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0"></div>
-                                <div className="flex-1 py-1">
-                                    <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
-                                    <div className="h-3 bg-slate-100 rounded w-1/2"></div>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="flex items-center justify-center h-full">
+                        <div className="w-8 h-8 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
                     </div>
                 ) : notifications.length === 0 ? (
-                    <div className="text-center py-20 mt-10">
-                        <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-slate-100">
-                            <span className="text-[40px] opacity-60">📭</span>
+                    <div className="flex flex-col items-center justify-center px-8 mt-20">
+                        <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                            <Bell size={40} color="#cbd5e1" />
                         </div>
-                        <h3 className="text-[18px] font-black text-slate-900 mb-2 tracking-tight">All caught up!</h3>
-                        <p className="text-[13px] font-medium text-slate-500 max-w-[220px] mx-auto leading-relaxed">
-                            There are no new notifications for you right now. Check back later!
+                        <h3 className="text-xl font-black text-slate-900 mb-2">All Caught Up!</h3>
+                        <p className="text-center text-slate-500 font-medium text-[14px]">
+                            You don't have any new notifications at the moment.
                         </p>
                     </div>
                 ) : (
-                    <div className="space-y-3 pb-20">
-                        {notifications.map((notif, idx) => (
+                    <div className="pb-20">
+                        {notifications.map((notif) => (
                             <div
                                 key={notif._id}
-                                onClick={() => handleNotifClick(notif.actionUrl)}
-                                style={{ animationDelay: `${idx * 40}ms` }}
-                                className={`group relative p-4 rounded-[18px] transition-all duration-200 ${notif.actionUrl ? 'cursor-pointer active:scale-[0.98]' : ''} animate-in slide-in-from-bottom-2 fade-in overflow-hidden border
-                                ${notif.isRead 
-                                    ? 'bg-white border-slate-100 shadow-sm' 
-                                    : 'bg-amber-50/50 border-amber-200 shadow-[0_4px_16px_rgba(251,191,36,0.12)]'
-                                }`}
+                                onClick={() => handleNotifClick(notif)}
+                                className={`flex items-start p-4 border-b border-slate-100 cursor-pointer active:bg-slate-50 transition-colors ${!notif.isRead ? 'bg-amber-50/30' : 'bg-white'}`}
                             >
-                                {/* Unread indicator bar */}
-                                {!notif.isRead && (
-                                    <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-400"></div>
-                                )}
-
-                                <div className="flex justify-between items-start gap-3 pl-1">
-                                    <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center
-                                        ${notif.isRead 
-                                            ? 'bg-slate-50 text-slate-400 border border-slate-100' 
-                                            : 'bg-white text-amber-500 shadow-sm border border-amber-100'
-                                        }`}>
-                                        <IcoBell />
-                                    </div>
-                                    <div className="flex-1 min-w-0 pt-0.5">
-                                        <h4 className={`text-[15px] leading-tight mb-1.5 tracking-tight ${notif.isRead ? 'font-bold text-slate-800' : 'font-black text-slate-900'}`}>
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 shrink-0 ${getBgColor(notif.type)}`}>
+                                    {getIcon(notif.type)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between mb-1 gap-2">
+                                        <h4 className={`text-[15px] ${!notif.isRead ? 'font-black text-slate-900' : 'font-bold text-slate-800'}`}>
                                             {notif.title}
                                         </h4>
-                                        <p className={`text-[13px] leading-snug ${notif.isRead ? 'text-slate-500 font-medium' : 'text-slate-700 font-semibold'}`}>
-                                            {notif.message}
-                                        </p>
-                                        <div className="text-[10px] font-black text-slate-400 mt-2.5 uppercase tracking-wider">
-                                            {new Date(notif.createdAt).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                        </div>
+                                        <span className="text-[11px] font-medium text-slate-400 shrink-0 mt-0.5">
+                                            {timeAgo(notif.createdAt)}
+                                        </span>
                                     </div>
-                                    <button
-                                        onClick={(e) => deleteNotification(notif._id, e)}
-                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-500 active:scale-90 transition-all flex-shrink-0 opacity-80"
-                                    >
-                                        <IcoTrash />
-                                    </button>
+                                    <p className={`text-[13px] leading-5 ${!notif.isRead ? 'font-medium text-slate-700' : 'text-slate-500'}`}>
+                                        {notif.message}
+                                    </p>
                                 </div>
+                                {!notif.isRead && (
+                                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full ml-3 mt-2 shrink-0"></div>
+                                )}
                             </div>
                         ))}
                     </div>

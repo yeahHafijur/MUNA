@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, Platform, Alert, Linking, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, Platform, Alert, Linking, ActivityIndicator, FlatList, Image } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
@@ -137,10 +137,21 @@ export default function VendorOrders() {
                         <Text className="text-[11px] font-bold uppercase text-slate-500 tracking-widest mb-2">Order Items</Text>
                         <View className="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3">
                             {order.items?.map((i: any, index: number) => (
-                                <View key={index} className="flex-row items-center py-1 flex-1">
-                                    <Text className="font-bold text-slate-500 mr-2">{i.quantity}×</Text>
-                                    <Text className="text-[13px] font-medium text-slate-700 flex-1">{i.name}</Text>
-                                    <Text className="text-[13px] font-bold text-slate-900">₹{i.price * i.quantity}</Text>
+                                <View key={index} className="flex-row items-center py-2 flex-1 border-b border-slate-100 last:border-0">
+                                    {i.productId?.image ? (
+                                        <View className="w-10 h-10 rounded-lg overflow-hidden bg-slate-200 mr-3 border border-slate-200">
+                                            <Image source={{ uri: i.productId.image }} style={{ width: '100%', height: '100%' }} />
+                                        </View>
+                                    ) : (
+                                        <View className="w-10 h-10 rounded-lg bg-slate-200 mr-3 border border-slate-200 items-center justify-center">
+                                            <Text className="text-[16px]">📦</Text>
+                                        </View>
+                                    )}
+                                    <View className="flex-1 flex-row items-center">
+                                        <Text className="font-bold text-slate-500 mr-2">{i.quantity}×</Text>
+                                        <Text className="text-[13px] font-medium text-slate-700 flex-1">{i.name}</Text>
+                                    </View>
+                                    <Text className="text-[13px] font-bold text-slate-900 ml-2">₹{i.price * i.quantity}</Text>
                                 </View>
                             ))}
                         </View>

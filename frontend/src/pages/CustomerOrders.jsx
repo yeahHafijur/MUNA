@@ -74,7 +74,7 @@ const CustomerOrders = () => {
             const res = await fetch('/api/orders/customer', { credentials: 'include',   });
             if (!res.ok) throw new Error("Failed to fetch");
             const data = await res.json();
-            return Array.isArray(data) ? data : [];
+            return data.orders || (Array.isArray(data) ? data : []);
         },
         enabled: true
     });

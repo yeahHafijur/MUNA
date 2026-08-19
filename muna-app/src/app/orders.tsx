@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Image, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Clock, Package, CheckCircle2, Truck, XCircle } from 'lucide-react-native';
@@ -232,6 +232,17 @@ export default function OrdersScreen() {
                                         </View>
                                         <Text className="text-amber-700 font-black text-[20px] tracking-widest">{order.deliveryOtp}</Text>
                                     </View>
+                                )}
+
+                                {/* Call Vendor */}
+                                {(order.status === 'pending' || order.status === 'accepted' || order.status === 'preparing' || order.status === 'out_for_delivery') && order.shopId?.vendorId?.phone && (
+                                    <TouchableOpacity
+                                        className="mt-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex-row items-center justify-center gap-2 shadow-sm"
+                                        onPress={() => Linking.openURL(`tel:${order.shopId.vendorId.phone}`)}
+                                    >
+                                        <Text className="text-[16px]">📞</Text>
+                                        <Text className="text-emerald-800 font-bold text-[13px]">Call Vendor</Text>
+                                    </TouchableOpacity>
                                 )}
 
                                 {/* Expanded Details */}

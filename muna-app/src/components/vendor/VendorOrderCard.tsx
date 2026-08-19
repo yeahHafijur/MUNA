@@ -88,6 +88,17 @@ const VendorOrderCard: React.FC<VendorOrderCardProps> = ({ order, updatingStatus
                 </TouchableOpacity>
             )}
 
+            {/* Call Customer */}
+            {order.customerId?.phone && order.status !== 'delivered' && order.status !== 'cancelled' && (
+                <TouchableOpacity
+                    className="mb-3 bg-blue-50 border border-blue-200 rounded-xl p-3 flex-row items-center justify-center gap-2"
+                    onPress={() => Linking.openURL(`tel:${order.customerId.phone}`)}
+                >
+                    <Text className="text-[16px]">📞</Text>
+                    <Text className="text-blue-800 font-bold text-[13px]">Call Customer</Text>
+                </TouchableOpacity>
+            )}
+
             <View className="pt-4 border-t border-slate-100 flex-row gap-3">
                 {updatingStatusId === order._id ? (
                     <View className="flex-1 py-3 items-center justify-center bg-slate-50 rounded-xl flex-row gap-2 border border-slate-100">

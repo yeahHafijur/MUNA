@@ -223,6 +223,17 @@ const CustomerOrders = () => {
                                             <span className="text-[20px] font-black text-amber-700 tracking-widest">{order.deliveryOtp}</span>
                                         </div>
                                     )}
+
+                                    {/* Call Vendor */}
+                                    {isActiveStatus && order.shopId?.vendorId?.phone && (
+                                        <a
+                                            href={`tel:${order.shopId.vendorId.phone}`}
+                                            className="mt-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-center gap-2 shadow-sm no-underline hover:bg-emerald-100 transition-colors cursor-pointer"
+                                        >
+                                            <span className="text-[16px]">📞</span>
+                                            <span className="text-[13px] font-bold text-emerald-800">Call Vendor</span>
+                                        </a>
+                                    )}
                                 </div>
 
                                 {isExpanded && (

@@ -75,10 +75,6 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
             Alert.alert("Location Required", "Please click 'Get Current Location' first.");
             return;
         }
-        if (!newAddressText.trim()) {
-            Alert.alert("Missing Info", "Please enter your House No. / Landmark.");
-            return;
-        }
 
         setSaving(true);
         const payload = {
@@ -268,15 +264,7 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
                             )}
                         </TouchableOpacity>
 
-                        <Text className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Complete Address</Text>
-                        <TextInput 
-                            value={newAddressText}
-                            onChangeText={setNewAddressText}
-                            placeholder="House No., Building Name, Landmark"
-                            className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[15px] font-medium text-slate-900 mb-4"
-                            multiline
-                            style={{ height: 80, textAlignVertical: 'top' }}
-                        />
+
 
                         {/* Save Address Option */}
                         <TouchableOpacity 
@@ -308,13 +296,13 @@ const CartLocation: React.FC<CartLocationProps> = ({ onLocationDetermined, locat
 
                         <TouchableOpacity 
                             onPress={handleSaveNewAddress}
-                            disabled={saving || !newAddressText.trim() || !newGps}
+                            disabled={saving || !newGps}
                             className="w-full py-4 rounded-2xl items-center shadow-sm"
-                            style={{ backgroundColor: (saving || !newAddressText.trim() || !newGps) ? '#e2e8f0' : '#0f172a' }}
+                            style={{ backgroundColor: (saving || !newGps) ? '#e2e8f0' : '#0f172a' }}
                         >
                             <Text 
                                 className="text-[15px] font-black"
-                                style={{ color: (saving || !newAddressText.trim() || !newGps) ? '#94a3b8' : '#ffffff' }}
+                                style={{ color: (saving || !newGps) ? '#94a3b8' : '#ffffff' }}
                             >
                                 {saving ? 'Processing...' : 'Proceed to Checkout'}
                             </Text>

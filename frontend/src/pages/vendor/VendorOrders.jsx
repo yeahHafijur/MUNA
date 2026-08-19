@@ -195,6 +195,18 @@ const VendorOrders = () => {
                 </div>
             )}
 
+            {/* Call Customer */}
+            {order.customerId?.phone && order.status !== 'delivered' && order.status !== 'cancelled' && (
+                <a
+                    href={`tel:${order.customerId.phone}`}
+                    className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-center gap-2 no-underline hover:bg-blue-100 transition-colors cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <span className="text-[16px]">📞</span>
+                    <span className="text-[13px] font-bold text-blue-800">Call Customer</span>
+                </a>
+            )}
+
             <div className="pt-3 mt-1 border-t border-slate-50 flex gap-2">
                 {updatingStatusId === order._id ? (
                     <div className="w-full py-3 flex justify-center items-center gap-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-400">

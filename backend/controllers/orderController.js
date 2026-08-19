@@ -256,7 +256,11 @@ const getCustomerOrders = async (req, res) => {
         const total = await Order.countDocuments(filter);
         
         const orders = await Order.find(filter)
-            .populate('shopId', 'name address image')
+            .populate({
+                path: 'shopId',
+                select: 'name address image vendorId',
+                populate: { path: 'vendorId', select: 'phone' }
+            })
             .populate('items.productId', 'image')
             .sort('-createdAt')
             .skip((page - 1) * limit)

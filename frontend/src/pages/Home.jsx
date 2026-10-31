@@ -41,8 +41,14 @@ const Home = () => {
 
     /* ── Fetch Data ── */
     const { data: shops = [], isLoading: loading } = useQuery({
-        queryKey: ['shops'],
-        queryFn: () => fetch('/api/shops', { credentials: 'include' }).then(r => r.json()),
+        queryKey: ['shops', userLocation?.lat, userLocation?.lng],
+        queryFn: () => {
+            let url = '/api/shops';
+            if (userLocation?.lat && userLocation?.lng) {
+                url += `?lat=${userLocation.lat}&lng=${userLocation.lng}`;
+            }
+            return fetch(url, { credentials: 'include' }).then(r => r.json());
+        },
     });
 
     const { data: featuredProducts = [] } = useQuery({
@@ -119,12 +125,11 @@ const Home = () => {
             return { ...shop, distance };
         });
 
-        // HIDE SHOPS THAT ARE MORE THAN 25 KM AWAY
+        // DYNAMIC DELIVERY RADIUS: Shop only visible within its configured maxRange (default 5 km)
         list = list.filter(shop => {
             if (userLocation) {
-                // If user location is known, only allow shops within 25km.
-                // This correctly hides shops without coordinates (distance = Infinity)
-                return shop.distance <= 25;
+                const maxRange = shop.deliverySettings?.maxRange ?? 5;
+                return shop.distance <= maxRange;
             }
             return true;
         });

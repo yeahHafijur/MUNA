@@ -17,8 +17,14 @@ const AllStores = () => {
 
     /* ── Fetch Data ── */
     const { data: shopsData = [], isLoading: loading } = useQuery({
-        queryKey: ['shops'],
-        queryFn: () => fetch('/api/shops', { credentials: 'include' }).then(r => r.json()),
+        queryKey: ['shops', userLocation?.lat, userLocation?.lng],
+        queryFn: () => {
+            let url = '/api/shops';
+            if (userLocation?.lat && userLocation?.lng) {
+                url += `?lat=${userLocation.lat}&lng=${userLocation.lng}`;
+            }
+            return fetch(url, { credentials: 'include' }).then(r => r.json());
+        },
     });
     const shops = Array.isArray(shopsData) ? shopsData : [];
 
@@ -46,6 +52,13 @@ const AllStores = () => {
             }
             return { ...shop, distance };
         });
+
+        if (userLocation) {
+            list = list.filter(shop => {
+                const maxRange = shop.deliverySettings?.maxRange ?? 5;
+                return shop.distance <= maxRange;
+            });
+        }
 
         if (activeCategory !== 'All') {
             list = list.filter(s => (s.category || 'Grocery') === activeCategory);

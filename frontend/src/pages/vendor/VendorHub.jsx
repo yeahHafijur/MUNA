@@ -295,6 +295,9 @@ const VendorHub = () => {
                             <div className="relative">
                                 <input type="number" required value={maxDeliveryRange} onChange={(e) => setMaxDeliveryRange(e.target.value)} className="peer w-full pt-5 pb-2 px-4 bg-slate-50 border-2 border-transparent rounded-[16px] text-[15px] text-slate-900 font-bold focus:outline-none focus:border-amber-400 focus:bg-white transition-all placeholder-transparent" placeholder="Max Range" />
                                 <label className="absolute left-4 top-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest peer-focus:-translate-y-1.5 peer-focus:text-amber-500 transition-all peer-placeholder-shown:translate-y-1 peer-placeholder-shown:text-[13px] peer-placeholder-shown:normal-case">Max Range (KM)</label>
+                                <p className="text-[10px] font-medium text-slate-500 mt-1 px-1">
+                                    💡 Aapki dukan is radius ke andar aane wale customers ko hi dikhegi.
+                                </p>
                             </div>
                             <button type="submit" disabled={isSaving} className="w-full mt-2 p-3.5 bg-amber-400 text-slate-900 rounded-[16px] font-black text-[14px] active:scale-[0.98] transition-transform shadow-[0_4px_14px_rgba(251,191,36,0.3)] disabled:opacity-70">
                                 {isSaving ? 'Saving...' : 'Save Rules'}

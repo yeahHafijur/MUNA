@@ -4,12 +4,97 @@ const { getDistanceFromLatLonInKm } = require('../utils/geo');
 
 const getAllShops = async (req, res) => {
     try {
-        let filter = { isActive: true }; // Only active shops by default
-        let query = Shop.find(filter).select('name address image category isOpen location rating udyamNumber').limit(1000);
-        const shops = await query.lean();
+        const { lat, lng } = req.query;
+        const parsedLat = parseFloat(lat);
+        const parsedLng = parseFloat(lng);
+        const hasLocation = !isNaN(parsedLat) && !isNaN(parsedLng);
+
+        // If coordinates provided, filter by shop's dynamic delivery range ($geoNear + maxRange)
+        if (hasLocation) {
+            try {
+                const pipeline = [
+                    {
+                        $geoNear: {
+                            near: { type: 'Point', coordinates: [parsedLng, parsedLat] },
+                            distanceField: 'distance', // Distance in kilometers
+                            distanceMultiplier: 0.001, // Convert meters to km
+                            query: { isActive: true },
+                            spherical: true
+                        }
+                    },
+                    {
+                        $match: {
+                            $expr: {
+                                $lte: [
+                                    '$distance',
+                                    { $ifNull: ['$deliverySettings.maxRange', 5] }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            name: 1,
+                            address: 1,
+                            image: 1,
+                            category: 1,
+                            isOpen: 1,
+                            location: 1,
+                            rating: 1,
+                            udyamNumber: 1,
+                            deliverySettings: 1,
+                            distance: 1
+                        }
+                    },
+                    {
+                        $sort: { isOpen: -1, distance: 1 }
+                    },
+                    {
+                        $limit: 1000
+                    }
+                ];
+
+                const shops = await Shop.aggregate(pipeline);
+                return res.status(200).json(shops);
+            } catch (geoError) {
+                console.warn('GeoNear aggregation fallback:', geoError.message);
+                // Resilient fallback to in-memory Haversine calculation
+                const allShops = await Shop.find({ isActive: true })
+                    .select('name address image category isOpen location rating udyamNumber deliverySettings')
+                    .lean();
+
+                const filteredShops = allShops
+                    .map(s => {
+                        const coords = s.location?.coordinates;
+                        const dist = (coords && coords.length === 2)
+                            ? getDistanceFromLatLonInKm(parsedLat, parsedLng, coords[1], coords[0])
+                            : Infinity;
+                        return { ...s, distance: dist };
+                    })
+                    .filter(s => {
+                        const maxRange = s.deliverySettings?.maxRange || 5;
+                        return s.distance <= maxRange;
+                    })
+                    .sort((a, b) => {
+                        if (a.isOpen !== b.isOpen) return a.isOpen ? -1 : 1;
+                        return a.distance - b.distance;
+                    });
+
+                return res.status(200).json(filteredShops);
+            }
+        }
+
+        // Default: If no coordinates provided (GPS disabled/denied), return active shops with deliverySettings
+        const shops = await Shop.find({ isActive: true })
+            .select('name address image category isOpen location rating udyamNumber deliverySettings')
+            .sort({ isOpen: -1 })
+            .limit(1000)
+            .lean();
+
         res.status(200).json(shops);
     } catch (error) {
-        res.status(500).json({ message: "Server Error" })
+        console.error('getAllShops error:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
